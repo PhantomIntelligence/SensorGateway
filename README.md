@@ -1,2 +1,2 @@
-# CANToUDPGateway
-Communication gateway between CAN and UDP protocols
+# SpiritSensorGateway
+Communication gateway between Spirit and differents Sensors.
