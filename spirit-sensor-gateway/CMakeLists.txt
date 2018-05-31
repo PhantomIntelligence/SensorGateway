@@ -1,23 +1,12 @@
 configure_file(config.h.in "${CMAKE_CURRENT_BINARY_DIR}/config.h" @ONLY)
 
-############  Perdition files   ###############
+############  SpiritSensorGateway files   ###############
 
 # Select all the source and header files
-file(GLOB COMMON_FILES "${CMAKE_CURRENT_SOURCE_DIR}/common/*")
-file(GLOB BACKEND_FILES "${CMAKE_CURRENT_SOURCE_DIR}/backend/*")
-file(GLOB FRONTEND_FILES "${CMAKE_CURRENT_SOURCE_DIR}/frontend/*")
+file(GLOB SRC_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/*")
 
-add_library(${PROJECT_NAME} SHARED ${COMMON_FILES} ${BACKEND_FILES} ${FRONTEND_FILES} config.h.in)
-
-
-########### SDL #######################################
-find_package(SDL2 REQUIRED)
-find_package(SDL2_image REQUIRED)
-include_directories(${SDL2_INCLUDE_DIRS})
-include_directories(${SDL2_IMAGE_INCLUDE_DIRS})
-#######################################################
-
-target_link_libraries(${PROJECT_NAME} ${SDL2_LIBRARIES} ${SDL2_IMAGE_LIBRARIES})
+add_library(${PROJECT_NAME} SHARED ${SRC_FILES} config.h.in)
+#add_library(${PROJECT_NAME} SHARED config.h.in)
 
 ########## CONAN ######################################
 if(EXISTS ${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
@@ -30,9 +19,6 @@ else()
     message(WARNING "The file conanbuildinfo.cmake doesn't exist, you have to run conan install first")
 endif()
 #######################################################
-
-## LIVE_SOURCE_DIR is the live test directory, name set in main CMakeLists.txt
-file(COPY assets DESTINATION ${CMAKE_BINARY_DIR}/${LIVE_SOURCE_DIR})
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
                       PUBLIC_HEADER "${HEADER_FILES};${CMAKE_CURRENT_BINARY_DIR}/config.h")
