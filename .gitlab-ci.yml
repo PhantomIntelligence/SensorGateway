@@ -1,0 +1,4 @@
+image: gcc
+
+build:
+  stage: build
