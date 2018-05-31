@@ -3,10 +3,9 @@ configure_file(config.h.in "${CMAKE_CURRENT_BINARY_DIR}/config.h" @ONLY)
 ############  SpiritSensorGateway files   ###############
 
 # Select all the source and header files
-#file(GLOB SRC_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/*")
+file(GLOB SRC_FILES "${CMAKE_CURRENT_SOURCE_DIR}/dummy/*")
 
-#add_library(${PROJECT_NAME} SHARED ${SRC_FILES} config.h.in)
-add_library(${PROJECT_NAME} SHARED config.h.in)
+add_library(${PROJECT_NAME} SHARED ${SRC_FILES} config.h.in)
 
 ########## CONAN ######################################
 if(EXISTS ${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
