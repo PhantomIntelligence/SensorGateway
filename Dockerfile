@@ -18,5 +18,7 @@ RUN git clone https://aur.archlinux.org/packer.git && \
 RUN packer --noconfirm --noedit conan
 
 # Install the SpiritSensorGateway
-RUN cmake
+RUN cmake --build $PWD/cmake-build-debug --target runtests -- -j 4
+
+CMD ['ls && ./cmake-build-debug/test/runtests']
 
