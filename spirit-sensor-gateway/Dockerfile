@@ -12,8 +12,7 @@ RUN pacman --noconfirm -S git cmake tar
 
 # Install packer to ease aur installation
 RUN git clone https://aur.archlinux.org/packer.git && \
-    tar -xvf packer.tar.gz && \
     cd packer && \
     makepkg -sirc && \
-    cd .. && ls
+    cd .. && rm -r packer
 
