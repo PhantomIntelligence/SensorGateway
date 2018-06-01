@@ -8,11 +8,14 @@ RUN reflector --latest 100 --save /etc/pacman.d/mirrorlist
 RUN pacman --noconfirm -Syyu
 
 # Install necessary programs
-RUN pacman --noconfirm -S git cmake tar
+RUN pacman --noconfirm -S git cmake
 
 # Install packer to ease aur installation
 RUN git clone https://aur.archlinux.org/packer.git && \
     cd packer && \
     makepkg -sirc && \
     cd .. && rm -r packer
+
+# Install conan & its dependencies
+RUN packer --noconfirm --noedit conan
 
