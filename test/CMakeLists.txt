@@ -9,13 +9,13 @@ include_directories(SYSTEM ${GOOGLE_TEST_DIR}/googlemock/include)
 
 # Add SpiritSensorGateway files
 # Select all the test and source files
-file(GLOB TEST_FILES "${CMAKE_CURRENT_SOURCE_DIR}/testsuite/*")
+file(GLOB TEST_FILES "${CMAKE_CURRENT_SOURCE_DIR}/test-suite/*")
 
 # Include Mocks
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/mock")
 
 # Include unfiled of higher hierarchy files
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}/testsuite")
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/test-suite")
 
 # Add all the test and mock files to the executable
 add_executable(runtests ${TEST_FILES})

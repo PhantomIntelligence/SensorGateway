@@ -2083,7 +2083,7 @@ static const char* const kReservedTestSuitesAttributes[] = {
   "timestamp"
 };
 
-// The list of reserved attributes used in the <testsuite> element of XML
+// The list of reserved attributes used in the <test-suite> element of XML
 // output.
 static const char* const kReservedTestSuiteAttributes[] = {
   "disabled",
@@ -2113,7 +2113,7 @@ static std::vector<std::string> GetReservedAttributesForElement(
     const std::string& xml_element) {
   if (xml_element == "testsuites") {
     return ArrayAsVector(kReservedTestSuitesAttributes);
-  } else if (xml_element == "testsuite") {
+  } else if (xml_element == "test-suite") {
     return ArrayAsVector(kReservedTestSuiteAttributes);
   } else if (xml_element == "testcase") {
     return ArrayAsVector(kReservedTestCaseAttributes);
@@ -3536,14 +3536,14 @@ std::string XmlUnitTestResultPrinter::RemoveInvalidXmlCharacters(
 // This is how Google Test concepts map to the DTD:
 //
 // <testsuites name="AllTests">        <-- corresponds to a UnitTest object
-//   <testsuite name="testcase-name">  <-- corresponds to a TestCase object
+//   <test-suite name="testcase-name">  <-- corresponds to a TestCase object
 //     <testcase name="test-name">     <-- corresponds to a TestInfo object
 //       <failure message="...">...</failure>
 //       <failure message="...">...</failure>
 //       <failure message="...">...</failure>
 //                                     <-- individual assertion failures
 //     </testcase>
-//   </testsuite>
+//   </test-suite>
 // </testsuites>
 
 // Formats the given time in milliseconds as seconds.
@@ -3674,7 +3674,7 @@ void XmlUnitTestResultPrinter::OutputXmlTestInfo(::std::ostream* stream,
 // Prints an XML representation of a TestCase object
 void XmlUnitTestResultPrinter::PrintXmlTestCase(std::ostream* stream,
                                                 const TestCase& test_case) {
-  const std::string kTestsuite = "testsuite";
+  const std::string kTestsuite = "test-suite";
   *stream << "  <" << kTestsuite;
   OutputXmlAttribute(stream, kTestsuite, "name", test_case.name());
   OutputXmlAttribute(stream, kTestsuite, "tests",
@@ -4377,7 +4377,7 @@ void UnitTestImpl::RecordProperty(const TestProperty& test_property) {
     xml_element = "testcase";
     test_result = &(current_test_info_->result_);
   } else if (current_test_case_ != NULL) {
-    xml_element = "testsuite";
+    xml_element = "test-suite";
     test_result = &(current_test_case_->ad_hoc_test_result_);
   } else {
     xml_element = "testsuites";
