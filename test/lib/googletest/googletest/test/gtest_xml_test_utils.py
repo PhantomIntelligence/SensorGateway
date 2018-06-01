@@ -109,7 +109,7 @@ class GTestXMLTestCase(gtest_test_utils.TestCase):
 
   identifying_attribute = {
     'testsuites': 'name',
-    'testsuite': 'name',
+    'test-suite': 'name',
     'testcase':  'name',
     'failure':   'message',
     }
@@ -118,7 +118,7 @@ class GTestXMLTestCase(gtest_test_utils.TestCase):
     """
     Fetches all of the child nodes of element, a DOM Element object.
     Returns them as the values of a dictionary keyed by the IDs of the
-    children.  For <testsuites>, <testsuite> and <testcase> elements, the ID
+    children.  For <testsuites>, <test-suite> and <testcase> elements, the ID
     is the value of their "name" attribute; for <failure> elements, it is
     the value of the "message" attribute; CDATA sections and non-whitespace
     text nodes are concatenated into a single CDATA section with ID
@@ -152,7 +152,7 @@ class GTestXMLTestCase(gtest_test_utils.TestCase):
     Normalizes Google Test's XML output to eliminate references to transient
     information that may change from run to run.
 
-    *  The "time" attribute of <testsuites>, <testsuite> and <testcase>
+    *  The "time" attribute of <testsuites>, <test-suite> and <testcase>
        elements is replaced with a single asterisk, if it contains
        only digit characters.
     *  The "timestamp" attribute of <testsuites> elements is replaced with a
@@ -171,7 +171,7 @@ class GTestXMLTestCase(gtest_test_utils.TestCase):
       timestamp = element.getAttributeNode('timestamp')
       timestamp.value = re.sub(r'^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d$',
                                '*', timestamp.value)
-    if element.tagName in ('testsuites', 'testsuite', 'testcase'):
+    if element.tagName in ('testsuites', 'test-suite', 'testcase'):
       time = element.getAttributeNode('time')
       time.value = re.sub(r'^\d+(\.\d+)?$', '*', time.value)
       type_param = element.getAttributeNode('type_param')
