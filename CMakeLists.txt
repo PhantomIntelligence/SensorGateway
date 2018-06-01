@@ -9,7 +9,7 @@ project(${PROJECT_NAME} CXX)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake-module/")
 
 # For more information on how the CMake-related files were created:
-# https://cmake.org/Wiki/CMake/Tutorials/How_to_create_a_ProjectConfig.cmake_file
+# https://gitlab.kitware.com/cmake/community/wikis/doc/tutorials/How-to-create-a-ProjectConfig.cmake-file
 
 
 set(${PROJECT_NAME}_MAJOR_VERSION 0)
