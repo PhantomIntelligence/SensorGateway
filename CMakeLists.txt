@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.8)
 
 set(PROJECT_NAME SpiritSensorGateway)
-set(LIVE_SOURCE_DIR "live")
-set(LIVE_NAME "Live")
+set(LIVE_SOURCE_DIR "app")
+set(LIVE_NAME "App")
 
 project(${PROJECT_NAME} CXX)
 

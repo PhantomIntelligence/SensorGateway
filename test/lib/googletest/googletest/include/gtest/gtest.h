@@ -415,7 +415,7 @@ class GTEST_API_ Test {
   // moment its destructor finishes) will be output in XML as attributes of
   // the <testcase> element.  Properties recorded from fixture's
   // SetUpTestCase or TearDownTestCase are logged as attributes of the
-  // corresponding <testsuite> element.  Calls to RecordProperty made in the
+  // corresponding <test-suite> element.  Calls to RecordProperty made in the
   // global context (before or after invocation of RUN_ALL_TESTS and from
   // SetUp/TearDown method of Environment objects registered with Google
   // Test) will be output as attributes of the <testsuites> element.
