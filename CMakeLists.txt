@@ -8,9 +8,14 @@ project(${PROJECT_NAME} CXX)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake-module/")
 
+message(STATUS "-------> CMAKE_CURRENT_BINARY_DIR:${CMAKE_CURRENT_BINARY_DIR}")
+message(STATUS "-------> CMAKE_CURRENT_SOURCE_DIR:${CMAKE_CURRENT_SOURCE_DIR}")
+message(STATUS "-------> CMAKE_FILES_DIRECTORY:${CMAKE_FILES_DIRECTORY}")
+message(STATUS "-------> CMAKE_BINARY_DIR:${CMAKE_BINARY_DIR}")
+message(STATUS "-------> CMAKE_SOURCE_DIR:${CMAKE_SOURCE_DIR}")
+
 # For more information on how the CMake-related files were created:
 # https://gitlab.kitware.com/cmake/community/wikis/doc/tutorials/How-to-create-a-ProjectConfig.cmake-file
-
 
 set(${PROJECT_NAME}_MAJOR_VERSION 0)
 set(${PROJECT_NAME}_MINOR_VERSION 0)
