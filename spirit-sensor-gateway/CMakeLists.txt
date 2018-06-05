@@ -12,7 +12,7 @@ if(EXISTS ${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
     include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
     conan_basic_setup(TARGETS)
 
-    message(STATUS "Linking: ${CONAN_LIBS}")
+    message(STATUS "Linking the following libs from conan: ${CONAN_LIBS}")
     conan_target_link_libraries(${PROJECT_NAME})
 else()
     message(WARNING "The file conanbuildinfo.cmake doesn't exist, you have to run conan install first")
