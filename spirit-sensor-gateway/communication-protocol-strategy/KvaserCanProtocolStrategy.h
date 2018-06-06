@@ -17,8 +17,6 @@
 #include "CommunicationProtocolStrategy.h"
 
 class KvaserCanProtocolStrategy : public CommunicationProtocolStrategy {
-    public:
-    KvaserCanProtocolStrategy(void);
     private:
         std::string unwrap(std::vector<unsigned int> binaryFrame);
 };

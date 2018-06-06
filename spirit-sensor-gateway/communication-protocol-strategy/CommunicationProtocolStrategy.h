@@ -15,12 +15,11 @@
 #define SPIRITSENSORGATEWAY_COMMUNICATIONPROTOCOLSTRATEGY_H
 
 #include <string>
+#include <vector>
 
 class CommunicationProtocolStrategy {
-public:
-    CommunicationProtocolStrategy(void);
-private:
-    virtual std::string unwrap(std::vector<unsigned int> binaryFrame) = 0;
+    private:
+        virtual std::string unwrap(std::vector<unsigned int> binaryFrame) = 0;
 };
 
 

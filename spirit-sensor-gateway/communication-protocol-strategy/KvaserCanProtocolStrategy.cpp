@@ -12,13 +12,9 @@
 */
 
 #include "KvaserCanProtocolStrategy.h"
-#include <canlib.h>
-
-KvaserCanProtocolStrategy::KvaserCanProtocolStrategy(): CommunicationProtocolStrategy() {}
 
 
 std::string  KvaserCanProtocolStrategy::unwrap(std::vector<unsigned int> binaryFrame){
-    canInitializeLibrary();
     // Todo call CanLib library
 
 }
