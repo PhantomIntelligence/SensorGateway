@@ -4,8 +4,9 @@ configure_file(config.h.in "${CMAKE_CURRENT_BINARY_DIR}/config.h" @ONLY)
 
 # Select all the source and header files
 file(GLOB SRC_FILES "${CMAKE_CURRENT_SOURCE_DIR}/dummy/*")
+file(GLOB PROTOCOL_WRAPPER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/protocol-wrapper/*")
 
-add_library(${PROJECT_NAME} SHARED ${SRC_FILES} config.h.in)
+add_library(${PROJECT_NAME} SHARED ${SRC_FILES} ${PROTOCOL_WRAPPER_FILES} config.h.in)
 
 ########## CONAN ######################################
 if(EXISTS ${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
