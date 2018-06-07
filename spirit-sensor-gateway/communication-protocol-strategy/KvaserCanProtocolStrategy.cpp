@@ -15,7 +15,14 @@
 #include <canlib.h>
 
 KvaserCanProtocolStrategy::KvaserCanProtocolStrategy() {
+    initializeCanConnection();
+}
+
+void KvaserCanProtocolStrategy::initializeCanConnection() {
     canInitializeLibrary();
+    canHandle canCircuitHandle = canOpenChannel(0, canOPEN_EXCLUSIVE);
+    canSetBusParams(canCircuitHandle, canBITRATE_1M, 0, 0, 0, 0, 0);
+    canBusOn(canCircuitHandle);
 }
 
 std::string  KvaserCanProtocolStrategy::unwrap(std::vector<unsigned int> binaryFrame){

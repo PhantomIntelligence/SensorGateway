@@ -21,6 +21,7 @@ class KvaserCanProtocolStrategy : public CommunicationProtocolStrategy {
         KvaserCanProtocolStrategy();
     private:
         std::string unwrap(std::vector<unsigned int> binaryFrame);
+        void initializeCanConnection();
 };
 
 
