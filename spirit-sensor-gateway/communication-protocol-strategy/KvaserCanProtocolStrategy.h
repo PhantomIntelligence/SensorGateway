@@ -15,9 +15,10 @@
 #define SPIRITSENSORGATEWAY_KVASERCANPROTOCOLSTRATEGY_H
 
 #include "CommunicationProtocolStrategy.h"
-#include <canlib.h>
 
 class KvaserCanProtocolStrategy : public CommunicationProtocolStrategy {
+    public:
+        KvaserCanProtocolStrategy();
     private:
         std::string unwrap(std::vector<unsigned int> binaryFrame);
 };
