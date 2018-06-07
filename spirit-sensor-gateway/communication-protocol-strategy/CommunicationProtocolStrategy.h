@@ -20,7 +20,7 @@
 
 namespace CommunicationProtocolStrategy {
     class CommunicationProtocolStrategy {
-    private:
+    public:
         virtual AWLMessage unwrapMessage() = 0;
     };
 }

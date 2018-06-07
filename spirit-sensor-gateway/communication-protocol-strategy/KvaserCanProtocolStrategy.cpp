@@ -54,7 +54,3 @@ AWLMessage KvaserCanProtocolStrategy::convertCanMessageToAwlMessage(CanMessage c
 
     return awlMessage;
 }
-
-
-
-

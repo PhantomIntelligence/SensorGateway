@@ -3,8 +3,10 @@
 # Select all the test and source files
 file(GLOB LIVE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/*")
 
+
+
 # Add all the test and mock files to the executable
-add_executable(${LIVE_NAME} ${LIVE_FILES})
+add_executable(${LIVE_NAME} ${LIVE_FILES} UnwrappingMessageTest.cpp)
 
 find_package(SpiritSensorGateway)
 target_link_libraries(${LIVE_NAME} ${SpiritSensorGateway_LIBRARIES} ${CONAN_LIBS})
