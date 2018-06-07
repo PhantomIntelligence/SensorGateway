@@ -13,7 +13,6 @@
 
 #include "KvaserCanProtocolStrategy.h"
 
-
 std::string  KvaserCanProtocolStrategy::unwrap(std::vector<unsigned int> binaryFrame){
     // Todo call CanLib library
 

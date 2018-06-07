@@ -15,6 +15,7 @@
 #define SPIRITSENSORGATEWAY_KVASERCANPROTOCOLSTRATEGY_H
 
 #include "CommunicationProtocolStrategy.h"
+#include <canlib.h>
 
 class KvaserCanProtocolStrategy : public CommunicationProtocolStrategy {
     private:
