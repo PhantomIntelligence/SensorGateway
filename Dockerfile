@@ -7,10 +7,9 @@ RUN pacman --noconfirm -Syyu && \
     reflector --latest 100 --save /etc/pacman.d/mirrorlist && \
     pacman --noconfirm -S sed wget git cmake jshon expac python-pip python-pyjwt python2-setuptools python-setuptools python-yaml python-fasteners python-bottle python-pylint python-future python-pygments python-astroid python-deprecation
 
+# Needed to install 
 RUN pacman --noconfirm -Syyu &&\
     pacman --noconfirm -S base-devel linux-headers 
-
-RUN ls -lAh /lib/modules/
 
 # Versioning problem with urllib3. Check if conan still needs this dependency
 RUN pip install --force-reinstall msgpack-python urllib3==1.21.1
@@ -29,8 +28,7 @@ RUN wget http://canlandbucket.s3-website-eu-west-1.amazonaws.com/productionResou
     tar -xzf linuxcan.tar.gz &&\
     cd linuxcan &&\
     ln -s /lib/modules/`ls --format=single-column --color=never /lib/modules | grep -v extra` /lib/modules/`uname -r` &&\
-    ls /lib/modules/ -lAh &&\ 
-    make 
+    make && make install
 
 
 ENTRYPOINT sed -i 's?/.*/SpiritSensorGateway?'`pwd`'?g' cmake-build-debug/CMakeCache.txt &&\
