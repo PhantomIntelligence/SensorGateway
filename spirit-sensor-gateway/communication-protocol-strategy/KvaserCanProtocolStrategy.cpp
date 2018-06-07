@@ -15,16 +15,6 @@
 
 using CommunicationProtocolStrategy::KvaserCanProtocolStrategy;
 
-namespace CommunicationProtocolStrategy{
-    struct KvaserCanMessage {
-        long id;
-        unsigned long timestamp;
-        unsigned int flags;
-        unsigned int length;
-        uint8_t data[0];
-    };
-}
-
 
 KvaserCanProtocolStrategy::KvaserCanProtocolStrategy(): canCircuitHandle(initializeCanConnection()){
 
@@ -44,17 +34,15 @@ canHandle KvaserCanProtocolStrategy::initializeCanConnection() {
     return canCircuitHandle;
 }
 
-
 AWLMessage KvaserCanProtocolStrategy::unwrapMessage(){
-    KvaserCanMessage canMessage{};
+    CanMessage canMessage{};
     canRead(canCircuitHandle, &canMessage.id, &canMessage.data, &canMessage.length, &canMessage.flags, &canMessage.timestamp);
-
-    return convertCanMessageToAWLMessage(canMessage);
+    return convertCanMessageToAwlMessage(canMessage);
 }
 
-AWLMessage KvaserCanProtocolStrategy::convertCanMessageToAWLMessage(KvaserCanMessage canMessage) {
-
+AWLMessage KvaserCanProtocolStrategy::convertCanMessageToAwlMessage(CanMessage canMessage) {
     AWLMessage awlMessage{};
+
     awlMessage.messageID = static_cast<unsigned64BitsData>(canMessage.id);
     awlMessage.messageLength = static_cast<unsigned8BitsData>(canMessage.length);
     awlMessage.messageFlags = static_cast<unsigned8BitsData >(canMessage.flags);

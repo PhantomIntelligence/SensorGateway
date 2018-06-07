@@ -25,11 +25,17 @@ namespace CommunicationProtocolStrategy {
         ~ KvaserCanProtocolStrategy();
 
     private:
+        struct CanMessage {
+            long id;
+            unsigned long timestamp;
+            unsigned int flags;
+            unsigned int length;
+            uint8_t data[0];
+        };
         canHandle canCircuitHandle;
         AWLMessage unwrapMessage();
-        AWLMessage convertCanMessageToAWLMessage();
+        AWLMessage convertCanMessageToAwlMessage(CanMessage canMessage);
         canHandle initializeCanConnection();
     };
-
 }
 #endif //SPIRITSENSORGATEWAY_KVASERCANPROTOCOLSTRATEGY_H
