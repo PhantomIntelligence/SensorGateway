@@ -17,10 +17,11 @@
 #include <string>
 #include <vector>
 
-class CommunicationProtocolStrategy {
+namespace CommunicationProtocolStrategy {
+    class CommunicationProtocolStrategy {
     private:
         virtual std::string unwrap(std::vector<unsigned int> binaryFrame) = 0;
-};
-
+    };
+}
 
 #endif //SPIRITSENSORGATEWAY_COMMUNICATIONPROTOCOLSTRATEGY_H

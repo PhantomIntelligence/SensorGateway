@@ -15,14 +15,19 @@
 #define SPIRITSENSORGATEWAY_KVASERCANPROTOCOLSTRATEGY_H
 
 #include "CommunicationProtocolStrategy.h"
+#include <canlib.h>
 
-class KvaserCanProtocolStrategy : public CommunicationProtocolStrategy {
+namespace CommunicationProtocolStrategy {
+    class KvaserCanProtocolStrategy : public CommunicationProtocolStrategy {
     public:
         KvaserCanProtocolStrategy();
+        ~ KvaserCanProtocolStrategy();
+
     private:
+        canHandle canCircuitHandle;
         std::string unwrap(std::vector<unsigned int> binaryFrame);
-        void initializeCanConnection();
-};
+        canHandle initializeCanConnection();
+    };
 
-
+}
 #endif //SPIRITSENSORGATEWAY_KVASERCANPROTOCOLSTRATEGY_H

@@ -12,17 +12,23 @@
 */
 
 #include "KvaserCanProtocolStrategy.h"
-#include <canlib.h>
+using CommunicationProtocolStrategy::KvaserCanProtocolStrategy;
 
-KvaserCanProtocolStrategy::KvaserCanProtocolStrategy() {
-    initializeCanConnection();
+KvaserCanProtocolStrategy::KvaserCanProtocolStrategy(): canCircuitHandle(initializeCanConnection()){
+
 }
 
-void KvaserCanProtocolStrategy::initializeCanConnection() {
+KvaserCanProtocolStrategy:: ~KvaserCanProtocolStrategy(){
+    canBusOff(canCircuitHandle);
+    canClose(canCircuitHandle);
+}
+
+canHandle KvaserCanProtocolStrategy::initializeCanConnection() {
     canInitializeLibrary();
     canHandle canCircuitHandle = canOpenChannel(0, canOPEN_EXCLUSIVE);
     canSetBusParams(canCircuitHandle, canBITRATE_1M, 0, 0, 0, 0, 0);
     canBusOn(canCircuitHandle);
+    return canCircuitHandle;
 }
 
 std::string  KvaserCanProtocolStrategy::unwrap(std::vector<unsigned int> binaryFrame){
