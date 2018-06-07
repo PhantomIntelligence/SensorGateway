@@ -1,4 +1,4 @@
-FROM base/devel:latest as build-base
+FROM base/devel:latest
 
 # Update system and install dependencies
 RUN pacman --noconfirm -Syyu && \
@@ -16,16 +16,13 @@ COPY dev-script/aurInstallDependencies /usr/bin/
 RUN chmod a+x /usr/bin/aurInstallDependencies
 RUN /bin/sh -c "aurInstallDependencies"
 
-RUN mkdir /builddir 
+WORKDIR /builddir
 COPY ./ /builddir/
-RUN cd builddir && \
-    sed -i 's?/.*/SpiritSensorGateway?'`pwd`'?g' cmake-build-debug/CMakeCache.txt &&\
-    ls -lAh &&  ./dev-script/conanUpdateDependencies && \
+ENTRYPOINT sed -i 's?/.*/SpiritSensorGateway?'`pwd`'?g' cmake-build-debug/CMakeCache.txt &&\
+    ./dev-script/conanUpdateDependencies &&\
     sed -i s/libstdc++/libstdc++11/g ~/.conan/profiles/default &&\
-    ./dev-script/conanUpdateDependencies && \
+    ./dev-script/conanUpdateDependencies &&\
     sed -i 's?/.*/SpiritSensorGateway?'`pwd`'?g' cmake-build-debug/Makefile &&\
-    cmake --build cmake-build-debug
-
-#CMD ['ls && ./cmake-build-debug/test/runtests']
-CMD ls builddir
+    cmake --build /builddir/cmake-build-debug --target runtests -- -j 4 &&\
+    /builddir/cmake-build-debug/test/runtests
 
