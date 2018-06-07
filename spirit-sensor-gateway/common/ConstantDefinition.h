@@ -11,18 +11,14 @@
 	limitations under the License.
 */
 
-#ifndef SPIRITSENSORGATEWAY_COMMUNICATIONPROTOCOLSTRATEGY_H
-#define SPIRITSENSORGATEWAY_COMMUNICATIONPROTOCOLSTRATEGY_H
+#ifndef SPIRITSENSORGATEWAY_CONSTANTDEFINITION_H
+#define SPIRITSENSORGATEWAY_CONSTANTDEFINITION_H
 
-#include "spirit-sensor-gateway/common/ConstantDefinition.h"
-#include <spirit-sensor-gateway/domain/Message.h>
+#include "TypeDefinition.h"
 
+namespace {
+    const int MESSAGE_DATA_LENGTH = 0;
 
-namespace CommunicationProtocolStrategy {
-    class CommunicationProtocolStrategy {
-    private:
-        virtual AWLMessage unwrapMessage() = 0;
-    };
-}
+};
 
-#endif //SPIRITSENSORGATEWAY_COMMUNICATIONPROTOCOLSTRATEGY_H
+#endif //SPIRITSENSORGATEWAY_CONSTANTDEFINITION_H

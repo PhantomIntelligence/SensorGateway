@@ -12,7 +12,19 @@
 */
 
 #include "KvaserCanProtocolStrategy.h"
+
 using CommunicationProtocolStrategy::KvaserCanProtocolStrategy;
+
+namespace CommunicationProtocolStrategy{
+    struct KvaserCanMessage {
+        long id;
+        unsigned long timestamp;
+        unsigned int flags;
+        unsigned int length;
+        uint8_t data[0];
+    };
+}
+
 
 KvaserCanProtocolStrategy::KvaserCanProtocolStrategy(): canCircuitHandle(initializeCanConnection()){
 
@@ -27,12 +39,34 @@ canHandle KvaserCanProtocolStrategy::initializeCanConnection() {
     canInitializeLibrary();
     canHandle canCircuitHandle = canOpenChannel(0, canOPEN_EXCLUSIVE);
     canSetBusParams(canCircuitHandle, canBITRATE_1M, 0, 0, 0, 0, 0);
+    canSetBusOutputControl(canCircuitHandle, canDRIVER_SILENT);
     canBusOn(canCircuitHandle);
     return canCircuitHandle;
 }
 
-std::string  KvaserCanProtocolStrategy::unwrap(std::vector<unsigned int> binaryFrame){
-    return "messagePayload";
+
+AWLMessage KvaserCanProtocolStrategy::unwrapMessage(){
+    KvaserCanMessage canMessage{};
+    canRead(canCircuitHandle, &canMessage.id, &canMessage.data, &canMessage.length, &canMessage.flags, &canMessage.timestamp);
+
+    return convertCanMessageToAWLMessage(canMessage);
 }
+
+AWLMessage KvaserCanProtocolStrategy::convertCanMessageToAWLMessage(KvaserCanMessage canMessage) {
+
+    AWLMessage awlMessage{};
+    awlMessage.messageID = static_cast<unsigned64BitsData>(canMessage.id);
+    awlMessage.messageLength = static_cast<unsigned8BitsData>(canMessage.length);
+    awlMessage.messageFlags = static_cast<unsigned8BitsData >(canMessage.flags);
+    awlMessage.messageTimestamp = static_cast<unsigned64BitsData >(canMessage.timestamp);
+
+    for (int dataIndex = 0; dataIndex < canMessage.length; ++dataIndex) {
+        awlMessage.messageData[dataIndex] = canMessage.data[dataIndex];
+    }
+
+    return awlMessage;
+}
+
+
 
 

@@ -14,8 +14,9 @@
 #ifndef SPIRITSENSORGATEWAY_KVASERCANPROTOCOLSTRATEGY_H
 #define SPIRITSENSORGATEWAY_KVASERCANPROTOCOLSTRATEGY_H
 
-#include "CommunicationProtocolStrategy.h"
 #include <canlib.h>
+
+#include "CommunicationProtocolStrategy.h"
 
 namespace CommunicationProtocolStrategy {
     class KvaserCanProtocolStrategy : public CommunicationProtocolStrategy {
@@ -25,7 +26,8 @@ namespace CommunicationProtocolStrategy {
 
     private:
         canHandle canCircuitHandle;
-        std::string unwrap(std::vector<unsigned int> binaryFrame);
+        AWLMessage unwrapMessage();
+        AWLMessage convertCanMessageToAWLMessage();
         canHandle initializeCanConnection();
     };
 

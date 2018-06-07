@@ -11,18 +11,17 @@
 	limitations under the License.
 */
 
-#ifndef SPIRITSENSORGATEWAY_COMMUNICATIONPROTOCOLSTRATEGY_H
-#define SPIRITSENSORGATEWAY_COMMUNICATIONPROTOCOLSTRATEGY_H
+#ifndef SPIRITSENSORGATEWAY_MESSAGE_H
+#define SPIRITSENSORGATEWAY_MESSAGE_H
 
-#include "spirit-sensor-gateway/common/ConstantDefinition.h"
-#include <spirit-sensor-gateway/domain/Message.h>
+#include <spirit-sensor-gateway/common/ConstantDefinition.h>
 
+struct AWLMessage {
+    unsigned64BitsData messageID;
+    unsigned64BitsData messageTimestamp;
+    unsigned8BitsData messageFlags;
+    unsigned8BitsData messageLength;
+    unsignedChar messageData[MESSAGE_DATA_LENGTH];
+};
 
-namespace CommunicationProtocolStrategy {
-    class CommunicationProtocolStrategy {
-    private:
-        virtual AWLMessage unwrapMessage() = 0;
-    };
-}
-
-#endif //SPIRITSENSORGATEWAY_COMMUNICATIONPROTOCOLSTRATEGY_H
+#endif //SPIRITSENSORGATEWAY_MESSAGE_H
