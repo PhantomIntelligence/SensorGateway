@@ -6,15 +6,14 @@
 
 int main(){
     std::ofstream outfile ("AWLMessages.txt");
-    KvaserCanProtocolStrategy kvaserCanProtocolStrategy;
+    KvaserCanProtocolStrategy * kvaserCanProtocolStrategy= new KvaserCanProtocolStrategy();
 
     for (int i = 0; i < 11; i++){
-        AWLMessage message = kvaserCanProtocolStrategy.unwrapMessage();
-        outfile << "messageId: " << std::to_string(message.messageID) << " messageFlags: " << message.messageFlags << "" << std::endl;
+        AWLMessage message = kvaserCanProtocolStrategy->unwrapMessage();
+        outfile << "messageId: " << message.messageID << " messageFlags: " << message.messageFlags
+                << "messageData: " << message.messageData  << "messageTimestamp: " << message.messageTimestamp << "messageLength: " << message.messageLength << std::endl;
     }
-
     outfile.close();
     delete kvaserCanProtocolStrategy;
-
     return 0;
 };
