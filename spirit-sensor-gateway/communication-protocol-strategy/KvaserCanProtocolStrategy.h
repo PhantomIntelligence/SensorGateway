@@ -31,7 +31,7 @@ namespace CommunicationProtocolStrategy {
             unsigned long timestamp;
             unsigned int flags;
             unsigned int length;
-            uint8_t data[0];
+            unsigned char data[];
         };
         canHandle canCircuitHandle;
         AWLMessage convertCanMessageToAwlMessage(CanMessage canMessage);

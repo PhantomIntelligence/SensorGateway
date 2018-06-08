@@ -1,20 +1,23 @@
 
 #include "spirit-sensor-gateway/communication-protocol-strategy/KvaserCanProtocolStrategy.cpp"
 #include <iostream>
-#include <fstream>
+#include <cstdio>
 
 
 int main(){
-    std::ofstream outfile ("AWLMessages.txt");
-    KvaserCanProtocolStrategy * kvaserCanProtocolStrategy= new KvaserCanProtocolStrategy();
+    auto file = std::fopen("AWLMessages.txt", "w+");
 
-    for (int i = 0; i < 11; i++){
+    KvaserCanProtocolStrategy * kvaserCanProtocolStrategy = new KvaserCanProtocolStrategy();
+
+    for (int i = 0; i < 10000000; i++){
         AWLMessage message = kvaserCanProtocolStrategy->unwrapMessage();
-        outfile << "messageId: " << message.messageID << " messageFlags: " << message.messageFlags
-                << " messageData: " << std::string(reinterpret_cast<char*> (message.messageData), message.messageLength)  << " messageTimestamp: " << message.messageTimestamp << " messageLength: " << message.messageLength << std::endl;
+        auto test = message.messageData[0];
+//        auto messageData = std::string(reinterpret_cast<char*> (message.messageData), 8* message.messageLength);
+        std::fprintf(file, "messageData:\t%s\t\n", &test);
     }
 
-    outfile.close();
     delete kvaserCanProtocolStrategy;
+    fflush(file);
+    fclose(file);
     return 0;
 };

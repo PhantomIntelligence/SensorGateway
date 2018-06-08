@@ -36,7 +36,7 @@ canHandle KvaserCanProtocolStrategy::initializeCanConnection() {
 
 AWLMessage KvaserCanProtocolStrategy::unwrapMessage(){
     CanMessage canMessage{};
-    canRead(canCircuitHandle, &canMessage.id, &canMessage.data, &canMessage.length, &canMessage.flags, &canMessage.timestamp);
+    canRead(canCircuitHandle, &canMessage.id, canMessage.data, &canMessage.length, &canMessage.flags, &canMessage.timestamp);
     return convertCanMessageToAwlMessage(canMessage);
 }
 
