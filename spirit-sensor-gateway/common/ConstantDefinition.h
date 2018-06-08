@@ -14,9 +14,17 @@
 #ifndef SPIRITSENSORGATEWAY_CONSTANTDEFINITION_H
 #define SPIRITSENSORGATEWAY_CONSTANTDEFINITION_H
 
+#include <iostream>
+
 
 namespace {
-    const int MESSAGE_DATA_LENGTH = 0;
+    using CommandID = uint8_t;
+    int const MESSAGE_DATA_LENGTH = 0;
+    CommandID const TRANSMIT_RAW  = 0xE0;
+    CommandID const TRANSMIT_COOKED = 0xE1;
+    CommandID const FRAME_DONE = 0x09;
+    CommandID const OBSTACLE_TRACK = 0x0A;
+    CommandID const OBSTACLE_VELOCITY = 0x0B;
 
 };
 
