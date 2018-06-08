@@ -43,10 +43,10 @@ AWLMessage KvaserCanProtocolStrategy::unwrapMessage(){
 AWLMessage KvaserCanProtocolStrategy::convertCanMessageToAwlMessage(CanMessage canMessage) {
     AWLMessage awlMessage{};
 
-    awlMessage.messageID = static_cast<unsigned64BitsData>(canMessage.id);
-    awlMessage.messageLength = static_cast<unsigned8BitsData>(canMessage.length);
-    awlMessage.messageFlags = static_cast<unsigned8BitsData >(canMessage.flags);
-    awlMessage.messageTimestamp = static_cast<unsigned64BitsData >(canMessage.timestamp);
+    awlMessage.messageID = static_cast<uint64_t>(canMessage.id);
+    awlMessage.messageLength = static_cast<uint8_t>(canMessage.length);
+    awlMessage.messageFlags = static_cast<uint8_t>(canMessage.flags);
+    awlMessage.messageTimestamp = static_cast<uint64_t>(canMessage.timestamp);
 
     for (int dataIndex = 0; dataIndex < canMessage.length; ++dataIndex) {
         awlMessage.messageData[dataIndex] = canMessage.data[dataIndex];
