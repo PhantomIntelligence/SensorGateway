@@ -11,8 +11,9 @@ int main(){
     for (int i = 0; i < 11; i++){
         AWLMessage message = kvaserCanProtocolStrategy->unwrapMessage();
         outfile << "messageId: " << message.messageID << " messageFlags: " << message.messageFlags
-                << "messageData: " << message.messageData  << "messageTimestamp: " << message.messageTimestamp << "messageLength: " << message.messageLength << std::endl;
+                << " messageData: " << std::string(reinterpret_cast<char*> (message.messageData), message.messageLength)  << " messageTimestamp: " << message.messageTimestamp << " messageLength: " << message.messageLength << std::endl;
     }
+
     outfile.close();
     delete kvaserCanProtocolStrategy;
     return 0;
