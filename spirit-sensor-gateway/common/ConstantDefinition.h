@@ -18,7 +18,7 @@
 
 
 namespace {
-    using CommandID = uint8_t;
+    using CommandID = uint16_t;
     int const MESSAGE_DATA_LENGTH = 0;
     CommandID const TRANSMIT_RAW  = 0xE0;
     CommandID const TRANSMIT_COOKED = 0xE1;

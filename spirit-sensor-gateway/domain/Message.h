@@ -23,5 +23,26 @@ struct AWLMessage {
     uint64_t messageLength;
     unsigned char messageData[MESSAGE_DATA_LENGTH];
 };
+struct AWLFrameDoneMessage {
+    uint16_t frameID;
+    uint16_t systemID;
+    uint32_t systemErrorFlag;
+
+};
+struct AWLObstacleTrackMessage {
+    uint16_t trackingId;
+    uint8_t obstacleSensor;
+    uint16_t obstaclePixel;
+    uint8_t trackProbability;
+    uint16_t objectIntensity;
+};
+struct AWLObstacleVelocityMessage {
+    uint16_t trackingId;
+    uint16_t trackDistance;
+    int16_t trackSpeed;
+    int16_t trackAcceleration ;
+
+
+};
 
 #endif //SPIRITSENSORGATEWAY_MESSAGE_H
