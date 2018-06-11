@@ -44,11 +44,10 @@ AWLMessage KvaserCanProtocolStrategy::convertCanMessageToAwlMessage(CanMessage c
     AWLMessage awlMessage{};
 
     awlMessage.messageID = static_cast<uint64_t>(canMessage.id);
-    awlMessage.messageLength = static_cast<uint64_t>(canMessage.length);
-    awlMessage.messageFlags = static_cast<uint64_t>(canMessage.flags);
-    awlMessage.messageTimestamp = static_cast<uint64_t>(canMessage.timestamp);
+    awlMessage.messageTimestamp = canMessage.timestamp;
+    awlMessage.messageLength = static_cast<uint8_t>(canMessage.length);
 
-    for (int dataIndex = 0; dataIndex < canMessage.length; ++dataIndex) {
+    for (int dataIndex = 0; dataIndex < MESSAGE_DATA_LENGTH_IN_BYTES; ++dataIndex) {
         awlMessage.messageData[dataIndex] = canMessage.data[dataIndex];
     }
 

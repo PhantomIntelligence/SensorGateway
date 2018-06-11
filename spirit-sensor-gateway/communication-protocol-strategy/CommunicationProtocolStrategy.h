@@ -14,8 +14,7 @@
 #ifndef SPIRITSENSORGATEWAY_COMMUNICATIONPROTOCOLSTRATEGY_H
 #define SPIRITSENSORGATEWAY_COMMUNICATIONPROTOCOLSTRATEGY_H
 
-#include "spirit-sensor-gateway/common/ConstantDefinition.h"
-#include <spirit-sensor-gateway/domain/Message.h>
+#include "spirit-sensor-gateway/domain/Message.h"
 
 
 namespace CommunicationProtocolStrategy {

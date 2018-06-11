@@ -14,9 +14,9 @@
 #ifndef SPIRITSENSORGATEWAY_CONSTANTDEFINITION_H
 #define SPIRITSENSORGATEWAY_CONSTANTDEFINITION_H
 
-
+//#include "TypeDefinition.h"
 namespace {
-    const int MESSAGE_DATA_LENGTH = 0;
+    const int MESSAGE_DATA_LENGTH_IN_BYTES = 0;
 
 };
 
