@@ -23,6 +23,7 @@ namespace CommunicationProtocolStrategy {
     public:
         KvaserCanProtocolStrategy();
         ~ KvaserCanProtocolStrategy();
+        void closeConnection();
         AWLMessage unwrapMessage();
 
     private:

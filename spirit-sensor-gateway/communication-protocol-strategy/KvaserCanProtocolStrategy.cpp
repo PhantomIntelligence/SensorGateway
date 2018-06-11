@@ -12,6 +12,7 @@
 */
 
 #include "KvaserCanProtocolStrategy.h"
+#include <mutex>
 
 using CommunicationProtocolStrategy::KvaserCanProtocolStrategy;
 
@@ -21,8 +22,7 @@ KvaserCanProtocolStrategy::KvaserCanProtocolStrategy(): canCircuitHandle(initial
 }
 
 KvaserCanProtocolStrategy:: ~KvaserCanProtocolStrategy(){
-    canBusOff(canCircuitHandle);
-    canClose(canCircuitHandle);
+
 }
 
 canHandle KvaserCanProtocolStrategy::initializeCanConnection() {
@@ -36,7 +36,7 @@ canHandle KvaserCanProtocolStrategy::initializeCanConnection() {
 
 AWLMessage KvaserCanProtocolStrategy::unwrapMessage(){
     CanMessage canMessage{};
-    canRead(canCircuitHandle, &canMessage.id, canMessage.data, &canMessage.length, &canMessage.flags, &canMessage.timestamp);
+    canRead(canCircuitHandle, &canMessage.id, &canMessage.data, &canMessage.length, &canMessage.flags, &canMessage.timestamp);
     return convertCanMessageToAwlMessage(canMessage);
 }
 
@@ -53,4 +53,9 @@ AWLMessage KvaserCanProtocolStrategy::convertCanMessageToAwlMessage(CanMessage c
     }
 
     return awlMessage;
+}
+
+void KvaserCanProtocolStrategy::closeConnection() {
+    canBusOff(canCircuitHandle);
+    canClose(canCircuitHandle);
 }

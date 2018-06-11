@@ -9,14 +9,14 @@ int main(){
 
     KvaserCanProtocolStrategy * kvaserCanProtocolStrategy = new KvaserCanProtocolStrategy();
 
-    for (int i = 0; i < 10000000; i++){
+    for (int i = 0; i < 10000; i++){
         AWLMessage message = kvaserCanProtocolStrategy->unwrapMessage();
         auto test = message.messageData[0];
 //        auto messageData = std::string(reinterpret_cast<char*> (message.messageData), 8* message.messageLength);
         std::fprintf(file, "messageData:\t%s\t\n", &test);
     }
 
-    delete kvaserCanProtocolStrategy;
+    kvaserCanProtocolStrategy->closeConnection();
     fflush(file);
     fclose(file);
     return 0;
