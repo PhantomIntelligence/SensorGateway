@@ -29,18 +29,18 @@ struct AWLFrameDoneMessage {
     uint32_t systemErrorFlag;
 
 };
-struct AWLObstacleTrackMessage {
+struct AWLDetectionTrackMessage  {
     uint16_t trackingId;
     uint8_t obstacleSensor;
     uint16_t obstaclePixel;
     uint8_t trackProbability;
     uint16_t objectIntensity;
 };
-struct AWLObstacleVelocityMessage {
+struct AWLDetectionVelocityMessage  {
     uint16_t trackingId;
     uint16_t trackDistance;
     int16_t trackSpeed;
-    int16_t trackAcceleration ;
+    int16_t trackAcceleration;
 
 
 };

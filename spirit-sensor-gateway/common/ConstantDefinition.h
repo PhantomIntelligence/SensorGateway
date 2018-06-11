@@ -23,8 +23,8 @@ namespace {
     CommandID const TRANSMIT_RAW  = 0xE0;
     CommandID const TRANSMIT_COOKED = 0xE1;
     CommandID const FRAME_DONE = 0x09;
-    CommandID const OBSTACLE_TRACK = 0x0A;
-    CommandID const OBSTACLE_VELOCITY = 0x0B;
+    CommandID const DETECTION_TRACK = 0x0A;
+    CommandID const DETECTION_VELOCITY = 0x0B;
 
 };
 
