@@ -19,7 +19,7 @@ int main(){
         for(int j=0 ; j<MESSAGE_DATA_LENGTH;j++) {
             std::fprintf(file, "Data position %d (decimal): %d \n", j, message.messageData[j]);
             if(j==MESSAGE_DATA_LENGTH-1){
-                std::fprintf(file, "Message en Hexadecimal %x %x %x %x %x %x %x %x \n",message.messageData[0],message.messageData[1],message.messageData[2],message.messageData[3],message.messageData[4],message.messageData[5],message.messageData[6],message.messageData[7]);
+                std::fprintf(file, "Message en Hexadecimal : %x %x %x %x %x %x %x %x \n",message.messageData[0],message.messageData[1],message.messageData[2],message.messageData[3],message.messageData[4],message.messageData[5],message.messageData[6],message.messageData[7]);
             }
         }
     }
