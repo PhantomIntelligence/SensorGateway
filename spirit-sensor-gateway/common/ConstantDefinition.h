@@ -14,9 +14,10 @@
 #ifndef SPIRITSENSORGATEWAY_CONSTANTDEFINITION_H
 #define SPIRITSENSORGATEWAY_CONSTANTDEFINITION_H
 
-//#include "TypeDefinition.h"
+
 namespace {
-    const int MESSAGE_DATA_LENGTH_IN_BYTES = 0;
+    const int MESSAGE_DATA_LENGTH = 8;
+    //const unsigned long READ_WAIT_INFINITE = -1;
 
 };
 

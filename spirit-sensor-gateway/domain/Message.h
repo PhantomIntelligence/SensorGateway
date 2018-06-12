@@ -19,9 +19,9 @@
 struct AWLMessage {
     uint64_t messageID;
     uint64_t messageTimestamp;
-    uint8_t messageFlags;
-    uint8_t messageLength;
-    unsigned char messageData[MESSAGE_DATA_LENGTH_IN_BYTES];
+    uint64_t messageFlags;
+    uint64_t messageLength;
+    unsigned char messageData[MESSAGE_DATA_LENGTH];
 };
 
 #endif //SPIRITSENSORGATEWAY_MESSAGE_H
