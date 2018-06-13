@@ -18,11 +18,14 @@
 
 #include "CommunicationProtocolStrategy.h"
 
+
+
 namespace CommunicationProtocolStrategy {
     class KvaserCanProtocolStrategy : public CommunicationProtocolStrategy {
     public:
         KvaserCanProtocolStrategy();
         ~ KvaserCanProtocolStrategy();
+        void closeConnection();
         AWLMessage unwrapMessage();
 
     private:
@@ -31,7 +34,7 @@ namespace CommunicationProtocolStrategy {
             unsigned long timestamp;
             unsigned int flags;
             unsigned int length;
-            uint8_t data[0];
+            uint8_t data[MESSAGE_DATA_LENGTH];
         };
         canHandle canCircuitHandle;
         AWLMessage convertCanMessageToAwlMessage(CanMessage canMessage);
