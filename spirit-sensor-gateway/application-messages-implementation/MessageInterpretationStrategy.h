@@ -21,6 +21,9 @@ namespace MessageInterpretationStrategy {
             uint16_t systemID;
             uint32_t systemErrorFlag;
         };
+        SpiritProtocolFrame currentSpiritProtocolFrame;
+
+        MessageInterpretationStrategy::MessageInterpretationStrategy(){};
         AWLFrameDoneMessage implementFrameDoneMessage(AWLMessage *awlMessage);
 
         AWLDetectionTrackMessage implementDetectionTrackMessage(AWLMessage *awlMessage);
@@ -30,6 +33,8 @@ namespace MessageInterpretationStrategy {
         void sendCookedFrame(SpiritProtocolFrame spiritProtocolFrame);
 
         void addMessageToFrame(AWLMessage awlMessage, SpiritProtocolFrame spiritProtocolFrame);
+
+        void setNewSpiritProtocolFrame();
 
 
     };
