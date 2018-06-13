@@ -7,15 +7,33 @@
 
 #include "spirit-sensor-gateway/common/ConstantDefinition.h"
 #include <spirit-sensor-gateway/domain/Message.h>
+#include <vector>
 
 namespace MessageInterpretationStrategy {
-    void implementMessage(AWLMessage *awlMessage);
+    class MessageInterpretationStrategy {
+    public:
+        void implementMessage(AWLMessage *awlMessage);
 
-    AWLFrameDoneMessage implementFrameDoneMessage(AWLMessage *awlMessage);
+    private:
+        struct SpiritProtocolFrame {
+            std::vector<AWLMessage> messageList;
+            uint16_t frameID;
+            uint16_t systemID;
+            uint32_t systemErrorFlag;
+        };
+        AWLFrameDoneMessage implementFrameDoneMessage(AWLMessage *awlMessage);
 
-    AWLDetectionTrackMessage implementDetectionTrackMessage(AWLMessage *awlMessage);
+        AWLDetectionTrackMessage implementDetectionTrackMessage(AWLMessage *awlMessage);
 
-    AWLDetectionVelocityMessage implementDetectionVelocityMessagee(AWLMessage *awlMessage);
+        AWLDetectionVelocityMessage implementDetectionVelocityMessagee(AWLMessage *awlMessage);
+
+        void sendCookedFrame(SpiritProtocolFrame spiritProtocolFrame);
+
+        void addMessageToFrame(AWLMessage awlMessage, SpiritProtocolFrame spiritProtocolFrame);
+
+
+    };
+
 }
 
 #endif //SPIRITSENSORGATEWAY_MESSAGEIMPLEMENTATIONSTRATEGY_H

@@ -23,20 +23,20 @@ struct AWLMessage {
     uint64_t messageLength;
     unsigned char messageData[MESSAGE_DATA_LENGTH];
 };
-struct AWLFrameDoneMessage {
+struct AWLFrameDoneMessage:AWLMessage {
     uint16_t frameID;
     uint16_t systemID;
     uint32_t systemErrorFlag;
 
 };
-struct AWLDetectionTrackMessage  {
+struct AWLDetectionTrackMessage:AWLMessage  {
     uint16_t trackingId;
     uint8_t obstacleSensor;
     uint16_t obstaclePixel;
     uint8_t trackProbability;
     uint16_t objectIntensity;
 };
-struct AWLDetectionVelocityMessage  {
+struct AWLDetectionVelocityMessage:AWLMessage  {
     uint16_t trackingId;
     uint16_t trackDistance;
     int16_t trackSpeed;

@@ -4,8 +4,10 @@
 
 #include "MessageInterpretationStrategy.h"
 
+using MessageInterpretationStrategy::MessageInterpretationStrategy;
+
 namespace MessageInterpretationStrategy {
-    void implementMessage(AWLMessage *awlMessage) {
+    void MessageInterpretationStrategy::implementMessage(AWLMessage *awlMessage) {
         switch (awlMessage->messageID) {
             case FRAME_DONE:
                 implementFrameDoneMessage(awlMessage);
@@ -16,16 +18,26 @@ namespace MessageInterpretationStrategy {
         }
     }
 
-    AWLFrameDoneMessage implementFrameDoneMessage(AWLMessage *awlMessage) {
+    AWLFrameDoneMessage MessageInterpretationStrategy::implementFrameDoneMessage(AWLMessage *awlMessage) {
         AWLFrameDoneMessage awlFrameDoneMessage{};
+
+        SpiritProtocolFrame spiritProtocolFrame{};
     }
 
 
-    AWLDetectionTrackMessage implementDetectionTrackMessage(AWLMessage *awlMessage) {
+    AWLDetectionTrackMessage MessageInterpretationStrategy::implementDetectionTrackMessage(AWLMessage *awlMessage) {
         AWLDetectionTrackMessage awlDetectionTrackMessage{};
     }
 
-    AWLDetectionVelocityMessage implementDetectionVelocityMessagee(AWLMessage *awlMessage) {
+    AWLDetectionVelocityMessage MessageInterpretationStrategy::implementDetectionVelocityMessagee(AWLMessage *awlMessage) {
         AWLDetectionVelocityMessage awlDetectionVelocityMessage{};
+    }
+
+    void MessageInterpretationStrategy::addMessageToFrame(AWLMessage awlMessage,SpiritProtocolFrame spiritProtocolFrame) {
+        spiritProtocolFrame.messageList.push_back(awlMessage);
+
+    }
+    void MessageInterpretationStrategy::sendCookedFrame(SpiritProtocolFrame spiritProtocolFrame) {
+
     }
 }
