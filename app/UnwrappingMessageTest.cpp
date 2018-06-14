@@ -1,4 +1,3 @@
-
 #include "spirit-sensor-gateway/communication-protocol-strategy/KvaserCanProtocolStrategy.cpp"
 #include <iostream>
 #include <cstdio>

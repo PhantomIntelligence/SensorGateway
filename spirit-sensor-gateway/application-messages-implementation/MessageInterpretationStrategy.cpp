@@ -4,10 +4,16 @@
 
 #include "MessageInterpretationStrategy.h"
 
-using MessageInterpretationStrategy::MessageInterpretationStrategy;
 
-namespace MessageInterpretationStrategy {
-    void MessageInterpretationStrategy::implementMessage(AWLMessage *awlMessage) {
+MessageInterpretationStrategy::~MessageInterpretationStrategy() {
+
+}
+MessageInterpretationStrategy::MessageInterpretationStrategy() {
+    setNewSpiritProtocolFrame();
+}
+
+
+ void MessageInterpretationStrategy::implementMessage(AWLMessage *awlMessage) {
         switch (awlMessage->messageID) {
             case FRAME_DONE:
                 implementFrameDoneMessage(awlMessage);
@@ -17,9 +23,7 @@ namespace MessageInterpretationStrategy {
                 implementDetectionVelocityMessagee(awlMessage);
         }
     }
-    MessageInterpretationStrategy::MessageInterpretationStrategy(){
-        this->currentSpiritProtocolFrame = SpiritProtocolFrame {};
-    }
+
 
     AWLFrameDoneMessage MessageInterpretationStrategy::implementFrameDoneMessage(AWLMessage *awlMessage) {
         AWLFrameDoneMessage awlFrameDoneMessage{};
@@ -40,10 +44,6 @@ namespace MessageInterpretationStrategy {
 
     AWLDetectionVelocityMessage MessageInterpretationStrategy::implementDetectionVelocityMessagee(AWLMessage *awlMessage) {
         AWLDetectionVelocityMessage awlDetectionVelocityMessage{};
-        awlDetectionVelocityMessage.trackingId = awlMessage->messageData[0];
-        awlDetectionVelocityMessage.trackDistance = awlMessage->messageData[1];
-        awlDetectionVelocityMessage.trackSpeed = awlMessage->messageData[2];
-        awlDetectionVelocityMessage.trackAcceleration = awlMessage->messageData[3];
         addMessageToFrame(awlDetectionVelocityMessage,this->currentSpiritProtocolFrame);
 
     }
@@ -58,4 +58,3 @@ namespace MessageInterpretationStrategy {
     void MessageInterpretationStrategy::sendCookedFrame(SpiritProtocolFrame spiritProtocolFrame) {
 
     }
-}

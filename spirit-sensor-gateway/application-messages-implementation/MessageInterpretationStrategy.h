@@ -9,10 +9,12 @@
 #include <spirit-sensor-gateway/domain/Message.h>
 #include <vector>
 
-namespace MessageInterpretationStrategy {
     class MessageInterpretationStrategy {
     public:
         void implementMessage(AWLMessage *awlMessage);
+        MessageInterpretationStrategy();
+        ~ MessageInterpretationStrategy();
+            void setNewSpiritProtocolFrame();
 
     private:
         struct SpiritProtocolFrame {
@@ -23,7 +25,6 @@ namespace MessageInterpretationStrategy {
         };
         SpiritProtocolFrame currentSpiritProtocolFrame;
 
-        MessageInterpretationStrategy::MessageInterpretationStrategy(){};
         AWLFrameDoneMessage implementFrameDoneMessage(AWLMessage *awlMessage);
 
         AWLDetectionTrackMessage implementDetectionTrackMessage(AWLMessage *awlMessage);
@@ -34,11 +35,10 @@ namespace MessageInterpretationStrategy {
 
         void addMessageToFrame(AWLMessage awlMessage, SpiritProtocolFrame spiritProtocolFrame);
 
-        void setNewSpiritProtocolFrame();
 
 
     };
 
-}
+
 
 #endif //SPIRITSENSORGATEWAY_MESSAGEIMPLEMENTATIONSTRATEGY_H
