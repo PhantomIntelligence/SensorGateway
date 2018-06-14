@@ -17,7 +17,7 @@
 
 namespace {
     const int MESSAGE_DATA_LENGTH = 8;
-    //const unsigned long READ_WAIT_INFINITE = -1;
+    const unsigned long READ_WAIT_INFINITE = -1;
 
 };
 

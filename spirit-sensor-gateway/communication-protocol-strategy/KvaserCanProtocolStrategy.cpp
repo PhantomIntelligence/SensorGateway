@@ -17,21 +17,18 @@
 using CommunicationProtocolStrategy::KvaserCanProtocolStrategy;
 
 
-KvaserCanProtocolStrategy::KvaserCanProtocolStrategy(): canCircuitHandle(initializeCanConnection()){
-
+KvaserCanProtocolStrategy::KvaserCanProtocolStrategy(): canCircuitHandle(){
+    initializeCanConnection();
 }
 
-KvaserCanProtocolStrategy:: ~KvaserCanProtocolStrategy(){
+KvaserCanProtocolStrategy:: ~KvaserCanProtocolStrategy()=default;
 
-}
-
-canHandle KvaserCanProtocolStrategy::initializeCanConnection() {
+void KvaserCanProtocolStrategy::initializeCanConnection() {
     canInitializeLibrary();
     canHandle canCircuitHandle = canOpenChannel(0, canOPEN_EXCLUSIVE);
     canSetBusParams(canCircuitHandle, canBITRATE_1M, 0, 0, 0, 0, 0);
     canSetBusOutputControl(canCircuitHandle, canDRIVER_SILENT);
     canBusOn(canCircuitHandle);
-    return canCircuitHandle;
 }
 
 AWLMessage KvaserCanProtocolStrategy::unwrapMessage(){
@@ -41,7 +38,7 @@ CanMessage canMessage{};
     unsigned int flags;
     unsigned int length;
     uint8_t data[MESSAGE_DATA_LENGTH];
-    canRead(canCircuitHandle, &id, data, &length, &flags, &timestamp);
+    canReadWait(canCircuitHandle, &id, data, &length, &flags, &timestamp,READ_WAIT_INFINITE);
 
     canMessage.id =id;
     canMessage.length=length;
@@ -51,9 +48,7 @@ CanMessage canMessage{};
         canMessage.data[i] = data[i];
     }
 
-    //canReadWait(canCircuitHandle,&canMessage.id,&canMessage.data,&canMessage.length,&canMessage.flags,&canMessage.timestamp,READ_WAIT_INFINITE); // permet de lire les messages indefinement mais pas de possibilite de close les bus sauf en cas  d erreur
     return convertCanMessageToAwlMessage(canMessage);
-            // return convertCanMessageToAwlMessage(canMessage);
 }
 
 AWLMessage KvaserCanProtocolStrategy::convertCanMessageToAwlMessage(CanMessage canMessage) {

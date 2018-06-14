@@ -16,7 +16,7 @@
 
 #include <canlib.h>
 
-#include "CommunicationProtocolStrategy.h"
+#include "CommunicationProtocolStrategy.hpp"
 
 
 
@@ -38,7 +38,7 @@ namespace CommunicationProtocolStrategy {
         };
         canHandle canCircuitHandle;
         AWLMessage convertCanMessageToAwlMessage(CanMessage canMessage);
-        canHandle initializeCanConnection();
+        void initializeCanConnection();
     };
 }
 #endif //SPIRITSENSORGATEWAY_KVASERCANPROTOCOLSTRATEGY_H
