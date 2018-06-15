@@ -11,15 +11,15 @@ int main(){
     KvaserCanProtocolStrategy * kvaserCanProtocolStrategy = new KvaserCanProtocolStrategy();
 
     for (auto i = 0; i < 10000; i++){
-        AWLMessage message = kvaserCanProtocolStrategy->unwrapMessage();
+        AWLMessage message = kvaserCanProtocolStrategy->readMessage();
         std::fprintf(file, "=================================================================================== \n");
-        std::fprintf(file, "ID : %" PRIu64 "\n",message.messageID);
-        std::fprintf(file, "Length : %" PRIu64 "\n",message.messageLength);
-        std::fprintf(file, "Timestamp : %" PRIu64 "\n",message.messageTimestamp);
-        for(int j=0 ; j<MESSAGE_DATA_LENGTH;j++) {
-            std::fprintf(file, "Data position %d (decimal): %d \n", j, message.messageData[j]);
-            if(j==MESSAGE_DATA_LENGTH-1){
-                std::fprintf(file, "Message en Hexadecimal : %x %x %x %x %x %x %x %x \n",message.messageData[0],message.messageData[1],message.messageData[2],message.messageData[3],message.messageData[4],message.messageData[5],message.messageData[6],message.messageData[7]);
+        std::fprintf(file, "ID : %" PRIu64 "\n",message.id);
+        std::fprintf(file, "Length : %" PRIu64 "\n",message.lenght);
+        std::fprintf(file, "timestamp : %" PRIu64 "\n",message.timestamp);
+        for(int j=0 ; j<MESSAGE_DATA_LENGTH_IN_MESSAGE;j++) {
+            std::fprintf(file, "Data position %d (decimal): %d \n", j, message.data[j]);
+            if(j==MESSAGE_DATA_LENGTH_IN_MESSAGE-1){
+                std::fprintf(file, "Message en Hexadecimal : %x %x %x %x %x %x %x %x \n",message.data[0],message.data[1],message.data[2],message.data[3],message.data[4],message.data[5],message.data[6],message.data[7]);
             }
         }
     }

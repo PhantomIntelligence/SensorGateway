@@ -26,7 +26,7 @@ namespace CommunicationProtocolStrategy {
         KvaserCanProtocolStrategy();
         ~ KvaserCanProtocolStrategy();
         void closeConnection();
-        AWLMessage unwrapMessage();
+        AWLMessage readMessage();
 
     private:
         struct CanMessage {
@@ -34,7 +34,7 @@ namespace CommunicationProtocolStrategy {
             unsigned long timestamp;
             unsigned int flags;
             unsigned int length;
-            uint8_t data[MESSAGE_DATA_LENGTH];
+            uint8_t data[MESSAGE_DATA_LENGTH_IN_MESSAGE];
         };
         canHandle canCircuitHandle;
         AWLMessage convertCanMessageToAwlMessage(CanMessage canMessage);

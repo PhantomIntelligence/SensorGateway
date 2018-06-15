@@ -31,20 +31,20 @@ void KvaserCanProtocolStrategy::initializeCanConnection() {
     canBusOn(canCircuitHandle);
 }
 
-AWLMessage KvaserCanProtocolStrategy::unwrapMessage(){
+AWLMessage KvaserCanProtocolStrategy::readMessage(){
 CanMessage canMessage{};
     long id;
     unsigned long timestamp;
     unsigned int flags;
     unsigned int length;
-    uint8_t data[MESSAGE_DATA_LENGTH];
+    uint8_t data[MESSAGE_DATA_LENGTH_IN_MESSAGE];
     canReadWait(canCircuitHandle, &id, data, &length, &flags, &timestamp,READ_WAIT_INFINITE);
 
     canMessage.id =id;
     canMessage.length=length;
     canMessage.flags=flags;
     canMessage.timestamp=timestamp;
-    for (auto i = 0; i < MESSAGE_DATA_LENGTH; ++i) {
+    for (auto i = 0; i < MESSAGE_DATA_LENGTH_IN_MESSAGE; ++i) {
         canMessage.data[i] = data[i];
     }
 
@@ -56,12 +56,12 @@ AWLMessage KvaserCanProtocolStrategy::convertCanMessageToAwlMessage(CanMessage c
     AWLMessage awlMessage{};
 
 
-    awlMessage.messageID = static_cast<uint64_t >(canMessage.id);
-    awlMessage.messageTimestamp = canMessage.timestamp;
-    awlMessage.messageLength = static_cast<uint8_t >(canMessage.length);
-    awlMessage.messageFlags= static_cast<uint64_t >(canMessage.flags);
-    for (auto i = 0; i < MESSAGE_DATA_LENGTH; ++i) {
-        awlMessage.messageData[i] = canMessage.data[i];
+    awlMessage.id = static_cast<uint64_t >(canMessage.id);
+    awlMessage.timestamp = canMessage.timestamp;
+    awlMessage.lenght = static_cast<uint8_t >(canMessage.length);
+    awlMessage.flags= static_cast<uint64_t >(canMessage.flags);
+    for (auto i = 0; i < MESSAGE_DATA_LENGTH_IN_MESSAGE; ++i) {
+        awlMessage.data[i] = canMessage.data[i];
     }
 
     return awlMessage;

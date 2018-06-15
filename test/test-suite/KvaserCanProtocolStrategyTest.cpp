@@ -12,7 +12,7 @@ class KvaserCanProtocolStrategyTest : public ::testing::Test {
 
 //TEST_F(KvaserCanProtocolStrategyTest, given_someCanMessage_when_unwrappingMessageFromProtocol_then_returnsCorrespondingAwlMessage) {
 //    KvaserCanProtocolStrategy kvaserCanProtocolStrategy;
-//    AWLMessage actualAWLMessage = kvaserCanProtocolStrategy.unwrapMessage();
+//    AWLMessage actualAWLMessage = kvaserCanProtocolStrategy.readMessage();
 //    ASSERT_EQ(actualAWLMessage, expectedAWLMessage);
 //}
 
