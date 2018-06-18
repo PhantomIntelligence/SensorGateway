@@ -38,11 +38,11 @@ AWLMessage KvaserCanProtocolStrategy::readMessage(){
 
 AWLMessage KvaserCanProtocolStrategy::convertCanMessageToAwlMessage(CanMessage canMessage) {
     AWLMessage awlMessage{};
-    awlMessage.messageID = static_cast<uint64_t >(canMessage.id);
-    awlMessage.messageTimestamp = canMessage.timestamp;
-    awlMessage.messageLength = static_cast<uint8_t >(canMessage.length);
+    awlMessage.id = static_cast<uint64_t >(canMessage.id);
+    awlMessage.timestamp = canMessage.timestamp;
+    awlMessage.Length = static_cast<uint8_t >(canMessage.length);
     for (auto i = 0; i < MESSAGE_DATA_LENGTH_IN_MESSAGE; ++i) {
-        awlMessage.messageData[i] = canMessage.data[i];
+        awlMessage.Data[i] = canMessage.data[i];
     }
 
     return awlMessage;
