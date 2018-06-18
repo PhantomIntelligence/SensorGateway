@@ -6,6 +6,7 @@
 #include <inttypes.h>
 
 int main(){
+
     auto file = std::fopen("AWLMessages.txt", "w+");
 
     KvaserCanProtocolStrategy * kvaserCanProtocolStrategy = new KvaserCanProtocolStrategy();
@@ -25,6 +26,7 @@ int main(){
     }
 
     kvaserCanProtocolStrategy->closeConnection();
+    delete kvaserCanProtocolStrategy;
     fflush(file);
     fclose(file);
     return 0;
