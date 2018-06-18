@@ -16,7 +16,9 @@
 
 #include <canlib.h>
 
-#include "CommunicationProtocolStrategy.h"
+#include "CommunicationProtocolStrategy.hpp"
+
+
 
 namespace CommunicationProtocolStrategy {
     class KvaserCanProtocolStrategy : public CommunicationProtocolStrategy {
@@ -32,11 +34,11 @@ namespace CommunicationProtocolStrategy {
             unsigned long timestamp;
             unsigned int flags;
             unsigned int length;
-            unsigned char data[];
+            uint8_t data[MESSAGE_DATA_LENGTH];
         };
         canHandle canCircuitHandle;
         AWLMessage convertCanMessageToAwlMessage(CanMessage canMessage);
-        canHandle initializeCanConnection();
+        void initializeCanConnection();
     };
 }
 #endif //SPIRITSENSORGATEWAY_KVASERCANPROTOCOLSTRATEGY_H

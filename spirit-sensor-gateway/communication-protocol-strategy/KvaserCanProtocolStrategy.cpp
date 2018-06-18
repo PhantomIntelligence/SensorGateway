@@ -12,43 +12,37 @@
 */
 
 #include "KvaserCanProtocolStrategy.h"
-#include <mutex>
 
 using CommunicationProtocolStrategy::KvaserCanProtocolStrategy;
 
 
-KvaserCanProtocolStrategy::KvaserCanProtocolStrategy(): canCircuitHandle(initializeCanConnection()){
-
+KvaserCanProtocolStrategy::KvaserCanProtocolStrategy(): canCircuitHandle(){
+    initializeCanConnection();
 }
 
-KvaserCanProtocolStrategy:: ~KvaserCanProtocolStrategy(){
+KvaserCanProtocolStrategy:: ~KvaserCanProtocolStrategy()=default;
 
-}
-
-canHandle KvaserCanProtocolStrategy::initializeCanConnection() {
+void KvaserCanProtocolStrategy::initializeCanConnection() {
     canInitializeLibrary();
     canHandle canCircuitHandle = canOpenChannel(0, canOPEN_EXCLUSIVE);
     canSetBusParams(canCircuitHandle, canBITRATE_1M, 0, 0, 0, 0, 0);
     canSetBusOutputControl(canCircuitHandle, canDRIVER_SILENT);
     canBusOn(canCircuitHandle);
-    return canCircuitHandle;
 }
 
 AWLMessage KvaserCanProtocolStrategy::unwrapMessage(){
     CanMessage canMessage{};
-    canReadWait(canCircuitHandle, &canMessage.id, &canMessage.data, &canMessage.length, &canMessage.flags, &canMessage.timestamp, 1000);
+    canReadWait(canCircuitHandle, &canMessage.id, &canMessage.data, &canMessage.length, &canMessage.flags, &canMessage.timestamp, READ_WAIT_INFINITE);
     return convertCanMessageToAwlMessage(canMessage);
 }
 
 AWLMessage KvaserCanProtocolStrategy::convertCanMessageToAwlMessage(CanMessage canMessage) {
     AWLMessage awlMessage{};
-
-    awlMessage.messageID = (uint8_t)canMessage.id;
-    awlMessage.messageTimestamp = (uint64_t)canMessage.timestamp;
-    awlMessage.messageLength = (uint8_t)(canMessage.length);
-
-    for (int dataIndex = 0; dataIndex < MESSAGE_DATA_LENGTH_IN_BYTES; ++dataIndex) {
-        awlMessage.messageData[dataIndex] = (uint8_t)canMessage.data[dataIndex];
+    awlMessage.messageID = static_cast<uint64_t >(canMessage.id);
+    awlMessage.messageTimestamp = canMessage.timestamp;
+    awlMessage.messageLength = static_cast<uint8_t >(canMessage.length);
+    for (auto i = 0; i < MESSAGE_DATA_LENGTH; ++i) {
+        awlMessage.messageData[i] = canMessage.data[i];
     }
 
     return awlMessage;
