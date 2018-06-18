@@ -30,7 +30,7 @@ void KvaserCanProtocolStrategy::initializeCanConnection() {
     canBusOn(canCircuitHandle);
 }
 
-AWLMessage KvaserCanProtocolStrategy::unwrapMessage(){
+AWLMessage KvaserCanProtocolStrategy::readMessage(){
     CanMessage canMessage{};
     canReadWait(canCircuitHandle, &canMessage.id, &canMessage.data, &canMessage.length, &canMessage.flags, &canMessage.timestamp, READ_WAIT_INFINITE);
     return convertCanMessageToAwlMessage(canMessage);
@@ -41,7 +41,7 @@ AWLMessage KvaserCanProtocolStrategy::convertCanMessageToAwlMessage(CanMessage c
     awlMessage.messageID = static_cast<uint64_t >(canMessage.id);
     awlMessage.messageTimestamp = canMessage.timestamp;
     awlMessage.messageLength = static_cast<uint8_t >(canMessage.length);
-    for (auto i = 0; i < MESSAGE_DATA_LENGTH; ++i) {
+    for (auto i = 0; i < MESSAGE_DATA_LENGTH_IN_MESSAGE; ++i) {
         awlMessage.messageData[i] = canMessage.data[i];
     }
 
