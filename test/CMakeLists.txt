@@ -18,7 +18,7 @@ include_directories("${CMAKE_CURRENT_SOURCE_DIR}/mock")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/test-suite")
 
 # Add all the test and mock files to the executable
-add_executable(runtests ${TEST_FILES} test-suite/KvaserCanProtocolStrategyTest.cpp)
+add_executable(runtests ${TEST_FILES})
 
 find_package(SpiritSensorGateway)
 target_link_libraries(runtests gtest gmock_main ${SpiritSensorGateway_LIBRARIES} ${CONAN_LIBS})

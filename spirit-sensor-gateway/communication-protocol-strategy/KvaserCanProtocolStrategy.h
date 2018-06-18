@@ -15,7 +15,6 @@
 #define SPIRITSENSORGATEWAY_KVASERCANPROTOCOLSTRATEGY_H
 
 #include <canlib.h>
-
 #include "CommunicationProtocolStrategy.hpp"
 
 
@@ -26,7 +25,7 @@ namespace CommunicationProtocolStrategy {
         KvaserCanProtocolStrategy();
         ~ KvaserCanProtocolStrategy();
         void closeConnection();
-        AWLMessage readMessage();
+        AWLMessage readMessages();
 
     private:
         struct CanMessage {
@@ -34,11 +33,13 @@ namespace CommunicationProtocolStrategy {
             unsigned long timestamp;
             unsigned int flags;
             unsigned int length;
-            uint8_t data[MESSAGE_DATA_LENGTH_IN_MESSAGE];
+            uint8_t data[MAX_CAN_DATA_LENGTH];
         };
-        canHandle canCircuitHandle;
+        canHandle communicationChannel;
         AWLMessage convertCanMessageToAwlMessage(CanMessage canMessage);
         void initializeCanConnection();
+        const unsigned long CANLIB_READ_WAIT_INFINITE_DELAY = -1;
+
     };
 }
 #endif //SPIRITSENSORGATEWAY_KVASERCANPROTOCOLSTRATEGY_H

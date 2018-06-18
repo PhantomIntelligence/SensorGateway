@@ -16,8 +16,7 @@
 
 
 namespace {
-    const int MESSAGE_DATA_LENGTH_IN_MESSAGE = 8;
-    const unsigned long READ_WAIT_INFINITE = -1;
+    const int MAX_CAN_DATA_LENGTH = 8;
 };
 
 #endif //SPIRITSENSORGATEWAY_CONSTANTDEFINITION_H

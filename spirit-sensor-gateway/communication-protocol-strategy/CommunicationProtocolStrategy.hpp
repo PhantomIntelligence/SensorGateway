@@ -15,13 +15,13 @@
 #define SPIRITSENSORGATEWAY_COMMUNICATIONPROTOCOLSTRATEGY_H
 
 #include "spirit-sensor-gateway/common/ConstantDefinition.h"
-#include <spirit-sensor-gateway/domain/Message.h>
+#include "spirit-sensor-gateway/domain/AWLMessage.h"
 
 
 namespace CommunicationProtocolStrategy {
     class CommunicationProtocolStrategy {
     public:
-        virtual AWLMessage readMessage() = 0;
+        virtual AWLMessage readMessages() = 0;
     };
 }
 
