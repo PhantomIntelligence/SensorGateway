@@ -17,11 +17,10 @@
 #include <spirit-sensor-gateway/common/ConstantDefinition.h>
 
 struct AWLMessage {
-    uint64_t messageID;
+    uint8_t messageID;
     uint64_t messageTimestamp;
-    uint8_t messageFlags;
     uint8_t messageLength;
-    unsigned char messageData[MESSAGE_DATA_LENGTH_IN_BYTES];
+    uint8_t messageData[MESSAGE_DATA_LENGTH_IN_BYTES];
 };
 
 #endif //SPIRITSENSORGATEWAY_MESSAGE_H

@@ -36,19 +36,19 @@ canHandle KvaserCanProtocolStrategy::initializeCanConnection() {
 
 AWLMessage KvaserCanProtocolStrategy::unwrapMessage(){
     CanMessage canMessage{};
-    canRead(canCircuitHandle, &canMessage.id, &canMessage.data, &canMessage.length, &canMessage.flags, &canMessage.timestamp);
+    canReadWait(canCircuitHandle, &canMessage.id, &canMessage.data, &canMessage.length, &canMessage.flags, &canMessage.timestamp, 1000);
     return convertCanMessageToAwlMessage(canMessage);
 }
 
 AWLMessage KvaserCanProtocolStrategy::convertCanMessageToAwlMessage(CanMessage canMessage) {
     AWLMessage awlMessage{};
 
-    awlMessage.messageID = static_cast<uint64_t>(canMessage.id);
-    awlMessage.messageTimestamp = canMessage.timestamp;
-    awlMessage.messageLength = static_cast<uint8_t>(canMessage.length);
+    awlMessage.messageID = (uint8_t)canMessage.id;
+    awlMessage.messageTimestamp = (uint64_t)canMessage.timestamp;
+    awlMessage.messageLength = (uint8_t)(canMessage.length);
 
     for (int dataIndex = 0; dataIndex < MESSAGE_DATA_LENGTH_IN_BYTES; ++dataIndex) {
-        awlMessage.messageData[dataIndex] = canMessage.data[dataIndex];
+        awlMessage.messageData[dataIndex] = (uint8_t)canMessage.data[dataIndex];
     }
 
     return awlMessage;
