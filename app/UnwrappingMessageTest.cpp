@@ -9,7 +9,7 @@ int main(){
 
     auto file = std::fopen("AWLMessages.txt", "w+");
 
-    KvaserCanProtocolStrategy * kvaserCanProtocolStrategy = new KvaserCanProtocolStrategy();
+    KvaserCanProtocolStrategy* kvaserCanProtocolStrategy = new KvaserCanProtocolStrategy();
 
     for (auto i = 0; i < 10000; i++){
         AWLMessage message = kvaserCanProtocolStrategy->readMessages();
