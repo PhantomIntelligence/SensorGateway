@@ -21,6 +21,8 @@
         SensorFrame currentSensorFrame;
 
         bool checkIfPixelExist(uint16_t pixelID,SensorFrame sensorFrame);
+        bool checkIfTrackExist(uint16_t trackID, SensorFrame sensorFrame);
+
 
         void addNewPixelToFrame(SensorFrame sensorFrame,SensorPixel sensorPixel);
 
@@ -35,6 +37,8 @@
         void translateDetectionTrackMessage(AWLMessage *awlMessage);
 
         void translateDetectionVelocityMessagee(AWLMessage *awlMessage);
+
+        void translateUnkownMessage(AWLMessage *awlMessage);
 
         void sendDoneFrame(SensorFrame sensorFrame);
 
