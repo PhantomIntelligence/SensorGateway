@@ -1,9 +1,9 @@
 
-#include "spirit-sensor-gateway/communication-protocol-strategy/KvaserCanProtocolStrategy.cpp"
 #include <iostream>
 #include <cstdio>
-
 #include <inttypes.h>
+#include "spirit-sensor-gateway/communication-protocol-strategy/KvaserCanProtocolStrategy.cpp"
+
 
 int main(){
 
@@ -12,7 +12,7 @@ int main(){
     KvaserCanProtocolStrategy* kvaserCanProtocolStrategy = new KvaserCanProtocolStrategy();
 
     for (auto i = 0; i < 10000; i++){
-        AWLMessage message = kvaserCanProtocolStrategy->readMessages();
+        AWLMessage message = kvaserCanProtocolStrategy->readMessage();
         std::fprintf(file, "=================================================================================== \n");
         std::fprintf(file, "ID : %" PRIu64 "\n",message.id);
         std::fprintf(file, "length : %d \n",message.length);

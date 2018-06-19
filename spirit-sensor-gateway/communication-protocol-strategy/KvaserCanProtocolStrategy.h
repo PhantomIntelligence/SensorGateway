@@ -21,11 +21,12 @@
 
 namespace CommunicationProtocolStrategy {
     class KvaserCanProtocolStrategy : public CommunicationProtocolStrategy {
+        const unsigned long CANLIB_READ_WAIT_INFINITE_DELAY = (unsigned long) -1;
     public:
         KvaserCanProtocolStrategy();
         ~ KvaserCanProtocolStrategy();
+        AWLMessage readMessage();
         void closeConnection();
-        AWLMessage readMessages();
 
     private:
         struct CanMessage {
@@ -33,13 +34,11 @@ namespace CommunicationProtocolStrategy {
             unsigned long timestamp;
             unsigned int flags;
             unsigned int length;
-            uint8_t data[MAX_CAN_DATA_LENGTH];
+            uint8_t data[MAX_AWL_CAN_DATA_LENGTH];
         };
+        void initializeCanConnection();
         canHandle communicationChannel;
         AWLMessage convertCanMessageToAwlMessage(CanMessage canMessage);
-        void initializeCanConnection();
-        const unsigned long CANLIB_READ_WAIT_INFINITE_DELAY = -1;
-
     };
 }
 #endif //SPIRITSENSORGATEWAY_KVASERCANPROTOCOLSTRATEGY_H

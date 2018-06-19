@@ -15,6 +15,15 @@
 
 using CommunicationProtocolStrategy::KvaserCanProtocolStrategy;
 
+const long KVASERCANBITRATE =  canBITRATE_1M;
+const unsigned int TIME_SEGMENT_1 = 0;
+const unsigned int TIME_SEGMENT_2 = 0;
+const unsigned int SYNCHRONIZATION_JUMP_WIDTH =0;
+const unsigned int NUMBER_OF_SAMPLING_POINTS = 0;
+const unsigned int SYNCMODE = 0;
+const int FLAGS_FOR_CHANNEL = canOPEN_EXCLUSIVE;
+const unsigned int CAN_DRIVER_TYPE = canDRIVER_NORMAL;
+
 
 KvaserCanProtocolStrategy::KvaserCanProtocolStrategy(): communicationChannel(){
     initializeCanConnection();
@@ -23,22 +32,14 @@ KvaserCanProtocolStrategy::KvaserCanProtocolStrategy(): communicationChannel(){
 KvaserCanProtocolStrategy:: ~KvaserCanProtocolStrategy()=default;
 
 void KvaserCanProtocolStrategy::initializeCanConnection() {
-    long kvaserCanBitRate =  canBITRATE_1M;
-    unsigned int timeSegment1 = 0;
-    unsigned int timeSegment2 = 0;
-    unsigned int synchronizationJumpWidth =0;
-    unsigned int numberOfSamplingPoints = 0;
-    unsigned int syncmode = 0;
-    int flagsForChannel = canOPEN_EXCLUSIVE;
-    const unsigned int canDriverType = canDRIVER_NORMAL;
     canInitializeLibrary();
-    canHandle communicationChannel = canOpenChannel(0, flagsForChannel);
-    canSetBusParams(communicationChannel, kvaserCanBitRate, timeSegment1, timeSegment2, synchronizationJumpWidth, numberOfSamplingPoints, syncmode);
-    canSetBusOutputControl(communicationChannel, canDriverType);
+    canHandle communicationChannel = canOpenChannel(0, FLAGS_FOR_CHANNEL);
+    canSetBusParams(communicationChannel, KVASERCANBITRATE, TIME_SEGMENT_1, TIME_SEGMENT_2, SYNCHRONIZATION_JUMP_WIDTH, NUMBER_OF_SAMPLING_POINTS, SYNCMODE);
+    canSetBusOutputControl(communicationChannel, CAN_DRIVER_TYPE);
     canBusOn(communicationChannel);
 }
 
-AWLMessage KvaserCanProtocolStrategy::readMessages(){
+AWLMessage KvaserCanProtocolStrategy::readMessage(){
     CanMessage canMessage{};
     canReadWait(communicationChannel, &canMessage.id, &canMessage.data, &canMessage.length, &canMessage.flags, &canMessage.timestamp, CANLIB_READ_WAIT_INFINITE_DELAY);
     return convertCanMessageToAwlMessage(canMessage);

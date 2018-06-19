@@ -14,13 +14,13 @@
 #ifndef SPIRITSENSORGATEWAY_MESSAGE_H
 #define SPIRITSENSORGATEWAY_MESSAGE_H
 
-#include <spirit-sensor-gateway/common/ConstantDefinition.h>
+#include "spirit-sensor-gateway/common/ConstantDefinition.h"
 
 struct AWLMessage {
     int64_t id;
     uint64_t timestamp;
     uint32_t length;
-    unsigned char data[MAX_CAN_DATA_LENGTH];
+    unsigned char data[MAX_AWL_CAN_DATA_LENGTH];
 };
 
 #endif //SPIRITSENSORGATEWAY_MESSAGE_H

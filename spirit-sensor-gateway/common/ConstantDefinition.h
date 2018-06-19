@@ -16,7 +16,7 @@
 
 
 namespace {
-    const int MAX_CAN_DATA_LENGTH = 8;
+    const int MAX_AWL_CAN_DATA_LENGTH = 8;
 };
 
 #endif //SPIRITSENSORGATEWAY_CONSTANTDEFINITION_H

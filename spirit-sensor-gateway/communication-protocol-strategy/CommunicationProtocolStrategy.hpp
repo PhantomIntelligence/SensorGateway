@@ -21,7 +21,7 @@
 namespace CommunicationProtocolStrategy {
     class CommunicationProtocolStrategy {
     public:
-        virtual AWLMessage readMessages() = 0;
+        virtual AWLMessage readMessage() = 0;
     };
 }
 
