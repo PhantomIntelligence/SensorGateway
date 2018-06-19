@@ -15,14 +15,14 @@
 
 using CommunicationProtocolStrategy::KvaserCanProtocolStrategy;
 
-const long KVASERCANBITRATE =  canBITRATE_1M;
-const unsigned int TIME_SEGMENT_1 = 0;
-const unsigned int TIME_SEGMENT_2 = 0;
-const unsigned int SYNCHRONIZATION_JUMP_WIDTH =0;
-const unsigned int NUMBER_OF_SAMPLING_POINTS = 0;
-const unsigned int SYNCMODE = 0;
-const int FLAGS_FOR_CHANNEL = canOPEN_EXCLUSIVE;
-const unsigned int CAN_DRIVER_TYPE = canDRIVER_NORMAL;
+const long CANLIB_KVASER_CAN_BIT_RATE =  canBITRATE_1M;
+const unsigned int CANLIB_TIME_SEGMENT_1 = 0;
+const unsigned int CANLIB_TIME_SEGMENT_2 = 0;
+const unsigned int CANLIB_SYNCHRONIZATION_JUMP_WIDTH =0;
+const unsigned int CANLIB_NUMBER_OF_SAMPLING_POINTS = 0;
+const unsigned int CANLIB_SYNCMODE = 0;
+const int CANLIB_FLAGS_FOR_CHANNEL = canOPEN_EXCLUSIVE;
+const unsigned int CANLIB_CAN_DRIVER_TYPE = canDRIVER_NORMAL;
 
 
 KvaserCanProtocolStrategy::KvaserCanProtocolStrategy(): communicationChannel(){
@@ -33,9 +33,9 @@ KvaserCanProtocolStrategy:: ~KvaserCanProtocolStrategy()=default;
 
 void KvaserCanProtocolStrategy::initializeCanConnection() {
     canInitializeLibrary();
-    canHandle communicationChannel = canOpenChannel(0, FLAGS_FOR_CHANNEL);
-    canSetBusParams(communicationChannel, KVASERCANBITRATE, TIME_SEGMENT_1, TIME_SEGMENT_2, SYNCHRONIZATION_JUMP_WIDTH, NUMBER_OF_SAMPLING_POINTS, SYNCMODE);
-    canSetBusOutputControl(communicationChannel, CAN_DRIVER_TYPE);
+    canHandle communicationChannel = canOpenChannel(0, CANLIB_FLAGS_FOR_CHANNEL);
+    canSetBusParams(communicationChannel, CANLIB_KVASER_CAN_BIT_RATE, CANLIB_TIME_SEGMENT_1, CANLIB_TIME_SEGMENT_2, CANLIB_SYNCHRONIZATION_JUMP_WIDTH, CANLIB_NUMBER_OF_SAMPLING_POINTS, CANLIB_SYNCMODE);
+    canSetBusOutputControl(communicationChannel, CANLIB_CAN_DRIVER_TYPE);
     canBusOn(communicationChannel);
 }
 
