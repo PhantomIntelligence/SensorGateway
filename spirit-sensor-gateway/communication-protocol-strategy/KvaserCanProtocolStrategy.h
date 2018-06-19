@@ -34,7 +34,7 @@ namespace CommunicationProtocolStrategy {
             unsigned long timestamp;
             unsigned int flags;
             unsigned int length;
-            uint8_t data[MAX_DATA_IN_AWL_MESSAGE];
+            uint8_t data[MAX_NUMBER_OF_DATA_IN_AWL_MESSAGE];
         };
         void initializeCanConnection();
         canHandle communicationChannel;

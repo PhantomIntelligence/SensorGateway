@@ -16,7 +16,7 @@
 
 
 namespace {
-    const int MAX_DATA_IN_AWL_MESSAGE = 8;
+    const int MAX_NUMBER_OF_DATA_IN_AWL_MESSAGE = 8;
 };
 
 #endif //SPIRITSENSORGATEWAY_CONSTANTDEFINITION_H
