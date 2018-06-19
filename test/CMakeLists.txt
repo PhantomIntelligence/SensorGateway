@@ -17,6 +17,9 @@ include_directories("${CMAKE_CURRENT_SOURCE_DIR}/mock")
 # Include unfiled of higher hierarchy files
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/test-suite")
 
+# Include manual-test
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/test/manual-test")
+
 # Add all the test and mock files to the executable
 add_executable(runtests ${TEST_FILES})
 
