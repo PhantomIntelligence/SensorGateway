@@ -27,6 +27,11 @@ namespace {
     const int MESSAGE_DATA_LENGTH = 8;
     const unsigned long READ_WAIT_INFINITE = -1;
 
+
 };
+namespace SensorSystemID{
+    uint16_t const AWL16 = 0x0010;
+    uint16_t const AWL7 = 0x0010;
+}
 
 #endif //SPIRITSENSORGATEWAY_CONSTANTDEFINITION_H

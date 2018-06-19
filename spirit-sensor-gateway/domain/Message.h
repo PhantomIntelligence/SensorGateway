@@ -24,34 +24,4 @@ struct AWLMessage {
     unsigned char messageData[MESSAGE_DATA_LENGTH];
 };
 
-struct AWLFrameDoneMessage:AWLMessage {
-    const int FRAME_ID_DATA_INDEX = 00;
-    const int SYSTEM_ID_DATA_INDEX = 02;
-    const int SYSTEM_ERROR_FLAG_DATA_INDEX= 04;
-    uint16_t frameID;
-    uint16_t systemID;
-    uint32_t systemErrorFlag;
-
-};
-struct AWLDetectionTrackMessage:AWLMessage  {
-    const int TRACKING_ID_DATA_INDEX = 00;
-    uint16_t trackingId;
-    uint8_t obstacleSensor;
-    uint16_t obstaclePixel;
-    uint8_t trackProbability;
-    uint16_t objectIntensity;
-};
-struct AWLDetectionVelocityMessage:AWLMessage  {
-    const int TRACKING_ID_DATA_INDEX = 00;
-    const int TRACK_DISTANCE_DATA_INDEX = 02;
-    const int TRACK_SPEED_DATA_INDEX = 04;
-    const int TRACK_ACCELERATION_DATA_INDEX = 06;
-    uint16_t trackingId;
-    uint16_t trackDistance;
-    int16_t trackSpeed;
-    int16_t trackAcceleration;
-
-
-};
-
 #endif //SPIRITSENSORGATEWAY_MESSAGE_H

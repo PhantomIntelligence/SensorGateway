@@ -8,7 +8,7 @@ file(GLOB DOMAIN_FILES "${CMAKE_CURRENT_SOURCE_DIR}/domain/*")
 file(GLOB SRC_FILES "${CMAKE_CURRENT_SOURCE_DIR}/dummy/*")
 file(GLOB COMMUNICATION_PROTOCOL_FILES "${CMAKE_CURRENT_SOURCE_DIR}/communication-protocol-strategy/*")
 
-add_library(${PROJECT_NAME} SHARED ${COMMON_FILES} ${DOMAIN_FILES} ${SRC_FILES} ${COMMUNICATION_PROTOCOL_FILES} application-messages-implementation/MessageInterpretationStrategy.h application-messages-implementation/MessageInterpretationStrategy.cpp)
+add_library(${PROJECT_NAME} SHARED ${COMMON_FILES} ${DOMAIN_FILES} ${SRC_FILES} ${COMMUNICATION_PROTOCOL_FILES} spirit-protocol/AWLMessageTranslation.h spirit-protocol/AWLMessageTranslation.cpp spirit-protocol/SpiritProtocol.h)
 
 ########## CONAN ######################################
 if(EXISTS ${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
