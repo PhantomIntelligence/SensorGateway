@@ -11,18 +11,18 @@
 	limitations under the License.
 */
 
-#ifndef SPIRITSENSORGATEWAY_TYPEDEFINITION_H
-#define SPIRITSENSORGATEWAY_TYPEDEFINITION_H
+#ifndef SPIRITSENSORGATEWAY_COMMUNICATIONPROTOCOLSTRATEGY_H
+#define SPIRITSENSORGATEWAY_COMMUNICATIONPROTOCOLSTRATEGY_H
 
-#include <cstdint>
-#include <string>
-#include <vector>
+#include "spirit-sensor-gateway/common/ConstantDefinition.h"
+#include "spirit-sensor-gateway/domain/AWLMessage.h"
 
 
-namespace {
-    typedef unsigned char unsignedChar;
-    typedef uint8_t unsigned8BitsData;
-    typedef uint64_t unsigned64BitsData;
-};
+namespace CommunicationProtocolStrategy {
+    class CommunicationProtocolStrategy {
+    public:
+        virtual AWLMessage readMessage() = 0;
+    };
+}
 
-#endif //SPIRITSENSORGATEWAY_TYPEDEFINITION_H
+#endif //SPIRITSENSORGATEWAY_COMMUNICATIONPROTOCOLSTRATEGY_H

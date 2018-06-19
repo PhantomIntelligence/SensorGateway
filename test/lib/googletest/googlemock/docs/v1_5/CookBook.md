@@ -1372,7 +1372,7 @@ has occurred. For example, in
   EXPECT_CALL(log, Log(WARNING, _, "File too large."))     // #1
       .Times(AnyNumber())
       .InSequence(s1, s2);
-  EXPECT_CALL(log, Log(WARNING, _, "Data set is empty."))  // #2
+  EXPECT_CALL(log, Log(WARNING, _, "data set is empty."))  // #2
       .InSequence(s1);
   EXPECT_CALL(log, Log(WARNING, _, "User not found."))     // #3
       .InSequence(s2);
