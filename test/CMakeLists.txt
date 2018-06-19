@@ -31,4 +31,8 @@ install(TARGETS runtests
         EXPORT SecureStreamingTargets
         RUNTIME DESTINATION "${INSTALL_BIN_DIR}" COMPONENT bin)
 
+
+# Includes the manual test
+add_subdirectory(manual-test)
+
 add_test(runtests runtests)
