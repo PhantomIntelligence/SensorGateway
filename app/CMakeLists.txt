@@ -14,5 +14,3 @@ install(TARGETS ${LIVE_NAME}
         # IMPORTANT: Add the RunTests executable to the "export-set"
         EXPORT SpiritSensorGatewayTestTargets
         RUNTIME DESTINATION "${INSTALL_BIN_DIR}" COMPONENT bin)
-
-add_test(runtests runtests)

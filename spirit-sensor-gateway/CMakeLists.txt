@@ -7,15 +7,17 @@ file(GLOB COMMON_FILES "${CMAKE_CURRENT_SOURCE_DIR}/common/*")
 file(GLOB DOMAIN_FILES "${CMAKE_CURRENT_SOURCE_DIR}/domain/*")
 file(GLOB SRC_FILES "${CMAKE_CURRENT_SOURCE_DIR}/dummy/*")
 file(GLOB COMMUNICATION_PROTOCOL_FILES "${CMAKE_CURRENT_SOURCE_DIR}/communication-protocol-strategy/*")
+file(GLOB SPIRIT_PROTOCOL_FILES "${CMAKE_CURRENT_SOURCE_DIR}/spirit-protocol/*")
 
-add_library(${PROJECT_NAME} SHARED ${COMMON_FILES} ${DOMAIN_FILES} ${SRC_FILES} ${COMMUNICATION_PROTOCOL_FILES} spirit-protocol/AWLMessageTranslation.h spirit-protocol/AWLMessageTranslation.cpp spirit-protocol/SpiritProtocol.h)
+
+add_library(${PROJECT_NAME} SHARED ${COMMON_FILES} ${DOMAIN_FILES} ${SRC_FILES} ${COMMUNICATION_PROTOCOL_FILES} ${SPIRIT_PROTOCOL_FILES} config.h.in )
 
 ########## CONAN ######################################
 if(EXISTS ${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
     include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
     conan_basic_setup(TARGETS)
 
-    message(STATUS "Linking: ${CONAN_LIBS}")
+    message(STATUS "Linking the following libs from conan: ${CONAN_LIBS}")
     conan_target_link_libraries(${PROJECT_NAME})
 else()
     message(WARNING "The file conanbuildinfo.cmake doesn't exist, you have to run conan install first")

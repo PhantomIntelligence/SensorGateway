@@ -6,7 +6,7 @@
 #define SPIRITSENSORGATEWAY_MESSAGEIMPLEMENTATIONSTRATEGY_H
 
 #include "spirit-sensor-gateway/common/ConstantDefinition.h"
-#include <spirit-sensor-gateway/domain/Message.h>
+#include "spirit-sensor-gateway/domain/AWLMessage.h"
 #include "SpiritProtocol.h"
 #include <vector>
 

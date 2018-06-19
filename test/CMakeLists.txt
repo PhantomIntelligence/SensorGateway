@@ -17,8 +17,12 @@ include_directories("${CMAKE_CURRENT_SOURCE_DIR}/mock")
 # Include unfiled of higher hierarchy files
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/test-suite")
 
+# Include manual-test
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/test/manual-test")
+
 # Add all the test and mock files to the executable
-add_executable(runtests ${TEST_FILES} test-suite/KvaserCanProtocolStrategyTest.cpp test-suite/MessageInterpretationStrategyTest.cpp)
+
+add_executable(runtests ${TEST_FILES})
 
 find_package(SpiritSensorGateway)
 target_link_libraries(runtests gtest gmock_main ${SpiritSensorGateway_LIBRARIES} ${CONAN_LIBS})
@@ -27,5 +31,9 @@ install(TARGETS runtests
         # IMPORTANT: Add the runtests executable to the "export-set"
         EXPORT SecureStreamingTargets
         RUNTIME DESTINATION "${INSTALL_BIN_DIR}" COMPONENT bin)
+
+
+# Includes the manual test
+add_subdirectory(manual-test)
 
 add_test(runtests runtests)

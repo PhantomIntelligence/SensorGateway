@@ -14,7 +14,7 @@ AWLMessageTranslation::AWLMessageTranslation() {
 
 
     void AWLMessageTranslation::translateMessage(AWLMessage *awlMessage) {
-        switch (awlMessage->messageID) {
+        switch (awlMessage->id) {
             case FRAME_DONE:
                 translateFrameDoneMessage(awlMessage);
             case DETECTION_TRACK :
@@ -27,8 +27,8 @@ AWLMessageTranslation::AWLMessageTranslation() {
 
     void AWLMessageTranslation::translateFrameDoneMessage(AWLMessage *awlMessage) {
 
-        this->currentSensorFrame.frameID = awlMessage->messageData[0];
-        this->currentSensorFrame.systemID = awlMessage->messageData[2];
+        this->currentSensorFrame.frameID = awlMessage->data[0];
+        this->currentSensorFrame.systemID = awlMessage->data[2];
         sendDoneFrame(this->currentSensorFrame);
         setNewSpiritProtocolFrame();
 

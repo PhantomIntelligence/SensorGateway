@@ -12,67 +12,52 @@
 */
 
 #include "KvaserCanProtocolStrategy.h"
-#include <mutex>
 
 using CommunicationProtocolStrategy::KvaserCanProtocolStrategy;
 
+const long CANLIB_KVASER_CAN_BIT_RATE =  canBITRATE_1M;
+const unsigned int CANLIB_TIME_SEGMENT_1 = 0;
+const unsigned int CANLIB_TIME_SEGMENT_2 = 0;
+const unsigned int CANLIB_SYNCHRONIZATION_JUMP_WIDTH = 0;
+const unsigned int CANLIB_NUMBER_OF_SAMPLING_POINTS = 0;
+const unsigned int CANLIB_SYNCMODE = 0;
+const int CANLIB_FLAGS_FOR_CHANNEL = canOPEN_EXCLUSIVE;
+const unsigned int CANLIB_CAN_DRIVER_TYPE = canDRIVER_NORMAL;
+const int CANLIB_CHANNEL_ID = 0;
 
-KvaserCanProtocolStrategy::KvaserCanProtocolStrategy(): canCircuitHandle(initializeCanConnection()){
 
+KvaserCanProtocolStrategy::KvaserCanProtocolStrategy(): communicationChannel(){
 }
 
-KvaserCanProtocolStrategy:: ~KvaserCanProtocolStrategy(){
+KvaserCanProtocolStrategy:: ~KvaserCanProtocolStrategy()=default;
 
-}
-
-canHandle KvaserCanProtocolStrategy::initializeCanConnection() {
+void KvaserCanProtocolStrategy::openConnection() {
     canInitializeLibrary();
-    canHandle canCircuitHandle = canOpenChannel(0, canOPEN_EXCLUSIVE);
-    canSetBusParams(canCircuitHandle, canBITRATE_1M, 0, 0, 0, 0, 0);
-    canSetBusOutputControl(canCircuitHandle, canDRIVER_SILENT);
-    canBusOn(canCircuitHandle);
-    return canCircuitHandle;
+    canHandle communicationChannel = canOpenChannel(CANLIB_CHANNEL_ID, CANLIB_FLAGS_FOR_CHANNEL);
+    canSetBusParams(communicationChannel, CANLIB_KVASER_CAN_BIT_RATE, CANLIB_TIME_SEGMENT_1, CANLIB_TIME_SEGMENT_2, CANLIB_SYNCHRONIZATION_JUMP_WIDTH, CANLIB_NUMBER_OF_SAMPLING_POINTS, CANLIB_SYNCMODE);
+    canSetBusOutputControl(communicationChannel, CANLIB_CAN_DRIVER_TYPE);
+    canBusOn(communicationChannel);
 }
 
-AWLMessage KvaserCanProtocolStrategy::unwrapMessage(){
-CanMessage canMessage{};
-    long id;
-    unsigned long timestamp;
-    unsigned int flags;
-    unsigned int length;
-    uint8_t data[MESSAGE_DATA_LENGTH];
-    canRead(canCircuitHandle, &id, data, &length, &flags, &timestamp);
-
-    canMessage.id =id;
-    canMessage.length=length;
-    canMessage.flags=flags;
-    canMessage.timestamp=timestamp;
-    for (auto i = 0; i < MESSAGE_DATA_LENGTH; ++i) {
-        canMessage.data[i] = data[i];
-    }
-
-    //canReadWait(canCircuitHandle,&canMessage.id,&canMessage.data,&canMessage.length,&canMessage.flags,&canMessage.timestamp,READ_WAIT_INFINITE); // permet de lire les messages indefinement mais pas de possibilite de close les bus sauf en cas  d erreur
+AWLMessage KvaserCanProtocolStrategy::readMessage(){
+    CanMessage canMessage{};
+    canReadWait(communicationChannel, &canMessage.id, &canMessage.data, &canMessage.length, &canMessage.flags, &canMessage.timestamp, CANLIB_READ_WAIT_INFINITE_DELAY);
     return convertCanMessageToAwlMessage(canMessage);
-            // return convertCanMessageToAwlMessage(canMessage);
 }
 
 AWLMessage KvaserCanProtocolStrategy::convertCanMessageToAwlMessage(CanMessage canMessage) {
-
     AWLMessage awlMessage{};
-
-
-    awlMessage.messageID = static_cast<uint64_t >(canMessage.id);
-    awlMessage.messageTimestamp = canMessage.timestamp;
-    awlMessage.messageLength = static_cast<uint8_t >(canMessage.length);
-    awlMessage.messageFlags= static_cast<uint64_t >(canMessage.flags);
-    for (auto i = 0; i < MESSAGE_DATA_LENGTH; ++i) {
-        awlMessage.messageData[i] = canMessage.data[i];
+    awlMessage.id = canMessage.id;
+    awlMessage.timestamp = canMessage.timestamp;
+    awlMessage.length = canMessage.length;
+    for (auto dataNumber = 0; dataNumber < canMessage.length; ++dataNumber) {
+        awlMessage.data[dataNumber] = canMessage.data[dataNumber];
     }
 
     return awlMessage;
 }
 
 void KvaserCanProtocolStrategy::closeConnection() {
-    canBusOff(canCircuitHandle);
-    canClose(canCircuitHandle);
+    canBusOff(communicationChannel);
+    canClose(communicationChannel);
 }

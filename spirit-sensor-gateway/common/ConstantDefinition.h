@@ -24,10 +24,8 @@ namespace {
     CommandID const FRAME_DONE = 0x09;
     CommandID const DETECTION_TRACK = 0x0A;
     CommandID const DETECTION_VELOCITY = 0x0B;
-    const int MESSAGE_DATA_LENGTH = 8;
     const unsigned long READ_WAIT_INFINITE = -1;
-
-
+    const int MAX_NUMBER_OF_DATA_IN_AWL_MESSAGE = 8;
 };
 namespace SensorSystemID{
     uint16_t const AWL16 = 0x0010;
