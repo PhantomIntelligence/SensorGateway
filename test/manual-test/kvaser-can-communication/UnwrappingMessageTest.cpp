@@ -64,6 +64,8 @@ int main() {
     std::fprintf(jsonFile, "]");
 
     kvaserCanProtocolStrategy.closeConnection();
+    fflush(file);
+    fclose(file);
     fflush(jsonFile);
     fclose(jsonFile);
     return 0;
