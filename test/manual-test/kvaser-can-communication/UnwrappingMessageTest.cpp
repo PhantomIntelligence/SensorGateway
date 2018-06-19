@@ -9,10 +9,11 @@ int main(){
 
     auto file = std::fopen("AWLMessages.txt", "w+");
 
-    KvaserCanProtocolStrategy* kvaserCanProtocolStrategy = new KvaserCanProtocolStrategy();
+    KvaserCanProtocolStrategy kvaserCanProtocolStrategy;
+    kvaserCanProtocolStrategy.openConnection();
 
     for (auto i = 0; i < 10000; i++){
-        AWLMessage message = kvaserCanProtocolStrategy->readMessage();
+        AWLMessage message = kvaserCanProtocolStrategy.readMessage();
         std::fprintf(file, "=================================================================================== \n");
         std::fprintf(file, "ID : %" PRIu64 "\n",message.id);
         std::fprintf(file, "length : %d \n",message.length);
@@ -25,8 +26,7 @@ int main(){
         }
     }
 
-    kvaserCanProtocolStrategy->closeConnection();
-    delete kvaserCanProtocolStrategy;
+    kvaserCanProtocolStrategy.closeConnection();
     fflush(file);
     fclose(file);
     return 0;

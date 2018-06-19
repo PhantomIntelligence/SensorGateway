@@ -11,7 +11,7 @@ foreach (file ${MANUAL_TEST_FILES})
         file(GLOB MANUAL_TEST_FILES ${currentPath}/*)
 
         set(MANUAL_TEST_NAME ${file})
-        set(MANUAL_TEST ${MANUAL_TEST_NAME}-manual-test)
+        set(MANUAL_TEST manual-test-${MANUAL_TEST_NAME})
         message(STATUS "Building manual test ${MANUAL_TEST_NAME}")
 
         add_executable(${MANUAL_TEST} ${MANUAL_TEST_FILES})

@@ -26,12 +26,11 @@ const unsigned int CANLIB_CAN_DRIVER_TYPE = canDRIVER_NORMAL;
 
 
 KvaserCanProtocolStrategy::KvaserCanProtocolStrategy(): communicationChannel(){
-    initializeCanConnection();
 }
 
 KvaserCanProtocolStrategy:: ~KvaserCanProtocolStrategy()=default;
 
-void KvaserCanProtocolStrategy::initializeCanConnection() {
+void KvaserCanProtocolStrategy::openConnection() {
     canInitializeLibrary();
     canHandle communicationChannel = canOpenChannel(0, CANLIB_FLAGS_FOR_CHANNEL);
     canSetBusParams(communicationChannel, CANLIB_KVASER_CAN_BIT_RATE, CANLIB_TIME_SEGMENT_1, CANLIB_TIME_SEGMENT_2, CANLIB_SYNCHRONIZATION_JUMP_WIDTH, CANLIB_NUMBER_OF_SAMPLING_POINTS, CANLIB_SYNCMODE);

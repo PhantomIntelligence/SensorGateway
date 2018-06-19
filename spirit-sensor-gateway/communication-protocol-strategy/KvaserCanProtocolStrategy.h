@@ -25,6 +25,7 @@ namespace CommunicationProtocolStrategy {
     public:
         KvaserCanProtocolStrategy();
         ~ KvaserCanProtocolStrategy();
+        void openConnection();
         AWLMessage readMessage();
         void closeConnection();
 
@@ -36,7 +37,6 @@ namespace CommunicationProtocolStrategy {
             unsigned int length;
             uint8_t data[MAX_NUMBER_OF_DATA_IN_AWL_MESSAGE];
         };
-        void initializeCanConnection();
         canHandle communicationChannel;
         AWLMessage convertCanMessageToAwlMessage(CanMessage canMessage);
     };
