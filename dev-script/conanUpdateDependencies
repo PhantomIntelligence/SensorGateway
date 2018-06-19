@@ -3,4 +3,4 @@
 conan remote add conan-transit https://conan-transit.bintray.com
 conan remote add bincrafters https://api.bintray.com/conan/bincrafters/public-conan
 
-conan install spirit-sensor-gateway -s build_type=Debug --install-folder=cmake-build-debug --build missing
+conan install spirit-sensor-gateway -s build_type=Debug --install-folder=$PWD/cmake-build-debug --build missing

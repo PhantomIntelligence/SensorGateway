@@ -1,0 +1,31 @@
+#!/bin/bash
+
+set -e # makes the build stop on first failure
+
+PACKAGE_NAMES=(
+python-patch
+python-node-semver
+python-pluginbase
+conan
+)
+
+
+BUILD_DIR=/tmp/nobody
+mkdir -p "$BUILD_DIR"
+chown nobody: "$BUILD_DIR"
+pushd "$BUILD_DIR" &> /dev/null
+
+# Installation loop
+for PACKAGE_NAME in ${PACKAGE_NAMES[*]}
+do
+    su nobody -c "git clone https://aur.archlinux.org/$PACKAGE_NAME.git" 
+
+    pushd "$BUILD_DIR"/$PACKAGE_NAME &> /dev/null
+    su nobody -c "makepkg --noconfirm"
+    pacman --upgrade --noconfirm *.xz
+
+    popd &> /dev/null
+    rm -rf "$BUILD_DIR"/$PACKAGE_NAME
+done
+
+popd &> /dev/null
