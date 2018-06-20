@@ -5,7 +5,7 @@
 #ifndef SPIRITSENSORGATEWAY_MESSAGEIMPLEMENTATIONSTRATEGY_H
 #define SPIRITSENSORGATEWAY_MESSAGEIMPLEMENTATIONSTRATEGY_H
 
-#include "spirit-sensor-gateway/common/ConstantDefinition.h"
+#include "spirit-sensor-gateway/common/ConstantFunction.h"
 #include "spirit-sensor-gateway/domain/AWLMessage.h"
 #include "SpiritProtocol.h"
 #include <vector>
@@ -20,17 +20,15 @@
     private:
         SensorFrame currentSensorFrame;
 
-        bool checkIfPixelExist(uint16_t pixelID,SensorFrame sensorFrame);
-        bool checkIfTrackExist(uint16_t trackID, SensorFrame sensorFrame);
+        bool checkIfPixelExist(uint16_t pixelID,SensorFrame sensorFrame) const;
+        bool checkIfTrackExist(uint16_t trackID, SensorFrame sensorFrame) const;
 
 
         void addNewPixelToFrame(SensorFrame sensorFrame,SensorPixel sensorPixel);
 
-        SensorTrack fetchTrack(uint16_t trackingID);
+        SensorTrack* fetchTrack(uint16_t trackingID) const;
 
-        SensorPixel fetchPixel(uint16_t pixelID);
-
-        void addTrackToPixel(SensorTrack sensorTrack,uint16_t pixelID);
+        SensorPixel fetchPixel(uint16_t pixelID) const;
 
         void translateFrameDoneMessage(AWLMessage *awlMessage);
 
@@ -38,7 +36,7 @@
 
         void translateDetectionVelocityMessagee(AWLMessage *awlMessage);
 
-        void translateUnkownMessage(AWLMessage *awlMessage);
+        std::string translateUnkownMessage(AWLMessage *awlMessage);
 
         void sendDoneFrame(SensorFrame sensorFrame);
 
