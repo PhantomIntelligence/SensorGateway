@@ -2,18 +2,18 @@
 // Created by samuelbouchard on 11/06/18.
 //
 
-#include "AWLMessageTranslation.h"
+#include "AWLMessageTranslator.h"
 
 
-AWLMessageTranslation::~AWLMessageTranslation() {
+AWLMessageTranslator::~AWLMessageTranslator() {
 
 }
-AWLMessageTranslation::AWLMessageTranslation() {
+AWLMessageTranslator::AWLMessageTranslator() {
     setNewSpiritProtocolFrame();
 }
 
 
-    void AWLMessageTranslation::translateMessage(AWLMessage *awlMessage) {
+    void AWLMessageTranslator::translateMessage(AWLMessage *awlMessage) {
         switch (awlMessage->id) {
             case FRAME_DONE:
                 translateFrameDoneMessage(awlMessage);
@@ -27,7 +27,7 @@ AWLMessageTranslation::AWLMessageTranslation() {
     }
 
 
-    void AWLMessageTranslation::translateFrameDoneMessage(AWLMessage *awlMessage) {
+    void AWLMessageTranslator::translateFrameDoneMessage(AWLMessage *awlMessage) {
 
         this->currentSensorFrame.frameID = awlMessage->data[0];
         this->currentSensorFrame.systemID = awlMessage->data[2];
@@ -36,7 +36,7 @@ AWLMessageTranslation::AWLMessageTranslation() {
 
     }
 
-    void AWLMessageTranslation::translateDetectionTrackMessage(AWLMessage *awlMessage) {
+    void AWLMessageTranslator::translateDetectionTrackMessage(AWLMessage *awlMessage) {
         uint16_t pixelIdToCheck;
         if(checkIfPixelExist(pixelIdToCheck,currentSensorFrame)){
             SensorPixel sensorPixel;
@@ -47,12 +47,12 @@ AWLMessageTranslation::AWLMessageTranslation() {
 
     }
 
-    void AWLMessageTranslation::translateDetectionVelocityMessagee(AWLMessage *awlMessage) {
+    void AWLMessageTranslator::translateDetectionVelocityMessagee(AWLMessage *awlMessage) {
 
 
 }
 
-    void AWLMessageTranslation::translateUnkownMessage(AWLMessage *awlMessage) {
+    void AWLMessageTranslator::translateUnkownMessage(AWLMessage *awlMessage) {
         std::string unkownMesageOutput = "An unknwon message was received";
         unkownMesageOutput += ("ID : %",awlMessage->id);
         unkownMesageOutput += ("Message length : % ",awlMessage->length);
@@ -61,7 +61,7 @@ AWLMessageTranslation::AWLMessageTranslation() {
 
     }
 
-    bool AWLMessageTranslation::checkIfTrackExist(uint16_t trackID, SensorFrame sensorFrame) {
+    bool AWLMessageTranslator::checkIfTrackExist(uint16_t trackID, SensorFrame sensorFrame) {
         for (int i = 0; i < currentSensorFrame.pixelList.size() ; ++i) {
             for (int j = 0; j < currentSensorFrame.pixelList[i].trackList.size(); ++j) {
                 if(currentSensorFrame.pixelList[i].trackList[j].id == trackID){
@@ -72,7 +72,7 @@ AWLMessageTranslation::AWLMessageTranslation() {
         return false;
     }
 
-    bool AWLMessageTranslation::checkIfPixelExist(uint16_t pixelID, SensorFrame sensorFrame) {
+    bool AWLMessageTranslator::checkIfPixelExist(uint16_t pixelID, SensorFrame sensorFrame) {
         for (int i = 0; i < sensorFrame.pixelList.size(); ++i) {
             if(sensorFrame.pixelList[i].id == pixelID){
                 return true;
@@ -81,11 +81,11 @@ AWLMessageTranslation::AWLMessageTranslation() {
         return false;
     }
 
-    void AWLMessageTranslation::setNewSpiritProtocolFrame() {
+    void AWLMessageTranslator::setNewSpiritProtocolFrame() {
         this->currentSensorFrame=SensorFrame{};
     }
 
-    void AWLMessageTranslation::addTrackToPixel(SensorTrack sensorTrack, uint16_t pixelID) {
+    void AWLMessageTranslator::addTrackToPixel(SensorTrack sensorTrack, uint16_t pixelID) {
         SensorPixel sensorPixelToAddTrack;
         for (int i = 0; i < currentSensorFrame.pixelList.size(); ++i) {
             if(currentSensorFrame.pixelList[i].id == pixelID){
@@ -94,11 +94,11 @@ AWLMessageTranslation::AWLMessageTranslation() {
         }
     }
 
-    void AWLMessageTranslation::sendDoneFrame(SensorFrame sensorFrame) {
+    void AWLMessageTranslator::sendDoneFrame(SensorFrame sensorFrame) {
 
     }
 
-    SensorPixel AWLMessageTranslation::fetchPixel(uint16_t pixelID) {
+    SensorPixel AWLMessageTranslator::fetchPixel(uint16_t pixelID) {
         for (int i = 0; i < currentSensorFrame.pixelList.size(); ++i) {
             if(currentSensorFrame.pixelList[i].id == pixelID){
                 return currentSensorFrame.pixelList[i];
@@ -106,6 +106,6 @@ AWLMessageTranslation::AWLMessageTranslation() {
         }
     }
 
-    SensorTrack AWLMessageTranslation::fetchTrack(uint16_t trackingID) {
+    SensorTrack AWLMessageTranslator::fetchTrack(uint16_t trackingID) {
 
     }

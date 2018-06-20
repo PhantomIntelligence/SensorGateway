@@ -10,11 +10,11 @@
 #include "SpiritProtocol.h"
 #include <vector>
 
-    class AWLMessageTranslation {
+    class AWLMessageTranslator {
     public:
         void translateMessage(AWLMessage *awlMessage);
-        AWLMessageTranslation();
-        ~ AWLMessageTranslation();
+        AWLMessageTranslator();
+        ~ AWLMessageTranslator();
         void setNewSpiritProtocolFrame();
 
     private:
