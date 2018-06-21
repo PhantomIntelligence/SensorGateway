@@ -4,7 +4,7 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
-#include "spirit-sensor-gateway/common/ring-buffer/RingBuffer.hpp"
+#include "spirit-sensor-gateway/common/RingBuffer.hpp"
 #include "data-model/DataModelFixture.h"
 #include "MockConsumerLink.h"
 

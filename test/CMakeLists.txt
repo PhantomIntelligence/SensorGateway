@@ -11,7 +11,7 @@ include_directories(SYSTEM ${GOOGLE_TEST_DIR}/googlemock/include)
 # Select all the test and source files
 file(GLOB TEST_FILES "${CMAKE_CURRENT_SOURCE_DIR}/test-suite/*")
 file(GLOB TEST_FILES "${CMAKE_CURRENT_SOURCE_DIR}/mock/*")
-file(GLOB RING_BUFFER_TEST_FILES "${CMAKE_CURRENT_SOURCE_DIR}/test-suite/ring-buffer/*")
+file(GLOB RING_BUFFER_TEST_FILES "${CMAKE_CURRENT_SOURCE_DIR}/test-suite/common/*")
 file(GLOB DATA_MODEL_FILES "${CMAKE_CURRENT_SOURCE_DIR}/test-suite/data-model/*")
 
 # Include Mocks

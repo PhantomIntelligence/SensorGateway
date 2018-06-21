@@ -17,7 +17,7 @@
 #ifndef SPIRITSENSORGATEWAY_MOCKCONSUMERLINK_H
 #define SPIRITSENSORGATEWAY_MOCKCONSUMERLINK_H
 
-#include "spirit-sensor-gateway/common/ring-buffer/ConsumerLink.hpp"
+#include "spirit-sensor-gateway/common/ConsumerLink.hpp"
 
 namespace Mock {
 
@@ -41,12 +41,12 @@ namespace Mock {
             active = false;
         }
 
-        Boolean isActive() const noexcept {
+        bool isActive() const noexcept {
             return active;
         }
 
     private:
-        Boolean active;
+        bool active;
     };
 }
 

@@ -39,28 +39,28 @@ namespace TestFunctions {
         static inline const NativeData initNativeData() {
 
             NativeSample distance;
-            distance[0] = static_cast<uData16>(30);
-            distance[1] = static_cast<uData16>(50);
-            distance[2] = static_cast<uData16>(80);
-            distance[3] = static_cast<uData16>(82);
+            distance[0] = static_cast<uint16_t>(30);
+            distance[1] = static_cast<uint16_t>(50);
+            distance[2] = static_cast<uint16_t>(80);
+            distance[3] = static_cast<uint16_t>(82);
 
             NativeSample velocity;
-            velocity[0] = static_cast<uData16>(ONE_HUNDRED_CENTIMETERS_PER_SECONDS / 3);
-            velocity[1] = static_cast<uData16>(2 * ONE_HUNDRED_CENTIMETERS_PER_SECONDS / 3);
-            velocity[2] = static_cast<uData16>(ONE_HUNDRED_CENTIMETERS_PER_SECONDS);
-            velocity[3] = static_cast<uData16>(ONE_HUNDRED_CENTIMETERS_PER_SECONDS);
+            velocity[0] = static_cast<uint16_t>(ONE_HUNDRED_CENTIMETERS_PER_SECONDS / 3);
+            velocity[1] = static_cast<uint16_t>(2 * ONE_HUNDRED_CENTIMETERS_PER_SECONDS / 3);
+            velocity[2] = static_cast<uint16_t>(ONE_HUNDRED_CENTIMETERS_PER_SECONDS);
+            velocity[3] = static_cast<uint16_t>(ONE_HUNDRED_CENTIMETERS_PER_SECONDS);
 
             NativeSample intensity;
-            intensity[0] = static_cast<uData16>(21);
-            intensity[1] = static_cast<uData16>(40);
-            intensity[2] = static_cast<uData16>(18);
-            intensity[3] = static_cast<uData16>(6);
+            intensity[0] = static_cast<uint16_t>(21);
+            intensity[1] = static_cast<uint16_t>(40);
+            intensity[2] = static_cast<uint16_t>(18);
+            intensity[3] = static_cast<uint16_t>(6);
 
             NativeSample confidenceLevel;
-            confidenceLevel[0] = static_cast<uData16>(99);
-            confidenceLevel[1] = static_cast<uData16>(85);
-            confidenceLevel[2] = static_cast<uData16>(65);
-            confidenceLevel[3] = static_cast<uData16>(55);
+            confidenceLevel[0] = static_cast<uint16_t>(99);
+            confidenceLevel[1] = static_cast<uint16_t>(85);
+            confidenceLevel[2] = static_cast<uint16_t>(65);
+            confidenceLevel[3] = static_cast<uint16_t>(55);
 
 
             NativeComplement nativeComplement = NativeComplement{distance, velocity, intensity, confidenceLevel};
@@ -99,11 +99,11 @@ namespace TestFunctions {
 
         static const ExampleDataModel::ProcessedComplement initProcessedComplement() {
             Sample discreteDetection;
-            discreteDetection[30] = static_cast<uData16>(21);
-            discreteDetection[50] = static_cast<uData16>(40);
-            discreteDetection[80] = static_cast<uData16>(18);
-            discreteDetection[82] = static_cast<uData16>(42);
-            uData16 samplingDistance = 2;
+            discreteDetection[30] = static_cast<uint16_t>(21);
+            discreteDetection[50] = static_cast<uint16_t>(40);
+            discreteDetection[80] = static_cast<uint16_t>(18);
+            discreteDetection[82] = static_cast<uint16_t>(42);
+            uint16_t samplingDistance = 2;
             ExampleDataModel::ProcessedComplement complement{discreteDetection, samplingDistance};
             return complement;
         }
@@ -111,23 +111,23 @@ namespace TestFunctions {
     private:
 
 
-        static inline uData16 drawNativeDetection() {
+        static inline uint16_t drawNativeDetection() {
             std::default_random_engine randomEngine(std::random_device{}());
-            std::uniform_int_distribution<uData16> detectionDistribution(0, EXAMPLE_DATA_NATIVE_SAMPLE_SIZE);
-            uData16 numberOfDetection = detectionDistribution(randomEngine);
+            std::uniform_int_distribution<uint16_t> detectionDistribution(0, EXAMPLE_DATA_NATIVE_SAMPLE_SIZE);
+            uint16_t numberOfDetection = detectionDistribution(randomEngine);
 
             return numberOfDetection;
         }
 
-        static NativeSample drawRandomNativeSample(uData16 const& numberOfDetection,
-                                                   uData16 const& min,
-                                                   uData16 const& max) {
+        static NativeSample drawRandomNativeSample(uint16_t const& numberOfDetection,
+                                                   uint16_t const& min,
+                                                   uint16_t const& max) {
 
             assert(numberOfDetection <= EXAMPLE_DATA_NATIVE_SAMPLE_SIZE &&
                    "A NativeData Sample shall have exactly 4 values (See global typedef and local constant definition).");
 
             std::default_random_engine randomEngine(std::random_device{}());
-            std::uniform_int_distribution<uData16> distribution(min, max);
+            std::uniform_int_distribution<uint16_t> distribution(min, max);
 
             NativeSample sample;
             for (auto i = 0; i < numberOfDetection; ++i) {
@@ -141,8 +141,8 @@ namespace TestFunctions {
 
         static const NativeData bundleNativeData(NativeComplement complement) {
 
-            auto guardianParameters = Parameters(static_cast<uData16>(DEFAULT_FWHM),
-                                                 static_cast<uData16>(DEFAULT_SAMPLING_TIME));
+            auto guardianParameters = Parameters(static_cast<uint16_t>(DEFAULT_FWHM),
+                                                 static_cast<uint16_t>(DEFAULT_SAMPLING_TIME));
 
             NativeData nativeData(guardianParameters, complement);
             return nativeData;

@@ -23,7 +23,7 @@
 
 using ExampleDataModel::Parameters;
 
-Parameters::Parameters(uData16 const& FWHM, uData16 const& samplingTime) :
+Parameters::Parameters(uint16_t const& FWHM, uint16_t const& samplingTime) :
         FWHM(FWHM),
         samplingTime(samplingTime) {
 }
@@ -44,24 +44,24 @@ void Parameters::swap(Parameters& current, Parameters& other) noexcept {
     std::swap(current.samplingTime, other.samplingTime);
 }
 
-uData16 const& Parameters::getFWHM() const {
+uint16_t const& Parameters::getFWHM() const {
     assert(FWHM != 0);
     return FWHM;
 }
 
 
-uData16 const& Parameters::getSamplingTime() const {
+uint16_t const& Parameters::getSamplingTime() const {
     assert(samplingTime != 0);
     return samplingTime;
 }
 
-Boolean Parameters::operator==(Parameters const& other) const {
+bool Parameters::operator==(Parameters const& other) const {
     auto sameFWHM = getFWHM() == other.getFWHM();
     auto sameSamplingDistance = getSamplingTime() == other.getSamplingTime();
     return (sameFWHM && sameSamplingDistance);
 }
 
-Boolean Parameters::operator!=(Parameters const& other) const {
+bool Parameters::operator!=(Parameters const& other) const {
     return !operator==(other);
 }
 

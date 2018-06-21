@@ -81,18 +81,18 @@ NativeSample const& NativeData::getConfidenceLevel() const {
     return confidenceLevel;
 }
 
-Boolean NativeData::operator==(NativeData const& other) const {
+bool NativeData::operator==(NativeData const& other) const {
     auto sameParameters = getParameters() == other.getParameters();
     auto sameDistance = getDistance() == other.getDistance();
     auto sameVelocity = getVelocity() == other.getVelocity();
     auto sameIntensity = getIntensity() == other.getIntensity();
     auto sameConfidenceLevel = getConfidenceLevel() == other.getConfidenceLevel();
 
-    Boolean equal = (sameParameters && sameDistance && sameVelocity && sameIntensity && sameConfidenceLevel);
+    bool equal = (sameParameters && sameDistance && sameVelocity && sameIntensity && sameConfidenceLevel);
     return equal;
 }
 
-Boolean NativeData::operator!=(NativeData const& other) const {
+bool NativeData::operator!=(NativeData const& other) const {
     return !operator==(other);
 }
 

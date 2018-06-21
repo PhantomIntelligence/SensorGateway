@@ -45,14 +45,14 @@ Sample const& Data::getConvolutedDetection() const {
     return convolutedDetection;
 }
 
-Boolean Data::operator==(Data const& other) const {
+bool Data::operator==(Data const& other) const {
     auto sameProcessedData = static_cast<ProcessedData>(*this).operator==(static_cast<ProcessedData>(other));
     auto sameConvolutedDetection = getConvolutedDetection() == other.getConvolutedDetection();
-    Boolean equal = (sameProcessedData && sameConvolutedDetection);
+    bool equal = (sameProcessedData && sameConvolutedDetection);
     return equal;
 }
 
-Boolean Data::operator!=(Data const& other) const {
+bool Data::operator!=(Data const& other) const {
     return !operator==(other);
 }
 

@@ -90,9 +90,9 @@ namespace ExampleDataModel {
          */
         NativeSample const& getConfidenceLevel() const;
 
-        Boolean operator==(NativeData const& other) const;
+        bool operator==(NativeData const& other) const;
 
-        Boolean operator!=(NativeData const& other) const;
+        bool operator!=(NativeData const& other) const;
 
         NativeData static const& returnDefaultData() noexcept;
 

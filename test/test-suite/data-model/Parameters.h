@@ -45,7 +45,7 @@ namespace ExampleDataModel {
          * @note The HIC++ requirements details are documented and well explained in the Data.h file. Please refer to it for any DR implementation explanation.
          * @see Data.h for more details
          */
-        Parameters(uData16 const& FWHM, uData16 const& samplingTime);
+        Parameters(uint16_t const& FWHM, uint16_t const& samplingTime);
 
         /**
          * @brief Default destructor of the Data example Data Representation (DR) class.
@@ -102,7 +102,7 @@ namespace ExampleDataModel {
          * @note The HIC++ requirements details are documented and well explained in the Data.h file. Please refer to it for any DR implementation explanation.
          * @see Data.h for more details
          */
-        uData16 const& getFWHM() const;
+        uint16_t const& getFWHM() const;
 
         /**
          * @brief Example for a getter signature for the Sampling Time of the Parameters example Data Representation (DR) class.
@@ -110,21 +110,21 @@ namespace ExampleDataModel {
          * @note The HIC++ requirements details are documented and well explained in the Data.h file. Please refer to it for any DR implementation explanation.
          * @see Data.h for more details
          */
-        uData16 const& getSamplingTime() const;
+        uint16_t const& getSamplingTime() const;
 
         /**
          * @brief Equality operator for a Data Representation (DR) class.
          * @note The HIC++ requirements details are documented and well explained in the Data.h file. Please refer to it for any DR implementation explanation.
          * @see Data.h for more details
          */
-        Boolean operator==(Parameters const& other) const;
+        bool operator==(Parameters const& other) const;
 
         /**
          * @brief Inequality operator for a Data Representation (DR) class.
          * @note The HIC++ requirements details are documented and well explained in the Data.h file. Please refer to it for any DR implementation explanation.
          * @see Data.h for more details
          */
-        Boolean operator!=(Parameters const& other) const;
+        bool operator!=(Parameters const& other) const;
 
         /**
          * @brief A mandatory function for all Data Representation (DR) class.
@@ -139,14 +139,14 @@ namespace ExampleDataModel {
          * @note The HIC++ requirements details are documented and well explained in the Data.h file. Please refer to it for any DR implementation explanation.
          * @see Data.h for more details
          */
-        uData16 FWHM;
+        uint16_t FWHM;
 
         /**
          *
          * @note The HIC++ requirements details are documented and well explained in the Data.h file. Please refer to it for any DR implementation explanation.
          * @see Data.h for more details
          */
-        uData16 samplingTime;
+        uint16_t samplingTime;
 
     };
 }

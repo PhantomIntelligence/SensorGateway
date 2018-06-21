@@ -24,7 +24,7 @@ namespace ExampleDataModel {
 
     struct ProcessedComplement {
         const Sample discreteDetection;
-        const uData16 samplingDistance;
+        const uint16_t samplingDistance;
     };
 
     class ProcessedData : public NativeData {
@@ -58,17 +58,17 @@ namespace ExampleDataModel {
 
         Sample const& getDiscreteDetections() const;
 
-        uData16 const& getSamplingDistance() const;
+        uint16_t const& getSamplingDistance() const;
 
-        Boolean operator==(ProcessedData const& other) const;
+        bool operator==(ProcessedData const& other) const;
 
-        Boolean operator!=(ProcessedData const& other) const;
+        bool operator!=(ProcessedData const& other) const;
 
         ProcessedData static const& returnDefaultData() noexcept;
 
     private:
         Sample discreteDetections;
-        uData16 samplingDistance;
+        uint16_t samplingDistance;
     };
 
 }

@@ -19,48 +19,17 @@
 #define SPIRITSENSORGATEWAY_DATAMODELTYPEDEFINITION_H
 
 #include <array>
-#include <atomic>
-#include <future>
-//#include "HICpp/HighIntegrityThread.h"
-//#include "Processing/ExceptionMessages.h"
-
-namespace { // Types
-
-    typedef bool Boolean;
-    typedef unsigned char unsignedChar;
-
-    typedef uint8_t uData8;
-    typedef uint16_t uData16;
-    typedef uint32_t uData32;
-    typedef uint64_t uData64;
-
-    typedef float Data32;
-    typedef double Data64;
-    typedef long double DataExtended;
-
-    typedef std::chrono::milliseconds Millisecond;
-    typedef std::chrono::high_resolution_clock::time_point TimePoint;
-    typedef std::chrono::high_resolution_clock HighResolutionClock;
-
-    typedef std::atomic_uint8_t AtomicCounter;
-    typedef std::atomic<Boolean> AtomicFlag;
-    typedef std::promise<Boolean> BooleanPromise;
-
-    typedef std::mutex Mutex;
-    typedef std::lock_guard<Mutex> LockGuard;
-}
 
 namespace { // Values
 
-    const Data64 PI = 3.141592653589793238462643383279502884197169399;
-    const uData16 ZERO = 0U;
+    const uint16_t ZERO = 0U;
 
-    const uData16 EXAMPLE_DATA_NATIVE_SAMPLE_SIZE = 4;
-    const uData16 EXAMPLE_DATA_ARRAY_SIZE = 100;
-    const uData16 ONE_HUNDRED_CENTIMETERS_PER_SECONDS = 2778;
+    const uint16_t EXAMPLE_DATA_NATIVE_SAMPLE_SIZE = 4;
+    const uint16_t EXAMPLE_DATA_ARRAY_SIZE = 100;
+    const uint16_t ONE_HUNDRED_CENTIMETERS_PER_SECONDS = 2778;
 
-    const uData16 DEFAULT_FWHM = 22;
-    const uData16 DEFAULT_SAMPLING_TIME = 2;
+    const uint16_t DEFAULT_FWHM = 22;
+    const uint16_t DEFAULT_SAMPLING_TIME = 2;
 
 }
 
@@ -84,13 +53,13 @@ namespace { // Functions
  * @brief A NativeSample is an array of 4 unsigned shorts in which the raw data from a physical sensor (referred as NativeData) will be stored.
  * @note This is currently only valid for example purposes.
  */
-typedef std::array<uData16, EXAMPLE_DATA_NATIVE_SAMPLE_SIZE> NativeSample;
+typedef std::array<uint16_t, EXAMPLE_DATA_NATIVE_SAMPLE_SIZE> NativeSample;
 
 /**
  * @brief A Sample is an array of 100 unsigned shorts in which data computed by Spectre is placed for transport.
  * @note This is currently only valid for example purposes.
  */
-typedef std::array<uData16, EXAMPLE_DATA_ARRAY_SIZE> Sample;
+typedef std::array<uint16_t, EXAMPLE_DATA_ARRAY_SIZE> Sample;
 
 namespace Defaults {
     const Sample EMPTY_SAMPLE = Sample();

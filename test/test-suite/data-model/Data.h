@@ -122,14 +122,14 @@ namespace ExampleDataModel {
          * @param other the instance to which the current DR instance is compared.
          * @return true if both instances contain the same data; false otherwise.
          */
-        Boolean operator==(Data const& other) const;
+        bool operator==(Data const& other) const;
 
         /**
          * @brief Inequality operator for a Data Representation (DR) class.
          * @param other the instance to which the current DR instance is compared.
          * @return false if both instances contain the same data; true otherwise.
          */
-        Boolean operator!=(Data const& other) const;
+        bool operator!=(Data const& other) const;
 
         /**
          * @brief A mandatory function for all Data Representation (DR) class.

@@ -55,20 +55,20 @@ Sample const& ProcessedData::getDiscreteDetections() const {
     return discreteDetections;
 }
 
-uData16 const& ProcessedData::getSamplingDistance() const {
+uint16_t const& ProcessedData::getSamplingDistance() const {
     return samplingDistance;
 }
 
-Boolean ProcessedData::operator==(ProcessedData const& other) const {
+bool ProcessedData::operator==(ProcessedData const& other) const {
     auto sameNativeData = static_cast<NativeData>(*this).operator==(static_cast<NativeData>(other));
     auto sameDiscreteDetection = getDiscreteDetections() == other.getDiscreteDetections();
     auto sameSamplingDistance = getSamplingDistance() == other.getSamplingDistance();
 
-    Boolean equal = (sameNativeData && sameDiscreteDetection && sameSamplingDistance);
+    bool equal = (sameNativeData && sameDiscreteDetection && sameSamplingDistance);
     return equal;
 }
 
-Boolean ProcessedData::operator!=(ProcessedData const& other) const {
+bool ProcessedData::operator!=(ProcessedData const& other) const {
     return !operator==(other);
 }
 
