@@ -15,16 +15,19 @@
         switch (awlMessage->id) {
             case FRAME_DONE:
                 translateFrameDoneMessage(awlMessage);
+                break;
             case DETECTION_TRACK :
                 translateDetectionTrackMessage(awlMessage);
+                break;
             case DETECTION_VELOCITY :
                 translateDetectionVelocityMessage(awlMessage);
+                break;
             default:
                 throw UnknownMessageException(awlMessage);
         }
     }
 
-    std::vector<SpiritFrame> AWLMessageTranslator::returnDoneFrameVector(SpiritFrame sensorFrame) const{
+    std::vector<SpiritFrame> AWLMessageTranslator::returnDoneFrameVector() const{
         return doneFrameList;
     };
 

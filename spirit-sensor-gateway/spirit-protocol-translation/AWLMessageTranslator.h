@@ -29,7 +29,7 @@ using namespace MessageID;
         void translateDebugMessage(SpiritDebugMessage spiritDebugMessage);
         AWLMessageTranslator();
         ~ AWLMessageTranslator();
-        std::vector <SpiritFrame> returnDoneFrameVector(SpiritFrame sensorFrame) const;
+        std::vector <SpiritFrame> returnDoneFrameVector() const;
 
     private:
         void setNewSpiritProtocolFrame();

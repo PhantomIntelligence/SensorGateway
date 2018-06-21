@@ -5,6 +5,7 @@
 #include <string>
 #include <fstream>
 #include <array>
+#include <ios>
 
 
 #include "spirit-sensor-gateway/spirit-protocol-translation/AWLMessageTranslator.h"
@@ -26,7 +27,7 @@ int main() {
 
 
     AWLMessageTranslator awlMessageTranslator;
-    auto AwlMessagesFiles = std::ifstream("AWLMessagesCustom.txt");
+    auto AwlMessagesFiles = std::ifstream("/home/samuelbouchard/Desktop/WorkingDir/SpiritSensorGateway/test/manual-test/spirit-protocol/AWLMessagesCustom.txt");
     if (AwlMessagesFiles) {
         std::string ligne;
         while (std::getline(AwlMessagesFiles, ligne)) {
@@ -40,9 +41,16 @@ int main() {
                 auto dataValue = std::stoi(awlData[3 + i]);
                 message.data[i] = static_cast<unsigned char>(dataValue);
             }
+            AWLMessage* pointerToMessage = &message;
+            awlMessageTranslator.translateBasicMessage(pointerToMessage);
         }
     } else {
         std::cerr << "Erreur d'ouverture de fichier\n";
+    }
+    std::vector<SpiritFrame> framelist;
+    framelist = awlMessageTranslator.returnDoneFrameVector();
+    for (int j = 0; j < framelist.size() ; ++j) {
+        std::cout<<framelist[j].frameID<<std::endl;
     }
     return 0;
 }
