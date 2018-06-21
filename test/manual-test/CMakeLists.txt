@@ -14,7 +14,7 @@ foreach (file ${MANUAL_TEST_FILES})
         set(MANUAL_TEST manual-test-${MANUAL_TEST_NAME})
         message(STATUS "Building manual test ${MANUAL_TEST_NAME}")
 
-        add_executable(${MANUAL_TEST} ${MANUAL_TEST_FILES} spirit-protocol/AWLMessageTranslationTest.cpp)
+        add_executable(${MANUAL_TEST} ${MANUAL_TEST_FILES})
         target_link_libraries(${MANUAL_TEST} ${SpiritSensorGateway_LIBRARIES} ${CONAN_LIBS})
 
 

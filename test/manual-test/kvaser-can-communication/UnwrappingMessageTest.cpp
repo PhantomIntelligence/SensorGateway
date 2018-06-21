@@ -5,12 +5,12 @@
 #include "spirit-sensor-gateway/communication-protocol-strategy/KvaserCanProtocolStrategy.cpp"
 
 
-int main() {
+int main(){
 
     const int NUMBER_DETECTION = 1000;
     auto file = std::fopen("AWLMessages.txt", "w+");
     auto jsonFile = std::fopen("AWLMessages.json", "w+");
-
+    auto customFile = std::fopen("AWLMessagesCustom.txt","w+");
 
     KvaserCanProtocolStrategy kvaserCanProtocolStrategy;
     kvaserCanProtocolStrategy.openConnection();
@@ -31,7 +31,6 @@ int main() {
             }
         }
     }
-
 
 
     //FOR GENERATING JSON FILE
@@ -63,10 +62,35 @@ int main() {
     }
     std::fprintf(jsonFile, "]");
 
+    //FOR GENERATING CUSTOM FILE
+    std::fprintf(customFile,"33-8-3973015-4-0-64-6-0-0-117-0\n");
+    for (auto i = 0; i < NUMBER_DETECTION; i++) {
+        AWLMessage message = kvaserCanProtocolStrategy.readMessage();
+        std::fprintf(customFile, "%" PRIu64"-", message.id);
+        std::fprintf(customFile, "%d-", message.length);
+        std::fprintf(customFile, "%" PRIu64"-", message.timestamp);
+        for (int j = 0; j < message.length; j++) {
+            if (j < message.length - 1) {
+                std::fprintf(customFile,"%d-",message.data[j]);
+            }
+            else{
+                std::fprintf(customFile, "%d",message.data[j]);
+            }
+        }
+        if(i == NUMBER_DETECTION/2){
+            std::fprintf(customFile,"\n27-8-3973015-4-0-64-6-0-0-117-0\n");
+        }
+        else{
+            std::fprintf(customFile, "\n");
+        }
+    }
+
     kvaserCanProtocolStrategy.closeConnection();
     fflush(file);
     fclose(file);
     fflush(jsonFile);
     fclose(jsonFile);
+    fflush(customFile);
+    fclose(customFile);
     return 0;
 };
