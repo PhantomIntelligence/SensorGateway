@@ -10,6 +10,9 @@ include_directories(SYSTEM ${GOOGLE_TEST_DIR}/googlemock/include)
 # Add SpiritSensorGateway files
 # Select all the test and source files
 file(GLOB TEST_FILES "${CMAKE_CURRENT_SOURCE_DIR}/test-suite/*")
+file(GLOB TEST_FILES "${CMAKE_CURRENT_SOURCE_DIR}/mock/*")
+file(GLOB RING_BUFFER_TEST_FILES "${CMAKE_CURRENT_SOURCE_DIR}/test-suite/ring-buffer/*")
+file(GLOB DATA_MODEL_FILES "${CMAKE_CURRENT_SOURCE_DIR}/test-suite/data-model/*")
 
 # Include Mocks
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/mock")
@@ -21,7 +24,9 @@ include_directories("${CMAKE_CURRENT_SOURCE_DIR}/test-suite")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/test/manual-test")
 
 # Add all the test and mock files to the executable
-add_executable(runtests ${TEST_FILES})
+add_executable(runtests ${TEST_FILES} ${MOCK_FILES} ${RING_BUFFER_TEST_FILES} ${DATA_MODEL_FILES})
+
+
 
 find_package(SpiritSensorGateway)
 target_link_libraries(runtests gtest gmock_main ${SpiritSensorGateway_LIBRARIES} ${CONAN_LIBS})

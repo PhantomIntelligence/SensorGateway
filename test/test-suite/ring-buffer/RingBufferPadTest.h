@@ -14,14 +14,4 @@
 	limitations under the License.
 */
 
-#ifndef SPIRITSENSORGATEWAY_DUMMYCLASS_H
-#define SPIRITSENSORGATEWAY_DUMMYCLASS_H
 
-namespace dummy {
-    class DummyClass {
-    public :
-        bool isTrue() const noexcept;
-    };
-}
-
-#endif //SPIRITSENSORGATEWAY_DUMMYCLASS_H
