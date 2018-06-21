@@ -19,7 +19,7 @@
 
 
 struct SensorTrack {
-    uint64_t id;
+    uint16_t id;
     uint16_t distance;
     int16_t speed;
     int16_t acceleration;

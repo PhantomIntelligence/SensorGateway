@@ -28,7 +28,7 @@ namespace SensorSystemID {
 namespace MessageID {
     using MessageID = uint64_t;
     MessageID const FRAME_DONE = 0x09;
-    MessageID const DETECTION_TRACK = 10;
+    MessageID const DETECTION_TRACK = 0x0A;
     MessageID const DETECTION_VELOCITY = 0x0B;
 }
 namespace CommandID {

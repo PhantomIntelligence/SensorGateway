@@ -14,7 +14,33 @@
 #define SPIRITSENSORGATEWAY_SPIRITFRAME_H
 
 
+#include <stdint-gcc.h>
+#include "SpiritPixel.h"
+
 class SpiritFrame {
+    public:
+
+        SpiritFrame();
+
+        ~SpiritFrame();
+
+        bool isFrameValid();
+
+        void addPixel(SpiritPixel spiritPixel);
+
+        bool doesPixelExist(uint16_t pixelID);
+
+        SpiritPixel getPixelById(uint16_t pixelID);
+
+    private:
+
+        uint16_t frameID;
+
+        uint16_t systemID;
+
+        uint32_t errorFlag;
+
+        std::vector<SpiritPixel> pixelList;
 
 };
 

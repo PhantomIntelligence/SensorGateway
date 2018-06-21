@@ -24,11 +24,18 @@ class SpiritFrameBuilder {
         ~SpiritFrameBuilder();
 
         SpiritFrame createNewFrame();
+
+        SpiritFrame getCurrentFrame();
+
+        std::vector getFrameList();
+
+        void addFrame(SpiritFrame spiritFrame);
     private:
+
 
         SpiritFrame currentSensorFrame;
 
-        std::vector<SpiritFrame> doneFrameList;
+        std::vector<SpiritFrame> frameList;
 };
 
 

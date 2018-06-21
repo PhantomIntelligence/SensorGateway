@@ -13,9 +13,27 @@
 #ifndef SPIRITSENSORGATEWAY_SPIRITPIXEL_H
 #define SPIRITSENSORGATEWAY_SPIRITPIXEL_H
 
+#include <vector>
+#include "SpiritTrack.h"
 
 class SpiritPixel {
+    public:
 
+    explicit SpiritPixel(uint16_t id);
+
+    ~SpiritPixel();
+
+    void addTrack(SpiritTrack spiritTrack);
+
+    bool doesTrackExist(uint16_t trackID);
+
+    SpiritTrack getTrackById(uint16_t trackID);
+
+    private:
+
+        uint16_t id;
+
+        std::vector<SpiritTrack> trackList;
 };
 
 
