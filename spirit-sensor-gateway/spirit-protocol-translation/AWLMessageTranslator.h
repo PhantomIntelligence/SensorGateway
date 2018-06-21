@@ -1,6 +1,15 @@
-//
-// Created by samuelbouchard on 11/06/18.
-//
+/**
+	Copyright 2014-2018 Phantom Intelligence Inc.
+	Licensed under the Apache License, Version 2.0 (the "License");
+	you may not use this file except in compliance with the License.
+	You may obtain a copy of the License at
+		http://www.apache.org/licenses/LICENSE-2.0
+	Unless required by applicable law or agreed to in writing, software
+	distributed under the License is distributed on an "AS IS" BASIS,
+	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+	See the License for the specific language governing permissions and
+	limitations under the License.
+*/
 
 #ifndef SPIRITSENSORGATEWAY_MESSAGEIMPLEMENTATIONSTRATEGY_H
 #define SPIRITSENSORGATEWAY_MESSAGEIMPLEMENTATIONSTRATEGY_H
@@ -16,33 +25,26 @@ using namespace MessageID;
         void translateMessage(AWLMessage *awlMessage);
         AWLMessageTranslator();
         ~ AWLMessageTranslator();
-        void setNewSpiritProtocolFrame();
+        std::vector <SensorFrame> returnDoneFrameVector(SensorFrame sensorFrame) const;
 
     private:
+        void setNewSpiritProtocolFrame();
+
+        std::vector<SensorFrame> doneFrameList;
+
         SensorFrame currentSensorFrame;
 
-        bool checkIfPixelExist(uint16_t pixelID,SensorFrame sensorFrame) const;
-        bool checkIfTrackExist(uint16_t trackID, SensorFrame sensorFrame) const;
-
-
-        void addNewPixelToFrame(SensorFrame sensorFrame,SensorPixel sensorPixel);
-
-        SensorTrack* fetchTrack(uint16_t trackingID) const;
-
-        SensorPixel fetchPixel(uint16_t pixelID) const;
-
+        SensorTrack* fetchPointerToTrack(uint16_t trackingID) const;
+        
         void translateFrameDoneMessage(AWLMessage *awlMessage);
 
         void translateDetectionTrackMessage(AWLMessage *awlMessage);
 
-        void translateDetectionVelocityMessagee(AWLMessage *awlMessage);
+        void translateDetectionVelocityMessage(AWLMessage *awlMessage);
 
-        std::string translateUnkownMessage(AWLMessage *awlMessage);
+        std::string translateUnknownMessage(AWLMessage *awlMessage);
 
-        SensorFrame sendDoneFrame(SensorFrame sensorFrame) const;
-
-
-
+        void addDoneFrame(SensorFrame sensorFrame) ;
 
     };
 
