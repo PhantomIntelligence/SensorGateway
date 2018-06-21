@@ -2,12 +2,14 @@
 #include "UnknownMessageException.h"
 
 
-AWLMessageTranslator::~AWLMessageTranslator() {
+    AWLMessageTranslator::~AWLMessageTranslator() {
 
     }
     AWLMessageTranslator::AWLMessageTranslator() {
         setNewSpiritProtocolFrame();
     }
+    
+    void AWLMessageTranslator::translateDebugMessage(SpiritDebugMessage spiritDebugMessage) {}
 
     void AWLMessageTranslator::translateBasicMessage(AWLMessage *awlMessage) {
         switch (awlMessage->id) {
@@ -22,7 +24,7 @@ AWLMessageTranslator::~AWLMessageTranslator() {
         }
     }
 
-    std::vector<SensorFrame> AWLMessageTranslator::returnDoneFrameVector(SensorFrame sensorFrame) const{
+    std::vector<SpiritFrame> AWLMessageTranslator::returnDoneFrameVector(SpiritFrame sensorFrame) const{
         return doneFrameList;
     };
 
@@ -58,13 +60,12 @@ AWLMessageTranslator::~AWLMessageTranslator() {
         sensorTrack->speed = convertTwoBytesToBigEndian(awlMessage->data[4],awlMessage->data[5]);
         sensorTrack->acceleration = convertTwoBytesToBigEndian(awlMessage->data[6],awlMessage->data[7]);
     }
-
-
+    
     void AWLMessageTranslator::setNewSpiritProtocolFrame() {
-        this->currentSensorFrame=SensorFrame{};
+        this->currentSensorFrame=SpiritFrame{};
     }
 
-    void AWLMessageTranslator::addDoneFrame(SensorFrame sensorFrame) {
+    void AWLMessageTranslator::addDoneFrame(SpiritFrame sensorFrame) {
         doneFrameList.push_back(sensorFrame);
     }
 

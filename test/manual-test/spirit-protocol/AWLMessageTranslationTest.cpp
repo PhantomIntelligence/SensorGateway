@@ -7,7 +7,7 @@
 #include <array>
 
 
-#include "spirit-sensor-gateway/spirit-protocol/AWLMessageTranslator.h"
+#include "spirit-sensor-gateway/spirit-protocol-translation/AWLMessageTranslator.h"
 
 void stringSplit(std::string stringToSplit, std::string *awlData) {
     std::string separator = "-";

@@ -26,18 +26,17 @@ using namespace MessageID;
     class AWLMessageTranslator {
     public:
         void translateBasicMessage(AWLMessage *awlMessage);
+        void translateDebugMessage(SpiritDebugMessage spiritDebugMessage);
         AWLMessageTranslator();
         ~ AWLMessageTranslator();
-        std::vector <SensorFrame> returnDoneFrameVector(SensorFrame sensorFrame) const;
+        std::vector <SpiritFrame> returnDoneFrameVector(SpiritFrame sensorFrame) const;
 
     private:
-        AWLMessage translateDebugMessage(SpiritDebugMessage spiritDebugMessage);
-
         void setNewSpiritProtocolFrame();
 
-        std::vector<SensorFrame> doneFrameList;
+        std::vector<SpiritFrame> doneFrameList;
 
-        SensorFrame currentSensorFrame;
+        SpiritFrame currentSensorFrame;
 
         SensorTrack* fetchPointerToTrack(uint16_t trackingID) ;
 
@@ -46,10 +45,8 @@ using namespace MessageID;
         void translateDetectionTrackMessage(AWLMessage *awlMessage);
 
         void translateDetectionVelocityMessage(AWLMessage *awlMessage);
-
-        std::string translateUnknownMessage(AWLMessage *awlMessage);
-
-        void addDoneFrame(SensorFrame sensorFrame) ;
+        
+        void addDoneFrame(SpiritFrame sensorFrame) ;
 
     };
 

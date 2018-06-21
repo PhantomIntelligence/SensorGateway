@@ -34,7 +34,7 @@ struct SensorPixel {
     std::vector<SensorTrack> trackList;
 };
 
-struct SensorFrame {
+struct SpiritFrame {
     uint16_t frameID;
     uint16_t systemID;
     std::vector<SensorPixel> pixelList;
