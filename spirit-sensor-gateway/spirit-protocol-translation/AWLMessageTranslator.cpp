@@ -1,7 +1,8 @@
 #include "AWLMessageTranslator.h"
+#include "UnknownMessageException.h"
 
 
-    AWLMessageTranslator::~AWLMessageTranslator() {
+AWLMessageTranslator::~AWLMessageTranslator() {
 
     }
     AWLMessageTranslator::AWLMessageTranslator() {
@@ -17,7 +18,7 @@
             case DETECTION_VELOCITY :
                 translateDetectionVelocityMessage(awlMessage);
             default:
-                translateUnknownMessage(awlMessage);
+                throw UnknownMessageException(awlMessage);
         }
     }
 
@@ -58,14 +59,6 @@
         sensorTrack->acceleration = convertTwoBytesToBigEndian(awlMessage->data[6],awlMessage->data[7]);
     }
 
-    std::string AWLMessageTranslator::translateUnknownMessage(AWLMessage *awlMessage) {
-        std::string unkownMesageOutput = "An unknwon message was received";
-        unkownMesageOutput += ("ID : %",awlMessage->id);
-        unkownMesageOutput += ("Message length : % ",awlMessage->length);
-        unkownMesageOutput += ("Message timestamp: % ",awlMessage->timestamp);
-        unkownMesageOutput += ("Message data: % % % % % % % %",awlMessage->data[0],awlMessage->data[1],awlMessage->data[2],awlMessage->data[3],awlMessage->data[4],awlMessage->data[5],awlMessage->data[6],awlMessage->data[7]);
-        return unkownMesageOutput;
-    }
 
     void AWLMessageTranslator::setNewSpiritProtocolFrame() {
         this->currentSensorFrame=SensorFrame{};
@@ -75,7 +68,7 @@
         doneFrameList.push_back(sensorFrame);
     }
 
-    SensorTrack* AWLMessageTranslator::fetchPointerToTrack(uint16_t trackingID) const{
+    SensorTrack* AWLMessageTranslator::fetchPointerToTrack(uint16_t trackingID) {
         SensorTrack* pointerToTrack;
         for (int i = 0; i < currentSensorFrame.pixelList.size(); ++i) {
             for (int j = 0; j < currentSensorFrame.pixelList[i].trackList.size(); ++j) {

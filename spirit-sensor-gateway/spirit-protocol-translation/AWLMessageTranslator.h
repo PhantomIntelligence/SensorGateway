@@ -39,7 +39,7 @@ using namespace MessageID;
 
         SensorFrame currentSensorFrame;
 
-        SensorTrack* fetchPointerToTrack(uint16_t trackingID) const;
+        SensorTrack* fetchPointerToTrack(uint16_t trackingID) ;
 
         void translateFrameDoneMessage(AWLMessage *awlMessage);
 
