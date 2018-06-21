@@ -20,32 +20,18 @@ class SpiritTrack {
     public:
 
         explicit SpiritTrack(uint16_t id,uint8_t confidenceLevel, uint16_t intensity);
-
         explicit SpiritTrack(uint16_t id,uint16_t distance, uint16_t acceleration);
-
         void setDistance(uint16_t distance);
-
         void setSpeed(uint16_t speed);
-
         void setAcceleration(uint16_t acceleration);
-
-
 
     private:
         uint16_t id;
-
         uint16_t distance;
-
         uint16_t speed;
-
         uint16_t acceleration;
-
         uint16_t intensity;
-
         uint8_t confidenceLevel;
-
-
-
 };
 
 

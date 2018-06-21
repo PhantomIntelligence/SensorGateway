@@ -27,7 +27,7 @@ int main() {
 
 
     AWLMessageTranslator awlMessageTranslator;
-    auto AwlMessagesFiles = std::ifstream("/home/samuelbouchard/Desktop/WorkingDir/SpiritSensorGateway/test/manual-test/spirit-protocol/AWLMessagesCustom.txt");
+    auto AwlMessagesFiles = std::ifstream("/home/phantom/SpiritSensorGateway/test/manual-test/spirit-protocol/AWLMessagesCustom.txt");
     if (AwlMessagesFiles) {
         std::string ligne;
         while (std::getline(AwlMessagesFiles, ligne)) {
@@ -48,7 +48,7 @@ int main() {
         std::cerr << "Erreur d'ouverture de fichier\n";
     }
     std::vector<SpiritFrame> framelist;
-    framelist = awlMessageTranslator.returnDoneFrameVector();
+    framelist = awlMessageTranslator.getSpiritFrames();
     for (int j = 0; j < framelist.size() ; ++j) {
         std::cout<<framelist[j].frameID<<std::endl;
     }

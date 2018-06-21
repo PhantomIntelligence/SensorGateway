@@ -19,30 +19,17 @@
 
 class SpiritFrame {
     public:
-
         SpiritFrame();
-
         ~SpiritFrame();
-
-        bool isFrameValid();
-
         void addPixel(SpiritPixel spiritPixel);
-
-        bool doesPixelExist(uint16_t pixelID);
-
-        SpiritPixel getPixelById(uint16_t pixelID);
+        std::vector<SpiritPixel> getPixels();
+        void setFrameID(uint16_t frameID);
+        void setSystemID(uint16_t systemID);
 
     private:
-
         uint16_t frameID;
-
         uint16_t systemID;
-
-        uint32_t errorFlag;
-
-        std::vector<SpiritPixel> pixelList;
-
+        std::vector<SpiritPixel> spiritPixels;
 };
-
 
 #endif //SPIRITSENSORGATEWAY_SPIRITFRAME_H
