@@ -10,6 +10,7 @@
 #include "SpiritProtocol.h"
 #include <vector>
 
+using namespace MessageID;
     class AWLMessageTranslator {
     public:
         void translateMessage(AWLMessage *awlMessage);
@@ -38,7 +39,7 @@
 
         std::string translateUnkownMessage(AWLMessage *awlMessage);
 
-        void sendDoneFrame(SensorFrame sensorFrame);
+        SensorFrame sendDoneFrame(SensorFrame sensorFrame) const;
 
 
 

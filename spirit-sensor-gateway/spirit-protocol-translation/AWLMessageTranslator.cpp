@@ -9,7 +9,6 @@ AWLMessageTranslator::AWLMessageTranslator() {
     setNewSpiritProtocolFrame();
 }
 
-
     void AWLMessageTranslator::translateMessage(AWLMessage *awlMessage) {
         switch (awlMessage->id) {
             case FRAME_DONE:
@@ -34,13 +33,8 @@ AWLMessageTranslator::AWLMessageTranslator() {
     }
 
     void AWLMessageTranslator::translateDetectionTrackMessage(AWLMessage *awlMessage) {
-        uint16_t pixelIdToCheck;
-        if(checkIfPixelExist(pixelIdToCheck,currentSensorFrame)){
-            SensorPixel sensorPixel;
-        }
-        else{
-            SensorPixel sensorPixel;
-            SensorTrack sensorTrack;
+            SensorPixel sensorPixel = SensorPixel{};
+            SensorTrack sensorTrack = SensorTrack{};
             sensorTrack.id = convertTwoBytesToBigEndian(awlMessage->data[0],awlMessage->data[1]);
             sensorTrack.confidenceLevel = awlMessage->data[5];
             sensorTrack.intensity = convertTwoBytesToBigEndian(awlMessage->data[6],awlMessage->data[7]);
@@ -51,11 +45,10 @@ AWLMessageTranslator::AWLMessageTranslator() {
 
         }
 
-    }
-
     void AWLMessageTranslator::translateDetectionVelocityMessagee(AWLMessage *awlMessage) {
         auto trackId = convertTwoBytesToBigEndian(awlMessage->data[0], awlMessage->data[1]);
         SensorTrack* sensorTrack =fetchTrack(trackId);
+
         sensorTrack->distance = convertTwoBytesToBigEndian(awlMessage->data[2],awlMessage->data[3]);
         sensorTrack->speed = convertTwoBytesToBigEndian(awlMessage->data[4],awlMessage->data[5]);
         sensorTrack->acceleration = convertTwoBytesToBigEndian(awlMessage->data[6],awlMessage->data[7]);
@@ -95,7 +88,8 @@ AWLMessageTranslator::AWLMessageTranslator() {
     }
 
 
-    void AWLMessageTranslator::sendDoneFrame(SensorFrame sensorFrame) {
+    SensorFrame AWLMessageTranslator::sendDoneFrame(SensorFrame sensorFrame) const {
+        return sensorFrame;
 
     }
 

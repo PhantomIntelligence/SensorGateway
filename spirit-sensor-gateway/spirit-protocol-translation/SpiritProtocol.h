@@ -32,4 +32,10 @@ struct SensorFrame {
     uint16_t systemID;
     uint32_t errorFlag;
 };
+
+struct SpiritDebug{
+    uint8_t id;
+    uint16_t adress;
+    int32_t value;
+};
 #endif //SPIRITSENSORGATEWAY_SPIRITPROTOCOL_H
