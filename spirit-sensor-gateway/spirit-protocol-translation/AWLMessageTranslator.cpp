@@ -43,30 +43,29 @@
         currentSpiritFrame->addPixel(spiritPixel);
 
         uint16_t spiritTrackID = convertTwoBytesToBigEndian(awlMessage->data[0],awlMessage->data[1]);
-        uint16_t spiritTrackConfidenceLevel = awlMessage->data[5];
+        uint8_t spiritTrackConfidenceLevel = awlMessage->data[5];
         uint16_t spiritTrackIntensity = convertTwoBytesToBigEndian(awlMessage->data[6],awlMessage->data[7]);
         SpiritTrack spiritTrack = SpiritTrack(spiritTrackID, spiritTrackConfidenceLevel, spiritTrackIntensity);
         spiritPixel.addTrack(spiritTrack);
     }
 
     void AWLMessageTranslator::translateDetectionVelocityMessage(AWLMessage *awlMessage) {
-        SpiritTrack * spiritTrack = fetchSpiritTrack(awlMessage);
-        spiritTrack->setDistance(convertTwoBytesToBigEndian(awlMessage->data[2],awlMessage->data[3]));
-        spiritTrack->setSpeed(convertTwoBytesToBigEndian(awlMessage->data[4],awlMessage->data[5]));
-        spiritTrack->setAcceleration(convertTwoBytesToBigEndian(awlMessage->data[6],awlMessage->data[7]));
+        SpiritTrack spiritTrack = fetchSpiritTrack(awlMessage);
+        spiritTrack.setDistance(convertTwoBytesToBigEndian(awlMessage->data[2],awlMessage->data[3]));
+        spiritTrack.setSpeed(convertTwoBytesToBigEndian(awlMessage->data[4],awlMessage->data[5]));
+        spiritTrack.setAcceleration(convertTwoBytesToBigEndian(awlMessage->data[6],awlMessage->data[7]));
     }
 
 
-    SpiritTrack* AWLMessageTranslator::fetchSpiritTrack(AWLMessage *awlMessage) {
+    SpiritTrack AWLMessageTranslator::fetchSpiritTrack(AWLMessage *awlMessage) {
+        SpiritTrack * fetchedSpiritTrack = NULL;
         uint16_t spiritTrackID = convertTwoBytesToBigEndian(awlMessage->data[0], awlMessage->data[1]);
-
-        for (int i = 0; i < currentSpiritFrame->getPixels().size(); ++i) {
-
-                /*if (currentSensorFrame.pixelList[i].trackList[j].id == trackingID){
-                    pointerToTrack = &currentSensorFrame.pixelList[i].trackList[j];
-                    break;
-                }*/
+        for (int pixelNumber = 0; pixelNumber < currentSpiritFrame->getPixels().size(); ++pixelNumber) {
+            SpiritPixel spiritPixel = currentSpiritFrame->getPixels()[pixelNumber];
+            SpiritTrack spiritTrack = spiritPixel.getTrackById(spiritTrackID);
+            if (&spiritTrack != NULL){
+                fetchedSpiritTrack =  &spiritTrack;
             }
         }
-        return pointerToTrack;
+        return *fetchedSpiritTrack;
     }

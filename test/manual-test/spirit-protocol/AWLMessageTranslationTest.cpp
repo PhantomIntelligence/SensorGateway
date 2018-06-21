@@ -47,10 +47,10 @@ int main() {
     } else {
         std::cerr << "Erreur d'ouverture de fichier\n";
     }
-    std::vector<SpiritFrame> framelist;
-    framelist = awlMessageTranslator.getSpiritFrames();
+
+    std::vector<SpiritFrame> framelist = awlMessageTranslator.getSpiritFrames();
     for (int j = 0; j < framelist.size() ; ++j) {
-        std::cout<<framelist[j].frameID<<std::endl;
+        std::cout<<framelist[j].getFrameID()<<std::endl;
     }
     return 0;
 }

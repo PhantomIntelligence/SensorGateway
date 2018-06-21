@@ -21,7 +21,6 @@ class SpiritPixel {
         explicit SpiritPixel(uint16_t id);
         ~SpiritPixel();
         void addTrack(SpiritTrack spiritTrack);
-        bool doesTrackExist(uint16_t trackID);
         SpiritTrack getTrackById(uint16_t trackID);
 
     private:

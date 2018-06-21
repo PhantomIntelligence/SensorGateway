@@ -24,6 +24,7 @@ class SpiritFrame {
         void addPixel(SpiritPixel spiritPixel);
         std::vector<SpiritPixel> getPixels();
         void setFrameID(uint16_t frameID);
+        uint16_t getFrameID();
         void setSystemID(uint16_t systemID);
 
     private:

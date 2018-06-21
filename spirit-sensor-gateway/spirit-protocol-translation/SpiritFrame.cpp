@@ -3,6 +3,9 @@
 SpiritFrame::SpiritFrame(){
 };
 
+SpiritFrame:: ~SpiritFrame(){
+};
+
 void SpiritFrame::addPixel(SpiritPixel spiritPixel){
     spiritPixels.push_back(spiritPixel);
 }
@@ -18,5 +21,9 @@ void SpiritFrame::setFrameID(uint16_t frameID){
 void SpiritFrame::setSystemID(uint16_t systemID){
     this->systemID = systemID;
 }
+
+uint16_t SpiritFrame::getFrameID(){
+    return frameID;
+};
 
 
