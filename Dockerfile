@@ -15,6 +15,8 @@ RUN pacman --noconfirm -Syyu &&\
 # Versioning problem with urllib3. Check if conan still needs this dependency
 RUN pip install --force-reinstall msgpack-python urllib3==1.21.1
 
+RUN whereis udevadm && udevadm control --reload
+
 RUN usermod --home /tmp/nobody --shell /bin/sh nobody
 
 COPY dev-script/aurInstallDependencies /usr/bin/
@@ -23,7 +25,6 @@ RUN /bin/sh -c "aurInstallDependencies"
 
 WORKDIR /builddir
 COPY ./ /builddir/
-RUN udevadm trigger && udevadm control --reload-rules
 
 # Install Kvaser's canlib
 RUN wget http://canlandbucket.s3-website-eu-west-1.amazonaws.com/productionResourcesFiles/47b24f0a-8f35-4fc5-bd7e-444e805caa9c/linuxcan.tar.gz &&\
