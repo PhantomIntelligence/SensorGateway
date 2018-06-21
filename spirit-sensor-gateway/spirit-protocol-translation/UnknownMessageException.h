@@ -20,10 +20,9 @@ class UnknownMessageException : public std::exception {
 
     public:
         UnknownMessageException(AWLMessage* awlMessage);
-        std::string getUnknownMessageException();
+        std::string getMessage();
     private:
-        void setUnknownMessageException(std::string unkownException);
-        std::string unknownMessageException;
+        std::string message;
 };
 
 
