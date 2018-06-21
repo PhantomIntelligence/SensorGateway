@@ -29,14 +29,14 @@ typedef RingBufferPad<ExampleDataModel::NativeData> NativePad;
 
 /**
  * @brief Test Fixture meant to ensure correct behavior of RingBufferPad.
- * @note A RingBuffer is used to implement the differents tested functions
+ * @note A RingBuffer is used to implement the different tested functions
  */
 class RingBufferPadTest : public ::testing::Test {
 
 protected:
-    RingBufferPadTest() {};
+    RingBufferPadTest() = default;
 
-    virtual ~RingBufferPadTest() {};
+    virtual ~RingBufferPadTest() = default;
 };
 
 

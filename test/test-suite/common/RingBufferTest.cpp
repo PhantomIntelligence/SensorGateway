@@ -25,8 +25,6 @@ protected:
 
 };
 
-
-
 RingBufferTest::RingBufferTest() {
 }
 
@@ -46,11 +44,12 @@ TEST_F(RingBufferTest, given_aData_when_consumeForALink_then_returnsData) {
     NativeBuffer nativeBuffer;
     auto linkMock = MockConsumerLink();
     auto nativeData = generateRandomNativeData();
-    nativeBuffer.write(std::move(std::move(nativeData)));
+    auto nativeDataCopy = NativeData(nativeData);
+    nativeBuffer.write(std::move(nativeData));
 
     auto consumedData = nativeBuffer.consumeNextDataFor(&linkMock);
 
-    ASSERT_EQ(nativeData, consumedData);
+    ASSERT_EQ(nativeDataCopy, consumedData);
 }
 
 TEST_F(RingBufferTest, given_twoDataOfWhichOneHasAlreadyBeenConsumed_when_consumeForALink_then_returnsTheSecondData) {
@@ -58,13 +57,14 @@ TEST_F(RingBufferTest, given_twoDataOfWhichOneHasAlreadyBeenConsumed_when_consum
     auto linkMock = MockConsumerLink();
     auto nativeDataOne = generateRandomNativeData();
     auto nativeDataTwo = generateRandomNativeData();
+    auto nativeDataTwoCopy = NativeData(nativeDataTwo);
     nativeBuffer.write(std::move(nativeDataOne));
     nativeBuffer.write(std::move(nativeDataTwo));
     nativeBuffer.consumeNextDataFor(&linkMock);
 
     auto consumedData = nativeBuffer.consumeNextDataFor(&linkMock);
 
-    ASSERT_EQ(nativeDataTwo, consumedData);
+    ASSERT_EQ(nativeDataTwoCopy, consumedData);
 }
 
 TEST_F(RingBufferTest, given_noData_when_consumeForALink_then_throwsARuntimeException) {
@@ -79,12 +79,13 @@ TEST_F(RingBufferTest, given_aDataAndTwoConsumers_when_consumeForALinkAfterTheOt
     auto firstLinkMock = MockConsumerLink();
     auto secondLinkMock = MockConsumerLink();
     auto nativeData = generateRandomNativeData();
+    auto nativeDataCopy = NativeData(nativeData);
     nativeBuffer.write(std::move(std::move(nativeData)));
 
     nativeBuffer.consumeNextDataFor(&firstLinkMock);
     auto consumedData = nativeBuffer.consumeNextDataFor(&secondLinkMock);
 
-    ASSERT_EQ(nativeData, consumedData);
+    ASSERT_EQ(nativeDataCopy, consumedData);
 
 }
 
@@ -116,6 +117,8 @@ TEST_F(RingBufferTest, given_twoDataAndAConsumerThatConsumedThemAll_when_consume
     auto firstLinkMock = MockConsumerLink();
     auto nativeDataOne = generateRandomNativeData();
     auto nativeDataTwo = generateRandomNativeData();
+    auto nativeDataOneCopy = NativeData(nativeDataOne);
+    auto nativeDataTwoCopy = NativeData(nativeDataTwo);
     nativeBuffer.write(std::move(nativeDataOne));
     nativeBuffer.write(std::move(nativeDataTwo));
     nativeBuffer.consumeNextDataFor(&firstLinkMock);
@@ -124,12 +127,13 @@ TEST_F(RingBufferTest, given_twoDataAndAConsumerThatConsumedThemAll_when_consume
     auto newLinkMock = MockConsumerLink();
     auto consumedData = nativeBuffer.consumeNextDataFor(&newLinkMock);
 
-    ASSERT_EQ(nativeDataOne, consumedData);
+    ASSERT_EQ(nativeDataOneCopy, consumedData);
 }
 
 TEST_F(RingBufferTest, given_aFullBuffer_when_writesOneNewData_then_overwritesTheFirstData) {
     NativeBuffer nativeBuffer;
     auto firstData = generateRandomNativeData();
+    auto firstDataCopy = NativeData(firstData);
     nativeBuffer.write(std::move(firstData));
     for (auto i = 0; i < RING_BUFFER_SIZE; ++i) {
         nativeBuffer.write(generateRandomNativeData());
@@ -138,13 +142,14 @@ TEST_F(RingBufferTest, given_aFullBuffer_when_writesOneNewData_then_overwritesTh
     auto newLinkMock = MockConsumerLink();
     auto lastWrittenData = nativeBuffer.consumeNextDataFor(&newLinkMock);
 
-    ASSERT_NE(firstData, lastWrittenData);
+    ASSERT_NE(firstDataCopy, lastWrittenData);
 }
 
 TEST_F(RingBufferTest, given_aFullBuffer_when_writesMoreThanOneData_then_overwritesTheOldestDataEachTime) {
     NativeBuffer nativeBuffer;
     auto firstData = generateRandomNativeData();
     auto secondData = generateRandomNativeData();
+    auto secondDataCopy = NativeData(firstData);
     nativeBuffer.write(std::move(firstData));
     nativeBuffer.write(std::move(secondData));
     for (auto i = 0; i < RING_BUFFER_SIZE; ++i) {
@@ -155,7 +160,7 @@ TEST_F(RingBufferTest, given_aFullBuffer_when_writesMoreThanOneData_then_overwri
     nativeBuffer.consumeNextDataFor(&newLinkMock);
     auto lastWrittenData = nativeBuffer.consumeNextDataFor(&newLinkMock);
 
-    ASSERT_NE(secondData, lastWrittenData);
+    ASSERT_NE(secondDataCopy, lastWrittenData);
 }
 
 #endif //SPECTRE_RINGBUFFERTEST_H

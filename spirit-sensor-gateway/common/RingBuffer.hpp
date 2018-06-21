@@ -99,11 +99,11 @@ namespace DataFlow {
         RingBuffer& operator=(RingBuffer&& other) = delete;
 
 
-        virtual /**
+       /**
         * @brief Writes the data to the RingBufferPad the writer is currently on, moves the writer and notifies all subscribed consumers they can be activated and start to read.
         * @param data The data that will be written
         */
-        void write(DATA&& data) {
+        virtual void write(DATA&& data) {
             writerLocation->write(std::forward<DATA>(data));
             writerLocation = writerLocation->next();
             notifyConsumersIfAnyIsPresent();
@@ -111,11 +111,11 @@ namespace DataFlow {
 
 
         /**
-       * @brief Read allows to access the DATA. It does not modify nor invalidate it.
-       * @see SensorData::RingBufferPad's class documentation for Concurrency Warning
-       * @param consumer A pointer to the AbstractScheduler<DATA> which is related to the consumption
-       * @return A copy of the current DATA
-       */
+         * @brief Read allows to access the DATA. It does not modify nor invalidate it.
+         * @see SensorData::RingBufferPad's class documentation for Concurrency Warning
+         * @param consumer A pointer to the ConsumerLink<DATA> which is related to the consumption
+         * @return A copy of the current DATA
+         */
         virtual auto consumeNextDataFor(Consumer* consumer) -> DATA const& {
             addLinkIfNoneExists(consumer);
             throwErrorIfIllegalConsumption(consumer);
@@ -126,6 +126,10 @@ namespace DataFlow {
         }
 
 
+        /**
+         * @brief Adds a Consumer* to its list. This consumer will be notified when a new data is written
+         * @param consumer a pointer to ConsumerLink<DATA>
+         */
         virtual void linkWith(Consumer* consumer) noexcept {
             addLinkIfNoneExists(consumer);
         }
