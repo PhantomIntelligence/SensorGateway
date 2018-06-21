@@ -15,7 +15,7 @@ RUN pacman --noconfirm -Syyu &&\
 # Versioning problem with urllib3. Check if conan still needs this dependency
 RUN pip install --force-reinstall msgpack-python urllib3==1.21.1
 
-RUN whereis udevadm && udevadm control --reload
+#RUN whereis udevadm && udevadm control --reload
 
 RUN usermod --home /tmp/nobody --shell /bin/sh nobody
 
