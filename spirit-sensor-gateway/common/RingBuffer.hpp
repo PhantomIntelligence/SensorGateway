@@ -29,8 +29,8 @@ namespace {
 namespace DataFlow {
 
     /**
-     * @brief Monitors and allows access to different data types. This is a Single Producer Multiple Processor Buffer.
-     * @template <class T> refers to the data type. Which should come from the SensorData namespace
+     * @brief Monitors and allows access to different data types. This is a Single-Producer-Multiple-Consumer structure.
+     * @template <class T> refers to the data type that this buffer will contain.
      */
     template<class T>
     class RingBuffer {
@@ -79,19 +79,19 @@ namespace DataFlow {
          * @brief Defaulted move constructor
          * @param other the other RingBuffer (to be moved)
          */
-        RingBuffer(RingBuffer&& other) = default;
+        RingBuffer(RingBuffer&& other) noexcept = default;
 
         virtual ~RingBuffer() = default;
 
         /**
          * @brief The RingBuffer are intended to be used as const instances. They shouldn't be assigned.
          */
-        RingBuffer(const RingBuffer& other) = delete;
+        RingBuffer(RingBuffer const& other) = delete;
 
         /**
          * @brief The RingBuffer are intended to be used as const instances. They shouldn't be assigned.
          */
-        RingBuffer& operator=(const RingBuffer& other) = delete;
+        RingBuffer& operator=(RingBuffer const& other) = delete;
 
         /**
          * @brief The RingBuffer are intended to be used as const instances. They shouldn't be copied.
@@ -99,7 +99,7 @@ namespace DataFlow {
         RingBuffer& operator=(RingBuffer&& other) = delete;
 
 
-        /**
+        virtual /**
         * @brief Writes the data to the RingBufferPad the writer is currently on, moves the writer and notifies all subscribed consumers they can be activated and start to read.
         * @param data The data that will be written
         */

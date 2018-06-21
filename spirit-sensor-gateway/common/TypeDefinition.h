@@ -1,12 +1,9 @@
 /**
 	Copyright 2014-2018 Phantom Intelligence Inc.
-
 	Licensed under the Apache License, Version 2.0 (the "License");
 	you may not use this file except in compliance with the License.
 	You may obtain a copy of the License at
-
 		http://www.apache.org/licenses/LICENSE-2.0
-
 	Unless required by applicable law or agreed to in writing, software
 	distributed under the License is distributed on an "AS IS" BASIS,
 	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -14,34 +11,14 @@
 	limitations under the License.
 */
 
+#ifndef SPIRITSENSORGATEWAY_TYPEDEFINITION_H
+#define SPIRITSENSORGATEWAY_TYPEDEFINITION_H
 
-#ifndef SPIRITSENSORGATEWAY_CONSUMERLINK_HPP
-#define SPIRITSENSORGATEWAY_CONSUMERLINK_HPP
+#include <mutex>
 
-#include "TypeDefinition.h"
+namespace {
+    typedef std::mutex Mutex;
+    typedef std::lock_guard<Mutex> LockGuard;
+};
 
-namespace DataFlow {
-
-    template<class T>
-    class RingBuffer;
-
-    template<class T>
-    class ConsumerLink {
-
-    protected:
-
-        virtual ~ConsumerLink() {}
-
-    public:
-
-        typedef RingBuffer<T> InputBuffer;
-
-        virtual void linkWith(InputBuffer* buffer) = 0;
-
-        virtual void activateFor(InputBuffer* buffer) = 0;
-
-        virtual void deactivateFor(InputBuffer* buffer) = 0;
-    };
-}
-
-#endif //SPIRITSENSORGATEWAY_CONSUMERLINK_HPP
+#endif //SPIRITSENSORGATEWAY_TYPEDEFINITION_H
