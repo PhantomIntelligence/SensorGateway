@@ -18,16 +18,21 @@
 #include "spirit-sensor-gateway/domain/AWLMessage.h"
 #include "SpiritProtocol.h"
 #include <vector>
+#include <stdexcept>
 
 using namespace MessageID;
+
+
     class AWLMessageTranslator {
     public:
-        void translateMessage(AWLMessage *awlMessage);
+        void translateBasicMessage(AWLMessage *awlMessage);
         AWLMessageTranslator();
         ~ AWLMessageTranslator();
         std::vector <SensorFrame> returnDoneFrameVector(SensorFrame sensorFrame) const;
 
     private:
+        AWLMessage translateDebugMessage(SpiritDebugMessage spiritDebugMessage);
+
         void setNewSpiritProtocolFrame();
 
         std::vector<SensorFrame> doneFrameList;
@@ -35,7 +40,7 @@ using namespace MessageID;
         SensorFrame currentSensorFrame;
 
         SensorTrack* fetchPointerToTrack(uint16_t trackingID) const;
-        
+
         void translateFrameDoneMessage(AWLMessage *awlMessage);
 
         void translateDetectionTrackMessage(AWLMessage *awlMessage);

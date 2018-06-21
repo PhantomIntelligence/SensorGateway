@@ -8,7 +8,7 @@
         setNewSpiritProtocolFrame();
     }
 
-    void AWLMessageTranslator::translateMessage(AWLMessage *awlMessage) {
+    void AWLMessageTranslator::translateBasicMessage(AWLMessage *awlMessage) {
         switch (awlMessage->id) {
             case FRAME_DONE:
                 translateFrameDoneMessage(awlMessage);

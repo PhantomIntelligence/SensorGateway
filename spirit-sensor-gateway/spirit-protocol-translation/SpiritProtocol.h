@@ -41,7 +41,7 @@ struct SensorFrame {
     uint32_t errorFlag;
 };
 
-struct SpiritDebug{
+struct SpiritDebugMessage{
     uint8_t id;
     uint16_t adress;
     int32_t value;
