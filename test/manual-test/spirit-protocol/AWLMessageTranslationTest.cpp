@@ -27,7 +27,8 @@ int main() {
 
     auto file = std::fopen("frameList.txt", "w+");
     AWLMessageTranslator awlMessageTranslator;
-    auto AwlMessagesFiles = std::ifstream("/home/rphl/Documents/Spirit/SpiritSensorGateway/test/manual-test/spirit-protocol/AWLMessagesCustom.txt");
+    auto AwlMessagesFiles = std::ifstream(
+            "/home/phantom/SpiritSensorGateway/test/manual-test/spirit-protocol/AWLMessagesCustom.txt");
     if (AwlMessagesFiles) {
         std::string ligne;
         while (std::getline(AwlMessagesFiles, ligne)) {
@@ -41,7 +42,7 @@ int main() {
                 auto dataValue = std::stoi(awlData[3 + i]);
                 message.data[i] = static_cast<unsigned char>(dataValue);
             }
-            AWLMessage* pointerToMessage = &message;
+            AWLMessage *pointerToMessage = &message;
             awlMessageTranslator.translateBasicMessage(pointerToMessage);
         }
     } else {
@@ -50,42 +51,46 @@ int main() {
 
     std::vector<SpiritFrame> framelist;
     framelist = awlMessageTranslator.getSpiritFrames();
-    for (std::vector<SpiritFrame>::iterator itFrame=framelist.begin(); itFrame!=framelist.end(); ++itFrame) {
-       uint16_t idFrame = itFrame->getFrameID();
-       uint16_t  systemId = itFrame->getSystemID();
-       uint32_t systemErrorFlag = itFrame->getSystemErrorFlag();
-       std::vector<SpiritPixel> sensorPilexlList = itFrame->getPixels();
+    for (std::vector<SpiritFrame>::iterator itFrame = framelist.begin(); itFrame != framelist.end(); ++itFrame) {
+        uint16_t idFrame = itFrame->getFrameID();
+        uint16_t systemId = itFrame->getSystemID();
+        //uint32_t errorFlag = itFrame->errorFlag;
+        std::vector<SpiritPixel> sensorPilexlList = itFrame->getPixels();
 
-        std::fprintf(file, "=========================================================================================\n");
-        std::fprintf(file, "Frame : %d \n",idFrame);
-        std::fprintf(file, "System : %d \n",systemId);
-        std::fprintf(file, "Flags : %d \n",systemErrorFlag);
+        std::fprintf(file,
+                     "=========================================================================================\n");
+        std::fprintf(file, "Frame : %d \n", idFrame);
+        std::fprintf(file, "System : %d \n", systemId);
 
-        for (std::vector<SpiritPixel>::iterator itPixel=sensorPilexlList.begin(); itPixel!=sensorPilexlList.end(); ++itPixel){
-          uint16_t idPixel = itPixel->getId();
-          std::vector<SpiritTrack> sensorTrackList = itPixel->getTracks();
+        //std::fprintf(file, "Flags : %d \n",errorFlag);
 
-            std::fprintf(file, "Pixel %d : \n",idPixel);
+        for (std::vector<SpiritPixel>::iterator itPixel = sensorPilexlList.begin();
+             itPixel != sensorPilexlList.end(); ++itPixel) {
+            uint16_t idPixel = itPixel->getId();
+            std::vector<SpiritTrack> sensorTrackList = itPixel->getTracks();
 
-          for(std::vector<SpiritTrack>::iterator itTrack=sensorTrackList.begin(); itTrack!=sensorTrackList.end(); ++itTrack){
-              uint16_t trackId = itTrack->getTrackID();
-              int16_t acceleration = itTrack->getAcceleration();
-              uint16_t distance = itTrack->getDistance();
-              uint16_t intensity = itTrack->getIntensity();
-              uint8_t confidenceLevel = itTrack->getConfidenceLevel();
-              int16_t speed = itTrack->getSpeed();
+            std::fprintf(file, "Pixel %d : \n", idPixel);
 
-              std::fprintf(file, ".. Track : %d \n",trackId);
-              std::fprintf(file, "..... Acceleration : %d \n",acceleration);
-              std::fprintf(file, "..... Distance : %d \n",distance);
-              std::fprintf(file, "..... Intensity : %d \n",intensity);
-              std::fprintf(file, "..... Confidence Level : %d \n",confidenceLevel);
-              std::fprintf(file, "..... Speed : %d \n",speed);
-          }
+            for (std::vector<SpiritTrack>::iterator itTrack = sensorTrackList.begin();
+                 itTrack != sensorTrackList.end(); ++itTrack) {
+                uint16_t trackId = itTrack->getTrackID();
+                int16_t acceleration = itTrack->getAcceleration();
+                uint16_t distance = itTrack->getDistance();
+                uint16_t intensity = itTrack->getIntensity();
+                uint8_t confidenceLevel = itTrack->getConfidenceLevel();
+                int16_t speed = itTrack->getSpeed();
+
+                std::fprintf(file, ".. Track : %d \n", trackId);
+                std::fprintf(file, "..... Acceleration : %d \n", acceleration);
+                std::fprintf(file, "..... Distance : %d \n", distance);
+                std::fprintf(file, "..... Intensity : %d \n", intensity);
+                std::fprintf(file, "..... Confidence Level : %d \n", confidenceLevel);
+                std::fprintf(file, "..... Speed : %d \n", speed);
+            }
         }
     }
-        fflush(file);
-        fclose(file);
+    fflush(file);
+    fclose(file);
 
     return 0;
 }

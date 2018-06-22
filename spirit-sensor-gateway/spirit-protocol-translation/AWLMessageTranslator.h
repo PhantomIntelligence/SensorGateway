@@ -35,7 +35,8 @@ using namespace MessageID;
         void translateEndOfFrameMessage(AWLMessage *awlMessage);
         void translateDetectionTrackMessage(AWLMessage *awlMessage);
         void translateDetectionVelocityMessage(AWLMessage *awlMessage);
-        SpiritTrack fetchSpiritTrack(AWLMessage *awlMessage);
+        void addTrackInPixel(AWLMessage *awlMessage, uint16_t spiritPixelID);
+        SpiritTrack * fetchSpiritTrack(AWLMessage *awlMessage);
     };
 
 #endif //SPIRITSENSORGATEWAY_MESSAGEIMPLEMENTATIONSTRATEGY_H
