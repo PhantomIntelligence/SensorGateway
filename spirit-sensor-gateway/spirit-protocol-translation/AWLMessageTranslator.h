@@ -16,7 +16,7 @@
 
 #include "spirit-sensor-gateway/common/ConstantFunction.h"
 #include "spirit-sensor-gateway/domain/AWLMessage.h"
-#include "SpiritFrame.h"
+#include "spirit-sensor-gateway/domain/SpiritFrame.h"
 #include <vector>
 #include <stdexcept>
 
