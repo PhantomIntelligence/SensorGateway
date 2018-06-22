@@ -17,13 +17,13 @@ std::vector<SpiritTrack> SpiritPixel::getTracks(){
     return spiritTracks;
 };
 
-SpiritTrack * SpiritPixel::getTrackById(uint16_t trackID){
-    SpiritTrack * spiritTrack = NULL;
-    for (int trackNumber = 0; trackNumber < spiritTracks.size(); ++trackNumber) {
+SpiritTrack SpiritPixel::getTrackById(uint16_t trackID){
+    SpiritTrack * spiritTrack = nullptr;
+    for (int trackNumber = 0; trackNumber < spiritTracks.size(); trackNumber++) {
         if (spiritTracks[trackNumber].getTrackID() == trackID){
            spiritTrack = &spiritTracks[trackNumber];
            break;
         }
     }
-    return spiritTrack;
+    return *spiritTrack;
 }
