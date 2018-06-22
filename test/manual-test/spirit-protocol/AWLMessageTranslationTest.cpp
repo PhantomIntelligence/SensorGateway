@@ -53,13 +53,13 @@ int main() {
     for (std::vector<SpiritFrame>::iterator itFrame=framelist.begin(); itFrame!=framelist.end(); ++itFrame) {
        uint16_t idFrame = itFrame->getFrameID();
        uint16_t  systemId = itFrame->getSystemID();
-       uint32_t errorFlag = itFrame->errorFlag;
+       uint32_t systemErrorFlag = itFrame->getSystemErrorFlag();
        std::vector<SpiritPixel> sensorPilexlList = itFrame->getPixels();
 
         std::fprintf(file, "=========================================================================================\n");
         std::fprintf(file, "Frame : %d \n",idFrame);
         std::fprintf(file, "System : %d \n",systemId);
-        std::fprintf(file, "Flags : %d \n",errorFlag);
+        std::fprintf(file, "Flags : %d \n",systemErrorFlag);
 
         for (std::vector<SpiritPixel>::iterator itPixel=sensorPilexlList.begin(); itPixel!=sensorPilexlList.end(); ++itPixel){
           uint16_t idPixel = itPixel->getId();

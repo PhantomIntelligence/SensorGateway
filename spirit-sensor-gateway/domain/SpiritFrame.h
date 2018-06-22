@@ -27,8 +27,12 @@ class SpiritFrame {
         uint16_t getFrameID();
         void setSystemID(uint16_t systemID);
         uint16_t getSystemID();
+        void setSystemErrorFlag(uint32_t systemErrorFlag);
+        uint32_t getSystemErrorFlag();
+
 
     private:
+        uint32_t systemErrorFlag;
         uint16_t frameID;
         uint16_t systemID;
         std::vector<SpiritPixel> spiritPixels;

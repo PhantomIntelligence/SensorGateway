@@ -30,5 +30,11 @@ uint16_t SpiritFrame::getSystemID(){
     return systemID;
 };
 
+void SpiritFrame::setSystemErrorFlag(uint32_t systemErrorFlag){
+    this->systemErrorFlag=systemErrorFlag;
+};
 
+uint32_t SpiritFrame::getSystemErrorFlag(){
+    return systemErrorFlag;
+}
 
