@@ -11,11 +11,11 @@ void SpiritTrack::setDistance(uint16_t distance){
     this->distance = distance;
 };
 
-void SpiritTrack::setSpeed(uint16_t speed){
+void SpiritTrack::setSpeed(int16_t speed){
     this->speed = speed;
 };
 
-void SpiritTrack::setAcceleration(uint16_t acceleration){
+void SpiritTrack::setAcceleration(int16_t acceleration){
     this->acceleration = acceleration;
 };
 
@@ -27,10 +27,10 @@ uint16_t SpiritTrack::getDistance(){
     return distance;
 };
 
-uint16_t SpiritTrack::getSpeed(){
+int16_t SpiritTrack::getSpeed(){
     return speed;
 };
-uint16_t SpiritTrack::getAcceleration(){
+int16_t SpiritTrack::getAcceleration(){
     return acceleration;
 };
 
@@ -38,6 +38,6 @@ uint16_t SpiritTrack::getIntensity(){
     return intensity;
 };
 
-uint16_t SpiritTrack::getConfidenceLevel(){
+uint8_t SpiritTrack::getConfidenceLevel(){
     return confidenceLevel;
 };
