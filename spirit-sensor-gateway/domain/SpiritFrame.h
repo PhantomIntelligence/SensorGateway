@@ -27,6 +27,7 @@ class SpiritFrame {
         uint16_t getFrameID();
         void setSystemID(uint16_t systemID);
         uint16_t getSystemID();
+        SpiritPixel * getPixelByID(uint16_t pixelID);
 
     private:
         uint16_t frameID;

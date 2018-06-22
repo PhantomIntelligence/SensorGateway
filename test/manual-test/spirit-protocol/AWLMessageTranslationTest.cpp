@@ -27,7 +27,7 @@ int main() {
 
     auto file = std::fopen("frameList.txt", "w+");
     AWLMessageTranslator awlMessageTranslator;
-    auto AwlMessagesFiles = std::ifstream("/home/rphl/Documents/Spirit/SpiritSensorGateway/test/manual-test/spirit-protocol/AWLMessagesCustom.txt");
+    auto AwlMessagesFiles = std::ifstream("/home/phantom/SpiritSensorGateway/test/manual-test/spirit-protocol/AWLMessagesCustom.txt");
     if (AwlMessagesFiles) {
         std::string ligne;
         while (std::getline(AwlMessagesFiles, ligne)) {
