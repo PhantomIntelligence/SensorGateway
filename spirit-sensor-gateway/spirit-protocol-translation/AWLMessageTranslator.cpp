@@ -2,19 +2,18 @@
 #include "UnknownMessageException.h"
 
 
+    AWLMessageTranslator::AWLMessageTranslator() {
+        currentSpiritFrame = new SpiritFrame();
+    }
+
     AWLMessageTranslator::~AWLMessageTranslator() {
 
     }
-    AWLMessageTranslator::AWLMessageTranslator() {
-        setNewSpiritProtocolFrame();
-    }
-    
-    void AWLMessageTranslator::translateDebugMessage(SpiritDebugMessage spiritDebugMessage) {}
 
     void AWLMessageTranslator::translateBasicMessage(AWLMessage *awlMessage) {
         switch (awlMessage->id) {
             case FRAME_DONE:
-                translateFrameDoneMessage(awlMessage);
+                translateEndOfFrameMessage(awlMessage);
                 break;
             case DETECTION_TRACK :
                 translateDetectionTrackMessage(awlMessage);
@@ -27,60 +26,46 @@
         }
     }
 
-    std::vector<SpiritFrame> AWLMessageTranslator::returnDoneFrameVector() const{
-        return doneFrameList;
+    std::vector<SpiritFrame> AWLMessageTranslator::getSpiritFrames() const{
+        return spiritFrames;
     };
 
-    void AWLMessageTranslator::translateFrameDoneMessage(AWLMessage *awlMessage) {
-
-        this->currentSensorFrame.frameID = awlMessage->data[0];
-        this->currentSensorFrame.systemID = awlMessage->data[2];
-        addDoneFrame(this->currentSensorFrame);
-        setNewSpiritProtocolFrame();
-
+    void AWLMessageTranslator::translateEndOfFrameMessage(AWLMessage *awlMessage) {
+        currentSpiritFrame->setFrameID(awlMessage->data[0]);
+        currentSpiritFrame->setSystemID(awlMessage->data[2]);
+        spiritFrames.push_back(*currentSpiritFrame);
+        currentSpiritFrame = new SpiritFrame();
     }
 
     void AWLMessageTranslator::translateDetectionTrackMessage(AWLMessage *awlMessage) {
-            SensorPixel sensorPixel = SensorPixel{};
-            SensorTrack sensorTrack = SensorTrack{};
+        uint16_t spiritPixelID = convertTwoBytesToBigEndian(awlMessage->data[3],awlMessage->data[4]);
+        SpiritPixel spiritPixel = SpiritPixel(spiritPixelID);
+        currentSpiritFrame->addPixel(spiritPixel);
 
-            sensorTrack.id = convertTwoBytesToBigEndian(awlMessage->data[0],awlMessage->data[1]);
-            sensorTrack.confidenceLevel = awlMessage->data[5];
-            sensorTrack.intensity = convertTwoBytesToBigEndian(awlMessage->data[6],awlMessage->data[7]);
-
-            sensorPixel.id = convertTwoBytesToBigEndian(awlMessage->data[3],awlMessage->data[4]);
-            sensorPixel.trackList.push_back(sensorTrack);
-
-            currentSensorFrame.pixelList.push_back(sensorPixel);
-
-        }
+        uint16_t spiritTrackID = convertTwoBytesToBigEndian(awlMessage->data[0],awlMessage->data[1]);
+        uint8_t spiritTrackConfidenceLevel = awlMessage->data[5];
+        uint16_t spiritTrackIntensity = convertTwoBytesToBigEndian(awlMessage->data[6],awlMessage->data[7]);
+        SpiritTrack spiritTrack = SpiritTrack(spiritTrackID, spiritTrackConfidenceLevel, spiritTrackIntensity);
+        spiritPixel.addTrack(spiritTrack);
+    }
 
     void AWLMessageTranslator::translateDetectionVelocityMessage(AWLMessage *awlMessage) {
-        auto trackId = convertTwoBytesToBigEndian(awlMessage->data[0], awlMessage->data[1]);
-        SensorTrack* sensorTrack = fetchPointerToTrack(trackId);
-
-        sensorTrack->distance = convertTwoBytesToBigEndian(awlMessage->data[2],awlMessage->data[3]);
-        sensorTrack->speed = convertTwoBytesToBigEndian(awlMessage->data[4],awlMessage->data[5]);
-        sensorTrack->acceleration = convertTwoBytesToBigEndian(awlMessage->data[6],awlMessage->data[7]);
-    }
-    
-    void AWLMessageTranslator::setNewSpiritProtocolFrame() {
-        this->currentSensorFrame=SpiritFrame{};
+        SpiritTrack spiritTrack = fetchSpiritTrack(awlMessage);
+        spiritTrack.setDistance(convertTwoBytesToBigEndian(awlMessage->data[2],awlMessage->data[3]));
+        spiritTrack.setSpeed(convertTwoBytesToBigEndian(awlMessage->data[4],awlMessage->data[5]));
+        spiritTrack.setAcceleration(convertTwoBytesToBigEndian(awlMessage->data[6],awlMessage->data[7]));
     }
 
-    void AWLMessageTranslator::addDoneFrame(SpiritFrame sensorFrame) {
-        doneFrameList.push_back(sensorFrame);
-    }
 
-    SensorTrack* AWLMessageTranslator::fetchPointerToTrack(uint16_t trackingID) {
-        SensorTrack* pointerToTrack;
-        for (int i = 0; i < currentSensorFrame.pixelList.size(); ++i) {
-            for (int j = 0; j < currentSensorFrame.pixelList[i].trackList.size(); ++j) {
-                if (currentSensorFrame.pixelList[i].trackList[j].id == trackingID){
-                    pointerToTrack = &currentSensorFrame.pixelList[i].trackList[j];
-                    break;
-                }
+    SpiritTrack AWLMessageTranslator::fetchSpiritTrack(AWLMessage *awlMessage) {
+        SpiritTrack * fetchedSpiritTrack = NULL;
+        uint16_t spiritTrackID = convertTwoBytesToBigEndian(awlMessage->data[0], awlMessage->data[1]);
+        for (int pixelNumber = 0; pixelNumber < currentSpiritFrame->getPixels().size(); ++pixelNumber) {
+            SpiritPixel spiritPixel = currentSpiritFrame->getPixels()[pixelNumber];
+            SpiritTrack spiritTrack = spiritPixel.getTrackById(spiritTrackID);
+            if (&spiritTrack != NULL){
+                fetchedSpiritTrack =  &spiritTrack;
             }
         }
-        return pointerToTrack;
+        return *fetchedSpiritTrack;
     }

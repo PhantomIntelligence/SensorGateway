@@ -18,22 +18,16 @@
 
 class SpiritPixel {
     public:
-
-    explicit SpiritPixel(uint16_t id);
-
-    ~SpiritPixel();
-
-    void addTrack(SpiritTrack spiritTrack);
-
-    bool doesTrackExist(uint16_t trackID);
-
-    SpiritTrack getTrackById(uint16_t trackID);
+        explicit SpiritPixel(uint16_t id);
+        ~SpiritPixel();
+        void addTrack(SpiritTrack spiritTrack);
+        SpiritTrack getTrackById(uint16_t trackID);
+        uint16_t getId();
+        std::vector<SpiritTrack> getTracks();
 
     private:
-
         uint16_t id;
-
-        std::vector<SpiritTrack> trackList;
+        std::vector<SpiritTrack> spiritTracks;
 };
 
 
