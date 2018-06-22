@@ -30,6 +30,7 @@ uint16_t SpiritFrame::getSystemID(){
     return systemID;
 };
 
+
 SpiritPixel * SpiritFrame::getPixelByID(uint16_t pixelID){
     SpiritPixel * spiritPixel = NULL;
     for (int pixelNumber = 0; pixelNumber < spiritPixels.size(); pixelNumber++) {
@@ -41,6 +42,5 @@ SpiritPixel * SpiritFrame::getPixelByID(uint16_t pixelID){
     return  spiritPixel;
 
 }
-
 
 
