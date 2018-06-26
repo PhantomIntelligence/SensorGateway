@@ -30,6 +30,10 @@ uint16_t SpiritFrame::getSystemID(){
     return systemID;
 };
 
+std::vector<std::string> SpiritFrame::getSystemErrorFlagMessages() {
+    return  systemErrorFlagMessages;
+};
+
 
 SpiritPixel * SpiritFrame::getPixelByID(uint16_t pixelID){
     SpiritPixel * spiritPixel = NULL;

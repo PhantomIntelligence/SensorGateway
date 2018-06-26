@@ -14,6 +14,7 @@
 #define SPIRITSENSORGATEWAY_SPIRITTRACK_H
 
 #include <cstdint>
+#include <string>
 
 class SpiritTrack {
 
