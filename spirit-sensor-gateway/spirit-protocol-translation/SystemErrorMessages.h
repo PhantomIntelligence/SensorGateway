@@ -22,7 +22,7 @@ namespace AWLSystemErrorMessages {
         std::string const RECEIVE_FIFO_OVERFLOW = "Receive FIFO Overflow";
         std::string const RECEIVE_FIFO_UNDERFLOW = "Receive FIFO Underflow";
         std::string const SYSTEM_RESET = "System Reset";
-        
+
     }
 
     namespace  AWLDeviceDriverError {

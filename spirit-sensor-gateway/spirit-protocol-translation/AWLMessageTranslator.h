@@ -17,10 +17,12 @@
 #include "spirit-sensor-gateway/common/ConstantFunction.h"
 #include "spirit-sensor-gateway/domain/AWLMessage.h"
 #include "spirit-sensor-gateway/domain/SpiritFrame.h"
+#include "SystemErrorMessages.h"
 #include <vector>
 #include <stdexcept>
 
 using namespace MessageID;
+using namespace AWLSystemErrorMessages;
 
     class AWLMessageTranslator {
     public:
@@ -36,6 +38,8 @@ using namespace MessageID;
         void translateDetectionTrackMessage(AWLMessage *awlMessage);
         void translateDetectionVelocityMessage(AWLMessage *awlMessage);
         void addTrackInPixel(AWLMessage *awlMessage, uint16_t spiritPixelID);
+        bool checkIfErrorMessages(AWLMessage *awlMessage);
+        void handleErrorMessages(AWLMessage *awlMessage);
         SpiritTrack fetchSpiritTrack(AWLMessage *awlMessage);
     };
 

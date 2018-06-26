@@ -85,3 +85,11 @@
         spiritPixel->addTrack(spiritTrack);
         std::cout << "Number of tracks in pixel "<< spiritPixelID << ": " <<spiritPixel->getTracks().size()<< std::endl;
     };
+
+    bool AWLMessageTranslator::checkIfErrorMessages(AWLMessage *awlMessage) {
+
+    }
+
+    void AWLMessageTranslator::handleErrorMessages(AWLMessage *awlMessage) {
+
+    }
