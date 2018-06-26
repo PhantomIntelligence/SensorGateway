@@ -1,3 +1,4 @@
+#include <iostream>
 #include "SpiritPixel.h"
 
 SpiritPixel::SpiritPixel(uint16_t id): id(id){};
@@ -10,20 +11,23 @@ uint16_t SpiritPixel::getId(){
 };
 
 void SpiritPixel::addTrack(SpiritTrack spiritTrack){
-    spiritTracks.push_back(spiritTrack);
+    spiritTracks.insert(std::make_pair(spiritTrack.getTrackID(), spiritTrack));
 }
 
-std::vector<SpiritTrack> SpiritPixel::getTracks(){
+std::unordered_map<uint16_t, SpiritTrack> SpiritPixel::getTracks(){
     return spiritTracks;
 };
 
-SpiritTrack SpiritPixel::getTrackById(uint16_t trackID){
-    SpiritTrack * spiritTrack = nullptr;
-    for (int trackNumber = 0; trackNumber < spiritTracks.size(); trackNumber++) {
-        if (spiritTracks[trackNumber].getTrackID() == trackID){
-           spiritTrack = &spiritTracks[trackNumber];
-           break;
-        }
+bool SpiritPixel::doesTrackExist(uint16_t trackID){
+    bool trackExists =  false;
+    if (spiritTracks.find(trackID) != spiritTracks.end()) {
+        trackExists = true;
     }
-    return *spiritTrack;
+    return trackExists;
+};
+
+SpiritTrack SpiritPixel::getTrackById(uint16_t trackID){
+    std::cout << spiritTracks[trackID].getTrackID() << std::endl;
+    SpiritTrack test = SpiritTrack(0, 0, 0);
+    return test;
 }

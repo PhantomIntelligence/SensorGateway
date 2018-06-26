@@ -63,13 +63,14 @@
         uint16_t spiritTrackID = convertTwoBytesToBigEndian(awlMessage->data[0], awlMessage->data[1]);
         for (int pixelNumber = 0; pixelNumber < currentSpiritFrame->getPixels().size(); pixelNumber++) {
             SpiritPixel spiritPixel = currentSpiritFrame->getPixels()[pixelNumber];
-            std::cout << "Pixel ID :"<<spiritPixel.getId() << std::endl;
-            SpiritTrack  spiritTrack = spiritPixel.getTrackById(spiritTrackID);
-            if (&spiritTrack != nullptr){
+            std::cout << "Checking Pixel ID :"<<spiritPixel.getId() << std::endl;
+            bool  trackExists = spiritPixel.doesTrackExist(spiritTrackID);
+            if (trackExists != false){
+                SpiritTrack  spiritTrack = spiritPixel.getTrackById(spiritTrackID);
                 fetchedSpiritTrack =  &spiritTrack;
+                std::cout << "Updating track: "<<fetchedSpiritTrack->getTrackID() << std::endl;
             }
         }
-        std::cout << "Updating track: "<<fetchedSpiritTrack->getTrackID() << std::endl;
         return *fetchedSpiritTrack;
     }
 

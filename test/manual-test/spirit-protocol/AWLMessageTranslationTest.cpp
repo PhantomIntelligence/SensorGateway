@@ -64,10 +64,10 @@ int main() {
 
         //std::fprintf(file, "Flags : %d \n",errorFlag);
 
-        for (std::vector<SpiritPixel>::iterator itPixel = sensorPilexlList.begin();
+        /*for (std::vector<SpiritPixel>::iterator itPixel = sensorPilexlList.begin();
              itPixel != sensorPilexlList.end(); ++itPixel) {
             uint16_t idPixel = itPixel->getId();
-            std::vector<SpiritTrack> sensorTrackList = itPixel->getTracks();
+            std::unordered_map<uint16_t, SpiritTrack>  sensorTrackList = itPixel->getTracks();
 
             std::fprintf(file, "Pixel %d : \n", idPixel);
 
@@ -88,6 +88,7 @@ int main() {
                 std::fprintf(file, "..... Speed : %d \n", speed);
             }
         }
+         */
     }
     fflush(file);
     fclose(file);

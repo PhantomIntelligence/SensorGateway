@@ -14,20 +14,22 @@
 #define SPIRITSENSORGATEWAY_SPIRITPIXEL_H
 
 #include <vector>
+#include <unordered_map>
 #include "SpiritTrack.h"
 
 class SpiritPixel {
     public:
-        explicit SpiritPixel(uint16_t id);
+        SpiritPixel(uint16_t id);
         ~SpiritPixel();
-        void addTrack(SpiritTrack spiritTrack);
-        SpiritTrack  getTrackById(uint16_t trackID);
         uint16_t getId();
-        std::vector<SpiritTrack> getTracks();
+        void addTrack(SpiritTrack spiritTrack);
+        bool doesTrackExist(uint16_t trackID);
+        SpiritTrack getTrackById(uint16_t trackID);
+        std::unordered_map<uint16_t, SpiritTrack> getTracks();
 
     private:
         uint16_t id;
-        std::vector<SpiritTrack> spiritTracks;
+        std::unordered_map<uint16_t, SpiritTrack> spiritTracks;
 };
 
 
