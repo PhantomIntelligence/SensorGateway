@@ -67,18 +67,18 @@ int main() {
         for (std::vector<SpiritPixel>::iterator itPixel = sensorPilexlList.begin();
              itPixel != sensorPilexlList.end(); ++itPixel) {
             uint16_t idPixel = itPixel->getId();
-            std::vector<SpiritTrack> sensorTrackList = itPixel->getTracks();
+            std::unordered_map<uint16_t, SpiritTrack>  sensorTrackList = itPixel->getTracks();
 
             std::fprintf(file, "Pixel %d : \n", idPixel);
 
-            for (std::vector<SpiritTrack>::iterator itTrack = sensorTrackList.begin();
-                 itTrack != sensorTrackList.end(); ++itTrack) {
-                uint16_t trackId = itTrack->getTrackID();
-                int16_t acceleration = itTrack->getAcceleration();
-                uint16_t distance = itTrack->getDistance();
-                uint16_t intensity = itTrack->getIntensity();
-                uint8_t confidenceLevel = itTrack->getConfidenceLevel();
-                int16_t speed = itTrack->getSpeed();
+            for (std::unordered_map<uint16_t, SpiritTrack>::iterator itTrack = sensorTrackList.begin();
+                itTrack != sensorTrackList.end(); ++itTrack) {
+                uint16_t trackId = itTrack->second.getTrackID();
+                int16_t acceleration = itTrack->second.getAcceleration();
+                uint16_t distance = itTrack->second.getDistance();
+                uint16_t intensity = itTrack->second.getIntensity();
+                uint8_t confidenceLevel = itTrack->second.getConfidenceLevel();
+                int16_t speed = itTrack->second.getSpeed();
 
                 std::fprintf(file, ".. Track : %d \n", trackId);
                 std::fprintf(file, "..... Acceleration : %d \n", acceleration);
