@@ -27,7 +27,5 @@ bool SpiritPixel::doesTrackExist(uint16_t trackID){
 };
 
 SpiritTrack SpiritPixel::getTrackById(uint16_t trackID){
-    std::cout << spiritTracks[trackID].getTrackID() << std::endl;
-    SpiritTrack test = SpiritTrack(0, 0, 0);
-    return test;
+    return spiritTracks.at(trackID);
 }
