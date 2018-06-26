@@ -55,11 +55,10 @@
     SpiritTrack AWLMessageTranslator::fetchSpiritTrack(AWLMessage *awlMessage) {
         SpiritTrack * fetchedSpiritTrack = nullptr;
         uint16_t spiritTrackID = convertTwoBytesToBigEndian(awlMessage->data[0], awlMessage->data[1]);
-        for (int pixelNumber = 0; pixelNumber < currentSpiritFrame->getPixels().size(); pixelNumber++) {
-            SpiritPixel spiritPixel = currentSpiritFrame->getPixels()[pixelNumber];
-            bool  trackExists = spiritPixel.doesTrackExist(spiritTrackID);
+        for (auto pixel : currentSpiritFrame->getPixels()) {
+            bool trackExists = pixel.second.doesTrackExist(spiritTrackID);
             if (trackExists){
-                SpiritTrack  spiritTrack = spiritPixel.getTrackById(spiritTrackID);
+                SpiritTrack  spiritTrack = pixel.second.getTrackById(spiritTrackID);
                 fetchedSpiritTrack =  &spiritTrack;
             }
         }
@@ -72,6 +71,6 @@
         uint8_t spiritTrackConfidenceLevel = awlMessage->data[5];
         uint16_t spiritTrackIntensity = convertTwoBytesToBigEndian(awlMessage->data[6],awlMessage->data[7]);
         SpiritTrack spiritTrack = SpiritTrack(spiritTrackID, spiritTrackConfidenceLevel, spiritTrackIntensity);
-        SpiritPixel * spiritPixel = currentSpiritFrame-> getPixelByID(spiritPixelID);
+        SpiritPixel* spiritPixel = currentSpiritFrame-> getPixelByID(spiritPixelID);
         spiritPixel->addTrack(spiritTrack);
     };

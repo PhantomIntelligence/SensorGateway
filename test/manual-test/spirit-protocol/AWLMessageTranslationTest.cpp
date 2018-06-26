@@ -55,7 +55,7 @@ int main() {
         uint16_t idFrame = itFrame->getFrameID();
         uint16_t systemId = itFrame->getSystemID();
         //uint32_t errorFlag = itFrame->errorFlag;
-        std::vector<SpiritPixel> sensorPilexlList = itFrame->getPixels();
+        std::unordered_map<uint16_t, SpiritPixel> sensorPilexlList = itFrame->getPixels();
 
         std::fprintf(file,
                      "=========================================================================================\n");
@@ -64,10 +64,10 @@ int main() {
 
         //std::fprintf(file, "Flags : %d \n",errorFlag);
 
-        for (std::vector<SpiritPixel>::iterator itPixel = sensorPilexlList.begin();
+        for (std::unordered_map<uint16_t, SpiritPixel>::iterator itPixel = sensorPilexlList.begin();
              itPixel != sensorPilexlList.end(); ++itPixel) {
-            uint16_t idPixel = itPixel->getId();
-            std::unordered_map<uint16_t, SpiritTrack>  sensorTrackList = itPixel->getTracks();
+            uint16_t idPixel = itPixel->second.getId();
+            std::unordered_map<uint16_t, SpiritTrack>  sensorTrackList = itPixel->second.getTracks();
 
             std::fprintf(file, "Pixel %d : \n", idPixel);
 

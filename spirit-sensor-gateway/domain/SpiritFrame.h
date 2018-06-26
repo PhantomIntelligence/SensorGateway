@@ -10,9 +10,9 @@
 	See the License for the specific language governing permissions and
 	limitations under the License.
 */
+
 #ifndef SPIRITSENSORGATEWAY_SPIRITFRAME_H
 #define SPIRITSENSORGATEWAY_SPIRITFRAME_H
-
 
 #include <stdint-gcc.h>
 #include "SpiritPixel.h"
@@ -21,19 +21,18 @@ class SpiritFrame {
     public:
         SpiritFrame();
         ~SpiritFrame();
-        void addPixel(SpiritPixel spiritPixel);
-        std::vector<SpiritPixel> getPixels();
-        void setFrameID(uint16_t frameID);
+        SpiritPixel* getPixelByID(uint16_t pixelID);
+        std::unordered_map<uint16_t, SpiritPixel> getPixels();
         uint16_t getFrameID();
-        void setSystemID(uint16_t systemID);
         uint16_t getSystemID();
-        SpiritPixel * getPixelByID(uint16_t pixelID);
+        void addPixel(SpiritPixel spiritPixel);
+        void setFrameID(uint16_t frameID);
+        void setSystemID(uint16_t systemID);
 
     private:
-        uint32_t systemErrorFlag;
+        std::unordered_map<uint16_t, SpiritPixel> spiritPixels;
         uint16_t frameID;
         uint16_t systemID;
-        std::vector<SpiritPixel> spiritPixels;
 };
 
 #endif //SPIRITSENSORGATEWAY_SPIRITFRAME_H
