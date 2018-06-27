@@ -45,14 +45,14 @@
     }
 
     void AWLMessageTranslator::translateDetectionVelocityMessage(AWLMessage *awlMessage) {
-        SpiritTrack spiritTrack = fetchSpiritTrack(awlMessage);
-        spiritTrack.setDistance(convertTwoBytesToBigEndian(awlMessage->data[2],awlMessage->data[3]));
-        spiritTrack.setSpeed(convertTwoBytesToBigEndian(awlMessage->data[4],awlMessage->data[5]));
-        spiritTrack.setAcceleration(convertTwoBytesToBigEndian(awlMessage->data[6],awlMessage->data[7]));
+        auto spiritTrack = fetchSpiritTrack(awlMessage);
+        spiritTrack->setDistance(convertTwoBytesToBigEndian(awlMessage->data[2],awlMessage->data[3]));
+        spiritTrack->setSpeed(convertTwoBytesToBigEndian(awlMessage->data[4],awlMessage->data[5]));
+        spiritTrack->setAcceleration(convertTwoBytesToBigEndian(awlMessage->data[6],awlMessage->data[7]));
     }
 
 
-    SpiritTrack AWLMessageTranslator::fetchSpiritTrack(AWLMessage *awlMessage) {
+    SpiritTrack* AWLMessageTranslator::fetchSpiritTrack(AWLMessage *awlMessage) {
         SpiritTrack * fetchedSpiritTrack = nullptr;
         uint16_t spiritTrackID = convertTwoBytesToBigEndian(awlMessage->data[0], awlMessage->data[1]);
         for (auto pixel : currentSpiritFrame->getPixels()) {
@@ -62,7 +62,7 @@
                 fetchedSpiritTrack =  &spiritTrack;
             }
         }
-        return *fetchedSpiritTrack;
+        return fetchedSpiritTrack;
     }
 
 

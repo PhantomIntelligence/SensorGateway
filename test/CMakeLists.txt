@@ -11,6 +11,7 @@ include_directories(SYSTEM ${GOOGLE_TEST_DIR}/googlemock/include)
 # Select all the test and source files
 file(GLOB TEST_FILES "${CMAKE_CURRENT_SOURCE_DIR}/test-suite/*")
 file(GLOB COMMON_TEST_FILES "${CMAKE_CURRENT_SOURCE_DIR}/test-suite/common/*")
+file(GLOB TRANSLATOR_TEST_FILES "${CMAKE_CURRENT_SOURCE_DIR}/test-suite/spirit-protocol-translation/*")
 
 # Include Mocks
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/mock")
@@ -23,7 +24,7 @@ include_directories("${CMAKE_CURRENT_SOURCE_DIR}/test/manual-test")
 
 # Add all the test and mock files to the executable
 
-add_executable(runtests ${TEST_FILES} ${COMMON_TEST_FILES})
+add_executable(runtests ${TEST_FILES} ${COMMON_TEST_FILES} ${TRANSLATOR_TEST_FILES})
 
 find_package(SpiritSensorGateway)
 target_link_libraries(runtests gtest gmock_main ${SpiritSensorGateway_LIBRARIES} ${CONAN_LIBS})
