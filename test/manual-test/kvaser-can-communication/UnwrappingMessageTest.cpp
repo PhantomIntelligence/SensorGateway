@@ -10,7 +10,7 @@ int main(){
     const int NUMBER_DETECTION = 1000;
     auto file = std::fopen("AWLMessages.txt", "w+");
     auto jsonFile = std::fopen("AWLMessages.json", "w+");
-    auto customFile = std::fopen("AWLMessagesCustom.txt","w+");
+    auto customFile = std::fopen("AWLMessages.txt","w+");
 
     KvaserCanProtocolStrategy kvaserCanProtocolStrategy;
     kvaserCanProtocolStrategy.openConnection();

@@ -19,7 +19,7 @@ foreach (file ${MANUAL_TEST_FILES})
 
 
         install(TARGETS ${MANUAL_TEST}
-            EXPORT SpiritSensorGatewayTargets
+            EXPORT ${PROJECT_NAME}Targets
                 RUNTIME DESTINATION "${INSTALL_BIN_DIR}" COMPONENT bin)
         message(STATUS "Done")
 

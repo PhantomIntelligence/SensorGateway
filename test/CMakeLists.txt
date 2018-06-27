@@ -30,9 +30,11 @@ target_link_libraries(runtests gtest gmock_main ${SpiritSensorGateway_LIBRARIES}
 
 install(TARGETS runtests
         # IMPORTANT: Add the runtests executable to the "export-set"
-        EXPORT SecureStreamingTargets
+        EXPORT ${PROJECT_NAME}Targets
         RUNTIME DESTINATION "${INSTALL_BIN_DIR}" COMPONENT bin)
 
+# Include acceptance-test
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/acceptance-test")
 
 # Includes the manual test
 add_subdirectory(manual-test)

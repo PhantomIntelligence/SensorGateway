@@ -1,4 +1,3 @@
-
 #include <iostream>
 #include <cstdio>
 #include <vector>
@@ -6,7 +5,6 @@
 #include <fstream>
 #include <array>
 #include <ios>
-
 
 #include "spirit-sensor-gateway/spirit-protocol-translation/AWLMessageTranslator.h"
 
@@ -28,7 +26,7 @@ int main() {
     auto file = std::fopen("frameList.txt", "w+");
     AWLMessageTranslator awlMessageTranslator;
     auto AwlMessagesFiles = std::ifstream(
-            "/home/phantom/SpiritSensorGateway/test/manual-test/spirit-protocol/AWLMessagesCustom.txt");
+            "/home/phantom/SpiritSensorGateway/test/manual-test/spirit-protocol/AWLMessages.txt");
     if (AwlMessagesFiles) {
         std::string ligne;
         while (std::getline(AwlMessagesFiles, ligne)) {
