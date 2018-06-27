@@ -67,7 +67,7 @@ TEST_F(AWLMessageTranslatorTest,given_anAWLMessageWithAnIdofEleven_when_translat
     awlMessageTranslatorTest->translateBasicMessage(&detectionVelocityAwlMessage);
     awlMessageTranslatorTest->translateBasicMessage(&endOfFrameAwlMessage);
 
-        
+
 
 
 
