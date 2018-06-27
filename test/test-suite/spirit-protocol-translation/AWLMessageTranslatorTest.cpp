@@ -25,7 +25,7 @@ TEST_F(AWLMessageTranslatorTest,given_anAWLMessageWithAFrameDoneId_when_translat
     auto expectedFrameIdOfSpiritFrame = 0x1012;
     auto expectedSystemIdOfSpiritFrame = 0x1000;
 
-    auto spiritFrame = awlMessageTranslatorTest->getSpiritFrames()[0];
+    auto spiritFrame = awlMessageTranslatorTest->getFrames()[0];
     ASSERT_EQ(expectedFrameIdOfSpiritFrame,spiritFrame.getFrameID());
     ASSERT_EQ(expectedSystemIdOfSpiritFrame,spiritFrame.getSystemID());
 
@@ -44,15 +44,14 @@ TEST_F(AWLMessageTranslatorTest,given_anAWLMessageWithADetectionTrackId_when_tra
     auto expectedTrackId = 0x2010;
     auto expectedTrackConfidenceLevel = 0x60;
     auto expectedTrackIntensity = 0x8070;
-    auto spiritFrame = awlMessageTranslatorTest.getSpiritFrames()[0];
-    auto spiritPixel = spiritFrame.getPixelByID(expectedPixelId);
-    auto spiritTrack = spiritPixel->getTrackById(expectedTrackId);
+    auto spiritFrame = awlMessageTranslatorTest.getFrames()[0];
+    auto spiritPixel = spiritFrame.fetchPixelByID(expectedPixelId);
+    auto spiritTrack = spiritPixel->fetchTrackByID(expectedTrackId);
 
 
-    ASSERT_EQ(spiritTrack.getTrackID(),expectedTrackId);
-    ASSERT_EQ(spiritTrack.getTrackID(),expectedTrackId);
-    ASSERT_EQ(spiritTrack.getConfidenceLevel(),expectedTrackConfidenceLevel);
-    ASSERT_EQ(spiritTrack.getIntensity(),expectedTrackIntensity);
+    ASSERT_EQ(spiritTrack->getID(),expectedTrackId);
+    ASSERT_EQ(spiritTrack->getConfidenceLevel(),expectedTrackConfidenceLevel);
+    ASSERT_EQ(spiritTrack->getIntensity(),expectedTrackIntensity);
 }
 
 TEST_F(AWLMessageTranslatorTest,given_anAWLMessageWithAnIdofEleven_when_translatingTheAwlMessage) {

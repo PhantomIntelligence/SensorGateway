@@ -49,31 +49,28 @@ int main() {
         std::cerr << "Erreur d'ouverture de fichier\n";
     }
 
-    std::vector<SpiritFrame> framelist;
-    framelist = awlMessageTranslator.getSpiritFrames();
-    for (std::vector<SpiritFrame>::iterator itFrame = framelist.begin(); itFrame != framelist.end(); ++itFrame) {
+    std::vector<Frame> framelist;
+    framelist = awlMessageTranslator.getFrames();
+    for (std::vector<Frame>::iterator itFrame = framelist.begin(); itFrame != framelist.end(); ++itFrame) {
         uint16_t idFrame = itFrame->getFrameID();
         uint16_t systemId = itFrame->getSystemID();
-        //uint32_t errorFlag = itFrame->errorFlag;
-        std::unordered_map<uint16_t, SpiritPixel> sensorPilexlList = itFrame->getPixels();
+        std::unordered_map<uint16_t, Pixel> sensorPilexlList = itFrame->getPixels();
 
         std::fprintf(file,
                      "=========================================================================================\n");
         std::fprintf(file, "Frame : %d \n", idFrame);
         std::fprintf(file, "System : %d \n", systemId);
 
-        //std::fprintf(file, "Flags : %d \n",errorFlag);
-
-        for (std::unordered_map<uint16_t, SpiritPixel>::iterator itPixel = sensorPilexlList.begin();
+        for (std::unordered_map<PixelID , Pixel>::iterator itPixel = sensorPilexlList.begin();
              itPixel != sensorPilexlList.end(); ++itPixel) {
-            uint16_t idPixel = itPixel->second.getId();
-            std::unordered_map<uint16_t, SpiritTrack>  sensorTrackList = itPixel->second.getTracks();
+            uint16_t idPixel = itPixel->second.getID();
+            std::unordered_map<TrackID, Track>  sensorTrackList = itPixel->second.getTracks();
 
             std::fprintf(file, "Pixel %d : \n", idPixel);
 
-            for (std::unordered_map<uint16_t, SpiritTrack>::iterator itTrack = sensorTrackList.begin();
+            for (std::unordered_map<TrackID, Track>::iterator itTrack = sensorTrackList.begin();
                 itTrack != sensorTrackList.end(); ++itTrack) {
-                uint16_t trackId = itTrack->second.getTrackID();
+                uint16_t trackId = itTrack->second.getID();
                 int16_t acceleration = itTrack->second.getAcceleration();
                 uint16_t distance = itTrack->second.getDistance();
                 uint16_t intensity = itTrack->second.getIntensity();

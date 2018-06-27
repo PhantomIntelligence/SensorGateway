@@ -10,27 +10,28 @@
 	See the License for the specific language governing permissions and
 	limitations under the License.
 */
+
 #ifndef SPIRITSENSORGATEWAY_SPIRITPIXEL_H
 #define SPIRITSENSORGATEWAY_SPIRITPIXEL_H
 
-#include <vector>
 #include <unordered_map>
-#include "SpiritTrack.h"
+#include "Track.h"
 
-class SpiritPixel {
-    public:
-        SpiritPixel(uint16_t id);
-        ~SpiritPixel();
-        uint16_t getId();
-        void addTrack(SpiritTrack spiritTrack);
-        bool doesTrackExist(uint16_t trackID);
-        SpiritTrack getTrackById(uint16_t trackID);
-        std::unordered_map<uint16_t, SpiritTrack> getTracks();
+namespace SpiritProtocol {
+    class Pixel {
+        public:
+            Pixel(PixelID pixelID);
+            ~Pixel();
+            void addTrack(Track track);
+            bool doesTrackExist(TrackID trackID);
+            Track* fetchTrackByID(TrackID trackID);
+            PixelID getID() const;
+            std::unordered_map<TrackID, Track> getTracks() const;
 
-    private:
-        uint16_t id;
-        std::unordered_map<uint16_t, SpiritTrack> spiritTracks;
-};
-
+        private:
+            uint16_t ID;
+            std::unordered_map<TrackID, Track> tracks;
+    };
+}
 
 #endif //SPIRITSENSORGATEWAY_SPIRITPIXEL_H
