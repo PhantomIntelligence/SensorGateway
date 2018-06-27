@@ -2,75 +2,72 @@
 #include "UnknownMessageException.h"
 
 
-    AWLMessageTranslator::AWLMessageTranslator() {
-        currentSpiritFrame = new SpiritFrame();
+AWLMessageTranslator::AWLMessageTranslator() {
+    currentFrame = new Frame();
+}
+
+AWLMessageTranslator::~AWLMessageTranslator() {
+}
+
+std::vector<Frame> AWLMessageTranslator::getFrames() const{
+    return frames;
+};
+
+void AWLMessageTranslator::translateBasicMessage(AWLMessage* awlMessage) {
+    switch (awlMessage->id) {
+        case FRAME_DONE:
+            translateEndOfFrameMessage(awlMessage);
+            break;
+        case DETECTION_TRACK :
+            translateDetectionTrackMessage(awlMessage);
+            break;
+        case DETECTION_VELOCITY :
+            translateDetectionVelocityMessage(awlMessage);
+            break;
+        default:
+            throw UnknownMessageException(awlMessage);
     }
+}
 
-    AWLMessageTranslator::~AWLMessageTranslator() {
+void AWLMessageTranslator::translateEndOfFrameMessage(AWLMessage* awlMessage) {
+    currentFrame->setFrameID(convertTwoBytesToBigEndian(awlMessage->data[0],awlMessage->data[1]));
+    currentFrame->setSystemID(convertTwoBytesToBigEndian(awlMessage->data[2],awlMessage->data[3]));
+    frames.push_back(*currentFrame);
+    currentFrame = new Frame();
+}
 
-    }
+void AWLMessageTranslator::translateDetectionTrackMessage(AWLMessage* awlMessage) {
+    PixelID pixelID = convertTwoBytesToBigEndian(awlMessage->data[3],awlMessage->data[4]);
+    Pixel pixel = Pixel(pixelID);
+    currentFrame->addPixel(pixel);
+    addTrackInPixel(awlMessage, pixelID);
+}
 
-    void AWLMessageTranslator::translateBasicMessage(AWLMessage *awlMessage) {
-        switch (awlMessage->id) {
-            case FRAME_DONE:
-                translateEndOfFrameMessage(awlMessage);
-                break;
-            case DETECTION_TRACK :
-                translateDetectionTrackMessage(awlMessage);
-                break;
-            case DETECTION_VELOCITY :
-                translateDetectionVelocityMessage(awlMessage);
-                break;
-            default:
-                throw UnknownMessageException(awlMessage);
+void AWLMessageTranslator::addTrackInPixel(AWLMessage* awlMessage, PixelID pixelID){
+    TrackID trackID = convertTwoBytesToBigEndian(awlMessage->data[0],awlMessage->data[1]);
+    ConfidenceLevel confidenceLevel = awlMessage->data[5];
+    Intensity intensity = convertTwoBytesToBigEndian(awlMessage->data[6],awlMessage->data[7]);
+    Track track = Track(trackID, confidenceLevel, intensity);
+    Pixel* pixel = currentFrame-> fetchPixelByID(pixelID);
+    pixel->addTrack(track);
+};
+
+void AWLMessageTranslator::translateDetectionVelocityMessage(AWLMessage* awlMessage) {
+    Track* track = fetchTrack(awlMessage);
+    track->setDistance(convertTwoBytesToBigEndian(awlMessage->data[2],awlMessage->data[3]));
+    track->setSpeed(convertTwoBytesToBigEndian(awlMessage->data[4],awlMessage->data[5]));
+    track->setAcceleration(convertTwoBytesToBigEndian(awlMessage->data[6],awlMessage->data[7]));
+}
+
+Track* AWLMessageTranslator::fetchTrack(AWLMessage* awlMessage) {
+    Track* fetchedTrack = nullptr;
+    TrackID trackID = convertTwoBytesToBigEndian(awlMessage->data[0], awlMessage->data[1]);
+    for (auto pixel : currentFrame->getPixels()) {
+        bool trackExists = pixel.second.doesTrackExist(trackID);
+        if (trackExists){
+            Track* track = pixel.second.fetchTrackByID(trackID);
+            fetchedTrack = track;
         }
     }
-
-    std::vector<SpiritFrame> AWLMessageTranslator::getSpiritFrames() const{
-        return spiritFrames;
-    };
-
-    void AWLMessageTranslator::translateEndOfFrameMessage(AWLMessage *awlMessage) {
-        currentSpiritFrame->setFrameID(convertTwoBytesToBigEndian(awlMessage->data[0],awlMessage->data[1]));
-        currentSpiritFrame->setSystemID(convertTwoBytesToBigEndian(awlMessage->data[2],awlMessage->data[3]));
-        spiritFrames.push_back(*currentSpiritFrame);
-        currentSpiritFrame = new SpiritFrame();
-    }
-
-    void AWLMessageTranslator::translateDetectionTrackMessage(AWLMessage *awlMessage) {
-        uint16_t spiritPixelID = convertTwoBytesToBigEndian(awlMessage->data[3],awlMessage->data[4]);
-        SpiritPixel spiritPixel = SpiritPixel(spiritPixelID);
-        currentSpiritFrame->addPixel(spiritPixel);
-        addTrackInPixel(awlMessage, spiritPixelID);
-    }
-
-    void AWLMessageTranslator::translateDetectionVelocityMessage(AWLMessage *awlMessage) {
-        SpiritTrack spiritTrack = fetchSpiritTrack(awlMessage);
-        spiritTrack.setDistance(convertTwoBytesToBigEndian(awlMessage->data[2],awlMessage->data[3]));
-        spiritTrack.setSpeed(convertTwoBytesToBigEndian(awlMessage->data[4],awlMessage->data[5]));
-        spiritTrack.setAcceleration(convertTwoBytesToBigEndian(awlMessage->data[6],awlMessage->data[7]));
-    }
-
-
-    SpiritTrack AWLMessageTranslator::fetchSpiritTrack(AWLMessage *awlMessage) {
-        SpiritTrack * fetchedSpiritTrack = nullptr;
-        uint16_t spiritTrackID = convertTwoBytesToBigEndian(awlMessage->data[0], awlMessage->data[1]);
-        for (auto pixel : currentSpiritFrame->getPixels()) {
-            bool trackExists = pixel.second.doesTrackExist(spiritTrackID);
-            if (trackExists){
-                SpiritTrack  spiritTrack = pixel.second.getTrackById(spiritTrackID);
-                fetchedSpiritTrack =  &spiritTrack;
-            }
-        }
-        return *fetchedSpiritTrack;
-    }
-
-
-    void AWLMessageTranslator::addTrackInPixel(AWLMessage *awlMessage, uint16_t spiritPixelID){
-        uint16_t spiritTrackID = convertTwoBytesToBigEndian(awlMessage->data[0],awlMessage->data[1]);
-        uint8_t spiritTrackConfidenceLevel = awlMessage->data[5];
-        uint16_t spiritTrackIntensity = convertTwoBytesToBigEndian(awlMessage->data[6],awlMessage->data[7]);
-        SpiritTrack spiritTrack = SpiritTrack(spiritTrackID, spiritTrackConfidenceLevel, spiritTrackIntensity);
-        SpiritPixel* spiritPixel = currentSpiritFrame-> getPixelByID(spiritPixelID);
-        spiritPixel->addTrack(spiritTrack);
-    };
+    return fetchedTrack;
+}

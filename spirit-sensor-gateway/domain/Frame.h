@@ -14,25 +14,26 @@
 #ifndef SPIRITSENSORGATEWAY_SPIRITFRAME_H
 #define SPIRITSENSORGATEWAY_SPIRITFRAME_H
 
-#include <stdint-gcc.h>
-#include "SpiritPixel.h"
+#include "Pixel.h"
 
-class SpiritFrame {
-    public:
-        SpiritFrame();
-        ~SpiritFrame();
-        SpiritPixel* getPixelByID(uint16_t pixelID);
-        std::unordered_map<uint16_t, SpiritPixel> getPixels();
-        uint16_t getFrameID();
-        uint16_t getSystemID();
-        void addPixel(SpiritPixel spiritPixel);
-        void setFrameID(uint16_t frameID);
-        void setSystemID(uint16_t systemID);
+namespace SpiritProtocol {
+    class Frame {
+        public:
+            Frame();
+            ~Frame();
+            void addPixel(Pixel pixel);
+            Pixel* fetchPixelByID(PixelID pixelID);
+            FrameID getFrameID() const;
+            std::unordered_map<PixelID, Pixel> getPixels() const;
+            SystemID getSystemID() const;
+            void setFrameID(FrameID frameID);
+            void setSystemID(SystemID systemID);
 
-    private:
-        std::unordered_map<uint16_t, SpiritPixel> spiritPixels;
-        uint16_t frameID;
-        uint16_t systemID;
-};
+        private:
+            FrameID frameID;
+            std::unordered_map<PixelID, Pixel> pixels;
+            SystemID systemID;
+    };
+}
 
 #endif //SPIRITSENSORGATEWAY_SPIRITFRAME_H
