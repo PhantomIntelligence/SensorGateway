@@ -18,7 +18,7 @@
 #ifndef SPIRITSENSORGATEWAY_CONSUMERLINK_HPP
 #define SPIRITSENSORGATEWAY_CONSUMERLINK_HPP
 
-#include "TypeDefinition.h"
+#include "ConstantDefinition.h"
 
 namespace DataFlow {
 

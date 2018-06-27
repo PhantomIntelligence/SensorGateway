@@ -68,7 +68,7 @@ namespace DataFlow {
 
         /**
          * @brief Default constructor.
-         * @note The map size is *by default* set to NUMBER_OF_CONSUMER_PER_BUFFER. The intention is to prevent dynamic resizing. Would a better way to make the memory usage be as static and efficient as possible, it should be implemented.
+         * @note The map size is *by default* set to NUMBER_OF_CONSUMER_PER_BUFFER. The intention is to prevent dynamic resizing. Should a better way to make the memory usage be as static and efficient as possible be found, it should be implemented.
          */
         RingBuffer() : writerLocation(&ring[0]) {
             locations.reserve(NUMBER_OF_CONSUMER_PER_BUFFER);
@@ -150,32 +150,32 @@ namespace DataFlow {
         }
 
         void addLinkIfNoneExists(Consumer* consumer) {
-            if (linkNotExistingWith(consumer)) {
+            if (hasNoExistingLinkWith(consumer)) {
                 Pad* consumerLocation = &ring[0];
                 this->locations.insert(ConsumerLocationPair(consumer, consumerLocation));
             }
         }
 
-        bool linkNotExistingWith(Consumer* consumer) {
+        bool hasNoExistingLinkWith(Consumer* consumer) {
             return locations.count(consumer) == 0;
         }
 
         void notifyConsumersIfAnyIsPresent() {
             if (!locations.empty()) {
                 for (auto location = locations.begin(), end = locations.end(); location != end; ++location) {
-                    if (!isOnWriter((*location).second)) {
+                    if (!isAtWriterLocation((*location).second)) {
                         (*location).first->activateFor(this);
                     }
                 }
             }
         }
 
-        bool isOnWriter(Pad* pad) const {
+        bool isAtWriterLocation(Pad* pad) const {
             return pad == writerLocation;
         }
 
-        bool isOnWriter(Consumer* consumer) const {
-            return isOnWriter(locations.at(consumer));
+        bool isAtWriterLocation(Consumer* consumer) const {
+            return isAtWriterLocation(locations.at(consumer));
         }
 
         auto consumeFor(Consumer* consumer) -> DATA const& {
@@ -184,7 +184,7 @@ namespace DataFlow {
         }
 
         void throwErrorIfIllegalConsumption(Consumer* consumer) {
-            if (isOnWriter(consumer)) {
+            if (isAtWriterLocation(consumer)) {
                 throwConsumerOnWriterException();
             }
         }
@@ -196,10 +196,10 @@ namespace DataFlow {
         }
 
         void advanceOrDeactivateConsumer(Consumer* consumer) {
-            if (!isOnWriter(consumer)) {
+            if (!isAtWriterLocation(consumer)) {
                 locations.at(consumer) = locations.at(consumer)->next();
             }
-            if (isOnWriter(consumer)) {
+            if (isAtWriterLocation(consumer)) {
                 consumer->deactivateFor(this);
             }
         }

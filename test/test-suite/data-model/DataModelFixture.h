@@ -71,12 +71,12 @@ namespace TestFunctions {
 
         static const NativeComplement generateRandomNativeComplement() {
 
-            auto numberOfDetection = drawNativeDetection();
+            auto numberOfDetections = drawNativeDetection();
 
-            auto distance = drawRandomNativeSample(numberOfDetection, 20, 300);
-            auto intensity = drawRandomNativeSample(numberOfDetection, 15, 50);
-            auto velocity = drawRandomNativeSample(numberOfDetection, 0, ONE_HUNDRED_CENTIMETERS_PER_SECONDS);
-            auto confidenceLevel = drawRandomNativeSample(numberOfDetection, 0, EXAMPLE_DATA_ARRAY_SIZE);
+            auto distance = drawRandomNativeSample(numberOfDetections, 20, 300);
+            auto intensity = drawRandomNativeSample(numberOfDetections, 15, 50);
+            auto velocity = drawRandomNativeSample(numberOfDetections, 0, ONE_HUNDRED_CENTIMETERS_PER_SECONDS);
+            auto confidenceLevel = drawRandomNativeSample(numberOfDetections, 0, EXAMPLE_DATA_ARRAY_SIZE);
 
             NativeComplement nativeComplement = NativeComplement{distance, velocity, intensity, confidenceLevel};
             return nativeComplement;
@@ -89,7 +89,7 @@ namespace TestFunctions {
          */
         static const NativeData generateRandomNativeData() {
 
-            auto numberOfDetection = drawNativeDetection();
+            auto numberOfDetections = drawNativeDetection();
 
             auto complement = generateRandomNativeComplement();
 
@@ -114,26 +114,26 @@ namespace TestFunctions {
         static inline uint16_t drawNativeDetection() {
             std::default_random_engine randomEngine(std::random_device{}());
             std::uniform_int_distribution<uint16_t> detectionDistribution(0, EXAMPLE_DATA_NATIVE_SAMPLE_SIZE);
-            uint16_t numberOfDetection = detectionDistribution(randomEngine);
+            uint16_t numberOfDetections = detectionDistribution(randomEngine);
 
-            return numberOfDetection;
+            return numberOfDetections;
         }
 
-        static NativeSample drawRandomNativeSample(uint16_t const& numberOfDetection,
+        static NativeSample drawRandomNativeSample(uint16_t const& numberOfDetections,
                                                    uint16_t const& min,
                                                    uint16_t const& max) {
 
-            assert(numberOfDetection <= EXAMPLE_DATA_NATIVE_SAMPLE_SIZE &&
+            assert(numberOfDetections <= EXAMPLE_DATA_NATIVE_SAMPLE_SIZE &&
                    "A NativeData Sample shall have exactly 4 values (See global typedef and local constant definition).");
 
             std::default_random_engine randomEngine(std::random_device{}());
             std::uniform_int_distribution<uint16_t> distribution(min, max);
 
             NativeSample sample;
-            for (auto i = 0; i < numberOfDetection; ++i) {
+            for (auto i = 0; i < numberOfDetections; ++i) {
                 sample[i] = distribution(randomEngine);
             }
-            for (int j = numberOfDetection; j < EXAMPLE_DATA_NATIVE_SAMPLE_SIZE; ++j) {
+            for (int j = numberOfDetections; j < EXAMPLE_DATA_NATIVE_SAMPLE_SIZE; ++j) {
                 sample[j] = 0;
             }
             return sample;

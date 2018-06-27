@@ -26,7 +26,7 @@ namespace DataFlow {
     /**
      * @brief A RingBufferPad is a custom forward-list node used by RingBuffer to ease the circular chaining, allow to read/write data
      * @template <class T> refers to the data type
-     * @warning Concurrency Warning: No thread safety has been implemented in this class. This is the responsibility the RingBuffer. It must be assumed any concurrent interaction potentially dangerous is dealt with before instances of this class are called
+     * @warning Concurrency Warning: No thread safety has been implemented in this class. This is the responsibility of the RingBuffer. It must be assumed any concurrent interaction potentially dangerous is dealt with before instances of this class are called
      * @see ThreadSafeRingBuffer for the thread safe usage of the RingBuffer and this class.
      */
     template<class T>
@@ -41,7 +41,7 @@ namespace DataFlow {
 
         /**
          * @brief Default constructor, which sets the currentData to its Default value.
-         * @attention the function "T::returnDefaults()" MUST be implemented in the passed Data type. This function must return an instance with all fields initialized and.
+         * @attention the function "T::returnDefaults()" MUST be implemented in the passed Data type. This function must return an instance with all fields initialized.
          */
         RingBufferPad() : nextPadSet(false), currentData(T::returnDefaultData()), nextPad(this) {}
 
@@ -74,7 +74,7 @@ namespace DataFlow {
 
 
         /**
-         * @brief Links this RingBufferPad to the one passed in parameters. Note that
+         * @brief Links this RingBufferPad to the one passed in parameters.
          * @param nextPad The RingBufferPad pointer which will be obtained on .next() call
          * @note The "next" RingBufferPad can only be set once. It shall remain this way.
          */
