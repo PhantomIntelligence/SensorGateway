@@ -14,5 +14,5 @@ class AWLMessageTranslatorTest :    public ::testing::Test{
 
 
 TEST_F(AWLMessageTranslatorTest,given_anAwlMessageWithAnIdOfNine_when_translatingTheAwlMessage_then_setTheCorrectFrameIdAndSystemIdOfTheFrame){
-    
+
 }
