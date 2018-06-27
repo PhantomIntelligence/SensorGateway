@@ -31,8 +31,8 @@
     };
 
     void AWLMessageTranslator::translateEndOfFrameMessage(AWLMessage *awlMessage) {
-        currentSpiritFrame->setFrameID(awlMessage->data[0]);
-        currentSpiritFrame->setSystemID(awlMessage->data[2]);
+        currentSpiritFrame->setFrameID(convertTwoBytesToBigEndian(awlMessage->data[0],awlMessage->data[1]));
+        currentSpiritFrame->setSystemID(convertTwoBytesToBigEndian(awlMessage->data[2],awlMessage->data[3]));
         spiritFrames.push_back(*currentSpiritFrame);
         currentSpiritFrame = new SpiritFrame();
     }
