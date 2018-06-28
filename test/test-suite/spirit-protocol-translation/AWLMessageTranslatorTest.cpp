@@ -33,43 +33,54 @@ TEST_F(AWLMessageTranslatorTest,given_anAWLMessageWithAFrameDoneId_when_translat
 
 TEST_F(AWLMessageTranslatorTest,given_anAWLMessageWithADetectionTrackId_when_translatingTheAwlMessage_then_) {
 
-    AWLMessageTranslator awlMessageTranslatorTest;
+    AWLMessageTranslator awlMessageTranslator;
     auto detectionTrackAwlMessage = givenAnAWLMessageWithAnId(DETECTION_TRACK);
     auto endOfFrameAwlMessage = givenAnAWLMessageWithAnId(FRAME_DONE);
 
-    awlMessageTranslatorTest.translateBasicMessage(&detectionTrackAwlMessage);
-    awlMessageTranslatorTest.translateBasicMessage(&endOfFrameAwlMessage);
+    awlMessageTranslator.translateBasicMessage(&detectionTrackAwlMessage);
+    awlMessageTranslator.translateBasicMessage(&endOfFrameAwlMessage);
 
     auto expectedPixelId = 0x0001;
     auto expectedTrackId = 0x2010;
     auto expectedTrackConfidenceLevel = 0x60;
     auto expectedTrackIntensity = 0x8070;
-    auto spiritFrame = awlMessageTranslatorTest.getFrames()[0];
+    auto spiritFrame = awlMessageTranslator.getFrames()[0];
     auto spiritPixel = spiritFrame.fetchPixelByID(expectedPixelId);
-    auto spiritTrack = spiritPixel->fetchTrackByID(expectedTrackId);
+    auto spiritTrack = *spiritPixel->fetchTrackByID(expectedTrackId);
 
 
-    ASSERT_EQ(spiritTrack->getID(),expectedTrackId);
-    ASSERT_EQ(spiritTrack->getConfidenceLevel(),expectedTrackConfidenceLevel);
-    ASSERT_EQ(spiritTrack->getIntensity(),expectedTrackIntensity);
+    ASSERT_EQ(spiritTrack.getID(),expectedTrackId);
+    ASSERT_EQ(spiritTrack.getConfidenceLevel(),expectedTrackConfidenceLevel);
+    ASSERT_EQ(spiritTrack.getIntensity(),expectedTrackIntensity);
 }
 
 TEST_F(AWLMessageTranslatorTest,given_anAWLMessageWithAnIdofEleven_when_translatingTheAwlMessage) {
 
-    AWLMessageTranslator* awlMessageTranslatorTest =  new AWLMessageTranslator();
+    AWLMessageTranslator awlMessageTranslator;
 
     auto detectionTrackAwlMessage = givenAnAWLMessageWithAnId(DETECTION_TRACK);
     auto detectionVelocityAwlMessage = givenAnAWLMessageWithAnId(DETECTION_VELOCITY);
     auto endOfFrameAwlMessage = givenAnAWLMessageWithAnId(FRAME_DONE);
-
-    awlMessageTranslatorTest->translateBasicMessage(&detectionTrackAwlMessage);
-    awlMessageTranslatorTest->translateBasicMessage(&detectionVelocityAwlMessage);
-    awlMessageTranslatorTest->translateBasicMessage(&endOfFrameAwlMessage);
-
-
-
+    awlMessageTranslator.translateBasicMessage(&detectionTrackAwlMessage);
+    awlMessageTranslator.translateBasicMessage(&detectionVelocityAwlMessage);
+    awlMessageTranslator.translateBasicMessage(&endOfFrameAwlMessage);
+    std::cout<<"====="<<std::endl;
+    std::cout<<awlMessageTranslator.getFrames()[0].getPixels()[1].getTracks()[0].getID()<<std::endl;
 
 
+    auto expectedPixelId = 0x0001;
+    auto expectedTrackId = 0x2010;
+    auto expectedTrackDistance = 0x0130;
+    auto expectedTrackSpeed = 0x6000;
+    auto expectedTrackAcceleration = 0x8070;
+
+    auto frame = awlMessageTranslator.getFrames()[0];
+    auto pixel = frame.fetchPixelByID(expectedPixelId);
+    auto track = *pixel->fetchTrackByID(expectedTrackId);
+
+    ASSERT_EQ(expectedTrackDistance,track.getDistance());
+    ASSERT_EQ(expectedTrackSpeed,track.getSpeed());
+    ASSERT_EQ(expectedTrackAcceleration,track.getAcceleration());
 }
 
 TEST_F(AWLMessageTranslatorTest,given_aTrackVelocityMessageAndNoDetectionTrackMessage_when_translatingTheMessage_then_throwsAnException){

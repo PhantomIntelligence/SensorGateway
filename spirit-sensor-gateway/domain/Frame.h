@@ -11,29 +11,31 @@
 	limitations under the License.
 */
 
-#ifndef SPIRITSENSORGATEWAY_SPIRITFRAME_H
-#define SPIRITSENSORGATEWAY_SPIRITFRAME_H
+#ifndef SPIRITSENSORGATEWAY_FRAME_H
+#define SPIRITSENSORGATEWAY_FRAME_H
 
 #include "Pixel.h"
 
 namespace SpiritProtocol {
+
     class Frame {
-        public:
+
+    public:
             Frame();
             ~Frame();
             void addPixel(Pixel pixel);
             Pixel* fetchPixelByID(PixelID pixelID);
             FrameID getFrameID() const;
-            std::unordered_map<PixelID, Pixel> getPixels() const;
+            std::array<Pixel, NUMBER_OF_PIXEL_IN_AWL_16_FRAME> getPixels() const;
             SystemID getSystemID() const;
             void setFrameID(FrameID frameID);
             void setSystemID(SystemID systemID);
 
         private:
             FrameID frameID;
-            std::unordered_map<PixelID, Pixel> pixels;
+            std::array<Pixel, NUMBER_OF_PIXEL_IN_AWL_16_FRAME> pixels;
             SystemID systemID;
     };
 }
 
-#endif //SPIRITSENSORGATEWAY_SPIRITFRAME_H
+#endif //SPIRITSENSORGATEWAY_FRAME_H

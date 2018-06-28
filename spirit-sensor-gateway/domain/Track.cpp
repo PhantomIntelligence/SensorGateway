@@ -21,6 +21,20 @@ namespace SpiritProtocol {
     Track::~Track() {
     };
 
+    bool Track::operator==(SpiritProtocol::Track const& other) const {
+        auto sameAcceleration = acceleration == other.acceleration;
+        auto sameConfidenceLevel = confidenceLevel == other.confidenceLevel;
+        auto sameDistance = distance == other.distance;
+        auto sameTrackId = ID == other.ID;
+        auto sameIntensity = intensity == other.intensity;
+        auto sameSpeed = speed == other.speed;
+        bool equal = (sameAcceleration && sameConfidenceLevel && sameDistance && sameTrackId && sameIntensity && sameSpeed);
+        return equal;
+    }
+    bool Track::operator!=(SpiritProtocol::Track const& other) const {
+        return  !(operator==(other));
+    }
+
     Acceleration Track::getAcceleration() const {
         return acceleration;
     };
@@ -33,7 +47,7 @@ namespace SpiritProtocol {
         return distance;
     };
 
-    uint16_t Track::getID() const {
+    TrackID Track::getID() const {
         return ID;
     };
 

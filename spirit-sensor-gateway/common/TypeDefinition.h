@@ -14,7 +14,11 @@
 #ifndef SPIRITSENSORGATEWAY_TYPEDEFINITION_H
 #define SPIRITSENSORGATEWAY_TYPEDEFINITION_H
 
+#include <array>
 #include <mutex>
+#include <iostream>
+
+
 
 namespace {
     typedef std::mutex Mutex;

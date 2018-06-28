@@ -14,13 +14,17 @@
 #ifndef SPIRITSENSORGATEWAY_SPIRITTRACK_H
 #define SPIRITSENSORGATEWAY_SPIRITTRACK_H
 
-#include "spirit-sensor-gateway/common/TypeDefinition.h"
+#include "spirit-sensor-gateway/common/ConstantFunction.h"
 
 namespace SpiritProtocol {
     class Track {
         public:
+            Track() = default;
+
             Track(TrackID trackID, ConfidenceLevel confidenceLevel, Intensity intensity);
             ~Track();
+            bool operator==(Track const& other) const;
+            bool operator!=(Track const& other) const;
             Acceleration getAcceleration() const;
             ConfidenceLevel getConfidenceLevel() const;
             Distance getDistance() const;

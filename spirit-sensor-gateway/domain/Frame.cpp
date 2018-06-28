@@ -21,18 +21,18 @@ namespace SpiritProtocol {
     };
 
     void Frame::addPixel(Pixel pixel) {
-        pixels.insert(std::make_pair(pixel.getID(), pixel));
+        pixels[pixel.getID()] = pixel;
     }
 
     Pixel* Frame::fetchPixelByID(PixelID pixelID) {
-        return &pixels.at(pixelID);
+        return &pixels[pixelID];
     }
 
     FrameID Frame::getFrameID() const {
         return frameID;
     };
 
-    std::unordered_map<PixelID, Pixel> Frame::getPixels() const {
+    std::array<Pixel,NUMBER_OF_PIXEL_IN_AWL_16_FRAME> Frame::getPixels() const {
         return pixels;
     };
 
