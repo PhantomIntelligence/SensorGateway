@@ -3,9 +3,11 @@ configure_file(config.h.in "${CMAKE_CURRENT_BINARY_DIR}/config.h" @ONLY)
 ############  SpiritSensorGateway files   ###############
 
 # Select all the source and header files
-file(GLOB SRC_FILES "${CMAKE_CURRENT_SOURCE_DIR}/dummy/*")
+file(GLOB COMMON_FILES "${CMAKE_CURRENT_SOURCE_DIR}/common/*")
+file(GLOB DOMAIN_FILES "${CMAKE_CURRENT_SOURCE_DIR}/domain/*")
+file(GLOB COMMUNICATION_PROTOCOL_FILES "${CMAKE_CURRENT_SOURCE_DIR}/communication-protocol-strategy/*")
 
-add_library(${PROJECT_NAME} SHARED ${SRC_FILES} config.h.in)
+add_library(${PROJECT_NAME} SHARED ${COMMON_FILES} ${DOMAIN_FILES} ${COMMUNICATION_PROTOCOL_FILES} config.h.in)
 
 ########## CONAN ######################################
 if(EXISTS ${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
@@ -18,6 +20,8 @@ else()
     message(WARNING "The file conanbuildinfo.cmake doesn't exist, you have to run conan install first")
 endif()
 #######################################################
+
+target_link_libraries(${PROJECT_NAME} canlib)
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
                       PUBLIC_HEADER "${HEADER_FILES};${CMAKE_CURRENT_BINARY_DIR}/config.h")
