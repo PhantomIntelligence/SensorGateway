@@ -11,11 +11,9 @@ RUN pacman --noconfirm -Syyu && \
 RUN pacman --noconfirm -Syyu &&\
     pacman --noconfirm -S base-devel linux-headers 
 
-# The following is used to install conan. TODO: Check if it could be easier to install conan with pip?
+# The following is used to install conan.
 # Versioning problem with urllib3. Check if conan still needs this dependency
 RUN pip install --force-reinstall msgpack-python urllib3==1.21.1
-
-#RUN whereis udevadm && udevadm control --reload
 
 RUN usermod --home /tmp/nobody --shell /bin/sh nobody
 
@@ -31,15 +29,14 @@ RUN wget http://canlandbucket.s3-website-eu-west-1.amazonaws.com/productionResou
     tar -xzf linuxcan.tar.gz &&\
     cd linuxcan &&\
     ln -s /lib/modules/`ls --format=single-column --color=never /lib/modules | grep -v extra` /lib/modules/`uname -r` &&\
-    make common && make install
+    make && make install
 
 
-#ENTRYPOINT sed -i 's?/.*/SpiritSensorGateway?'`pwd`'?g' cmake-build-debug/CMakeCache.txt &&\
-    #./dev-script/conanUpdateDependencies &&\
-    #sed -i s/libstdc++/libstdc++11/g ~/.conan/profiles/default &&\
-    #./dev-script/conanUpdateDependencies &&\
-    #sed -i 's?/.*/SpiritSensorGateway?'`pwd`'?g' cmake-build-debug/Makefile &&\
-    #cmake --build /builddir/cmake-build-debug --target runtests -- -j 4 &&\
-    #/builddir/cmake-build-debug/test/runtests
-#ENTRYPOINT /builddir/linuxcan/canlib/examples/canmonitor 0
-ENTRYPOINT /builddir/linuxcan/canlib/examples/listChannels
+ENTRYPOINT sed -i 's?/.*/SpiritSensorGateway?'`pwd`'?g' cmake-build-debug/CMakeCache.txt &&\
+    ./dev-script/conanUpdateDependencies &&\
+    sed -i s/libstdc++/libstdc++11/g ~/.conan/profiles/default &&\
+    ./dev-script/conanUpdateDependencies &&\
+    sed -i 's?/.*/SpiritSensorGateway?'`pwd`'?g' cmake-build-debug/Makefile &&\
+    cmake --build /builddir/cmake-build-debug --target runtests -- -j 4 &&\
+    /builddir/cmake-build-debug/test/runtests
+
