@@ -21,7 +21,7 @@
 #include "DataModelTypeDefinition.h"
 
 /**
- * @brief The Data Representation (DR) classes contained in this namespace form an basic implementation guide for DR classes in Spectre.
+ * @brief The Data Representation (DR) classes contained in this namespace form an basic implementation guide for DR classes in Spirit.
  * @note The HIC++ requirements details are documented and well explained in the Data.h file. Please refer to it for any DR implementation explanation.
  * @see Data.h for more details
  */
