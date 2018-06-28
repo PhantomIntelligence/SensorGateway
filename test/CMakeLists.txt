@@ -24,7 +24,7 @@ include_directories("${CMAKE_CURRENT_SOURCE_DIR}/test/manual-test")
 add_executable(runtests ${TEST_FILES})
 
 find_package(SpiritSensorGateway)
-target_link_libraries(runtests gtest gmock_main ${SpiritSensorGateway_LIBRARIES} ${CONAN_LIBS})
+target_link_libraries(runtests gtest gmock_main ${SpiritSensorGateway_LIBRARIES} ${CONAN_LIBS} ${uWS_TARGET_LINKS})
 
 install(TARGETS runtests
         # IMPORTANT: Add the runtests executable to the "export-set"
