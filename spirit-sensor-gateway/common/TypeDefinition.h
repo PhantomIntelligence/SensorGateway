@@ -11,13 +11,14 @@
 	limitations under the License.
 */
 
-#ifndef SPIRITSENSORGATEWAY_CONSTANTDEFINITION_H
-#define SPIRITSENSORGATEWAY_CONSTANTDEFINITION_H
+#ifndef SPIRITSENSORGATEWAY_TYPEDEFINITION_H
+#define SPIRITSENSORGATEWAY_TYPEDEFINITION_H
 
-#include "TypeDefinition.h"
+#include <mutex>
 
 namespace {
-    const uint8_t MAX_NUMBER_OF_DATA_IN_AWL_MESSAGE = 8;
+    typedef std::mutex Mutex;
+    typedef std::lock_guard<Mutex> LockGuard;
 };
 
-#endif //SPIRITSENSORGATEWAY_CONSTANTDEFINITION_H
+#endif //SPIRITSENSORGATEWAY_TYPEDEFINITION_H
