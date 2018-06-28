@@ -1,5 +1,5 @@
-#ifndef SPECTRE_RINGBUFFERTEST_H
-#define SPECTRE_RINGBUFFERTEST_H
+#ifndef SPIRITSENSORGATEWAY_RINGBUFFERTEST_H
+#define SPIRITSENSORGATEWAY_RINGBUFFERTEST_H
 
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
@@ -40,7 +40,7 @@ NativeData generateRandomNativeData() {
 }
 
 
-TEST_F(RingBufferTest, given_aData_when_consumeForALink_then_returnsData) {
+TEST_F(RingBufferTest, given_aData_when_consumeNextDataForALink_then_returnsData) {
     NativeBuffer nativeBuffer;
     auto linkMock = MockConsumerLink();
     auto nativeData = generateRandomNativeData();
@@ -52,7 +52,7 @@ TEST_F(RingBufferTest, given_aData_when_consumeForALink_then_returnsData) {
     ASSERT_EQ(nativeDataCopy, consumedData);
 }
 
-TEST_F(RingBufferTest, given_twoDataOfWhichOneHasAlreadyBeenConsumed_when_consumeForALink_then_returnsTheSecondData) {
+TEST_F(RingBufferTest, given_twoDataOfWhichOneHasAlreadyBeenConsumed_when_consumeNextDataForALink_then_returnsTheSecondData) {
     NativeBuffer nativeBuffer;
     auto linkMock = MockConsumerLink();
     auto nativeDataOne = generateRandomNativeData();
@@ -67,14 +67,14 @@ TEST_F(RingBufferTest, given_twoDataOfWhichOneHasAlreadyBeenConsumed_when_consum
     ASSERT_EQ(nativeDataTwoCopy, consumedData);
 }
 
-TEST_F(RingBufferTest, given_noData_when_consumeForALink_then_throwsARuntimeException) {
+TEST_F(RingBufferTest, given_noData_when_consumeNextDataForALink_then_throwsARuntimeException) {
     NativeBuffer nativeBuffer;
     auto linkMock = MockConsumerLink();
 
     EXPECT_THROW(nativeBuffer.consumeNextDataFor(&linkMock), std::runtime_error);
 }
 
-TEST_F(RingBufferTest, given_aDataAndTwoConsumers_when_consumeForALinkAfterTheOtherOne_then_returnsTheData) {
+TEST_F(RingBufferTest, given_aDataAndTwoConsumers_when_consumeNextDataForALinkAfterTheOtherOne_then_returnsTheData) {
     NativeBuffer nativeBuffer;
     auto firstLinkMock = MockConsumerLink();
     auto secondLinkMock = MockConsumerLink();
@@ -112,7 +112,7 @@ TEST_F(RingBufferTest, given_dataAndAConsumer_when_consumesTheLastDataForThatCon
     ASSERT_FALSE(linkMock.isActive());
 }
 
-TEST_F(RingBufferTest, given_twoDataAndAConsumerThatConsumedThemAll_when_consumesForANewConsumer_then_returnsTheFirstData) {
+TEST_F(RingBufferTest, given_twoDataAndAConsumerThatConsumedThemAll_when_consumesNextDataForANewConsumer_then_returnsTheFirstData) {
     NativeBuffer nativeBuffer;
     auto firstLinkMock = MockConsumerLink();
     auto nativeDataOne = generateRandomNativeData();
@@ -163,4 +163,4 @@ TEST_F(RingBufferTest, given_aFullBuffer_when_writesMoreThanOneData_then_overwri
     ASSERT_NE(secondDataCopy, lastWrittenData);
 }
 
-#endif //SPECTRE_RINGBUFFERTEST_H
+#endif //SPIRITSENSORGATEWAY_RINGBUFFERTEST_H

@@ -14,8 +14,8 @@
 	limitations under the License.
 */
 
-#ifndef SPECTRE_RINGBUFFERPADTEST_H
-#define SPECTRE_RINGBUFFERPADTEST_H
+#ifndef SPIRITSENSORGATEWAY_RINGBUFFERPADTEST_H
+#define SPIRITSENSORGATEWAY_RINGBUFFERPADTEST_H
 
 #include <gtest/gtest.h>
 
@@ -84,5 +84,5 @@ TEST_F(RingBufferPadTest, given_data_when_read_then_returnsData) {
     ASSERT_EQ(readData, data);
 }
 
-#endif //SPECTRE_RINGBUFFERPADTEST_H
+#endif //SPIRITSENSORGATEWAY_RINGBUFFERPADTEST_H
 
