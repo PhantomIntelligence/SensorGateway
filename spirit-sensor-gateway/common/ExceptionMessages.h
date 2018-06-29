@@ -23,8 +23,8 @@
 
 namespace ExceptionMessage {
 
-    static auto ABSTRACT_POINTER_ARRAY_ILLEGAL_CONSUMPTION_EMPTY = "Illegal consumption of pointer: the AbstractPointerArray is empty.";
-    static auto ABSTRACT_POINTER_ARRAY_ILLEGAL_STORE_FULL = "Illegal store of pointer: the AbstractPointerArray is full.";
+    static auto ABSTRACT_POINTER_ARRAY_ILLEGAL_CONSUMPTION_EMPTY = "Illegal consumption of pointer: the ConstantSizedAbstractPointerArray is empty.";
+    static auto ABSTRACT_POINTER_ARRAY_ILLEGAL_STORE_FULL = "Illegal store of pointer: the ConstantSizedAbstractPointerArray is full.";
 
     static auto CONSTANT_SIZED_POINTER_LIST_ILLEGAL_REMOVAL_POINTER_NOT_CONTAINED = "Illegal removal of pointer: the ConstantSizedPointerList is does not contain the pointer.";
 

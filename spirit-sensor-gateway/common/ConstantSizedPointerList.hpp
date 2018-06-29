@@ -29,14 +29,14 @@ namespace ConstantContainer {
      * @template <class T, std::size_t SIZE> refers to the SIZE number of data of type T that this List will contain.
      */
     template<class T, std::size_t SIZE>
-    class ConstantSizedPointerList final : AbstractPointerArray<T, SIZE> {
+    class ConstantSizedPointerList final : ConstantSizedAbstractPointerArray<T, SIZE> {
 
-        using super = AbstractPointerArray<T, SIZE>;
+        using super = ConstantSizedAbstractPointerArray<T, SIZE>;
         using MarkerPosition = typename super::IteratorMarker;
 
     public:
 
-        using super::AbstractPointerArray;
+        using super::ConstantSizedAbstractPointerArray;
         using super::empty;
         using super::full;
 

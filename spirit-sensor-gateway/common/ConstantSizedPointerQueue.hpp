@@ -18,7 +18,7 @@
 #ifndef SPIRITSENSORGATEWAY_CONSTANTSIZEDPOINTERQUEUE_HPP
 #define SPIRITSENSORGATEWAY_CONSTANTSIZEDPOINTERQUEUE_HPP
 
-#include "AbstractPointerArray.hpp"
+#include "ConstantSizedAbstractPointerArray.hpp"
 
 namespace ConstantContainer {
 
@@ -29,13 +29,13 @@ namespace ConstantContainer {
      * @template <class T, std::size_t SIZE> refers to the SIZE number of data of type T that this Queue will contain.
      */
     template<class T, std::size_t SIZE>
-    class ConstantSizedPointerQueue final : AbstractPointerArray<T, SIZE> {
+    class ConstantSizedPointerQueue final : ConstantSizedAbstractPointerArray<T, SIZE> {
 
-        using super = AbstractPointerArray<T, SIZE>;
+        using super = ConstantSizedAbstractPointerArray<T, SIZE>;
 
     public:
 
-        using super::AbstractPointerArray;
+        using super::ConstantSizedAbstractPointerArray;
         using super::empty;
         using super::full;
 

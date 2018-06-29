@@ -23,7 +23,7 @@
 namespace ConstantContainer {
 
     template<class T, std::size_t SIZE>
-    class AbstractPointerArray {
+    class ConstantSizedAbstractPointerArray {
     protected:
 
         using Array = std::array<T, SIZE>;
@@ -78,7 +78,7 @@ namespace ConstantContainer {
 
     public:
 
-        AbstractPointerArray() :
+        ConstantSizedAbstractPointerArray() :
                 producerMarker(pointers.begin()),
                 consumerMarker(pointers.begin()),
                 BEGIN(pointers.begin()),
@@ -87,27 +87,27 @@ namespace ConstantContainer {
             pointers.fill(nullptr);
         }
 
-        ~AbstractPointerArray() noexcept = default;
+        ~ConstantSizedAbstractPointerArray() noexcept = default;
 
         /**
          * @brief The CircularPointerArray are intended to be used as const instances. They shouldn't be moved.
          */
-        AbstractPointerArray(AbstractPointerArray&& other) noexcept = delete;
+        ConstantSizedAbstractPointerArray(ConstantSizedAbstractPointerArray&& other) noexcept = delete;
 
         /**
          * @brief The CircularPointerArray are intended to be used as const instances. They shouldn't be moved.
          */
-        AbstractPointerArray(AbstractPointerArray const& other) = delete;
+        ConstantSizedAbstractPointerArray(ConstantSizedAbstractPointerArray const& other) = delete;
 
         /**
          * @brief The CircularPointerArray are intended to be used as const instances. They shouldn't be assigned.
          */
-        AbstractPointerArray& operator=(AbstractPointerArray const& other) = delete;
+        ConstantSizedAbstractPointerArray& operator=(ConstantSizedAbstractPointerArray const& other) = delete;
 
         /**
          * @brief The CircularPointerArray are intended to be used as const instances. They shouldn't be copied.
          */
-        AbstractPointerArray& operator=(AbstractPointerArray&& other) noexcept = delete;
+        ConstantSizedAbstractPointerArray& operator=(ConstantSizedAbstractPointerArray&& other) noexcept = delete;
 
         bool empty() const noexcept {
             return numberOfPointersHeld.load() == 0;
