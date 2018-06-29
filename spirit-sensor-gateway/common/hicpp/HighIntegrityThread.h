@@ -41,9 +41,9 @@ namespace HighIntegrity {
     template<ThreadExecutionType TYPE>
     class HighIntegrityThread {
     public:
-        template<class F, class ...Args>
-        HighIntegrityThread(F&& f, Args&& ...args)
-                : m_thread(std::forward<F>(f), std::forward<Args>(args)...) {
+        template<class F, class ...ARGS>
+        HighIntegrityThread(F&& f, ARGS&& ...args)
+                : m_thread(std::forward<F>(f), std::forward<ARGS>(args)...) {
         }
 
         HighIntegrityThread(HighIntegrityThread const&) = delete;
