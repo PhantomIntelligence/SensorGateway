@@ -1,10 +1,7 @@
 # Add SpiritSensorGateway acceptance test files
 file(GLOB TEST_FILES "${CMAKE_CURRENT_SOURCE_DIR}/spirit-protocol-translation/*")
 
-# Include Mocks
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}/mock")
-
-add_executable(acceptance-tests ${TEST_FILES})
+add_executable(acceptance-tests ${TEST_FILES} ${UTILITIES_FILES})
 
 find_package(SpiritSensorGateway)
 target_link_libraries(acceptance-tests gtest gmock_main ${SpiritSensorGateway_LIBRARIES} ${CONAN_LIBS})

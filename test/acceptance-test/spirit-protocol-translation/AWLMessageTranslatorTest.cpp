@@ -1,84 +1,69 @@
+/**
+	Copyright 2014-2018 Phantom Intelligence Inc.
+	Licensed under the Apache License, Version 2.0 (the "License");
+	you may not use this file except in compliance with the License.
+	You may obtain a copy of the License at
+		http://www.apache.org/licenses/LICENSE-2.0
+	Unless required by applicable law or agreed to in writing, software
+	distributed under the License is distributed on an "AS IS" BASIS,
+	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+	See the License for the specific language governing permissions and
+	limitations under the License.
+*/
+
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
-#include <experimental/filesystem>
 #include <fstream>
+#include "test/acceptance-test/fixtures/AWLMessagesFixture.cpp"
+#include "test/acceptance-test/fixtures/SpiritFramesFixture.cpp"
+#include "test/utilities/AWLMessagesFileManager.h"
+#include "test/utilities/SpiritFramesFileManager.h"
 #include "spirit-sensor-gateway/spirit-protocol-translation/AWLMessageTranslator.h"
 
-namespace filesystem = std::experimental::filesystem;
+using namespace TestUtilities;
 
-class AWLMessageTranslatorTest:  public ::testing::Test {
-public:
-    AWLMessageTranslator* awlMessageTranslator = new AWLMessageTranslator();
-
-    void buildFramesFile(std::vector<Frame> frames, std::ifstream& framesFile){
-
-    }
-
-    std::vector<AWLMessage> fetchAWLMessagesFromFile(std::string const &fileName){
-        std::string currentPath = filesystem::current_path();
-        std::ifstream file = std::ifstream(currentPath + "/" + fileName);
-        std::vector<AWLMessage> messages = parseAWLMessagesFromFile(file);
-        return messages;
-    }
-
+class AWLMessageTranslatorTest : public ::testing::Test {
+protected:
     virtual void SetUp(){
-
+        awlMessagesFileManager.buildFileFromSensorMessages(awlMessagesFixture, "AWLMessagesInputFile.txt");
+        spiritFramesFileManager.buildFileFromSpiritFrames(spiritFramesFixture, "ExpectedSpiritFramesOutputFile.txt");
     }
 
-    virtual void TearDown(){
+    bool areFilesEqual(std::string const& firstFilename, std::string const& secondFilename) {
+        bool filesAreEqual = true;
+        auto firstFile = std::ifstream(firstFilename);
+        auto secondFile = std::ifstream(secondFilename);
 
-    }
-
-private:
-    std::vector<AWLMessage> parseAWLMessagesFromFile(std::ifstream& file){
-        std::vector<AWLMessage> messages;
-        if (file) {
-            std::string fileLine;
-            while (std::getline(file, fileLine)) {
-                AWLMessage message = parseAWLMessageFromFileLine(fileLine);
-                messages.push_back(message);
+        if (firstFile and secondFile) {
+            std::string lineFromFirstFile;
+            std::string lineFromSecondFile;
+            while (std::getline(firstFile, lineFromFirstFile) and std::getline(secondFile, lineFromSecondFile)) {
+                if (lineFromFirstFile.compare(lineFromSecondFile) != 0){
+                    filesAreEqual = false;
+                    break;
+                }
             }
         } else {
-            std::cerr << "An error occurred while opening the file.\n";
+            std::cerr << "An error occurred while opening a file.\n";
         }
-        return messages;
+
+        return filesAreEqual;
     }
 
-    AWLMessage parseAWLMessageFromFileLine(std::string& fileLine){
-        AWLMessage message{};
-        std::string messageContent[11];
-        parseAWLMessageContentFromFileLine(fileLine, messageContent);
-        message.id = stoi(messageContent[0]);
-        message.length = (unsigned) stoi(messageContent[1]);
-        message.timestamp = (unsigned) stoi(messageContent[2]);
-        for (auto dataPosition = 0; dataPosition < MAX_NUMBER_OF_DATA_IN_AWL_MESSAGE; dataPosition++) {
-            auto dataValue = std::stoi(messageContent[3 + dataPosition]);
-            message.data[dataPosition] = static_cast<unsigned char>(dataValue);
-        }
-        return message;
-    }
-
-    void parseAWLMessageContentFromFileLine(std::string fileLine, std::string* messageContentArray) {
-        std::string messageContentSeparator = "-";
-        size_t separatorPosition = 0;
-        auto contentPosition = 0;
-        while ((separatorPosition = fileLine.find(messageContentSeparator)) != std::string::npos) {
-            std::string content = fileLine.substr(0, separatorPosition);
-            messageContentArray[contentPosition] = content;
-            contentPosition++;
-            fileLine.erase(0, separatorPosition + messageContentSeparator.length());
-        }
-        messageContentArray[contentPosition] = fileLine;
-    }
+    AWLMessagesFileManager awlMessagesFileManager;
+    SpiritFramesFileManager spiritFramesFileManager;
 };
 
-TEST_F(AWLMessageTranslatorTest, ordered){
-    std::vector<AWLMessage> messages = fetchAWLMessagesFromFile("AWLMessages.txt");
-    for(auto message : messages){
-        awlMessageTranslator->translateBasicMessage(&message);
+TEST_F(AWLMessageTranslatorTest, ordered) {
+    AWLMessageTranslator awlMessageTranslator;
+    std::vector<AWLMessage> messages = awlMessagesFileManager.parseSensorMessagesFromFile("AWLMessagesInputFile.txt");
+    for (auto message : messages) {
+        awlMessageTranslator.translateBasicMessage(&message);
     }
-    std::vector<Frame> frames = awlMessageTranslator->getFrames();
-    //buildFramesFile(frames, framesFile);
+    std::vector<Frame> frames = awlMessageTranslator.getFrames();
+    spiritFramesFileManager.buildFileFromSpiritFrames(frames, "ActualSpiritFramesOutputFile.txt");
+    ASSERT_TRUE(areFilesEqual("ExpectedSpiritFramesOutputFile.txt", "ActualSpiritFramesOutputFile.txt"));
+
 }
 
 

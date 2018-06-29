@@ -122,7 +122,7 @@ class ClientLoginError(urllib2.HTTPError):
 
 
 class AbstractRpcServer(object):
-  """Provides a common interface for a simple RPC server."""
+  """Provides a utilities interface for a simple RPC server."""
 
   def __init__(self, host, auth_function, host_override=None, extra_headers={},
                save_cookies=False):

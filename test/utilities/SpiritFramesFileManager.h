@@ -11,23 +11,23 @@
 	limitations under the License.
 */
 
-#ifndef SPIRITSENSORGATEWAY_COMMUNICATIONPROTOCOLSTRATEGY_H
-#define SPIRITSENSORGATEWAY_COMMUNICATIONPROTOCOLSTRATEGY_H
+#ifndef SPIRITSENSORGATEWAY_SPIRITFRAMESFILEMANAGER_H
+#define SPIRITSENSORGATEWAY_SPIRITFRAMESFILEMANAGER_H
 
-#include "spirit-sensor-gateway/common/ConstantDefinition.h"
-#include "spirit-sensor-gateway/domain/AWLMessage.h"
+#include "spirit-sensor-gateway/domain/Frame.h"
+#include "SensorMessagesFileManager.h"
 
+namespace TestUtilities {
 
-namespace CommunicationProtocolStrategy {
-    class CommunicationProtocolStrategy {
+    class SpiritFramesFileManager {
+
     public:
-        virtual AWLMessage readMessage() = 0;
+        SpiritFramesFileManager() = default;
 
-        virtual void openConnection() = 0;
+        ~SpiritFramesFileManager() = default;
 
-        virtual void closeConnection() = 0;
-
+        void buildFileFromSpiritFrames(std::vector<SpiritProtocol::Frame> frames, char const* filename);
     };
 }
 
-#endif //SPIRITSENSORGATEWAY_COMMUNICATIONPROTOCOLSTRATEGY_H
+#endif //SPIRITSENSORGATEWAY_SPIRITFRAMESFILEMANAGER_H

@@ -15,7 +15,7 @@
 #define SPIRITSENSORGATEWAY_CONSTANTDEFINITION_H
 
 #include <iostream>
-
+#include <vector>
 
 namespace {
     const unsigned long READ_WAIT_INFINITE = -1;
