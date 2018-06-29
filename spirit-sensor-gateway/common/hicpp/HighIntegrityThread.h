@@ -29,7 +29,7 @@ namespace high_integrity {
     /**
      * @brief Enum used in this template to determine if the thread should run by itself and will be expected to rejoin a thread later (JOIN) or if it simply will be executed and no be expected back (DETACH)
      */
-    enum ThreadExec : int32_t {
+    enum ThreadExecutionType : int32_t {
         DETACH,
         JOIN,
     };
@@ -38,7 +38,7 @@ namespace high_integrity {
      * @brief Delete safe implementation of std::threads. Only this implementation shall be used in the project
      * @template ThreadExec the enum type (see enum ThreadExec)
      */
-    template<ThreadExec thread_exec>
+    template<ThreadExecutionType thread_exec>
     class thread {
     public:
         template<class F, class ...Args>
@@ -85,7 +85,7 @@ namespace high_integrity {
      * @brief DETACH specialisation for HIThreads
      */
     template<>
-    inline void thread<ThreadExec::DETACH>::join_or_detach() {
+    inline void thread<ThreadExecutionType::DETACH>::join_or_detach() {
         m_thread.detach();
     }
 
@@ -93,7 +93,7 @@ namespace high_integrity {
      * @brief JOIN specialisation for HIThreads
      */
     template<>
-    inline void thread<ThreadExec::JOIN>::join_or_detach() {
+    inline void thread<ThreadExecutionType::JOIN>::join_or_detach() {
         m_thread.join();
     }
 
