@@ -134,7 +134,6 @@ namespace DataFlow {
             addLinkIfNoneExists(consumer);
         }
 
-
     private:
 
         void chainPadsInARing() {
