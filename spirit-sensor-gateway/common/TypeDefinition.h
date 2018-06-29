@@ -15,10 +15,16 @@
 #define SPIRITSENSORGATEWAY_TYPEDEFINITION_H
 
 #include <mutex>
+#include <atomic>
+
+#include "hicpp/HighIntegrityThread.h"
+#include "ExceptionMessages.h"
 
 namespace {
     typedef std::mutex Mutex;
     typedef std::lock_guard<Mutex> LockGuard;
+
+    typedef std::atomic_uint8_t AtomicCounter;
 };
 
 #endif //SPIRITSENSORGATEWAY_TYPEDEFINITION_H

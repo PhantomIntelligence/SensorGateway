@@ -31,6 +31,10 @@ namespace DataFlow {
     class ThreadSafeRingBuffer : public RingBuffer<T> {
         using super = RingBuffer<T>;
 
+    protected:
+
+        typedef T DATA;
+
     public:
 
         ThreadSafeRingBuffer() : super() {

@@ -14,7 +14,7 @@
 #ifndef SPIRITSENSORGATEWAY_CONSTANTDEFINITION_H
 #define SPIRITSENSORGATEWAY_CONSTANTDEFINITION_H
 
-#include "TypeDefinition.h"
+#include "ExceptionMessages.h"
 
 namespace {
     const uint8_t MAX_NUMBER_OF_DATA_IN_AWL_MESSAGE = 8;
