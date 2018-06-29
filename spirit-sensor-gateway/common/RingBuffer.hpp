@@ -99,10 +99,10 @@ namespace DataFlow {
         RingBuffer& operator=(RingBuffer&& other) = delete;
 
 
-       /**
-        * @brief Writes the data to the RingBufferPad the writer is currently on, moves the writer and notifies all subscribed consumers they can be activated and start to read.
-        * @param data The data that will be written
-        */
+        /**
+         * @brief Writes the data to the RingBufferPad the writer is currently on, moves the writer and notifies all subscribed consumers they can be activated and start to read.
+         * @param data The data that will be written
+         */
         virtual void write(DATA&& data) {
             writerLocation->write(std::forward<DATA>(data));
             writerLocation = writerLocation->next();
@@ -190,8 +190,7 @@ namespace DataFlow {
         }
 
         [[noreturn]] void throwConsumerOnWriterException() const {
-            auto CONSUMPTION_ON_WRITER_MESSAGE = "Illegal consumption, execution should not reach this point. The calling entity should not be allowed to proceed to this call";
-            std::runtime_error schedulerIsFullException(CONSUMPTION_ON_WRITER_MESSAGE);
+            std::runtime_error schedulerIsFullException(ExceptionMessage::RING_BUFFER_CONSUMPTION_ON_WRITER_MESSAGE);
             throw schedulerIsFullException;
         }
 

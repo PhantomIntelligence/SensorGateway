@@ -56,18 +56,14 @@ namespace Processing {
 
         void validateNotFull() const {
             if (full()) {
-                throwIllegalActionException(ExceptionMessage::CIRCULAR_POINTER_ARRAY_ILLEGAL_STORE_FULL);
+                throwIllegalActionException(ExceptionMessage::ABSTRACT_POINTER_ARRAY_ILLEGAL_STORE_FULL);
             }
         }
 
         void validateNotEmpty() const {
             if (empty()) {
-                throwIllegalActionException(ExceptionMessage::CIRCULAR_POINTER_ARRAY_ILLEGAL_CONSUMPTION_EMPTY);
+                throwIllegalActionException(ExceptionMessage::ABSTRACT_POINTER_ARRAY_ILLEGAL_CONSUMPTION_EMPTY);
             }
-        }
-
-        [[noreturn]] void throwIllegalActionException(char const* message) const {
-            throw std::runtime_error(message);
         }
 
         PointerArray pointers;

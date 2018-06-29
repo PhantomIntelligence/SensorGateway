@@ -11,13 +11,24 @@
 	limitations under the License.
 */
 
-#ifndef SPIRITSENSORGATEWAY_CONSTANTDEFINITION_H
-#define SPIRITSENSORGATEWAY_CONSTANTDEFINITION_H
+#ifndef SPIRITSENSORGATEWAY_CONSTANTFUNCTIONSDEFINITION_H
+#define SPIRITSENSORGATEWAY_CONSTANTFUNCTIONSDEFINITION_H
 
 #include "ExceptionMessages.h"
 
 namespace {
-    const uint8_t MAX_NUMBER_OF_DATA_IN_AWL_MESSAGE = 8;
+    /**
+     * @brief Allows to start the various JoinableThreads in the constructors without blocking anything
+     */
+    void voidAction() {}
+
+    /**
+     * @brief Throws a runtime error with the specified message
+     * @param message that will be in the error
+     */
+    [[noreturn]] void throwIllegalActionException(char const* message) {
+        throw std::runtime_error(message);
+    }
 };
 
-#endif //SPIRITSENSORGATEWAY_CONSTANTDEFINITION_H
+#endif //SPIRITSENSORGATEWAY_CONSTANTFUNCTIONSDEFINITION_H

@@ -23,10 +23,12 @@
 
 namespace ExceptionMessage {
 
-    static auto CIRCULAR_POINTER_ARRAY_ILLEGAL_CONSUMPTION_EMPTY = "Illegal consumption of pointer: the AbstractPointerArray is empty.";
-    static auto CIRCULAR_POINTER_ARRAY_ILLEGAL_STORE_FULL = "Illegal store of pointer: the AbstractPointerArray is full.";
+    static auto ABSTRACT_POINTER_ARRAY_ILLEGAL_CONSUMPTION_EMPTY = "Illegal consumption of pointer: the AbstractPointerArray is empty.";
+    static auto ABSTRACT_POINTER_ARRAY_ILLEGAL_STORE_FULL = "Illegal store of pointer: the AbstractPointerArray is full.";
 
     static auto CONSTANT_SIZED_POINTER_LIST_ILLEGAL_REMOVAL_POINTER_NOT_CONTAINED = "Illegal removal of pointer: the ConstantSizedPointerList is does not contain the pointer.";
+
+    static auto RING_BUFFER_CONSUMPTION_ON_WRITER_MESSAGE = "Illegal consumption, execution should not reach this point. The calling entity should not be allowed to proceed to this call";
 
     static auto WORK_SCHEDULER_ILLEGAL_LINKING_SCHEDULER_HAS_BEEN_STOPPED = "Illegal linking attempt of WorkScheduler and InputBuffer: The WorkScheduler has received the terminate order, no new InputBuffer can be linked.";
     static auto WORK_SCHEDULER_ILLEGAL_LINKING_OF_ALREADY_LINKED_BUFFER_MESSAGE = "Illegal linking attempt of WorkScheduler and InputBuffer: The InputBuffer has already been linked.";

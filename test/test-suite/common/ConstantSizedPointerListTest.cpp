@@ -20,7 +20,6 @@
 
 #include <gtest/gtest.h>
 
-
 #include "spirit-sensor-gateway/common/ConstantSizedPointerList.hpp"
 #include "data-model/DataModelFixture.h"
 
@@ -41,17 +40,16 @@ public:
 
     using List = Processing::ConstantSizedPointerList<NativeData, ConstantSizedPointerListTest::TEST_SIZE>;
 
-    void fillList(List* vector) const;
+    void fillList(List* list) const {
+        NativeData data = DataTestUtil::generateRandomNativeData();
+        auto pointer = &data;
+
+        for (auto i = 0; i < ConstantSizedPointerListTest::TEST_SIZE; ++i) {
+            list->store(pointer);
+        }
+    }
 };
 
-void ConstantSizedPointerListTest::fillList(List* list) const {
-    NativeData data = DataTestUtil::generateRandomNativeData();
-    auto pointer = &data;
-
-    for (auto i = 0; i < ConstantSizedPointerListTest::TEST_SIZE; ++i) {
-        list->store(pointer);
-    }
-}
 
 TEST_F(ConstantSizedPointerListTest, given_anEmptyList_when_askedIfIsEmpty_then_returnsTrue) {
     List list;
@@ -61,7 +59,7 @@ TEST_F(ConstantSizedPointerListTest, given_anEmptyList_when_askedIfIsEmpty_then_
     ASSERT_TRUE(empty);
 }
 
-TEST_F(ConstantSizedPointerListTest, given_anEmptyList_when_askedIfIsEmpty_then_returnsFalse) {
+TEST_F(ConstantSizedPointerListTest, given_aListHoldingOneData_when_askedIfIsEmpty_then_returnsFalse) {
     List list;
     NativeData data = DataTestUtil::generateRandomNativeData();
     auto pointer = &data;
@@ -92,30 +90,17 @@ TEST_F(ConstantSizedPointerListTest, given_aFullList_when_askedIfIsFull_then_ret
 TEST_F(ConstantSizedPointerListTest, given_anEmptyList_when_consumeNext_then_throwsAnException) {
     List list;
 
-    auto hasThrownException = false;
-    try {
-        list.consumeNext();
-    } catch (runtime_error& error) {
-        hasThrownException = true;
-    }
-
-    ASSERT_TRUE(hasThrownException);
+    ASSERT_THROW(list.consumeNext(), std::runtime_error);
 }
 
 TEST_F(ConstantSizedPointerListTest, given_aFullList_when_storingANewPointer_then_throwsAnException) {
     List list;
     fillList(&list);
 
-    auto hasThrownException = false;
-    try {
-        NativeData data = DataTestUtil::generateRandomNativeData();
-        auto pointer = &data;
-        list.store(pointer);
-    } catch (runtime_error& error) {
-        hasThrownException = true;
-    }
+    NativeData data = DataTestUtil::generateRandomNativeData();
+    auto pointer = &data;
 
-    ASSERT_TRUE(hasThrownException);
+    ASSERT_THROW(list.store(pointer), std::runtime_error);
 }
 
 TEST_F(ConstantSizedPointerListTest, given_aStoredPointer_when_consumeNext_then_returnsThePointer) {
@@ -129,18 +114,7 @@ TEST_F(ConstantSizedPointerListTest, given_aStoredPointer_when_consumeNext_then_
     ASSERT_EQ(pointer, storedPointer);
 }
 
-TEST_F(ConstantSizedPointerListTest, given__when_consumeNext_then_returnsThePointer) {
-    List list;
-    NativeData data = DataTestUtil::generateRandomNativeData();
-    auto pointer = &data;
-    list.store(pointer);
-
-    auto storedPointer = list.consumeNext();
-
-    ASSERT_EQ(pointer, storedPointer);
-}
-
-TEST_F(ConstantSizedPointerListTest, given__when_fillingAndConsumingTheListTwice_then_dataRemainsCoherent) {
+TEST_F(ConstantSizedPointerListTest, given_aListOfSizeN_when_storingAndConsumingInAListTwoNTimes_then_dataRemainsCoherent) {
     List list;
 
     for (auto j = 0; j < ConstantSizedPointerListTest::TEST_SIZE * 2; ++j) {
@@ -153,7 +127,7 @@ TEST_F(ConstantSizedPointerListTest, given__when_fillingAndConsumingTheListTwice
     }
 }
 
-TEST_F(ConstantSizedPointerListTest, given_aFullList_when_readAllTheElementsAndAskIfStillFull_then_returnsTrue) {
+TEST_F(ConstantSizedPointerListTest, given_aFullList_when_readAllTheElementsAndAskIfFull_then_returnsTrue) {
     List list;
     fillList(&list);
     for (auto k = 0; k < ConstantSizedPointerListTest::TEST_SIZE; ++k) {
@@ -190,14 +164,7 @@ TEST_F(ConstantSizedPointerListTest, given_aPointerNotInTheList_when_askedToRemo
     NativeData data = DataTestUtil::generateRandomNativeData();
     auto pointer = &data;
 
-    auto hasThrownException = false;
-    try {
-        list.remove(pointer);
-    } catch (runtime_error& error) {
-        hasThrownException = true;
-    }
-
-    ASSERT_TRUE(hasThrownException);
+    ASSERT_THROW(list.remove(pointer), std::runtime_error);
 }
 
 TEST_F(ConstantSizedPointerListTest, given_aPointerInTheList_when_askedToRemoveIt_then_thePointerIsNoLongerContainedInTheList) {

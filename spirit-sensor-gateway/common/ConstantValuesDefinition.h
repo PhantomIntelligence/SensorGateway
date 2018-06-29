@@ -11,16 +11,13 @@
 	limitations under the License.
 */
 
-#ifndef SPIRITSENSORGATEWAY_MESSAGE_H
-#define SPIRITSENSORGATEWAY_MESSAGE_H
+#ifndef SPIRITSENSORGATEWAY_CONSTANTVALUESDEFINITION_H
+#define SPIRITSENSORGATEWAY_CONSTANTVALUESDEFINITION_H
 
-#include "spirit-sensor-gateway/common/ConstantValuesDefinition.h"
+#include "ConstantFunctionsDefinition.h"
 
-struct AWLMessage {
-    int64_t id;
-    uint64_t timestamp;
-    uint32_t length;
-    unsigned char data[MAX_NUMBER_OF_DATA_IN_AWL_MESSAGE];
+namespace {
+    const uint8_t MAX_NUMBER_OF_DATA_IN_AWL_MESSAGE = 8;
 };
 
-#endif //SPIRITSENSORGATEWAY_MESSAGE_H
+#endif //SPIRITSENSORGATEWAY_CONSTANTVALUESDEFINITION_H

@@ -95,8 +95,7 @@ namespace Processing {
         }
 
         [[noreturn]] void throwIllegalRemovalException() const {
-            super::throwIllegalActionException(
-                    ExceptionMessage::CONSTANT_SIZED_POINTER_LIST_ILLEGAL_REMOVAL_POINTER_NOT_CONTAINED);
+            throwIllegalActionException(ExceptionMessage::CONSTANT_SIZED_POINTER_LIST_ILLEGAL_REMOVAL_POINTER_NOT_CONTAINED);
         }
 
         using super::pointers;

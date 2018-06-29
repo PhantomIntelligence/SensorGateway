@@ -33,22 +33,6 @@ namespace { // Values
 
 }
 
-namespace { // Functions
-    /**
-     * @brief Allows to start the various JoinableThreads in the constructors without blocking anything
-     */
-    void voidAction() {}
-
-    /**
-     * @brief Throws a runtime error with the specified message
-     * @param message that will be in the error
-     */
-    [[noreturn]] void throwIllegalActionException(char const* message) {
-        throw std::runtime_error(message);
-    }
-
-}
-
 /**
  * @brief A NativeSample is an array of 4 unsigned shorts in which the raw data from a physical sensor (referred as NativeData) will be stored.
  * @note This is currently only valid for example purposes.
