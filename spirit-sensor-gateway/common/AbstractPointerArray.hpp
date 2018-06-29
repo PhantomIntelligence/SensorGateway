@@ -20,7 +20,7 @@
 
 #include "ConstantValuesDefinition.h"
 
-namespace Processing {
+namespace ConstantContainer {
 
     template<class T, std::size_t SIZE>
     class AbstractPointerArray {

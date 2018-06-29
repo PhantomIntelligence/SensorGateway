@@ -20,7 +20,7 @@
 
 #include "ConstantSizedPointerQueue.hpp"
 
-namespace Processing {
+namespace ConstantContainer {
 
     /**
      * @brief Constant sized list pointer structure.

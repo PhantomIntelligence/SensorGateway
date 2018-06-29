@@ -38,7 +38,7 @@ public:
 
     static const uint16_t TEST_SIZE = 8;
 
-    using List = Processing::ConstantSizedPointerList<NativeData, ConstantSizedPointerListTest::TEST_SIZE>;
+    using List = ConstantContainer::ConstantSizedPointerList<NativeData, ConstantSizedPointerListTest::TEST_SIZE>;
 
     void fillList(List* list) const {
         NativeData data = DataTestUtil::generateRandomNativeData();

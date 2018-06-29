@@ -37,7 +37,7 @@ public:
 
     static const uint16_t TEST_SIZE = 8;
 
-    using Queue = Processing::ConstantSizedPointerQueue<NativeData, ConstantSizedPointerQueueTest::TEST_SIZE>;
+    using Queue = ConstantContainer::ConstantSizedPointerQueue<NativeData, ConstantSizedPointerQueueTest::TEST_SIZE>;
 
     void fillQueue(Queue* queue) const {
         NativeData data = DataTestUtil::generateRandomNativeData();
