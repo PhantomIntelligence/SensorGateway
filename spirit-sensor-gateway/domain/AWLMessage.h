@@ -16,7 +16,8 @@
 
 #include "spirit-sensor-gateway/common/ConstantDefinition.h"
 
-struct AWLMessage {
+
+struct AWLMessage{
     int64_t id;
     uint64_t timestamp;
     uint32_t length;

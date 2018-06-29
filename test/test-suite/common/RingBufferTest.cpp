@@ -3,6 +3,9 @@
 
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
+#include <spirit-sensor-gateway/domain/AWLMessage.h>
+#include <spirit-sensor-gateway/communication-protocol/SensorCommunicator.hpp>
+#include <spirit-sensor-gateway/communication-protocol/KvaserCanProtocolStrategy.h>
 
 #include "spirit-sensor-gateway/common/RingBuffer.hpp"
 #include "data-model/DataModelFixture.h"
@@ -32,6 +35,9 @@ RingBufferTest::~RingBufferTest() {}
 
 
 NativeData generateRandomNativeData() {
+    SensorMessageTranslation::KvaserCanProtocolStrategy strategy;
+    SensorAccessLinkElement::SensorCommunicator<AWLMessage> sensorCommunicator(&strategy);
+    
     auto nativeData = DataTestUtil::generateRandomNativeData();
     while (nativeData == NativeData::returnDefaultData()) {
         nativeData = DataTestUtil::generateRandomNativeData();

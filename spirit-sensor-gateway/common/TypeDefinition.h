@@ -16,9 +16,11 @@
 
 #include <mutex>
 
+
 namespace {
     typedef std::mutex Mutex;
     typedef std::lock_guard<Mutex> LockGuard;
+    typedef high_integrity::thread<high_integrity::ThreadExec::JOIN> JoinableThread;
 };
 
 #endif //SPIRITSENSORGATEWAY_TYPEDEFINITION_H

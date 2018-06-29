@@ -19,8 +19,8 @@
 
 
 
-namespace CommunicationProtocolStrategy {
-    class KvaserCanProtocolStrategy : public CommunicationProtocolStrategy {
+namespace SensorMessageTranslation {
+    class KvaserCanProtocolStrategy : public CommunicationProtocolStrategy<AWLMessage> {
         const unsigned long CANLIB_READ_WAIT_INFINITE_DELAY = (unsigned long) -1;
     public:
         KvaserCanProtocolStrategy();

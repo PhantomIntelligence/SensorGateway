@@ -13,7 +13,7 @@
 
 #include "KvaserCanProtocolStrategy.h"
 
-using CommunicationProtocolStrategy::KvaserCanProtocolStrategy;
+using SensorMessageTranslation::KvaserCanProtocolStrategy;
 
 const long CANLIB_KVASER_CAN_BIT_RATE =  canBITRATE_1M;
 const unsigned int CANLIB_TIME_SEGMENT_1 = 0;
