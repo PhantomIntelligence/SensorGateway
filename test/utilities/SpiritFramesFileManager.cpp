@@ -31,7 +31,8 @@ void SpiritFramesFileManager::buildFileFromSpiritFrames(std::vector<SpiritProtoc
             std::unordered_map<SpiritProtocol::TrackID, SpiritProtocol::Track> tracks = pixel.second.getTracks();
             for (auto track : tracks) {
                 std::fprintf(file, ".. Track : %d \n",  track.second.getID() );
-                std::fprintf(file, "..... Acceleration : %d \n", track.second.getAcceleration());
+                //TODO: remove comment line once getAcceleration return the right value
+                //std::fprintf(file, "..... Acceleration : %d \n", track.second.getAcceleration());
                 //TODO: remove comment line once getDistance return the right value
                 //std::fprintf(file, "..... Distance : %d \n", track.second.getDistance());
                 std::fprintf(file, "..... Intensity : %d \n", track.second.getIntensity());
