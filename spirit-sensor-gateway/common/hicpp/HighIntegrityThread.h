@@ -38,7 +38,7 @@ namespace HighIntegrity {
      * @brief Delete safe implementation of std::threads. Only this implementation shall be used in the project
      * @template ThreadExec the enum type (see enum ThreadExec)
      */
-    template<ThreadExecutionType T>
+    template<ThreadExecutionType TYPE>
     class HighIntegrityThread {
     public:
         template<class F, class ...Args>
