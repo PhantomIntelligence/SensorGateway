@@ -20,7 +20,7 @@
 
 #include "ConstantSizedAbstractPointerArray.hpp"
 
-namespace ConstantContainer {
+namespace Container {
 
     /**
      * @brief Constant sized FIFO pointer structure.

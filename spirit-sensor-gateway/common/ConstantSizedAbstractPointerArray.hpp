@@ -20,7 +20,7 @@
 
 #include "ConstantValuesDefinition.h"
 
-namespace ConstantContainer {
+namespace Container {
 
     template<class T, std::size_t SIZE>
     class ConstantSizedAbstractPointerArray {
