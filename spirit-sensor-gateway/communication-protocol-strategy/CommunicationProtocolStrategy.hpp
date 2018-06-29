@@ -14,7 +14,6 @@
 #ifndef SPIRITSENSORGATEWAY_COMMUNICATIONPROTOCOLSTRATEGY_H
 #define SPIRITSENSORGATEWAY_COMMUNICATIONPROTOCOLSTRATEGY_H
 
-#include "spirit-sensor-gateway/common/ConstantValuesDefinition.h"
 #include "spirit-sensor-gateway/domain/AWLMessage.h"
 
 
