@@ -24,7 +24,7 @@
 /**
  * @brief High Integrity C++ default compliant code is contained in this namespace. It has been directly obtained from the HIC++ version 4
  */
-namespace high_integrity {
+namespace HighIntegrity {
 
     /**
      * @brief Enum used in this template to determine if the thread should run by itself and will be expected to rejoin a thread later (JOIN) or if it simply will be executed and no be expected back (DETACH)
@@ -38,19 +38,19 @@ namespace high_integrity {
      * @brief Delete safe implementation of std::threads. Only this implementation shall be used in the project
      * @template ThreadExec the enum type (see enum ThreadExec)
      */
-    template<ThreadExecutionType thread_exec>
-    class thread {
+    template<ThreadExecutionType T>
+    class HighIntegrityThread {
     public:
         template<class F, class ...Args>
-        thread(F&& f, Args&& ...args)
+        HighIntegrityThread(F&& f, Args&& ...args)
                 : m_thread(std::forward<F>(f), std::forward<Args>(args)...) {
         }
 
-        thread(thread const&) = delete;
+        HighIntegrityThread(HighIntegrityThread const&) = delete;
 
-        thread(thread&&) = default;
+        HighIntegrityThread(HighIntegrityThread&&) = default;
 
-        ~thread() {
+        ~HighIntegrityThread() {
             safeExit();
         }
 
@@ -60,9 +60,9 @@ namespace high_integrity {
             }
         }
 
-        thread& operator=(const thread&) = delete;
+        HighIntegrityThread& operator=(const HighIntegrityThread&) = delete;
 
-        thread& operator=(thread&& other) {
+        HighIntegrityThread& operator=(HighIntegrityThread&& other) {
             if (this != &other) {
                 safeExit();
             }
@@ -72,7 +72,7 @@ namespace high_integrity {
 
         inline void join() { m_thread.join(); }
 
-        void swap(thread& other) noexcept { std::swap(m_thread, other.m_thread); }
+        void swap(HighIntegrityThread& other) noexcept { std::swap(m_thread, other.m_thread); }
 
     private:
         inline void join_or_detach();
@@ -85,7 +85,7 @@ namespace high_integrity {
      * @brief DETACH specialisation for HIThreads
      */
     template<>
-    inline void thread<ThreadExecutionType::DETACH>::join_or_detach() {
+    inline void HighIntegrityThread<ThreadExecutionType::DETACH>::join_or_detach() {
         m_thread.detach();
     }
 
@@ -93,7 +93,7 @@ namespace high_integrity {
      * @brief JOIN specialisation for HIThreads
      */
     template<>
-    inline void thread<ThreadExecutionType::JOIN>::join_or_detach() {
+    inline void HighIntegrityThread<ThreadExecutionType::JOIN>::join_or_detach() {
         m_thread.join();
     }
 
