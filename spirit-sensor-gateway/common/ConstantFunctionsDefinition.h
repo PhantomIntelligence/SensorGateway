@@ -11,17 +11,24 @@
 	limitations under the License.
 */
 
-#ifndef SPIRITSENSORGATEWAY_TYPEDEFINITION_H
-#define SPIRITSENSORGATEWAY_TYPEDEFINITION_H
+#ifndef SPIRITSENSORGATEWAY_CONSTANTFUNCTIONSDEFINITION_H
+#define SPIRITSENSORGATEWAY_CONSTANTFUNCTIONSDEFINITION_H
 
-#include <mutex>
-#include "HICpp/HighIntegrityThread.h"
-
+#include "ExceptionMessages.h"
 
 namespace {
-    typedef std::mutex Mutex;
-    typedef std::lock_guard<Mutex> LockGuard;
-    typedef HighIntegrity::HighIntegrityThread<HighIntegrity::ThreadExecutionType::JOIN> JoinableThread;
+    /**
+     * @brief Allows to start the various JoinableThreads in the constructors without blocking anything
+     */
+    void voidAction() {}
+
+    /**
+     * @brief Throws a runtime error with the specified message
+     * @param message that will be in the error
+     */
+    [[noreturn]] void throwIllegalActionException(char const* message) {
+        throw std::runtime_error(message);
+    }
 };
 
-#endif //SPIRITSENSORGATEWAY_TYPEDEFINITION_H
+#endif //SPIRITSENSORGATEWAY_CONSTANTFUNCTIONSDEFINITION_H
