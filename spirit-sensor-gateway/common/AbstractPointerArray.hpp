@@ -18,7 +18,7 @@
 #ifndef SPIRITSENSORGATEWAY_ABSTRACTPOINTERARRAY_HPP
 #define SPIRITSENSORGATEWAY_ABSTRACTPOINTERARRAY_HPP
 
-#include "DataSink.hpp"
+#include "ConstantValuesDefinition.h"
 
 namespace Processing {
 

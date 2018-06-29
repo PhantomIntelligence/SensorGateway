@@ -29,139 +29,124 @@ using TestFunctions::DataTestUtil;
 class ConstantSizedPointerQueueTest : public ::testing::Test {
 protected:
 
-    ConstantSizedPointerQueueTest() {}
+    ConstantSizedPointerQueueTest() = default;
 
-    virtual ~ConstantSizedPointerQueueTest() {}
+    virtual ~ConstantSizedPointerQueueTest() = default;
 
 public:
 
     static const uint16_t TEST_SIZE = 8;
 
-    using Array = Processing::ConstantSizedPointerQueue<NativeData, ConstantSizedPointerQueueTest::TEST_SIZE>;
+    using Queue = Processing::ConstantSizedPointerQueue<NativeData, ConstantSizedPointerQueueTest::TEST_SIZE>;
 
-    void fillArray(Array* array) const;
+    void fillQueue(Queue* queue) const {
+        NativeData data = DataTestUtil::generateRandomNativeData();
+        auto pointer = &data;
+
+        for (auto i = 0; i < ConstantSizedPointerQueueTest::TEST_SIZE; ++i) {
+            queue->store(pointer);
+        }
+    }
 };
 
-void ConstantSizedPointerQueueTest::fillArray(Array* array) const {
-    NativeData data = DataTestUtil::generateRandomNativeData();
-    auto pointer = &data;
+TEST_F(ConstantSizedPointerQueueTest, given_anEmptyQueue_when_askedIfIsEmpty_then_returnsTrue) {
+    Queue queue;
 
-    for (auto i = 0; i < ConstantSizedPointerQueueTest::TEST_SIZE; ++i) {
-        array->store(pointer);
-    }
-}
-
-TEST_F(ConstantSizedPointerQueueTest, given_anEmptyArray_when_askedIfIsEmpty_then_returnsTrue) {
-    Array array;
-
-    auto empty = array.empty();
+    auto empty = queue.empty();
 
     ASSERT_TRUE(empty);
 }
 
-TEST_F(ConstantSizedPointerQueueTest, given_anEmptyArray_when_askedIfIsEmpty_then_returnsFalse) {
-    Array array;
+TEST_F(ConstantSizedPointerQueueTest, given_anQueueWithOneElement_when_askedIfIsEmpty_then_returnsFalse) {
+    Queue queue;
     NativeData data = DataTestUtil::generateRandomNativeData();
     auto pointer = &data;
-    array.store(pointer);
+    queue.store(pointer);
 
-    auto empty = array.empty();
+    auto empty = queue.empty();
 
     ASSERT_FALSE(empty);
 }
 
-TEST_F(ConstantSizedPointerQueueTest, given_anEmptyArray_when_askedIfIsFull_then_returnsFalse) {
-    Array array;
+TEST_F(ConstantSizedPointerQueueTest, given_anEmptyQueue_when_askedIfIsFull_then_returnsFalse) {
+    Queue queue;
 
-    auto full = array.full();
+    auto full = queue.full();
 
     ASSERT_FALSE(full);
 }
 
-TEST_F(ConstantSizedPointerQueueTest, given_aFullArray_when_askedIfIsFull_then_returnsTrue) {
-    Array array;
-    fillArray(&array);
+TEST_F(ConstantSizedPointerQueueTest, given_aFullQueue_when_askedIfIsFull_then_returnsTrue) {
+    Queue queue;
+    fillQueue(&queue);
 
-    auto full = array.full();
+    auto full = queue.full();
 
     ASSERT_TRUE(full);
 }
 
-TEST_F(ConstantSizedPointerQueueTest, given_anEmptyArray_when_consumeNext_then_throwsAnException) {
-    Array array;
+TEST_F(ConstantSizedPointerQueueTest, given_anEmptyQueue_when_consumeNext_then_throwsAnException) {
+    Queue queue;
 
-    auto hasThrownException = false;
-    try {
-        array.consumeNext();
-    } catch (std::runtime_error& error) {
-        hasThrownException = true;
-    }
-
-    ASSERT_TRUE(hasThrownException);
+    ASSERT_THROW(queue.consumeNext(), std::runtime_error);
 }
 
-TEST_F(ConstantSizedPointerQueueTest, given_aFullArray_when_storingANewPointer_then_throwsAnException) {
-    Array array;
-    fillArray(&array);
+TEST_F(ConstantSizedPointerQueueTest, given_aFullQueue_when_storingANewPointer_then_throwsAnException) {
+    Queue queue;
+    fillQueue(&queue);
 
-    auto hasThrownException = false;
-    try {
-        NativeData data = DataTestUtil::generateRandomNativeData();
-        auto pointer = &data;
-        array.store(pointer);
-    } catch (std::runtime_error& error) {
-        hasThrownException = true;
-    }
+    NativeData data = DataTestUtil::generateRandomNativeData();
+    auto pointer = &data;
 
-    ASSERT_TRUE(hasThrownException);
+    ASSERT_THROW(queue.store(pointer), std::runtime_error);
 }
 
 TEST_F(ConstantSizedPointerQueueTest, given_aStoredPointer_when_consumeNext_then_returnsThePointer) {
-    Array array;
+    Queue queue;
     NativeData data = DataTestUtil::generateRandomNativeData();
     auto pointer = &data;
-    array.store(pointer);
+    queue.store(pointer);
 
-    auto storedPointer = array.consumeNext();
+    auto storedPointer = queue.consumeNext();
 
     ASSERT_EQ(pointer, storedPointer);
 }
 
 TEST_F(ConstantSizedPointerQueueTest, given_twoPointerStoredInOrder_when_consumed_then_returnedInTheOrderTheyWereStored) {
-    Array array;
+    Queue queue;
     NativeData firstData = DataTestUtil::generateRandomNativeData();
     NativeData secondData = DataTestUtil::generateRandomNativeData();
     auto firstPointer = &firstData;
     auto secondPointer = &secondData;
-    array.store(firstPointer);
-    array.store(secondPointer);
+    queue.store(firstPointer);
+    queue.store(secondPointer);
 
-    auto firstStoredPointer = array.consumeNext();
-    auto secondStoredPointer = array.consumeNext();
+    auto firstStoredPointer = queue.consumeNext();
+    auto secondStoredPointer = queue.consumeNext();
 
     ASSERT_EQ(firstPointer, firstStoredPointer);
     ASSERT_EQ(secondPointer, secondStoredPointer);
 }
 
 TEST_F(ConstantSizedPointerQueueTest, given__when_consumeNext_then_returnsThePointer) {
-    Array array;
+    Queue queue;
     NativeData data = DataTestUtil::generateRandomNativeData();
     auto pointer = &data;
-    array.store(pointer);
+    queue.store(pointer);
 
-    auto storedPointer = array.consumeNext();
+    auto storedPointer = queue.consumeNext();
 
     ASSERT_EQ(pointer, storedPointer);
 }
 
-TEST_F(ConstantSizedPointerQueueTest, given__when_fillingAndConsumingTheArrayTwice_then_dataRemainsCoherent) {
-    Array array;
+TEST_F(ConstantSizedPointerQueueTest, given__when_fillingAndConsumingTheQueueTwice_then_dataRemainsCoherent) {
+    Queue queue;
 
     for (auto j = 0; j < ConstantSizedPointerQueueTest::TEST_SIZE * 2; ++j) {
         NativeData data = DataTestUtil::generateRandomNativeData();
         auto pointer = &data;
-        array.store(pointer);
-        auto storedPointer = array.consumeNext();
+        queue.store(pointer);
+        auto storedPointer = queue.consumeNext();
 
         EXPECT_EQ(data, *storedPointer);
     }

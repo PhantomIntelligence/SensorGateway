@@ -18,10 +18,16 @@
 #ifndef SPIRITSENSORGATEWAY_CONSTANTSIZEDPOINTERQUEUE_HPP
 #define SPIRITSENSORGATEWAY_CONSTANTSIZEDPOINTERQUEUE_HPP
 
-#include "ConstantSizedPointerList.hpp"
+#include "AbstractPointerArray.hpp"
 
 namespace Processing {
 
+    /**
+     * @brief Constant sized FIFO pointer structure.
+     * It basically acts as a buffer for pointers.
+     * It only offers the basic store and consumeNext operations. Note that it offers no random access.
+     * @template <class T, std::size_t SIZE> refers to the SIZE number of data of type T that this Queue will contain.
+     */
     template<class T, std::size_t SIZE>
     class ConstantSizedPointerQueue final : AbstractPointerArray<T, SIZE> {
 

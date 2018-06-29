@@ -131,7 +131,7 @@ TEST_F(ConstantSizedPointerListTest, given_aFullList_when_readAllTheElementsAndA
     List list;
     fillList(&list);
     for (auto k = 0; k < ConstantSizedPointerListTest::TEST_SIZE; ++k) {
-        list.readNext();
+        list.readNextPointerToConsume();
     }
     auto full = list.full();
 

@@ -185,13 +185,8 @@ namespace DataFlow {
 
         void throwErrorIfIllegalConsumption(Consumer* consumer) {
             if (isAtWriterLocation(consumer)) {
-                throwConsumerOnWriterException();
+                throwIllegalActionException(ExceptionMessage::RING_BUFFER_CONSUMPTION_ON_WRITER_MESSAGE);
             }
-        }
-
-        [[noreturn]] void throwConsumerOnWriterException() const {
-            std::runtime_error schedulerIsFullException(ExceptionMessage::RING_BUFFER_CONSUMPTION_ON_WRITER_MESSAGE);
-            throw schedulerIsFullException;
         }
 
         void advanceOrDeactivateConsumer(Consumer* consumer) {

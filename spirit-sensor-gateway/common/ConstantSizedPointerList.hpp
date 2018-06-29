@@ -18,10 +18,16 @@
 #ifndef SPIRITSENSORGATEWAY_CONSTANTSIZEDPOINTERLIST_HPP
 #define SPIRITSENSORGATEWAY_CONSTANTSIZEDPOINTERLIST_HPP
 
-#include "AbstractPointerArray.hpp"
+#include "ConstantSizedPointerQueue.hpp"
 
 namespace Processing {
 
+    /**
+     * @brief Constant sized list pointer structure.
+     * It acts as a basic FIFO container with added methods to ease the removal and to check if a pointer is held.
+     * It also offers to peek at the next pointer that will be consume without removing it.
+     * @template <class T, std::size_t SIZE> refers to the SIZE number of data of type T that this List will contain.
+     */
     template<class T, std::size_t SIZE>
     class ConstantSizedPointerList final : AbstractPointerArray<T, SIZE> {
 
@@ -49,7 +55,7 @@ namespace Processing {
             return contentToReturn;
         }
 
-        auto readNext() -> T* {
+        auto readNextPointerToConsume() -> T* {
             LockGuard guard(contentMutex);
             super::validateNotEmpty();
             placeConsumerMarkerOnNextOccupiedPosition();
