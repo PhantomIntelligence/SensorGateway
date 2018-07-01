@@ -11,6 +11,7 @@
 	limitations under the License.
 */
 
+#include <map>
 #include "spirit-sensor-gateway/common/TypeDefinition.h"
 #include "SpiritFramesFileManager.h"
 
@@ -24,8 +25,10 @@ void SpiritFramesFileManager::buildFileFromSpiritFrames(std::vector<SpiritProtoc
         std::fprintf(file, "Frame : %d \n", frame.getFrameID() );
         std::fprintf(file, "System : %d \n", frame.getSystemID());
 
-        std::unordered_map<SpiritProtocol::PixelID, SpiritProtocol::Pixel> pixels = frame.getPixels();
-        for (auto pixel : pixels) {
+        //TODO: remove unordered map and ordered map structures once the domain class has been updated.
+        std::unordered_map<SpiritProtocol::PixelID, SpiritProtocol::Pixel> unorderedPixels = frame.getPixels();
+        std::map<SpiritProtocol::PixelID, SpiritProtocol::Pixel> orderedPixels(unorderedPixels.begin(), unorderedPixels.end());
+        for (auto pixel : orderedPixels) {
             std::fprintf(file, "Pixel %d : \n", pixel.second.getID());
 
             std::unordered_map<SpiritProtocol::TrackID, SpiritProtocol::Track> tracks = pixel.second.getTracks();

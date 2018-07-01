@@ -54,7 +54,6 @@ protected:
     SpiritFramesFileManager spiritFramesFileManager;
 };
 
-//TODO: note that this test will pass once the Frame structure is changed (for one that is ordered).
 TEST_F(AWLMessageTranslatorTest, given_someInputFileContainingValidAWLMessages_when_translatingAWLMessagesIntoSpiritFrames_then_returnCorrespondingSpriritFramesOutputFile) {
     AWLMessageTranslator awlMessageTranslator;
     std::vector<AWLMessage> messages = awlMessagesFileManager.parseSensorMessagesFromFile("AWLMessagesInputFile.txt");
