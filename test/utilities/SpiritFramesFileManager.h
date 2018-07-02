@@ -14,19 +14,23 @@
 #ifndef SPIRITSENSORGATEWAY_SPIRITFRAMESFILEMANAGER_H
 #define SPIRITSENSORGATEWAY_SPIRITFRAMESFILEMANAGER_H
 
+#include "FileManager.hpp"
 #include "spirit-sensor-gateway/domain/Frame.h"
-#include "SensorMessagesFileManager.h"
 
 namespace TestUtilities {
 
-    class SpiritFramesFileManager {
+    class SpiritFramesFileManager : public FileManager<SpiritProtocol::Frame> {
 
     public:
         SpiritFramesFileManager() = default;
 
-        ~SpiritFramesFileManager() = default;
+        ~SpiritFramesFileManager() override = default;
 
-        void buildFileFromSpiritFrames(std::vector<SpiritProtocol::Frame> frames, char const* filename);
+    private:
+        SpiritProtocol::Frame readMessageFromLine(std::string const& line) override;
+
+        void writeBlockWithMessage(SpiritProtocol::Frame const& message, std::FILE* file) override;
+
     };
 }
 

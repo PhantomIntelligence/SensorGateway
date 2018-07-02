@@ -12,39 +12,37 @@
 */
 
 #include <map>
-#include "spirit-sensor-gateway/common/TypeDefinition.h"
 #include "SpiritFramesFileManager.h"
 
 using TestUtilities::SpiritFramesFileManager;
 
-void SpiritFramesFileManager::buildFileFromSpiritFrames(std::vector<SpiritProtocol::Frame> frames,
-                                                        char const* filename) {
-    auto file = std::fopen(filename, "w+");
-    for (SpiritProtocol::Frame const& frame : frames){
-        std::fprintf(file, "======================================================================================\n");
-        std::fprintf(file, "Frame : %d \n", frame.getFrameID() );
-        std::fprintf(file, "System : %d \n", frame.getSystemID());
+SpiritProtocol::Frame SpiritFramesFileManager::readMessageFromLine(std::string const& line) {
+    return SpiritProtocol::Frame();
+}
 
-        //TODO: remove unordered map and ordered map structures once the domain class has been updated.
-        std::unordered_map<SpiritProtocol::PixelID, SpiritProtocol::Pixel> unorderedPixels = frame.getPixels();
-        std::map<SpiritProtocol::PixelID, SpiritProtocol::Pixel> orderedPixels(unorderedPixels.begin(), unorderedPixels.end());
-        for (auto pixel : orderedPixels) {
-            std::fprintf(file, "Pixel %d : \n", pixel.second.getID());
+void SpiritFramesFileManager::writeBlockWithMessage(SpiritProtocol::Frame const& message, std::FILE* file) {
+    std::fprintf(file, "======================================================================================\n");
+    std::fprintf(file, "Frame : %d \n", message.getFrameID() );
+    std::fprintf(file, "System : %d \n", message.getSystemID());
 
-            std::unordered_map<SpiritProtocol::TrackID, SpiritProtocol::Track> tracks = pixel.second.getTracks();
-            for (auto track : tracks) {
-                std::fprintf(file, ".. Track : %d \n",  track.second.getID() );
-                //TODO: remove comment line once getAcceleration return the right value
-                //std::fprintf(file, "..... Acceleration : %d \n", track.second.getAcceleration());
-                //TODO: remove comment line once getDistance return the right value
-                //std::fprintf(file, "..... Distance : %d \n", track.second.getDistance());
-                std::fprintf(file, "..... Intensity : %d \n", track.second.getIntensity());
-                std::fprintf(file, "..... Confidence Level : %d \n", track.second.getConfidenceLevel());
-                //TODO: remove comment line once getSpeed return the right value
-                //std::fprintf(file, "..... Speed : %d \n", track.second.getSpeed() );
-            }
+    //TODO: remove unordered map and ordered map structures once the domain class has been updated.
+    std::unordered_map<SpiritProtocol::PixelID, SpiritProtocol::Pixel> unorderedPixels = message.getPixels();
+    std::map<SpiritProtocol::PixelID, SpiritProtocol::Pixel> orderedPixels(unorderedPixels.begin(), unorderedPixels.end());
+    for (auto pixel : orderedPixels) {
+        std::fprintf(file, "Pixel %d : \n", pixel.second.getID());
+
+        std::unordered_map<SpiritProtocol::TrackID, SpiritProtocol::Track> tracks = pixel.second.getTracks();
+        for (auto track : tracks) {
+            std::fprintf(file, ".. Track : %d \n",  track.second.getID() );
+            //TODO: remove comment line once getAcceleration return the right value
+            //std::fprintf(file, "..... Acceleration : %d \n", track.second.getAcceleration());
+            //TODO: remove comment line once getDistance return the right value
+            //std::fprintf(file, "..... Distance : %d \n", track.second.getDistance());
+            std::fprintf(file, "..... Intensity : %d \n", track.second.getIntensity());
+            std::fprintf(file, "..... Confidence Level : %d \n", track.second.getConfidenceLevel());
+            //TODO: remove comment line once getSpeed return the right value
+            //std::fprintf(file, "..... Speed : %d \n", track.second.getSpeed() );
         }
     }
-    fflush(file);
-    fclose(file);
+
 }

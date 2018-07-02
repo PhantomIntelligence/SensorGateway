@@ -14,10 +14,10 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 #include <fstream>
-#include "test/acceptance-test/fixtures/AWLMessagesFixture.cpp"
-#include "test/acceptance-test/fixtures/SpiritFramesFixture.cpp"
 #include "test/utilities/AWLMessagesFileManager.h"
 #include "test/utilities/SpiritFramesFileManager.h"
+#include "test/acceptance-test/fixtures/AWLMessagesFixture.cpp"
+#include "test/acceptance-test/fixtures/SpiritFramesFixture.cpp"
 #include "spirit-sensor-gateway/spirit-protocol-translation/AWLMessageTranslator.h"
 
 using namespace TestUtilities;
@@ -25,8 +25,8 @@ using namespace TestUtilities;
 class AWLMessageTranslatorTest : public ::testing::Test {
 protected:
     virtual void SetUp(){
-        awlMessagesFileManager.buildFileFromSensorMessages(awlMessagesFixture, "AWLMessagesInputFile.txt");
-        spiritFramesFileManager.buildFileFromSpiritFrames(spiritFramesFixture, "ExpectedSpiritFramesOutputFile.txt");
+        awlMessagesFileManager.writeFileWithMessages(awlMessagesFixture, "AWLMessagesInputFile.txt");
+        spiritFramesFileManager.writeFileWithMessages(spiritFramesFixture, "ExpectedSpiritFramesOutputFile.txt");
     }
 
     bool areFilesEqual(std::string const& firstFilename, std::string const& secondFilename) {
@@ -56,14 +56,13 @@ protected:
 
 TEST_F(AWLMessageTranslatorTest, given_someInputFileContainingValidAWLMessages_when_translatingAWLMessagesIntoSpiritFrames_then_returnCorrespondingSpriritFramesOutputFile) {
     AWLMessageTranslator awlMessageTranslator;
-    std::vector<AWLMessage> messages = awlMessagesFileManager.parseSensorMessagesFromFile("AWLMessagesInputFile.txt");
+    std::vector<AWLMessage> messages = awlMessagesFileManager.readMessagesFromFile("AWLMessagesInputFile.txt");
     for (auto message : messages) {
         awlMessageTranslator.translateBasicMessage(&message);
     }
     std::vector<Frame> frames = awlMessageTranslator.getFrames();
-    spiritFramesFileManager.buildFileFromSpiritFrames(frames, "ActualSpiritFramesOutputFile.txt");
+    spiritFramesFileManager.writeFileWithMessages(frames, "ActualSpiritFramesOutputFile.txt");
     ASSERT_TRUE(areFilesEqual("ExpectedSpiritFramesOutputFile.txt", "ActualSpiritFramesOutputFile.txt"));
-
 }
 
 

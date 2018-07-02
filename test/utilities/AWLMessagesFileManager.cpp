@@ -11,18 +11,17 @@
 	limitations under the License.
 */
 
-#include <sstream>
 #include "AWLMessagesFileManager.h"
 
 using TestUtilities::AWLMessagesFileManager;
 
-AWLMessage AWLMessagesFileManager::parseSensorMessageFromLine(std::string const& line) {
+AWLMessage AWLMessagesFileManager::readMessageFromLine(std::string const& line) {
     AWLMessage message{};
     std::string messageContent[NUMBER_OF_DATA_IN_LINE];
     parseAWLMessageContentFromLine(line, messageContent);
-    message.id = stoi(messageContent[POSITION_OF_AWL_MESSAGE_ID_IN_LINE]);
-    message.length = (unsigned) stoi(messageContent[POSITION_OF_AWL_MESSAGE_LENGTH_IN_LINE]);
-    message.timestamp = (unsigned) stoi(messageContent[POSITION_OF_AWL_MESSAGE_TIMESTAMP_IN_LINE]);
+    message.id = std::stoi(messageContent[POSITION_OF_AWL_MESSAGE_ID_IN_LINE]);
+    message.length = (unsigned) std::stoi(messageContent[POSITION_OF_AWL_MESSAGE_LENGTH_IN_LINE]);
+    message.timestamp = (unsigned) std::stoi(messageContent[POSITION_OF_AWL_MESSAGE_TIMESTAMP_IN_LINE]);
     for (auto dataPosition = 0; dataPosition < MAX_NUMBER_OF_DATA_IN_AWL_MESSAGE; dataPosition++) {
         auto dataValue = std::stoi(messageContent[POSITION_OF_AWL_MESSAGE_DATA_IN_LINE + dataPosition]);
         message.data[dataPosition] = static_cast<unsigned char>(dataValue);
@@ -42,13 +41,17 @@ void AWLMessagesFileManager::parseAWLMessageContentFromLine(std::string line, st
     messageContentArray[contentPosition] = line;
 }
 
-std::string AWLMessagesFileManager::buildLineFromSensorMessage(AWLMessage const& message) {
-    std::stringstream lineStringStream;
-    lineStringStream << (int)message.id  << LINE_SEPARATOR << (int)message.length << LINE_SEPARATOR << (long)message.timestamp << LINE_SEPARATOR;
+void AWLMessagesFileManager::writeBlockWithMessage(AWLMessage const& message, std::FILE* file) {
+    std::fprintf(file, "%d", (int)message.id );
+    std::fprintf(file, "%s", LINE_SEPARATOR.c_str());
+    std::fprintf(file, "%d", (int)message.length);
+    std::fprintf(file, "%s", LINE_SEPARATOR.c_str());
+    std::fprintf(file, "%ld", (long)message.timestamp);
+    std::fprintf(file, "%s", LINE_SEPARATOR.c_str());
     for (auto dataPosition = 0; dataPosition < MAX_NUMBER_OF_DATA_IN_AWL_MESSAGE - 1; dataPosition++) {
-        lineStringStream << (int)message.data[dataPosition] << LINE_SEPARATOR;
+        std::fprintf(file, "%d", (int)message.data[dataPosition] );
+        std::fprintf(file, "%s", LINE_SEPARATOR.c_str());
     }
-    lineStringStream << (int)message.data[MAX_NUMBER_OF_DATA_IN_AWL_MESSAGE - 1];
-    std::string line = lineStringStream.str();
-    return line;
+    std::fprintf(file, "%d\n", (int)message.data[MAX_NUMBER_OF_DATA_IN_AWL_MESSAGE - 1]);
 }
+

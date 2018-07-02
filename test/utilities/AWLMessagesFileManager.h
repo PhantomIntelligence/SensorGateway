@@ -11,26 +11,27 @@
 	limitations under the License.
 */
 
-#ifndef SPIRITSENSORGATEWAY_AWLMESSAGESFILEPARSERSTRATEGY_H
-#define SPIRITSENSORGATEWAY_AWLMESSAGESFILEPARSERSTRATEGY_H
+#ifndef SPIRITSENSORGATEWAY_AWLMESSAGESFILEMANAGER_H
+#define SPIRITSENSORGATEWAY_AWLMESSAGESFILEMANAGER_H
 
-#include "SensorMessagesFileManager.h"
+#include "FileManager.hpp"
+#include "spirit-sensor-gateway/domain/AWLMessage.h"
 
 namespace TestUtilities {
 
-    class AWLMessagesFileManager : public SensorMessagesFileManager {
+    class AWLMessagesFileManager : public FileManager<AWLMessage> {
 
     public:
         AWLMessagesFileManager() = default;
 
-        ~AWLMessagesFileManager() = default;
+        ~AWLMessagesFileManager() override = default;
 
     private:
-        std::string buildLineFromSensorMessage(AWLMessage const& message) override;
-
-        AWLMessage parseSensorMessageFromLine(std::string const& line) override;
+        AWLMessage readMessageFromLine(std::string const& line) override;
 
         void parseAWLMessageContentFromLine(std::string line, std::string* messageContentArray);
+
+        void writeBlockWithMessage(AWLMessage const& message, std::FILE* file) override;
 
         const std::string LINE_SEPARATOR = "-";
 
@@ -43,7 +44,8 @@ namespace TestUtilities {
         const int POSITION_OF_AWL_MESSAGE_TIMESTAMP_IN_LINE = 2;
 
         const int POSITION_OF_AWL_MESSAGE_DATA_IN_LINE = 3;
+
     };
 }
 
-#endif //SPIRITSENSORGATEWAY_AWLMESSAGESFILEPARSERSTRATEGY_H
+#endif //SPIRITSENSORGATEWAY_AWLMESSAGESFILEMANAGER_H
