@@ -64,17 +64,15 @@ TEST_F(AWLMessageTranslatorTest,given_anAWLMessageWithAnIdofEleven_when_translat
     awlMessageTranslator.translateBasicMessage(&detectionTrackAwlMessage);
     awlMessageTranslator.translateBasicMessage(&detectionVelocityAwlMessage);
     awlMessageTranslator.translateBasicMessage(&endOfFrameAwlMessage);
-    std::cout<<"====="<<std::endl;
-    std::cout<<awlMessageTranslator.getFrames()[0].getPixels()[1].getTracks()[0].getID()<<std::endl;
 
 
     auto expectedPixelId = 0x0001;
     auto expectedTrackId = 0x2010;
-    auto expectedTrackDistance = 0x0130;
-    auto expectedTrackSpeed = 0x6000;
-    auto expectedTrackAcceleration = 0x8070;
+    uint16_t expectedTrackDistance = 0x0130;
+    int16_t expectedTrackSpeed = 0x6000;
+    int16_t expectedTrackAcceleration = 0x8070;
 
-    auto frame = awlMessageTranslator.getFrames()[0];
+    auto frame = awlMessageTranslator.getFrames().at(0);
     auto pixel = frame.fetchPixelByID(expectedPixelId);
     auto track = *pixel->fetchTrackByID(expectedTrackId);
 

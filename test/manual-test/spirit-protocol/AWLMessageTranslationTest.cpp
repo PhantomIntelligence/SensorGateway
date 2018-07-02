@@ -23,7 +23,7 @@ void stringSplit(std::string stringToSplit, std::string *awlData) {
     awlData[positionData] = stringToSplit;
 }
 
-int main() {
+/*int main() {
 
     auto file = std::fopen("frameList.txt", "w+");
     AWLMessageTranslator awlMessageTranslator;
@@ -54,7 +54,7 @@ int main() {
     for (std::vector<Frame>::iterator itFrame = framelist.begin(); itFrame != framelist.end(); ++itFrame) {
         uint16_t idFrame = itFrame->getFrameID();
         uint16_t systemId = itFrame->getSystemID();
-        std::unordered_map<uint16_t, Pixel> sensorPilexlList = itFrame->getPixels();
+        std::unordered_map<uint16_t, Pixel> sensorPilexlList = itFrame->getPixelsAddress();
 
         std::fprintf(file,
                      "=========================================================================================\n");
@@ -90,5 +90,5 @@ int main() {
     fclose(file);
 
     return 0;
-}
+}*/
 

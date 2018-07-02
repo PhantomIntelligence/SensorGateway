@@ -30,23 +30,23 @@ void AWLMessageTranslator::translateBasicMessage(AWLMessage* awlMessage) {
 }
 
 void AWLMessageTranslator::translateEndOfFrameMessage(AWLMessage* awlMessage) {
-    currentFrame->setFrameID(convertTwoBytesToBigEndian(awlMessage->data[0], awlMessage->data[1]));
-    currentFrame->setSystemID(convertTwoBytesToBigEndian(awlMessage->data[2], awlMessage->data[3]));
+    currentFrame->setFrameID(convertTwoBytesToUnsignedBigEndian(awlMessage->data[0], awlMessage->data[1]));
+    currentFrame->setSystemID(convertTwoBytesToUnsignedBigEndian(awlMessage->data[2], awlMessage->data[3]));
     frames.push_back(*currentFrame);
     currentFrame = new Frame();
 }
 
 void AWLMessageTranslator::translateDetectionTrackMessage(AWLMessage* awlMessage) {
-    PixelID pixelID = convertTwoBytesToBigEndian(awlMessage->data[3], awlMessage->data[4]);
+    PixelID pixelID = convertTwoBytesToUnsignedBigEndian(awlMessage->data[3], awlMessage->data[4]);
     Pixel pixel = Pixel(pixelID);
     currentFrame->addPixel(pixel);
     addTrackInPixel(awlMessage, pixelID);
 }
 
 void AWLMessageTranslator::addTrackInPixel(AWLMessage* awlMessage, PixelID pixelID) {
-    TrackID trackID = convertTwoBytesToBigEndian(awlMessage->data[0], awlMessage->data[1]);
+    TrackID trackID = convertTwoBytesToUnsignedBigEndian(awlMessage->data[0], awlMessage->data[1]);
     ConfidenceLevel confidenceLevel = awlMessage->data[5];
-    Intensity intensity = convertTwoBytesToBigEndian(awlMessage->data[6], awlMessage->data[7]);
+    Intensity intensity = convertTwoBytesToUnsignedBigEndian(awlMessage->data[6], awlMessage->data[7]);
     Track track = Track(trackID, confidenceLevel, intensity);
     Pixel* pixel = currentFrame->fetchPixelByID(pixelID);
     pixel->addTrack(track);
@@ -54,17 +54,17 @@ void AWLMessageTranslator::addTrackInPixel(AWLMessage* awlMessage, PixelID pixel
 
 void AWLMessageTranslator::translateDetectionVelocityMessage(AWLMessage* awlMessage) {
     auto track = fetchTrack(awlMessage);
-    track->setDistance(convertTwoBytesToBigEndian(awlMessage->data[2], awlMessage->data[3]));
-    track->setSpeed(convertTwoBytesToBigEndian(awlMessage->data[4], awlMessage->data[5]));
-    track->setAcceleration(convertTwoBytesToBigEndian(awlMessage->data[6], awlMessage->data[7]));
+    track->setDistance(convertTwoBytesToUnsignedBigEndian(awlMessage->data[2], awlMessage->data[3]));
+    track->setSpeed(convertTwoBytesToSignedBigEndian(awlMessage->data[4], awlMessage->data[5]));
+    track->setAcceleration(convertTwoBytesToSignedBigEndian(awlMessage->data[6], awlMessage->data[7]));
 }
 
 
 Track* AWLMessageTranslator::fetchTrack(AWLMessage* awlMessage) const {
-    TrackID trackID = convertTwoBytesToBigEndian(awlMessage->data[0], awlMessage->data[1]);
-    auto pixels = currentFrame->getPixels();
+    TrackID trackID = convertTwoBytesToUnsignedBigEndian(awlMessage->data[0], awlMessage->data[1]);
+    auto pixels = currentFrame->getPixelsAddress();
     for (auto i = 0; i < NUMBER_OF_PIXEL_IN_AWL_16_FRAME; ++i) {
-        auto pixel = &pixels[i];
+        auto pixel = &pixels->at(i);
         auto trackExists = pixel->doesTrackExist(trackID);
         if (trackExists) {
             return pixel->fetchTrackByID(trackID);

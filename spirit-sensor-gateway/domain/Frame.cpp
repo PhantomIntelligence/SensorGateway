@@ -32,8 +32,8 @@ namespace SpiritProtocol {
         return frameID;
     };
 
-    std::array<Pixel,NUMBER_OF_PIXEL_IN_AWL_16_FRAME> Frame::getPixels() const {
-        return pixels;
+    std::array<Pixel,NUMBER_OF_PIXEL_IN_AWL_16_FRAME>* Frame::getPixelsAddress() {
+        return &pixels;
     };
 
     SystemID Frame::getSystemID() const {

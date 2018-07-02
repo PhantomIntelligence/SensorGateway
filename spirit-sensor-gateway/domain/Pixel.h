@@ -42,13 +42,13 @@ namespace SpiritProtocol {
 
         void addTrack(Track track);
 
-        bool doesTrackExist(TrackID trackID) const;
+        bool doesTrackExist(TrackID trackID);
 
         Track* fetchTrackByID(TrackID trackID);
 
         PixelID getID() const;
 
-        std::array<Track, MAXIMUM_NUMBER_OF_TRACK_IN_AWL16_PIXEL> getTracks() const;
+        std::array<Track, MAXIMUM_NUMBER_OF_TRACK_IN_AWL16_PIXEL>* getTracksAdress();
 
     private:
         uint16_t ID;
