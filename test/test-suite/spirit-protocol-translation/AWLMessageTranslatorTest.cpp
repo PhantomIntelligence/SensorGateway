@@ -81,19 +81,6 @@ TEST_F(AWLMessageTranslatorTest,given_anAWLMessageWithAnIdofEleven_when_translat
     ASSERT_EQ(expectedTrackAcceleration,track.getAcceleration());
 }
 
-TEST_F(AWLMessageTranslatorTest,given_aTrackVelocityMessageAndNoDetectionTrackMessage_when_translatingTheMessage_then_throwsAnException){
-    AWLMessageTranslator awlMessageTranslatorTest;
-
-    auto detectionVelocityAwlMessage = givenAnAWLMessageWithAnId(DETECTION_VELOCITY);
-
-}
-
-TEST_F(AWLMessageTranslatorTest,given_anAWLMessageWithAnUnknownID) {
-    AWLMessageTranslator* awlMessageTranslatorTest =  new AWLMessageTranslator();
-    AWLMessage* awlMessage= new AWLMessage();
-    awlMessage->id = 0x11;
-
-}
 
 AWLMessage AWLMessageTranslatorTest::givenAnAWLMessageWithAnId(uint16_t id) const {
 
