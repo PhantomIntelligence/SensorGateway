@@ -31,48 +31,22 @@ using NativeBuffer = DataFlow::RingBuffer<NativeData>;
 using OutputProducer = DataFlow::DataSource<ProcessedData>;
 using ProcessingStrategy = DataFlow::DataSink<NativeData>;
 
-using ProcessedOutputSequencer = DataFlow::OutputSequencer<ProcessedData, TestWorker>;
-using NativeProcedure = DataFlow::Procedure<NativeData, ProcessedData>;
-using Scheduler = DataFlow::DataProcessingScheduler<NativeData>;
+using NativeSink = DataFlow::DataSink<NativeData>;
 
-class WorkSchedulerTest : public ::testing::Test {
+class DataProcessingSchedulerTest : public ::testing::Test {
 protected:
 
-    WorkSchedulerTest() = default;
+    DataProcessingSchedulerTest() = default;
 
-    virtual ~WorkSchedulerTest() = default;
+    virtual ~DataProcessingSchedulerTest() = default;
 
-};
+    uint16_t const ARBITRARY_NUMBER_OF_CONSUMPTION_BEFORE_STOP = 5;
 
-
-class MockProcedure : public NativeProcedure {
-public:
-    MockProcedure() : numberOfTimesCalled(0), processedData(
-            ProcessedData(DataTestUtil::generateRandomNativeData(), DataTestUtil::initProcessedComplement())) {
-    }
-
-    ProcessedData process(NativeData&& dataIn) const override {
-        ++numberOfTimesCalled;
-        return expectedProcessedData();
-    }
-
-    int getNumberOfTimesCalled() const noexcept {
-        return numberOfTimesCalled;
-    }
-
-    ProcessedData const& expectedProcessedData() const noexcept {
-        return processedData;
-    }
-
-private:
-
-    mutable AtomicCounter numberOfTimesCalled;
-    ProcessedData processedData;
 };
 
 class MockInputBuffer : public NativeBuffer {
 public:
-    MockInputBuffer(uData16 numberOfConsumptionBeforeStop) :
+    explicit MockInputBuffer(uint16_t numberOfConsumptionBeforeStop) :
             numberOfTimesToBeConsumedBeforeStop(numberOfConsumptionBeforeStop),
             data(DataTestUtil::generateRandomNativeData()),
             numberOfCallsToConsumeNextData(0) {
@@ -99,20 +73,20 @@ public:
     }
 
 private:
-    uData16 const numberOfTimesToBeConsumedBeforeStop;
+    uint16_t const numberOfTimesToBeConsumedBeforeStop;
     AtomicCounter numberOfCallsToConsumeNextData;
     DATA data;
     Consumer* linkedConsumer = nullptr;
 };
 
-class MockOutputProducer : public OutputProducer {
+class MockSink : public NativeSink {
 public:
-    MockOutputProducer(uData16 numberOfWriteGoal) :
+    explicit MockSink(uint8_t numberOfWriteGoal) :
             numberOfWritesGoal(numberOfWriteGoal),
             actualNumberOfWrites(0) {
     }
 
-    void produce(DATA&& data) override {
+    void consume(DATA&& data) override {
         ++actualNumberOfWrites;
         if (hasBeenCalledExpectedNumberOfTimes()) {
             numberOfWritesAchieved.set_value(true);
@@ -129,33 +103,22 @@ private:
     mutable BooleanPromise numberOfWritesAchieved;
 };
 
-TEST_F(WorkSchedulerTest, given_aStoppedWorkScheduler_when_linksAnInputBuffer_then_throwsAnException) {
+using SingleInputScheduler = DataFlow::DataProcessingScheduler<NativeData, MockSink, NUMBER_OF_CONCURRENT_INPUT_FOR_SENSOR_ACCESS_LINK_ELEMENTS>;
+
+TEST_F(DataProcessingSchedulerTest, given_aStoppedWorkScheduler_when_linksAnInputBuffer_then_throwsAnException) {
     MockInputBuffer inputBuffer(1);
-    MockOutputProducer outputProducer(5);
-    ProcessedOutputSequencer processedOutputSequencer(&outputProducer);
-    processedOutputSequencer.terminateAndJoin();
-    MockProcedure processMock;
-    WorkerPool workerPool(&processMock);
-    workerPool.terminateWorkers();
-    Scheduler scheduler(&workerPool, &processedOutputSequencer);
+    MockSink mockSink(ARBITRARY_NUMBER_OF_CONSUMPTION_BEFORE_STOP);
+    SingleInputScheduler scheduler(&mockSink);
     scheduler.terminateAndJoin();
 
-    auto hasThrownException = false;
-    try {
-        scheduler.linkWith(&inputBuffer);
-    } catch (std::runtime_error) {
-        hasThrownException = true;
-    }
-    ASSERT_TRUE(hasThrownException);
+    ASSERT_THROW(scheduler.linkWith(&inputBuffer), std::runtime_error);
 }
 
-TEST_F(WorkSchedulerTest, given_anUnlinkedInputBuffer_when_activatesForThatBuffer_then_throwsAnException) {
+TEST_F(DataProcessingSchedulerTest, given_anUnlinkedInputBuffer_when_activatesForThatBuffer_then_throwsAnException) {
     MockInputBuffer inputBuffer(1);
-    MockOutputProducer outputProducer(5);
-    ProcessedOutputSequencer processedOutputSequencer(&outputProducer);
-    MockProcedure processMock;
-    WorkerPool workerPool(&processMock);
-    Scheduler scheduler(&workerPool, &processedOutputSequencer);
+    MockSink mockSink(ARBITRARY_NUMBER_OF_CONSUMPTION_BEFORE_STOP);
+    SingleInputScheduler scheduler(&mockSink);
+    scheduler.terminateAndJoin();
 
     auto hasThrownException = false;
     try {
@@ -163,19 +126,16 @@ TEST_F(WorkSchedulerTest, given_anUnlinkedInputBuffer_when_activatesForThatBuffe
     } catch (std::runtime_error) {
         hasThrownException = true;
     }
+
     scheduler.terminateAndJoin();
-    processedOutputSequencer.terminateAndJoin();
-    workerPool.terminateWorkers();
     ASSERT_TRUE(hasThrownException);
 }
 
-TEST_F(WorkSchedulerTest, given_anUnlinkedInputBuffer_when_deactivatesForThatBuffer_then_throwsAnException) {
+TEST_F(DataProcessingSchedulerTest, given_anUnlinkedInputBuffer_when_deactivatesForThatBuffer_then_throwsAnException) {
     MockInputBuffer inputBuffer(1);
-    MockOutputProducer outputProducer(5);
-    ProcessedOutputSequencer processedOutputSequencer(&outputProducer);
-    MockProcedure processMock;
-    WorkerPool workerPool(&processMock);
-    Scheduler scheduler(&workerPool, &processedOutputSequencer);
+    MockSink mockSink(ARBITRARY_NUMBER_OF_CONSUMPTION_BEFORE_STOP);
+    SingleInputScheduler scheduler(&mockSink);
+    scheduler.terminateAndJoin();
 
     auto hasThrownException = false;
     try {
@@ -183,32 +143,26 @@ TEST_F(WorkSchedulerTest, given_anUnlinkedInputBuffer_when_deactivatesForThatBuf
     } catch (std::runtime_error) {
         hasThrownException = true;
     }
+
     scheduler.terminateAndJoin();
-    processedOutputSequencer.terminateAndJoin();
-    workerPool.terminateWorkers();
     ASSERT_TRUE(hasThrownException);
 }
 
-TEST_F(WorkSchedulerTest, given_anUnlinkedInputBuffer_when_linksIt_then_callsTheRingBuffersLinkFunction) {
+TEST_F(DataProcessingSchedulerTest, given_anUnlinkedInputBuffer_when_linksIt_then_callsTheRingBuffersLinkFunction) {
     MockInputBuffer inputBufferMock(1);
-    MockOutputProducer outputProducer(5);
-    ProcessedOutputSequencer processedOutputSequencer(&outputProducer);
-    MockProcedure processMock;
-    WorkerPool workerPool(&processMock);
-    Scheduler scheduler(&workerPool, &processedOutputSequencer);
+    MockSink mockSink(ARBITRARY_NUMBER_OF_CONSUMPTION_BEFORE_STOP);
+    SingleInputScheduler scheduler(&mockSink);
 
     scheduler.linkWith(&inputBufferMock);
 
     auto linkedConsumer = inputBufferMock.getLinkedConsumer();
     scheduler.terminateAndJoin();
-    processedOutputSequencer.terminateAndJoin();
-    workerPool.terminateWorkers();
     ASSERT_EQ(linkedConsumer, &scheduler);
 }
 
 class MockConsumptionCountingInputBuffer : public NativeBuffer {
 public:
-    MockConsumptionCountingInputBuffer(uData16 numberOfConsumptionBeforeStop) :
+    MockConsumptionCountingInputBuffer(uint16_t numberOfConsumptionBeforeStop) :
             numberOfTimesToBeConsumedBeforeStop(numberOfConsumptionBeforeStop),
             numberOfCallsToConsumeNextData(0) {}
 
@@ -220,7 +174,7 @@ public:
         return NativeBuffer::consumeNextDataFor(consumer);
     }
 
-    Boolean hasBeenCalledExpectedNumberOfTimes() const {
+    bool hasBeenCalledExpectedNumberOfTimes() const {
         return numberOfCallsToConsumeNextData.load() == numberOfTimesToBeConsumedBeforeStop;
     };
 
@@ -231,21 +185,17 @@ public:
     }
 
 private:
-    uData16 const numberOfTimesToBeConsumedBeforeStop;
+    uint16_t const numberOfTimesToBeConsumedBeforeStop;
     AtomicCounter numberOfCallsToConsumeNextData;
     mutable BooleanPromise consumptionGoalReached;
 };
 
-TEST_F(WorkSchedulerTest,
+TEST_F(DataProcessingSchedulerTest,
        given_aLinkedInputBuffer_when_activatesForThatBuffer_then_consumesFromTheInputBufferUntilStopped) {
-    uData16 numberOfConsumptionBeforeStop = NUMBER_OF_WORKER_PER_PIPE + 3;
-    MockOutputProducer outputProducer(numberOfConsumptionBeforeStop);
-    ProcessedOutputSequencer processedOutputSequencer(&outputProducer);
+    MockSink mockSink(ARBITRARY_NUMBER_OF_CONSUMPTION_BEFORE_STOP);
+    SingleInputScheduler scheduler(&mockSink);
+    uint16_t numberOfConsumptionBeforeStop = 42;
     MockConsumptionCountingInputBuffer inputBufferMock(numberOfConsumptionBeforeStop);
-
-    MockProcedure processMock;
-    WorkerPool workerPool(&processMock);
-    Scheduler scheduler(&workerPool, &processedOutputSequencer);
     scheduler.linkWith(&inputBufferMock);
 
     for (auto l = 0; l < numberOfConsumptionBeforeStop; ++l) {
@@ -253,25 +203,18 @@ TEST_F(WorkSchedulerTest,
         inputBufferMock.write(std::move(newData));
     }
 
-
     inputBufferMock.waitConsumptionGoalToBeReached();
-
     scheduler.terminateAndJoin();
-    processedOutputSequencer.terminateAndJoin();
-    workerPool.terminateWorkers();
 
     auto hasBeenCalledExpectedNumberOfTimes = inputBufferMock.hasBeenCalledExpectedNumberOfTimes();
     ASSERT_TRUE(hasBeenCalledExpectedNumberOfTimes);
 }
 
-TEST_F(WorkSchedulerTest,
+TEST_F(DataProcessingSchedulerTest,
        given_aWorkSchedulerWithTheMaximumNumberOfBufferLinked_when_attemptingToLinkOneMore_then_throwsAnIllegalNumberOfInputBufferException) {
-    NativeBuffer inputBuffers[NUMBER_OF_INPUT_BUFFER_PER_PIPE];
-    MockOutputProducer outputProducer(5);
-    ProcessedOutputSequencer processedOutputSequencer(&outputProducer);
-    MockProcedure processMock;
-    WorkerPool workerPool(&processMock);
-    Scheduler scheduler(&workerPool, &processedOutputSequencer);
+    MockSink mockSink(ARBITRARY_NUMBER_OF_CONSUMPTION_BEFORE_STOP);
+    SingleInputScheduler scheduler(&mockSink);
+    NativeBuffer inputBuffers[NUMBER_OF_CONCURRENT_INPUT_FOR_SENSOR_ACCESS_LINK_ELEMENTS];
     for (auto& inputBuffer : inputBuffers) {
         scheduler.linkWith(&inputBuffer);
     }
@@ -283,19 +226,15 @@ TEST_F(WorkSchedulerTest,
     } catch (std::runtime_error const&) {
         hasThrownException = true;
     }
+
     scheduler.terminateAndJoin();
-    processedOutputSequencer.terminateAndJoin();
-    workerPool.terminateWorkers();
     ASSERT_TRUE(hasThrownException);
 }
 
-TEST_F(WorkSchedulerTest, given_anInputBuffer_when_linkingItMoreThanOnce_then_anExceptionIsThrown) {
-    MockInputBuffer inputBufferMock(0);
-    MockOutputProducer outputProducer(5);
-    ProcessedOutputSequencer processedOutputSequencer(&outputProducer);
-    MockProcedure processMock;
-    WorkerPool workerPool(&processMock);
-    Scheduler scheduler(&workerPool, &processedOutputSequencer);
+TEST_F(DataProcessingSchedulerTest, given_anInputBuffer_when_linkingItMoreThanOnce_then_anExceptionIsThrown) {
+    MockInputBuffer inputBufferMock(1);
+    MockSink mockSink(ARBITRARY_NUMBER_OF_CONSUMPTION_BEFORE_STOP);
+    SingleInputScheduler scheduler(&mockSink);
 
     auto hasThrownException = false;
     scheduler.linkWith(&inputBufferMock);
@@ -305,25 +244,26 @@ TEST_F(WorkSchedulerTest, given_anInputBuffer_when_linkingItMoreThanOnce_then_an
         hasThrownException = true;
     }
     scheduler.terminateAndJoin();
-    processedOutputSequencer.terminateAndJoin();
-    workerPool.terminateWorkers();
     ASSERT_TRUE(hasThrownException);
 }
 
-TEST_F(WorkSchedulerTest,
+
+TEST_F(DataProcessingSchedulerTest,
        given_twoLinkedInputBuffer_when_activatesForTheSecondBuffer_then_theFirstBufferIsNotCalledAndTheSecondBufferIsCalled) {
-    uData16 numberOfConsumptionBeforeStop = 8;
-    MockConsumptionCountingInputBuffer firstBufferMock(0);
-    MockConsumptionCountingInputBuffer secondBufferMock(numberOfConsumptionBeforeStop);
-    MockOutputProducer outputProducer(numberOfConsumptionBeforeStop);
-    ProcessedOutputSequencer processedOutputSequencer(&outputProducer);
-    MockProcedure processMock;
-    WorkerPool workerPool(&processMock);
-    Scheduler scheduler(&workerPool, &processedOutputSequencer);
+    uint8_t const NUMBER_OF_INPUT_BUFFERS = 2;
+    using Scheduler = DataFlow::DataProcessingScheduler<NativeData, MockSink, NUMBER_OF_INPUT_BUFFERS>;
+    auto numberOfConsumptionExpectedForFirstBuffer = 0;
+    auto numberOfConsumptionExpectedForSecondBuffer = 8;
+    auto numberOfConsumptionBeforeStop = numberOfConsumptionExpectedForFirstBuffer + numberOfConsumptionExpectedForSecondBuffer;
+
+    MockConsumptionCountingInputBuffer firstBufferMock(numberOfConsumptionExpectedForFirstBuffer);
+    MockConsumptionCountingInputBuffer secondBufferMock(numberOfConsumptionExpectedForSecondBuffer);
+    MockSink mockSink(numberOfConsumptionBeforeStop);
+    Scheduler scheduler(&mockSink);
     scheduler.linkWith(&firstBufferMock);
     scheduler.linkWith(&secondBufferMock);
 
-    for (auto l = 0; l < numberOfConsumptionBeforeStop; ++l) {
+    for (auto l = 0; l < numberOfConsumptionExpectedForSecondBuffer; ++l) {
         auto nativeData = DataTestUtil::generateRandomNativeData();
         secondBufferMock.write(std::move(nativeData));
     }
@@ -332,8 +272,6 @@ TEST_F(WorkSchedulerTest,
     secondBufferMock.waitConsumptionGoalToBeReached();
 
     scheduler.terminateAndJoin();
-    processedOutputSequencer.terminateAndJoin();
-    workerPool.terminateWorkers();
 
     auto firstHasBeenCalledExpectedNumberOfTimes = firstBufferMock.hasBeenCalledExpectedNumberOfTimes();
     ASSERT_TRUE(firstHasBeenCalledExpectedNumberOfTimes);
@@ -344,77 +282,23 @@ TEST_F(WorkSchedulerTest,
 /**
  * @note: Medium test
  */
-TEST_F(WorkSchedulerTest,
-       given_aNumberOfData_when_dataIswrittenToTheInputBuffer_then_callsTheProcedureTheSameNumberOfTimes) {
+TEST_F(DataProcessingSchedulerTest,
+       given_aNumberOfData_when_dataIswrittenToTheInputBuffer_then_callsTheDataSinkTheSameNumberOfTimes) {
     NativeBuffer inputBuffer;
-    uData16 numberOfData = 16;
-    MockOutputProducer outputProducer(numberOfData);
-    ProcessedOutputSequencer processedOutputSequencer(&outputProducer);
-    MockProcedure processMock;
-    WorkerPool workerPool(&processMock);
-    Scheduler scheduler(&workerPool, &processedOutputSequencer);
+    MockSink mockSink(ARBITRARY_NUMBER_OF_CONSUMPTION_BEFORE_STOP);
+    SingleInputScheduler scheduler(&mockSink);
+
     scheduler.linkWith(&inputBuffer);
 
-    for (uData16 k = 0; k < numberOfData; ++k) {
+    for (auto k = 0; k < ARBITRARY_NUMBER_OF_CONSUMPTION_BEFORE_STOP; ++k) {
         auto nativeData = DataTestUtil::generateRandomNativeData();
         inputBuffer.write(std::move(nativeData));
     }
 
     scheduler.terminateAndJoin();
-    processedOutputSequencer.terminateAndJoin();
-    workerPool.terminateWorkers();
 
-    auto numberOfTimesProcessExecuted = processMock.getNumberOfTimesCalled();
-    ASSERT_EQ(numberOfData, numberOfTimesProcessExecuted);
-}
-
-class MockSequenceCountingOutputSequencer : public ProcessedOutputSequencer {
-    using super = ProcessedOutputSequencer;
-public:
-    MockSequenceCountingOutputSequencer(uData16 goal, MockOutputProducer* outputProducer) :
-            ProcessedOutputSequencer(outputProducer),
-            numberOfCallGoal(goal),
-            numberOfCallsToConsumeNextData(0) {}
-
-    void sequenceWork(TestWorker* nextWorker) override {
-        super::sequenceWork(nextWorker);
-        numberOfCallsToConsumeNextData++;
-    }
-
-    bool hasBeenCalledExpectedNumberOfTimes() const {
-        return numberOfCallsToConsumeNextData.load() == numberOfCallGoal;
-    };
-
-private:
-    uData16 const numberOfCallGoal;
-    AtomicCounter numberOfCallsToConsumeNextData;
-};
-
-/**
- * @note: Medium test
- */
-TEST_F(WorkSchedulerTest,
-       given_aNumberOfData_when_dataIswrittenToTheInputBuffer_then_callsTheOutputSequencerTheSameNumberOfTimes) {
-    NativeBuffer inputBuffer;
-    uData16 numberOfData = 5;
-    MockOutputProducer outputProducer(numberOfData);
-    MockSequenceCountingOutputSequencer processedOutputSequencer(numberOfData, &outputProducer);
-    MockProcedure processMock;
-    WorkerPool workerPool(&processMock);
-    Scheduler scheduler(&workerPool, &processedOutputSequencer);
-    scheduler.linkWith(&inputBuffer);
-
-    for (uData16 k = 0; k < numberOfData; ++k) {
-        auto nativeData = DataTestUtil::generateRandomNativeData();
-        inputBuffer.write(std::move(nativeData));
-    }
-
-    scheduler.terminateAndJoin();
-    processedOutputSequencer.terminateAndJoin();
-    workerPool.terminateWorkers();
-
-    auto sequencerCalledCorrectNumberOfTimes = processedOutputSequencer.hasBeenCalledExpectedNumberOfTimes();
-    ASSERT_TRUE(sequencerCalledCorrectNumberOfTimes);
+    auto calledExpectedNumberOfTimes = mockSink.hasBeenCalledExpectedNumberOfTimes();
+    ASSERT_TRUE(calledExpectedNumberOfTimes);
 }
 
 #endif //SPIRITSENSORGATEWAY_WORKSCHEDULERTEST_CPP

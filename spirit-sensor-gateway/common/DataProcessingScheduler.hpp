@@ -21,22 +21,22 @@
 
 namespace DataFlow {
 
-    template<class T>
+    template<class T, class SINK, uint8_t const NUMBER_OF_CONCURENT_INPUTS>
     class DataProcessingScheduler : public ConsumerLink<T> {
 
         typedef T DATA;
-        typedef DataSink<DATA> DataSink;
         typedef RingBuffer<DATA> InputBuffer;
-        typedef Container::ConstantSizedPointerList<InputBuffer, NUMBER_OF_CONCURRENT_INPUT_FOR_SENSOR_ACCESS_LINK_ELEMENTS> InputBufferStates;
+        typedef Container::ConstantSizedPointerList<InputBuffer, NUMBER_OF_CONCURENT_INPUTS> InputBufferStates;
 
     public:
 
         /**
          * @brief Default constructor. A  should be only instantiated once and live the same amount of time it's controlling structure does.
          */
-        DataProcessingScheduler(DataSink* dataSink) :
+        DataProcessingScheduler(SINK* dataSink) :
                 terminateOrderReceived(false),
                 numberOfLinkedBuffers(0),
+                dataSink(dataSink),
                 schedulerThread(JoinableThread(voidAction)) {
 
             schedulerThread.safeExit();
@@ -108,7 +108,7 @@ namespace DataFlow {
                 if (!readyToConsumeInputBuffers.empty()) {
                     auto inputBufferToConsumeFrom = readyToConsumeInputBuffers.readNextPointerToConsume();
                     auto data = inputBufferToConsumeFrom->consumeNextDataFor(this);
-                    // TODO: dataSink->consume(std::move(data);
+                    dataSink->consume(std::move(data));
                 }
             }
         }
@@ -140,7 +140,7 @@ namespace DataFlow {
         }
 
         void validateStatusArrayNotFull() const {
-            if (numberOfLinkedBuffers.load() == NUMBER_OF_CONCURRENT_INPUT_FOR_SENSOR_ACCESS_LINK_ELEMENTS) {
+            if (numberOfLinkedBuffers.load() == NUMBER_OF_CONCURENT_INPUTS) {
                 throwIllegalActionException(ExceptionMessage::DATA_PROCESSING_SCHEDULER_ILLEGAL_NUMBER_OF_INPUT_BUFFER_MESSAGE);
             }
         }
@@ -159,6 +159,7 @@ namespace DataFlow {
         InputBufferStates readyToConsumeInputBuffers;
         InputBufferStates catchedUpInputBuffers;
 
+        SINK* dataSink;
     };
 }
 
