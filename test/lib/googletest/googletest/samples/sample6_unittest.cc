@@ -29,7 +29,7 @@
 //
 // Author: wan@google.com (Zhanyong Wan)
 
-// This sample shows how to test common properties of multiple
+// This sample shows how to test utilities properties of multiple
 // implementations of the same interface (aka interface tests).
 
 // The interface and its implementations are in this header.
