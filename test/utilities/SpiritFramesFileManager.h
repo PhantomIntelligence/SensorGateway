@@ -27,9 +27,29 @@ namespace TestUtilities {
         ~SpiritFramesFileManager() override = default;
 
     private:
-        SpiritProtocol::Frame readMessageFromLine(std::string const& line) override;
+        SpiritProtocol::Frame readMessageFromFileBlock(std::string const& fileBlock) override;
 
-        void writeBlockWithMessage(SpiritProtocol::Frame const& message, std::FILE* file) override;
+        void writeFileBlockWithMessage(SpiritProtocol::Frame const& message, std::FILE* file) override;
+
+        const std::string FRAME_ID_LABEL = "Frame ID";
+
+        const std::string SYSTEM_ID_LABEL = "System ID";
+
+        const std::string PIXELS_LABEL = "Pixels";
+
+        const std::string PIXEL_ID_LABEL = "Pixel ID";
+
+        const std::string TRACKS_LABEL = "Tracks";
+
+        const std::string TRACK_ID_LABEL = "Track ID";
+
+        const std::string INTENSITY_LABEL = "Ìntensity";
+
+        const std::string CONFIDENCE_LEVEL_LABEL = "Confidence Level";
+
+        const std::string DISTANCE_LABEL = "Distance";
+
+        const std::string ACCELERATION_LABEL = "Acceleration";
 
     };
 }

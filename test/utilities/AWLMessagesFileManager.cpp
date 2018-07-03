@@ -11,47 +11,37 @@
 	limitations under the License.
 */
 
+#include <cstring>
 #include "AWLMessagesFileManager.h"
 
 using TestUtilities::AWLMessagesFileManager;
 
-AWLMessage AWLMessagesFileManager::readMessageFromLine(std::string const& line) {
+AWLMessage AWLMessagesFileManager::readMessageFromFileBlock(std::string const& fileBlock) {
     AWLMessage message{};
-    std::string messageContent[NUMBER_OF_DATA_IN_LINE];
-    parseAWLMessageContentFromLine(line, messageContent);
-    message.id = std::stoi(messageContent[POSITION_OF_AWL_MESSAGE_ID_IN_LINE]);
-    message.length = (unsigned) std::stoi(messageContent[POSITION_OF_AWL_MESSAGE_LENGTH_IN_LINE]);
-    message.timestamp = (unsigned) std::stoi(messageContent[POSITION_OF_AWL_MESSAGE_TIMESTAMP_IN_LINE]);
+    message.id = std::stoi(fetchSubstringBetweenDelimiters(fileBlock, ID_LABEL+MESSAGE_LABEL_VALUE_ASSOCIATOR, "\n"));
+    message.length = (unsigned) std::stoi(fetchSubstringBetweenDelimiters(fileBlock, LENGTH_LABEL+MESSAGE_LABEL_VALUE_ASSOCIATOR, "\n"));
+    message.timestamp = (unsigned) std::stoi(fetchSubstringBetweenDelimiters(fileBlock, TIMESTAMP_LABEL+MESSAGE_LABEL_VALUE_ASSOCIATOR, "\n"));
     for (auto dataPosition = 0; dataPosition < MAX_NUMBER_OF_DATA_IN_AWL_MESSAGE; dataPosition++) {
-        auto dataValue = std::stoi(messageContent[POSITION_OF_AWL_MESSAGE_DATA_IN_LINE + dataPosition]);
+        auto dataValue = std::stoi(fetchSubstringBetweenDelimiters(fileBlock, DATA_POSITION_LABEL+ " " +std::to_string(dataPosition + 1) +MESSAGE_LABEL_VALUE_ASSOCIATOR, "\n"));
         message.data[dataPosition] = static_cast<unsigned char>(dataValue);
     }
     return message;
 }
 
-void AWLMessagesFileManager::parseAWLMessageContentFromLine(std::string line, std::string* messageContentArray) {
-    size_t separatorPosition = 0;
-    auto contentPosition = 0;
-    while ((separatorPosition = line.find(LINE_SEPARATOR)) != std::string::npos) {
-        std::string content = line.substr(0, separatorPosition);
-        messageContentArray[contentPosition] = content;
-        contentPosition++;
-        line.erase(0, separatorPosition + LINE_SEPARATOR.length());
+void AWLMessagesFileManager::writeFileBlockWithMessage(AWLMessage const& message, std::FILE* file) {
+    std::fprintf(file, "%s%s%d\n", ID_LABEL.c_str(), MESSAGE_LABEL_VALUE_ASSOCIATOR.c_str(), (int)message.id);
+    std::fprintf(file, "%s%s%d\n", LENGTH_LABEL.c_str(), MESSAGE_LABEL_VALUE_ASSOCIATOR.c_str(), (int)message.length);
+    std::fprintf(file, "%s%s%ld\n", TIMESTAMP_LABEL.c_str(), MESSAGE_LABEL_VALUE_ASSOCIATOR.c_str(), (long)message.timestamp);
+    std::fprintf(file, "%s%s\n", DATA_LABEL.c_str(), MESSAGE_LABEL_VALUE_ASSOCIATOR.c_str());
+    for (auto dataPosition = 0; dataPosition < MAX_NUMBER_OF_DATA_IN_AWL_MESSAGE - 1; dataPosition++) {
+        std::fprintf(file, "%s", MESSAGE_CONTENT_TABULATOR.c_str());
+        std::fprintf(file, "%s %d%s%d\n", DATA_POSITION_LABEL.c_str(), dataPosition + 1, MESSAGE_LABEL_VALUE_ASSOCIATOR.c_str(),
+                     (int)message.data[dataPosition]);
     }
-    messageContentArray[contentPosition] = line;
+    std::fprintf(file, "%s", MESSAGE_CONTENT_TABULATOR.c_str());
+    std::fprintf(file, "%s %d%s%d\n", DATA_POSITION_LABEL.c_str(), MAX_NUMBER_OF_DATA_IN_AWL_MESSAGE,
+                 MESSAGE_LABEL_VALUE_ASSOCIATOR.c_str(), (int)message.data[MAX_NUMBER_OF_DATA_IN_AWL_MESSAGE - 1]);
+    std::fprintf(file, "%s\n", MESSAGES_SEPARATOR.c_str());
 }
 
-void AWLMessagesFileManager::writeBlockWithMessage(AWLMessage const& message, std::FILE* file) {
-    std::fprintf(file, "%d", (int)message.id );
-    std::fprintf(file, "%s", LINE_SEPARATOR.c_str());
-    std::fprintf(file, "%d", (int)message.length);
-    std::fprintf(file, "%s", LINE_SEPARATOR.c_str());
-    std::fprintf(file, "%ld", (long)message.timestamp);
-    std::fprintf(file, "%s", LINE_SEPARATOR.c_str());
-    for (auto dataPosition = 0; dataPosition < MAX_NUMBER_OF_DATA_IN_AWL_MESSAGE - 1; dataPosition++) {
-        std::fprintf(file, "%d", (int)message.data[dataPosition] );
-        std::fprintf(file, "%s", LINE_SEPARATOR.c_str());
-    }
-    std::fprintf(file, "%d\n", (int)message.data[MAX_NUMBER_OF_DATA_IN_AWL_MESSAGE - 1]);
-}
 

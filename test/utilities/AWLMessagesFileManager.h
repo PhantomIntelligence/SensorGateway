@@ -27,24 +27,19 @@ namespace TestUtilities {
         ~AWLMessagesFileManager() override = default;
 
     private:
-        AWLMessage readMessageFromLine(std::string const& line) override;
+        AWLMessage readMessageFromFileBlock(std::string const& fileBlock) override;
 
-        void parseAWLMessageContentFromLine(std::string line, std::string* messageContentArray);
+        void writeFileBlockWithMessage(AWLMessage const& message, std::FILE* file) override;
 
-        void writeBlockWithMessage(AWLMessage const& message, std::FILE* file) override;
+        const std::string ID_LABEL = "ID";
 
-        const std::string LINE_SEPARATOR = "-";
+        const std::string LENGTH_LABEL = "Length";
 
-        const int NUMBER_OF_DATA_IN_LINE = 11;
+        const std::string TIMESTAMP_LABEL = "Timestamp";
 
-        const int POSITION_OF_AWL_MESSAGE_ID_IN_LINE = 0;
+        const std::string DATA_LABEL = "Data";
 
-        const int POSITION_OF_AWL_MESSAGE_LENGTH_IN_LINE = 1;
-
-        const int POSITION_OF_AWL_MESSAGE_TIMESTAMP_IN_LINE = 2;
-
-        const int POSITION_OF_AWL_MESSAGE_DATA_IN_LINE = 3;
-
+        const std::string DATA_POSITION_LABEL = "Position";
     };
 }
 
