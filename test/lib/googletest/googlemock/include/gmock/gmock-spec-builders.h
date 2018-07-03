@@ -681,7 +681,7 @@ GTEST_API_ extern ThreadLocal<Sequence*> g_gmock_implicit_sequence;
 //   1. We need to store collections of expectations of different
 //   types (e.g. all pre-requisites of a particular expectation, all
 //   expectations in a sequence).  Therefore these expectation objects
-//   must share a common base class.
+//   must share a utilities base class.
 //
 //   2. We can avoid binary code bloat by moving methods not depending
 //   on the template argument of Expectation to the base class.

@@ -75,7 +75,7 @@ def Run(command):
   return p.exited and p.exit_code == 0
 
 
-# The tests.  TODO(wan@google.com): refactor the class to share common
+# The tests.  TODO(wan@google.com): refactor the class to share utilities
 # logic with code in gtest_break_on_failure_unittest.py.
 class ThrowOnFailureTest(gtest_test_utils.TestCase):
   """Tests the throw-on-failure mode."""

@@ -79,7 +79,7 @@ namespace testing {
 template <class MockClass>
 class NiceMock : public MockClass {
  public:
-  // We don't factor out the constructor body to a common method, as
+  // We don't factor out the constructor body to a utilities method, as
   // we have to avoid a possible clash with members of MockClass.
   NiceMock() {
     ::testing::Mock::AllowUninterestingCalls(
@@ -175,7 +175,7 @@ class NiceMock : public MockClass {
 template <class MockClass>
 class NaggyMock : public MockClass {
  public:
-  // We don't factor out the constructor body to a common method, as
+  // We don't factor out the constructor body to a utilities method, as
   // we have to avoid a possible clash with members of MockClass.
   NaggyMock() {
     ::testing::Mock::WarnUninterestingCalls(
@@ -271,7 +271,7 @@ class NaggyMock : public MockClass {
 template <class MockClass>
 class StrictMock : public MockClass {
  public:
-  // We don't factor out the constructor body to a common method, as
+  // We don't factor out the constructor body to a utilities method, as
   // we have to avoid a possible clash with members of MockClass.
   StrictMock() {
     ::testing::Mock::FailUninterestingCalls(
@@ -364,7 +364,7 @@ class StrictMock : public MockClass {
   GTEST_DISALLOW_COPY_AND_ASSIGN_(StrictMock);
 };
 
-// The following specializations catch some (relatively more common)
+// The following specializations catch some (relatively more utilities)
 // user errors of nesting nice and strict mocks.  They do NOT catch
 // all possible errors.
 

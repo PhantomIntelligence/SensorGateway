@@ -382,7 +382,7 @@ TEST(DirectoryTest, RootDirectoryExists) {
 #if GTEST_OS_WINDOWS
 TEST(DirectoryTest, RootOfWrongDriveDoesNotExists) {
   const int saved_drive_ = _getdrive();
-  // Find a drive that doesn't exist. Start with 'Z' to avoid common ones.
+  // Find a drive that doesn't exist. Start with 'Z' to avoid utilities ones.
   for (char drive = 'Z'; drive >= 'A'; drive--)
     if (_chdrive(drive - 'A' + 1) == -1) {
       char non_drive[_MAX_PATH];  // NOLINT
