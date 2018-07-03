@@ -21,7 +21,7 @@
 
 namespace DataFlow {
 /**
- * @brief DataSource interface, has the necessary element (i.e. an OutputBuffer) to be used as an input with ConsumerLink
+ * @brief DataSource abstract class, owns an OutputBuffer that will produce inputs for ConsumerLinks.
  */
     template<class T>
     class DataSource {
