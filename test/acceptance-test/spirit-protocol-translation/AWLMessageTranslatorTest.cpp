@@ -29,27 +29,6 @@ protected:
         spiritFramesFileManager.writeFileWithMessages(spiritFramesFixture, "ExpectedSpiritFramesOutputFile.txt");
     }
 
-    bool areFilesEqual(std::string const& firstFilename, std::string const& secondFilename) {
-        bool filesAreEqual = true;
-        auto firstFile = std::ifstream(firstFilename);
-        auto secondFile = std::ifstream(secondFilename);
-
-        if (firstFile and secondFile) {
-            std::string lineFromFirstFile;
-            std::string lineFromSecondFile;
-            while (std::getline(firstFile, lineFromFirstFile) and std::getline(secondFile, lineFromSecondFile)) {
-                if (lineFromFirstFile.compare(lineFromSecondFile) != 0){
-                    filesAreEqual = false;
-                    break;
-                }
-            }
-        } else {
-            std::cerr << "An error occurred while opening a file.\n";
-        }
-
-        return filesAreEqual;
-    }
-
     AWLMessagesFileManager awlMessagesFileManager;
     SpiritFramesFileManager spiritFramesFileManager;
 };
@@ -62,7 +41,7 @@ TEST_F(AWLMessageTranslatorTest, given_someInputFileContainingValidAWLMessages_w
     }
     std::vector<Frame> frames = awlMessageTranslator.getFrames();
     spiritFramesFileManager.writeFileWithMessages(frames, "ActualSpiritFramesOutputFile.txt");
-    ASSERT_TRUE(areFilesEqual("ExpectedSpiritFramesOutputFile.txt", "ActualSpiritFramesOutputFile.txt"));
+    ASSERT_TRUE(spiritFramesFileManager.areFilesEqual("ExpectedSpiritFramesOutputFile.txt", "ActualSpiritFramesOutputFile.txt"));
 }
 
 

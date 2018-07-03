@@ -31,7 +31,7 @@ namespace TestUtilities {
 
         void writeFileBlockWithMessage(SpiritProtocol::Frame const& message, std::FILE* file) override;
 
-        void writeFileLineWithContentLabel(std::FILE* file,unsigned int numberOfTabulator,char const* contentLabel);
+        void writeFileLineWithContentLabel(std::FILE* file, unsigned int numberOfTabulator, char const* contentLabel);
 
         void writeFileLineWithContentLabelAndValue(std::FILE* file, unsigned int numberOfTabulator,
                                                    char const* contentLabel, unsigned int contentValue);

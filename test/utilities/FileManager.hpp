@@ -58,6 +58,27 @@ namespace TestUtilities {
             fclose(file);
         }
 
+        bool areFilesEqual(std::string const& firstFilename, std::string const& secondFilename) {
+            bool filesAreEqual = true;
+            auto firstFile = std::ifstream(firstFilename);
+            auto secondFile = std::ifstream(secondFilename);
+
+            if (firstFile and secondFile) {
+                std::string lineFromFirstFile;
+                std::string lineFromSecondFile;
+                while (std::getline(firstFile, lineFromFirstFile) and std::getline(secondFile, lineFromSecondFile)) {
+                    if (lineFromFirstFile.compare(lineFromSecondFile) != 0){
+                        filesAreEqual = false;
+                        break;
+                    }
+                }
+            } else {
+                std::cerr << "An error occurred while opening a file.\n";
+            }
+
+            return filesAreEqual;
+        }
+
     protected:
         std::string fetchSubstringBetweenDelimiters(std::string const& fileBlock, std::string const& firstDelimiter,
                                                  std::string const& secondDelimiter) {

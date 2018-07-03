@@ -33,14 +33,11 @@ void AWLMessagesFileManager::writeFileBlockWithMessage(AWLMessage const& message
     std::fprintf(file, "%s%s%d\n", LENGTH_LABEL.c_str(), MESSAGE_LABEL_VALUE_ASSOCIATOR.c_str(), (int)message.length);
     std::fprintf(file, "%s%s%ld\n", TIMESTAMP_LABEL.c_str(), MESSAGE_LABEL_VALUE_ASSOCIATOR.c_str(), (long)message.timestamp);
     std::fprintf(file, "%s%s\n", DATA_LABEL.c_str(), MESSAGE_LABEL_VALUE_ASSOCIATOR.c_str());
-    for (auto dataPosition = 0; dataPosition < MAX_NUMBER_OF_DATA_IN_AWL_MESSAGE - 1; dataPosition++) {
+    for (auto dataPosition = 0; dataPosition < MAX_NUMBER_OF_DATA_IN_AWL_MESSAGE; dataPosition++) {
         std::fprintf(file, "%s", MESSAGE_CONTENT_TABULATOR.c_str());
         std::fprintf(file, "%s %d%s%d\n", DATA_POSITION_LABEL.c_str(), dataPosition + 1, MESSAGE_LABEL_VALUE_ASSOCIATOR.c_str(),
                      (int)message.data[dataPosition]);
     }
-    std::fprintf(file, "%s", MESSAGE_CONTENT_TABULATOR.c_str());
-    std::fprintf(file, "%s %d%s%d\n", DATA_POSITION_LABEL.c_str(), MAX_NUMBER_OF_DATA_IN_AWL_MESSAGE,
-                 MESSAGE_LABEL_VALUE_ASSOCIATOR.c_str(), (int)message.data[MAX_NUMBER_OF_DATA_IN_AWL_MESSAGE - 1]);
     std::fprintf(file, "%s\n", MESSAGES_SEPARATOR.c_str());
 }
 
