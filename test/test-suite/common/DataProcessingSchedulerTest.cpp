@@ -40,7 +40,8 @@ protected:
 
     virtual ~DataProcessingSchedulerTest() = default;
 
-    uint16_t const ARBITRARY_NUMBER_OF_CONSUMPTION_BEFORE_STOP = 5;
+    uint8_t const ARBITRARY_NUMBER_OF_CONSUMPTION_BEFORE_STOP = 1;
+    uint8_t const ARBITRARY_NUMBER_OF_CALL_GOAL = 42;
 
 };
 
@@ -55,18 +56,25 @@ public:
     auto consumeNextDataFor(Consumer* consumer) -> DATA const& override {
         numberOfCallsToConsumeNextData++;
         if (hasBeenCalledExpectedNumberOfTimes()) {
-            consumer->deactivateFor(this);
+            consumptionGoalReached.set_value(true);
         }
-        return data;
+        return NativeBuffer::consumeNextDataFor(consumer);
     }
 
     void linkWith(Consumer* consumer) noexcept override {
         linkedConsumer = consumer;
+        NativeBuffer::linkWith(consumer);
     }
 
     bool hasBeenCalledExpectedNumberOfTimes() const {
         return numberOfCallsToConsumeNextData.load() == numberOfTimesToBeConsumedBeforeStop;
     };
+
+    void waitConsumptionGoalToBeReached() const {
+        if (!hasBeenCalledExpectedNumberOfTimes()) {
+            consumptionGoalReached.get_future().wait();
+        }
+    }
 
     Consumer* getLinkedConsumer() const noexcept {
         return linkedConsumer;
@@ -77,6 +85,7 @@ private:
     AtomicCounter numberOfCallsToConsumeNextData;
     DATA data;
     Consumer* linkedConsumer = nullptr;
+    mutable BooleanPromise consumptionGoalReached;
 };
 
 class MockSink : public NativeSink {
@@ -106,20 +115,21 @@ private:
 using SingleInputScheduler = DataFlow::DataProcessingScheduler<NativeData, MockSink, NUMBER_OF_CONCURRENT_INPUT_FOR_SENSOR_ACCESS_LINK_ELEMENTS>;
 
 TEST_F(DataProcessingSchedulerTest, given_aStoppedWorkScheduler_when_linksAnInputBuffer_then_throwsAnException) {
-    MockInputBuffer inputBuffer(1);
-    MockSink mockSink(ARBITRARY_NUMBER_OF_CONSUMPTION_BEFORE_STOP);
+    MockSink mockSink(ARBITRARY_NUMBER_OF_CALL_GOAL);
     SingleInputScheduler scheduler(&mockSink);
     scheduler.terminateAndJoin();
+
+    NativeBuffer inputBuffer;
 
     ASSERT_THROW(scheduler.linkWith(&inputBuffer), std::runtime_error);
 }
 
 TEST_F(DataProcessingSchedulerTest, given_anUnlinkedInputBuffer_when_activatesForThatBuffer_then_throwsAnException) {
-    MockInputBuffer inputBuffer(1);
-    MockSink mockSink(ARBITRARY_NUMBER_OF_CONSUMPTION_BEFORE_STOP);
+    MockSink mockSink(ARBITRARY_NUMBER_OF_CALL_GOAL);
     SingleInputScheduler scheduler(&mockSink);
     scheduler.terminateAndJoin();
 
+    NativeBuffer inputBuffer;
     auto hasThrownException = false;
     try {
         scheduler.activateFor(&inputBuffer);
@@ -132,11 +142,11 @@ TEST_F(DataProcessingSchedulerTest, given_anUnlinkedInputBuffer_when_activatesFo
 }
 
 TEST_F(DataProcessingSchedulerTest, given_anUnlinkedInputBuffer_when_deactivatesForThatBuffer_then_throwsAnException) {
-    MockInputBuffer inputBuffer(1);
-    MockSink mockSink(ARBITRARY_NUMBER_OF_CONSUMPTION_BEFORE_STOP);
+    MockSink mockSink(ARBITRARY_NUMBER_OF_CALL_GOAL);
     SingleInputScheduler scheduler(&mockSink);
     scheduler.terminateAndJoin();
 
+    NativeBuffer inputBuffer;
     auto hasThrownException = false;
     try {
         scheduler.deactivateFor(&inputBuffer);
@@ -148,9 +158,9 @@ TEST_F(DataProcessingSchedulerTest, given_anUnlinkedInputBuffer_when_deactivates
     ASSERT_TRUE(hasThrownException);
 }
 
-TEST_F(DataProcessingSchedulerTest, given_anUnlinkedInputBuffer_when_linksIt_then_callsTheRingBuffersLinkFunction) {
-    MockInputBuffer inputBufferMock(1);
-    MockSink mockSink(ARBITRARY_NUMBER_OF_CONSUMPTION_BEFORE_STOP);
+TEST_F(DataProcessingSchedulerTest, given_anUnlinkedInputBuffer_when_linksIt_then_callsTheRingBuffersLinkFunctionWithAPointerToTheScheduler) {
+    MockInputBuffer inputBufferMock(ARBITRARY_NUMBER_OF_CONSUMPTION_BEFORE_STOP);
+    MockSink mockSink(ARBITRARY_NUMBER_OF_CALL_GOAL);
     SingleInputScheduler scheduler(&mockSink);
 
     scheduler.linkWith(&inputBufferMock);
@@ -160,45 +170,14 @@ TEST_F(DataProcessingSchedulerTest, given_anUnlinkedInputBuffer_when_linksIt_the
     ASSERT_EQ(linkedConsumer, &scheduler);
 }
 
-class MockConsumptionCountingInputBuffer : public NativeBuffer {
-public:
-    MockConsumptionCountingInputBuffer(uint16_t numberOfConsumptionBeforeStop) :
-            numberOfTimesToBeConsumedBeforeStop(numberOfConsumptionBeforeStop),
-            numberOfCallsToConsumeNextData(0) {}
-
-    auto consumeNextDataFor(Consumer* consumer) -> DATA const& override {
-        numberOfCallsToConsumeNextData++;
-        if (hasBeenCalledExpectedNumberOfTimes()) {
-            consumptionGoalReached.set_value(true);
-        }
-        return NativeBuffer::consumeNextDataFor(consumer);
-    }
-
-    bool hasBeenCalledExpectedNumberOfTimes() const {
-        return numberOfCallsToConsumeNextData.load() == numberOfTimesToBeConsumedBeforeStop;
-    };
-
-    void waitConsumptionGoalToBeReached() const {
-        if (!hasBeenCalledExpectedNumberOfTimes()) {
-            consumptionGoalReached.get_future().wait();
-        }
-    }
-
-private:
-    uint16_t const numberOfTimesToBeConsumedBeforeStop;
-    AtomicCounter numberOfCallsToConsumeNextData;
-    mutable BooleanPromise consumptionGoalReached;
-};
-
 TEST_F(DataProcessingSchedulerTest,
        given_aLinkedInputBuffer_when_activatesForThatBuffer_then_consumesFromTheInputBufferUntilStopped) {
-    MockSink mockSink(ARBITRARY_NUMBER_OF_CONSUMPTION_BEFORE_STOP);
+    MockSink mockSink(ARBITRARY_NUMBER_OF_CALL_GOAL);
     SingleInputScheduler scheduler(&mockSink);
-    uint16_t numberOfConsumptionBeforeStop = 42;
-    MockConsumptionCountingInputBuffer inputBufferMock(numberOfConsumptionBeforeStop);
+    MockInputBuffer inputBufferMock(ARBITRARY_NUMBER_OF_CALL_GOAL);
     scheduler.linkWith(&inputBufferMock);
 
-    for (auto l = 0; l < numberOfConsumptionBeforeStop; ++l) {
+    for (auto l = 0; l < ARBITRARY_NUMBER_OF_CALL_GOAL; ++l) {
         auto newData = DataTestUtil::generateRandomNativeData();
         inputBufferMock.write(std::move(newData));
     }
@@ -212,7 +191,7 @@ TEST_F(DataProcessingSchedulerTest,
 
 TEST_F(DataProcessingSchedulerTest,
        given_aWorkSchedulerWithTheMaximumNumberOfBufferLinked_when_attemptingToLinkOneMore_then_throwsAnIllegalNumberOfInputBufferException) {
-    MockSink mockSink(ARBITRARY_NUMBER_OF_CONSUMPTION_BEFORE_STOP);
+    MockSink mockSink(ARBITRARY_NUMBER_OF_CALL_GOAL);
     SingleInputScheduler scheduler(&mockSink);
     NativeBuffer inputBuffers[NUMBER_OF_CONCURRENT_INPUT_FOR_SENSOR_ACCESS_LINK_ELEMENTS];
     for (auto& inputBuffer : inputBuffers) {
@@ -232,14 +211,14 @@ TEST_F(DataProcessingSchedulerTest,
 }
 
 TEST_F(DataProcessingSchedulerTest, given_anInputBuffer_when_linkingItMoreThanOnce_then_anExceptionIsThrown) {
-    MockInputBuffer inputBufferMock(1);
-    MockSink mockSink(ARBITRARY_NUMBER_OF_CONSUMPTION_BEFORE_STOP);
+    MockSink mockSink(ARBITRARY_NUMBER_OF_CALL_GOAL);
     SingleInputScheduler scheduler(&mockSink);
 
+    NativeBuffer inputBuffer;
     auto hasThrownException = false;
-    scheduler.linkWith(&inputBufferMock);
+    scheduler.linkWith(&inputBuffer);
     try {
-        scheduler.linkWith(&inputBufferMock);
+        scheduler.linkWith(&inputBuffer);
     } catch (std::runtime_error const&) {
         hasThrownException = true;
     }
@@ -252,12 +231,12 @@ TEST_F(DataProcessingSchedulerTest,
        given_twoLinkedInputBuffer_when_activatesForTheSecondBuffer_then_theFirstBufferIsNotCalledAndTheSecondBufferIsCalled) {
     uint8_t const NUMBER_OF_INPUT_BUFFERS = 2;
     using Scheduler = DataFlow::DataProcessingScheduler<NativeData, MockSink, NUMBER_OF_INPUT_BUFFERS>;
-    auto numberOfConsumptionExpectedForFirstBuffer = 0;
-    auto numberOfConsumptionExpectedForSecondBuffer = 8;
-    auto numberOfConsumptionBeforeStop = numberOfConsumptionExpectedForFirstBuffer + numberOfConsumptionExpectedForSecondBuffer;
+    uint8_t const noConsumption = 0;
+    uint8_t const numberOfConsumptionExpectedForSecondBuffer = 8;
+    uint8_t const numberOfConsumptionBeforeStop = noConsumption + numberOfConsumptionExpectedForSecondBuffer;
 
-    MockConsumptionCountingInputBuffer firstBufferMock(numberOfConsumptionExpectedForFirstBuffer);
-    MockConsumptionCountingInputBuffer secondBufferMock(numberOfConsumptionExpectedForSecondBuffer);
+    MockInputBuffer firstBufferMock(noConsumption);
+    MockInputBuffer secondBufferMock(numberOfConsumptionExpectedForSecondBuffer);
     MockSink mockSink(numberOfConsumptionBeforeStop);
     Scheduler scheduler(&mockSink);
     scheduler.linkWith(&firstBufferMock);
@@ -285,12 +264,12 @@ TEST_F(DataProcessingSchedulerTest,
 TEST_F(DataProcessingSchedulerTest,
        given_aNumberOfData_when_dataIswrittenToTheInputBuffer_then_callsTheDataSinkTheSameNumberOfTimes) {
     NativeBuffer inputBuffer;
-    MockSink mockSink(ARBITRARY_NUMBER_OF_CONSUMPTION_BEFORE_STOP);
+    MockSink mockSink(ARBITRARY_NUMBER_OF_CALL_GOAL);
     SingleInputScheduler scheduler(&mockSink);
 
     scheduler.linkWith(&inputBuffer);
 
-    for (auto k = 0; k < ARBITRARY_NUMBER_OF_CONSUMPTION_BEFORE_STOP; ++k) {
+    for (auto k = 0; k < ARBITRARY_NUMBER_OF_CALL_GOAL; ++k) {
         auto nativeData = DataTestUtil::generateRandomNativeData();
         inputBuffer.write(std::move(nativeData));
     }
