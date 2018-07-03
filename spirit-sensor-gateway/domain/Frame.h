@@ -26,7 +26,7 @@ namespace SpiritProtocol {
             void addPixel(Pixel pixel);
             Pixel* fetchPixelByID(PixelID pixelID);
             FrameID getFrameID() const;
-            std::array<Pixel, NUMBER_OF_PIXEL_IN_AWL_16_FRAME>* getPixelsAddress() ;
+            std::array<Pixel, NUMBER_OF_PIXEL_IN_AWL_16_FRAME>* getPixels() ;
             SystemID getSystemID() const;
             void setFrameID(FrameID frameID);
             void setSystemID(SystemID systemID);

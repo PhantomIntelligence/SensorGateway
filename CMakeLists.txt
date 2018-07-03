@@ -44,7 +44,7 @@ include_directories(
 )
 
 set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -lpthread")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -lpthread ")
 
 add_subdirectory(spirit-sensor-gateway)
 #add_subdirectory(${LIVE_APP_SOURCE_DIR})

@@ -13,6 +13,7 @@ file(GLOB TEST_FILES "${CMAKE_CURRENT_SOURCE_DIR}/test-suite/*")
 file(GLOB COMMON_TEST_FILES "${CMAKE_CURRENT_SOURCE_DIR}/test-suite/common/*")
 file(GLOB TRANSLATOR_TEST_FILES "${CMAKE_CURRENT_SOURCE_DIR}/test-suite/spirit-protocol-translation/*")
 file(GLOB DOMAIN_TEST_FILES "${CMAKE_CURRENT_SOURCE_DIR}/test-suite/domain/*")
+file(GLOB UTILITIES_FILES "${CMAKE_CURRENT_SOURCE_DIR}/utilities/*")
 
 # Include Mocks
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/mock")
@@ -25,16 +26,19 @@ include_directories("${CMAKE_CURRENT_SOURCE_DIR}/test/manual-test")
 
 # Add all the test and mock files to the executable
 
-add_executable(runtests ${TEST_FILES} ${COMMON_TEST_FILES} ${TRANSLATOR_TEST_FILES} ${DOMAIN_TEST_FILES})
+add_executable(runtests ${TEST_FILES} ${COMMON_TEST_FILES} ${TRANSLATOR_TEST_FILES} ${DOMAIN_TEST_FILES} ${UTILITIES_FILES})
+
 
 find_package(SpiritSensorGateway)
 target_link_libraries(runtests gtest gmock_main ${SpiritSensorGateway_LIBRARIES} ${CONAN_LIBS})
 
 install(TARGETS runtests
         # IMPORTANT: Add the runtests executable to the "export-set"
-        EXPORT SecureStreamingTargets
+        EXPORT ${PROJECT_NAME}Targets
         RUNTIME DESTINATION "${INSTALL_BIN_DIR}" COMPONENT bin)
 
+# Include acceptance-test
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/acceptance-test")
 
 # Includes the manual test
 add_subdirectory(manual-test)

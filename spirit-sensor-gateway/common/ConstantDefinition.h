@@ -15,26 +15,29 @@
 #define SPIRITSENSORGATEWAY_CONSTANTDEFINITION_H
 
 #include "TypeDefinition.h"
-
+#include <iostream>
+#include <vector>
 
 namespace {
     unsigned long const READ_WAIT_INFINITE = -1;
     int const  MAX_NUMBER_OF_DATA_IN_AWL_MESSAGE = 8;
-
     int const NUMBER_OF_PIXEL_IN_AWL_16_FRAME = 16;
     int const MAXIMUM_NUMBER_OF_TRACK_IN_AWL16_PIXEL = 16;
 
 };
+
 namespace SensorSystemID {
     uint16_t const AWL16 = 0x0010;
     uint16_t const AWL7 = 0x0010;
 }
+
 namespace MessageID {
     using MessageID = uint64_t;
     MessageID const FRAME_DONE = 0x09;
     MessageID const DETECTION_TRACK = 0x0A;
     MessageID const DETECTION_VELOCITY = 0x0B;
 }
+
 namespace CommandID {
     using CommandID = uint16_t;
     CommandID const SET_PARAMETER  = 0xC0;
@@ -50,6 +53,7 @@ namespace CommandID {
     CommandID const DEBUG_FORCE_REFRESH = 0xF2;
 
 };
+
 namespace CommandType{
     using CommandType = uint16_t ;
     CommandType const ALGO_SELECTED = 0x01;
