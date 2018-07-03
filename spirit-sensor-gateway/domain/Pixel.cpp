@@ -65,7 +65,7 @@ namespace SpiritProtocol {
 
     bool Pixel::doesTrackExist(TrackID trackID)  {
         bool trackExists = false;
-        for (auto track:*getTracksAdress()) {
+        for (auto track:*getTracksAddress()) {
             if (track.getID() == trackID) {
                 trackExists = true;
             }
@@ -75,7 +75,6 @@ namespace SpiritProtocol {
 
     Track* Pixel::fetchTrackByID(TrackID trackID) {
         Track* fetchedTrack;
-        std::cout<<fetchedTrack<<std::endl;
         for (auto i = 0; i < MAXIMUM_NUMBER_OF_TRACK_IN_AWL16_PIXEL; ++i) {
             Track* track = &tracks[i];
             if (track->getID() == trackID) {
@@ -90,7 +89,7 @@ namespace SpiritProtocol {
         return ID;
     }
 
-    std::array<Track, MAXIMUM_NUMBER_OF_TRACK_IN_AWL16_PIXEL>* Pixel::getTracksAdress()  {
+    std::array<Track, MAXIMUM_NUMBER_OF_TRACK_IN_AWL16_PIXEL>* Pixel::getTracksAddress()  {
 
         return &tracks;
     };

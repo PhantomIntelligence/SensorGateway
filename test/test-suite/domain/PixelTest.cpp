@@ -26,7 +26,7 @@ TEST_F(PixelTest,given_anExistingTrackInAPixel_when_fetchingTheTrackWithItsId_th
     pixel.addTrack(track);
 
     auto trackPointer = pixel.fetchTrackByID(track.getID());
-    Track* testPointer = &pixel.getTracksAdress()->at(0);
+    Track* testPointer = &pixel.getTracksAddress()->at(0);
 
     ASSERT_EQ(trackPointer, testPointer);
 }
@@ -36,7 +36,7 @@ TEST_F(PixelTest,given_anEmptyPixelAndATrack_when_addingTheTrackToThePixel_then_
     Pixel pixel(0x01);
     pixel.addTrack(track);
 
-    ASSERT_EQ(track, pixel.getTracksAdress()->at(0));
+    ASSERT_EQ(track, pixel.getTracksAddress()->at(0));
 }
 
 #endif //SPIRITSENSORGATEWAY_PIXELTEST_CPP

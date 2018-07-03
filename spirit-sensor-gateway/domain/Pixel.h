@@ -48,7 +48,7 @@ namespace SpiritProtocol {
 
         PixelID getID() const;
 
-        std::array<Track, MAXIMUM_NUMBER_OF_TRACK_IN_AWL16_PIXEL>* getTracksAdress();
+        std::array<Track, MAXIMUM_NUMBER_OF_TRACK_IN_AWL16_PIXEL>* getTracksAddress();
 
     private:
         uint16_t ID;
