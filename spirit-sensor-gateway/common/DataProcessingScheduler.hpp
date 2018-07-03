@@ -37,7 +37,7 @@ namespace DataFlow {
                 terminateOrderReceived(false),
                 numberOfLinkedBuffers(0),
                 dataSink(dataSink),
-                schedulerThread(JoinableThread(voidAction)) {
+                schedulerThread(JoinableThread(voidFunctionForCleanJoinableThreadInitialization)) {
 
             schedulerThread.safeExit();
             schedulerThread = JoinableThread(&DataProcessingScheduler::start, this);
@@ -105,7 +105,7 @@ namespace DataFlow {
 
         void start() {
             while (cannotExitSafely()) {
-                if (!readyToConsumeInputBuffers.empty()) {
+                if (!readyToConsumeInputBuffers.isEmpty()) {
                     auto inputBufferToConsumeFrom = readyToConsumeInputBuffers.readNextPointerToConsume();
                     auto data = inputBufferToConsumeFrom->consumeNextDataFor(this);
                     dataSink->consume(std::move(data));
@@ -114,7 +114,7 @@ namespace DataFlow {
         }
 
         bool cannotExitSafely() const noexcept {
-            return !(readyToConsumeInputBuffers.empty() && terminateOrderHasBeenReceived());
+            return !(readyToConsumeInputBuffers.isEmpty() && terminateOrderHasBeenReceived());
         }
 
         bool terminateOrderHasBeenReceived() const {

@@ -24,15 +24,15 @@
 namespace ExceptionMessage {
 
     static auto ABSTRACT_POINTER_ARRAY_ILLEGAL_CONSUMPTION_EMPTY = "Illegal consumption of pointer: the ConstantSizedAbstractPointerArray is empty.";
-    static auto ABSTRACT_POINTER_ARRAY_ILLEGAL_STORE_FULL = "Illegal store of pointer: the ConstantSizedAbstractPointerArray is full.";
+    static auto ABSTRACT_POINTER_ARRAY_ILLEGAL_STORE_FULL = "Illegal store of pointer: the ConstantSizedAbstractPointerArray is isFull.";
 
-    static auto CONSTANT_SIZED_POINTER_LIST_ILLEGAL_REMOVAL_POINTER_NOT_CONTAINED = "Illegal removal of pointer: the ConstantSizedPointerList is does not contain the pointer.";
+    static auto CONSTANT_SIZED_POINTER_LIST_ILLEGAL_REMOVAL_OF_POINTER = "Illegal removal of pointer: the ConstantSizedPointerList does not contain the pointer.";
 
-    static auto RING_BUFFER_CONSUMPTION_ON_WRITER_MESSAGE = "Illegal consumption, execution should not reach this point. The calling entity should not be allowed to proceed to this call";
+    static auto RING_BUFFER_ILLEGAL_CONSUMPTION_ON_WRITER_LOCATION_MESSAGE = "Illegal consumption, execution should not reach this point. The calling entity should not be allowed to proceed to this call";
 
-    static auto DATA_PROCESSING_SCHEDULER_ILLEGAL_LINKING_SCHEDULER_HAS_BEEN_STOPPED = "Illegal linking attempt of DataProcessingScheduler and InputBuffer: The DataProcessingScheduler has received the terminate order, no new InputBuffer can be linked.";
-    static auto DATA_PROCESSING_SCHEDULER_ILLEGAL_LINKING_OF_ALREADY_LINKED_BUFFER_MESSAGE = "Illegal linking attempt of DataProcessingScheduler and InputBuffer: The InputBuffer has already been linked.";
-    static auto DATA_PROCESSING_SCHEDULER_ILLEGAL_NUMBER_OF_INPUT_BUFFER_MESSAGE = "Illegal linking attempt of DataProcessingScheduler and InputBuffer: The maximum number of InputBuffer has already been reached for this DataProcessingScheduler.";
+    static auto DATA_PROCESSING_SCHEDULER_ILLEGAL_LINKING_SCHEDULER_HAS_BEEN_STOPPED = "Illegal linking attempt between DataProcessingScheduler and InputBuffer: The DataProcessingScheduler has received the terminate order, no new InputBuffer can be linked.";
+    static auto DATA_PROCESSING_SCHEDULER_ILLEGAL_LINKING_OF_ALREADY_LINKED_BUFFER_MESSAGE = "Illegal linking attempt between DataProcessingScheduler and InputBuffer: The InputBuffer has already been linked.";
+    static auto DATA_PROCESSING_SCHEDULER_ILLEGAL_NUMBER_OF_INPUT_BUFFER_MESSAGE = "Illegal linking attempt between DataProcessingScheduler and InputBuffer: The maximum number of InputBuffer has already been reached for this DataProcessingScheduler.";
     static auto DATA_PROCESSING_SCHEDULER_ILLEGAL_ACTIVATION_MESSAGE = "Illegal DataProcessingScheduler activation attempt from an unlinked InputBuffer";
     static auto DATA_PROCESSING_SCHEDULER_ILLEGAL_DEACTIVATION_MESSAGE = "Illegal DataProcessingScheduler deactivation attempt from an unlinked InputBuffer";
 }
