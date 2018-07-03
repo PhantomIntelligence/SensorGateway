@@ -21,12 +21,12 @@
 
 namespace DataFlow {
 
-    template<class T, class SINK, uint8_t const NUMBER_OF_CONCURENT_INPUTS>
+    template<class T, class SINK, uint8_t const NUMBER_OF_CONCURRENT_INPUTS>
     class DataProcessingScheduler : public ConsumerLink<T> {
 
         typedef T DATA;
         typedef RingBuffer<DATA> InputBuffer;
-        typedef Container::ConstantSizedPointerList<InputBuffer, NUMBER_OF_CONCURENT_INPUTS> InputBufferStates;
+        typedef Container::ConstantSizedPointerList<InputBuffer, NUMBER_OF_CONCURRENT_INPUTS> InputBufferStates;
 
     public:
 
@@ -71,15 +71,15 @@ namespace DataFlow {
             validateBufferIsNotLinked(buffer);
             validateStatusArrayNotFull();
             ++numberOfLinkedBuffers;
-            catchedUpInputBuffers.store(buffer);
+            caughtUpInputBuffers.store(buffer);
             buffer->linkWith(this);
         }
 
         void activateFor(InputBuffer* buffer) override {
             LockGuard guard(inputBufferStatusMutex);
             validateBufferIsLinked(buffer, ExceptionMessage::DATA_PROCESSING_SCHEDULER_ILLEGAL_ACTIVATION_MESSAGE);
-            if (catchedUpInputBuffers.contains(buffer)) {
-                catchedUpInputBuffers.remove(buffer);
+            if (caughtUpInputBuffers.contains(buffer)) {
+                caughtUpInputBuffers.remove(buffer);
                 readyToConsumeInputBuffers.store(buffer);
             }
         }
@@ -89,7 +89,7 @@ namespace DataFlow {
             validateBufferIsLinked(buffer, ExceptionMessage::DATA_PROCESSING_SCHEDULER_ILLEGAL_DEACTIVATION_MESSAGE);
             if (readyToConsumeInputBuffers.contains(buffer)) {
                 readyToConsumeInputBuffers.remove(buffer);
-                catchedUpInputBuffers.store(buffer);
+                caughtUpInputBuffers.store(buffer);
             }
         }
 
@@ -129,7 +129,7 @@ namespace DataFlow {
         }
 
         bool isBufferLinked(InputBuffer* buffer) const noexcept {
-            return catchedUpInputBuffers.contains(buffer) || readyToConsumeInputBuffers.contains(buffer);
+            return caughtUpInputBuffers.contains(buffer) || readyToConsumeInputBuffers.contains(buffer);
         }
 
         void validateBufferIsNotLinked(InputBuffer* buffer) const {
@@ -140,7 +140,7 @@ namespace DataFlow {
         }
 
         void validateStatusArrayNotFull() const {
-            if (numberOfLinkedBuffers.load() == NUMBER_OF_CONCURENT_INPUTS) {
+            if (numberOfLinkedBuffers.load() == NUMBER_OF_CONCURRENT_INPUTS) {
                 throwIllegalActionException(ExceptionMessage::DATA_PROCESSING_SCHEDULER_ILLEGAL_NUMBER_OF_INPUT_BUFFER_MESSAGE);
             }
         }
@@ -157,7 +157,7 @@ namespace DataFlow {
         Mutex inputBufferStatusMutex;
         AtomicCounter numberOfLinkedBuffers;
         InputBufferStates readyToConsumeInputBuffers;
-        InputBufferStates catchedUpInputBuffers;
+        InputBufferStates caughtUpInputBuffers;
 
         SINK* dataSink;
     };

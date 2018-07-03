@@ -33,7 +33,7 @@ namespace DataFlow {
 
         virtual ~DataSource() noexcept = default;
 
-        void linkOutput(ConsumerLink<DATA>* consumer) {
+        void linkConsumer(ConsumerLink<DATA>* consumer) {
             consumer->linkWith(&outputBuffer);
         }
 
