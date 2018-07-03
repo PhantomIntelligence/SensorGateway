@@ -31,6 +31,11 @@ namespace TestUtilities {
 
         void writeFileBlockWithMessage(SpiritProtocol::Frame const& message, std::FILE* file) override;
 
+        void writeFileLineWithContentLabel(std::FILE* file,unsigned int numberOfTabulator,char const* contentLabel);
+
+        void writeFileLineWithContentLabelAndValue(std::FILE* file, unsigned int numberOfTabulator,
+                                                   char const* contentLabel, unsigned int contentValue);
+
         const std::string FRAME_ID_LABEL = "Frame ID";
 
         const std::string SYSTEM_ID_LABEL = "System ID";
@@ -51,6 +56,7 @@ namespace TestUtilities {
 
         const std::string ACCELERATION_LABEL = "Acceleration";
 
+        const std::string SPEED_LABEL = "Speed";
     };
 }
 
