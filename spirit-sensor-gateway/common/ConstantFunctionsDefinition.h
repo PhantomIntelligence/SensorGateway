@@ -11,20 +11,24 @@
 	limitations under the License.
 */
 
-#ifndef SPIRITSENSORGATEWAY_TYPEDEFINITION_H
-#define SPIRITSENSORGATEWAY_TYPEDEFINITION_H
+#ifndef SPIRITSENSORGATEWAY_CONSTANTFUNCTIONSDEFINITION_H
+#define SPIRITSENSORGATEWAY_CONSTANTFUNCTIONSDEFINITION_H
 
-#include <mutex>
-#include <atomic>
-
-#include "hicpp/HighIntegrityThread.h"
 #include "ExceptionMessages.h"
 
 namespace {
-    typedef std::mutex Mutex;
-    typedef std::lock_guard<Mutex> LockGuard;
+    /**
+     * @brief Allows to start the various JoinableThreads in the constructors without blocking anything
+     */
+    void voidAction() {}
 
-    typedef std::atomic_uint8_t AtomicCounter;
+    /**
+     * @brief Throws a runtime error with the specified message
+     * @param message that will be in the error
+     */
+    [[noreturn]] void throwIllegalActionException(char const* message) {
+        throw std::runtime_error(message);
+    }
 };
 
-#endif //SPIRITSENSORGATEWAY_TYPEDEFINITION_H
+#endif //SPIRITSENSORGATEWAY_CONSTANTFUNCTIONSDEFINITION_H
