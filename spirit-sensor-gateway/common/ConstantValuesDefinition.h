@@ -17,7 +17,7 @@
 #include "ConstantFunctionsDefinition.h"
 
 namespace {
-    uint8_t const  MAX_NUMBER_OF_DATA_IN_AWL_MESSAGE = 8;
+    uint8_t const MAX_NUMBER_OF_DATA_IN_AWL_MESSAGE = 8;
     uint8_t const NUMBER_OF_CONCURRENT_INPUT_FOR_SENSOR_ACCESS_LINK_ELEMENTS = 1;
 };
 

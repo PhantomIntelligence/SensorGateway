@@ -31,7 +31,7 @@ namespace DataFlow {
     public:
 
         /**
-         * @brief Default constructor. A  should be only instantiated once and live the same amount of time it's controlling structure does.
+         * @brief Default constructor. A DataProcessingScheduler should be only instantiated once and live the same amount of time it's controlling structure does.
          */
         DataProcessingScheduler(SINK* dataSink) :
                 terminateOrderReceived(false),
