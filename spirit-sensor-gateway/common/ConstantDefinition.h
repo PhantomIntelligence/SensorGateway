@@ -16,11 +16,12 @@
 
 #include <iostream>
 #include <vector>
+#include "TypeDefinition.h"
 
 namespace {
     const unsigned long READ_WAIT_INFINITE = -1;
     const int MAX_NUMBER_OF_DATA_IN_AWL_MESSAGE = 8;
-};
+
 namespace SensorSystemID {
     uint16_t const AWL16 = 0x0010;
     uint16_t const AWL7 = 0x0010;
