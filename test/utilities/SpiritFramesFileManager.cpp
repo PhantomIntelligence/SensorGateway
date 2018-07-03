@@ -34,10 +34,8 @@ void SpiritFramesFileManager::writeFileBlockWithMessage(SpiritProtocol::Frame me
         for (auto track : *tracks) {
             writeFileLineWithContentLabel(file, 2, TRACKS_LABEL.c_str());
             writeFileLineWithContentLabelAndValue(file, 3, TRACK_ID_LABEL.c_str(), track.getID());
-            //TODO: remove comment line once getAcceleration return the right value
-//            writeFileLineWithContentLabelAndValue(file, 3, ACCELERATION_LABEL.c_str(), track.second.getAcceleration());
-            //TODO: remove comment line once getDistance return the right value
-//            writeFileLineWithContentLabelAndValue(file, 3, DISTANCE_LABEL.c_str(), track.second.getDistance());
+            writeFileLineWithContentLabelAndValue(file, 3, ACCELERATION_LABEL.c_str(), track.getAcceleration());
+            writeFileLineWithContentLabelAndValue(file, 3, DISTANCE_LABEL.c_str(), track.getDistance());
             writeFileLineWithContentLabelAndValue(file, 3, INTENSITY_LABEL.c_str(), track.getIntensity());
             writeFileLineWithContentLabelAndValue(file, 3, CONFIDENCE_LEVEL_LABEL.c_str(), track.getConfidenceLevel());
             //TODO: remove comment line once getSpeed return the right value
