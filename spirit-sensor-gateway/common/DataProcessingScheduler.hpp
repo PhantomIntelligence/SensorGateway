@@ -25,8 +25,8 @@ namespace DataFlow {
     class DataProcessingScheduler : public ConsumerLink<T> {
 
         typedef T DATA;
-        typedef RingBuffer<DATA> InputBuffer;
-        typedef Container::ConstantSizedPointerList<InputBuffer, NUMBER_OF_CONCURRENT_INPUTS> InputBufferStates;
+        typedef RingBuffer<DATA> DataSourceBuffer;
+        typedef Container::ConstantSizedPointerList<DataSourceBuffer, NUMBER_OF_CONCURRENT_INPUTS> InputBufferStates;
 
     public:
 
@@ -39,7 +39,7 @@ namespace DataFlow {
                 dataSink(dataSink),
                 schedulerThread(JoinableThread(voidFunctionForCleanJoinableThreadInitialization)) {
 
-            schedulerThread.safeExit();
+            schedulerThread.exitSafely();
             schedulerThread = JoinableThread(&DataProcessingScheduler::start, this);
         }
 
@@ -65,7 +65,7 @@ namespace DataFlow {
          */
         DataProcessingScheduler& operator=(DataProcessingScheduler&& other) = delete;
 
-        void linkWith(InputBuffer* buffer) override {
+        void linkWith(DataSourceBuffer* buffer) override {
             LockGuard guard(inputBufferStatusMutex);
             validateStillAcceptsInputBuffers();
             validateBufferIsNotLinked(buffer);
@@ -75,7 +75,7 @@ namespace DataFlow {
             buffer->linkWith(this);
         }
 
-        void activateFor(InputBuffer* buffer) override {
+        void activateFor(DataSourceBuffer* buffer) override {
             LockGuard guard(inputBufferStatusMutex);
             validateBufferIsLinked(buffer, ExceptionMessage::DATA_PROCESSING_SCHEDULER_ILLEGAL_ACTIVATION_MESSAGE);
             if (caughtUpInputBuffers.contains(buffer)) {
@@ -84,7 +84,7 @@ namespace DataFlow {
             }
         }
 
-        void deactivateFor(InputBuffer* buffer) override {
+        void deactivateFor(DataSourceBuffer* buffer) override {
             LockGuard guard(inputBufferStatusMutex);
             validateBufferIsLinked(buffer, ExceptionMessage::DATA_PROCESSING_SCHEDULER_ILLEGAL_DEACTIVATION_MESSAGE);
             if (readyToConsumeInputBuffers.contains(buffer)) {
@@ -98,7 +98,7 @@ namespace DataFlow {
             if (!terminateOrderHasBeenReceived()) {
                 terminateOrderReceived.store(true);
             }
-            schedulerThread.safeExit();
+            schedulerThread.exitSafely();
         }
 
     private:
@@ -128,11 +128,11 @@ namespace DataFlow {
             }
         }
 
-        bool isBufferLinked(InputBuffer* buffer) const noexcept {
+        bool isBufferLinked(DataSourceBuffer* buffer) const noexcept {
             return caughtUpInputBuffers.contains(buffer) || readyToConsumeInputBuffers.contains(buffer);
         }
 
-        void validateBufferIsNotLinked(InputBuffer* buffer) const {
+        void validateBufferIsNotLinked(DataSourceBuffer* buffer) const {
             if (isBufferLinked(buffer)) {
                 throwIllegalActionException(
                         ExceptionMessage::DATA_PROCESSING_SCHEDULER_ILLEGAL_LINKING_OF_ALREADY_LINKED_BUFFER_MESSAGE);
@@ -145,7 +145,7 @@ namespace DataFlow {
             }
         }
 
-        void validateBufferIsLinked(InputBuffer* buffer, char const* message) const {
+        void validateBufferIsLinked(DataSourceBuffer* buffer, char const* message) const {
             if (!isBufferLinked(buffer)) {
                 throwIllegalActionException(message);
             }

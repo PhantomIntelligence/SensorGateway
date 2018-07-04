@@ -30,11 +30,11 @@ namespace ExceptionMessage {
 
     static auto RING_BUFFER_ILLEGAL_CONSUMPTION_ON_WRITER_LOCATION_MESSAGE = "Illegal consumption, execution should not reach this point. The calling entity should not be allowed to proceed to this call";
 
-    static auto DATA_PROCESSING_SCHEDULER_ILLEGAL_LINKING_SCHEDULER_HAS_BEEN_STOPPED = "Illegal linking attempt between DataProcessingScheduler and InputBuffer: The DataProcessingScheduler has received the terminate order, no new InputBuffer can be linked.";
-    static auto DATA_PROCESSING_SCHEDULER_ILLEGAL_LINKING_OF_ALREADY_LINKED_BUFFER_MESSAGE = "Illegal linking attempt between DataProcessingScheduler and InputBuffer: The InputBuffer has already been linked.";
-    static auto DATA_PROCESSING_SCHEDULER_ILLEGAL_NUMBER_OF_INPUT_BUFFER_MESSAGE = "Illegal linking attempt between DataProcessingScheduler and InputBuffer: The maximum number of InputBuffer has already been reached for this DataProcessingScheduler.";
-    static auto DATA_PROCESSING_SCHEDULER_ILLEGAL_ACTIVATION_MESSAGE = "Illegal DataProcessingScheduler activation attempt from an unlinked InputBuffer";
-    static auto DATA_PROCESSING_SCHEDULER_ILLEGAL_DEACTIVATION_MESSAGE = "Illegal DataProcessingScheduler deactivation attempt from an unlinked InputBuffer";
+    static auto DATA_PROCESSING_SCHEDULER_ILLEGAL_LINKING_SCHEDULER_HAS_BEEN_STOPPED = "Illegal linking attempt between DataProcessingScheduler and DataSourceBuffer: The DataProcessingScheduler has received the terminate order, no new DataSourceBuffer can be linked.";
+    static auto DATA_PROCESSING_SCHEDULER_ILLEGAL_LINKING_OF_ALREADY_LINKED_BUFFER_MESSAGE = "Illegal linking attempt between DataProcessingScheduler and DataSourceBuffer: The DataSourceBuffer has already been linked.";
+    static auto DATA_PROCESSING_SCHEDULER_ILLEGAL_NUMBER_OF_INPUT_BUFFER_MESSAGE = "Illegal linking attempt between DataProcessingScheduler and DataSourceBuffer: The maximum number of DataSourceBuffer has already been reached for this DataProcessingScheduler.";
+    static auto DATA_PROCESSING_SCHEDULER_ILLEGAL_ACTIVATION_MESSAGE = "Illegal DataProcessingScheduler activation attempt from an unlinked DataSourceBuffer";
+    static auto DATA_PROCESSING_SCHEDULER_ILLEGAL_DEACTIVATION_MESSAGE = "Illegal DataProcessingScheduler deactivation attempt from an unlinked DataSourceBuffer";
 }
 
 

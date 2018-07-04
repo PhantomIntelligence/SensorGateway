@@ -51,10 +51,10 @@ namespace HighIntegrity {
         HighIntegrityThread(HighIntegrityThread&&) = default;
 
         ~HighIntegrityThread() {
-            safeExit();
+            exitSafely();
         }
 
-        inline void safeExit() {
+        inline void exitSafely() {
             if (thread.joinable()) {
                 joinOrDetach();
             }
@@ -64,7 +64,7 @@ namespace HighIntegrity {
 
         HighIntegrityThread& operator=(HighIntegrityThread&& other) {
             if (this != &other) {
-                safeExit();
+                exitSafely();
             }
             swap(other);
             return *this;
