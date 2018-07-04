@@ -30,7 +30,9 @@ namespace DataFlow {
 
     protected:
 
-        typedef std::unordered_map<ConsumerLink<T>*, RingBufferPad<T>*> ConsumerLocationsMap;
+        typedef ConsumerLink<T> Consumer;
+
+        typedef std::unordered_map<Consumer*, RingBufferPad<T>*> ConsumerLocationsMap;
 
         uint8_t const NUMBER_OF_CONSUMER_PER_BUFFER = 8;
 
@@ -71,7 +73,7 @@ namespace DataFlow {
         }
 
 
-        virtual auto consumeNextDataFor(ConsumerLink<T>* consumer) -> T const& {
+        virtual auto consumeNextDataFor(Consumer* consumer) -> T const& {
             addLinkIfNoneExists(consumer);
             throwErrorIfIllegalConsumption(consumer);
             T const& currentData = consumeFor(consumer);
@@ -79,7 +81,7 @@ namespace DataFlow {
             return currentData;
         }
 
-        virtual void linkWith(ConsumerLink<T>* consumer) noexcept {
+        virtual void linkWith(Consumer* consumer) noexcept {
             addLinkIfNoneExists(consumer);
         }
 
@@ -97,16 +99,15 @@ namespace DataFlow {
             buffer[RING_BUFFER_SIZE - 1].setNext(firstPad);
         }
 
-        void addLinkIfNoneExists(ConsumerLink<T>* consumer) {
+        void addLinkIfNoneExists(Consumer* consumer) {
             if (hasNoExistingLinkWith(consumer)) {
                 RingBufferPad<T>* consumerLocation = &buffer[0];
-                std::pair<ConsumerLink<T>*, RingBufferPad<T>*> consumerLocationPair =
-                        std::make_pair(consumer, consumerLocation);
+                 auto consumerLocationPair = std::make_pair(consumer, consumerLocation);
                 this->consumerLocationsMap.insert(consumerLocationPair);
             }
         }
 
-        bool hasNoExistingLinkWith(ConsumerLink<T>* consumer) {
+        bool hasNoExistingLinkWith(Consumer* consumer) {
             return consumerLocationsMap.count(consumer) == 0;
         }
 
@@ -124,22 +125,22 @@ namespace DataFlow {
             return pad == writerLocation;
         }
 
-        bool isAtWriterLocation(ConsumerLink<T>* consumer) const {
+        bool isAtWriterLocation(Consumer* consumer) const {
             return istWriterLocation(consumerLocationsMap.at(consumer));
         }
 
-        auto consumeFor(ConsumerLink<T>* consumer) -> T const& {
+        auto consumeFor(Consumer* consumer) -> T const& {
             T const& data = consumerLocationsMap.at(consumer)->read();
             return data;
         }
 
-        void throwErrorIfIllegalConsumption(ConsumerLink<T>* consumer) {
+        void throwErrorIfIllegalConsumption(Consumer* consumer) {
             if (isAtWriterLocation(consumer)) {
                 throwIllegalActionException(ExceptionMessage::RING_BUFFER_ILLEGAL_CONSUMPTION_ON_WRITER_LOCATION_MESSAGE);
             }
         }
 
-        void advanceOrDeactivateConsumer(ConsumerLink<T>* consumer) {
+        void advanceOrDeactivateConsumer(Consumer* consumer) {
             if (!isAtWriterLocation(consumer)) {
                 consumerLocationsMap.at(consumer) = consumerLocationsMap.at(consumer)->next();
             }

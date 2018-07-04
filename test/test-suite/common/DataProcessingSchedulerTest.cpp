@@ -53,7 +53,7 @@ public:
             numberOfCallsToConsumeNextData(0) {
     }
 
-    auto consumeNextDataFor(Consumer* consumer) -> DATA const& override {
+    auto consumeNextDataFor(Consumer* consumer) -> NativeData const& override {
         numberOfCallsToConsumeNextData++;
         if (hasBeenCalledExpectedNumberOfTimes()) {
             consumptionGoalReached.set_value(true);
@@ -83,7 +83,7 @@ public:
 private:
     uint16_t const numberOfTimesToBeConsumedBeforeStop;
     AtomicCounter numberOfCallsToConsumeNextData;
-    DATA data;
+    NativeData data;
     Consumer* linkedConsumer = nullptr;
     mutable BooleanPromise consumptionGoalReached;
 };
@@ -95,7 +95,7 @@ public:
             actualNumberOfWrites(0) {
     }
 
-    void consume(DATA&& data) override {
+    void consume(NativeData&& data) override {
         ++actualNumberOfWrites;
         if (hasBeenCalledExpectedNumberOfTimes()) {
             numberOfWritesAchieved.set_value(true);
