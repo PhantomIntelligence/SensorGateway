@@ -18,7 +18,10 @@
 
 namespace {
 
-    void initializeCleanJoinableThread() {}
+    /**
+      * @warning Allows to start the various JoinableThreads in the constructors without blocking anything
+      */
+    void voidAction() {}
 
     [[noreturn]] void throwIllegalActionException(char const* message) {
         throw std::runtime_error(message);
