@@ -18,7 +18,7 @@
 
 namespace {
 
-    void voidFunctionForCleanJoinableThreadInitialization() {}
+    void initializeCleanJoinableThread() {}
 
     [[noreturn]] void throwIllegalActionException(char const* message) {
         throw std::runtime_error(message);

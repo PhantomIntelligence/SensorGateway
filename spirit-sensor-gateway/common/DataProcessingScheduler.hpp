@@ -24,72 +24,68 @@ namespace DataFlow {
     template<class T, class SINK, uint8_t const NUMBER_OF_CONCURRENT_INPUTS>
     class DataProcessingScheduler : public ConsumerLink<T> {
 
-        typedef T DATA;
-        typedef RingBuffer<DATA> InputBuffer;
-        typedef Container::ConstantSizedPointerList<InputBuffer, NUMBER_OF_CONCURRENT_INPUTS> InputBufferStates;
+        typedef Container::ConstantSizedPointerList<RingBuffer<T> , NUMBER_OF_CONCURRENT_INPUTS> InputBuffers;
 
     public:
 
-        /**
-         * @brief Default constructor. A DataProcessingScheduler should be only instantiated once and live the same amount of time it's controlling structure does.
-         */
         DataProcessingScheduler(SINK* dataSink) :
                 terminateOrderReceived(false),
                 numberOfLinkedBuffers(0),
                 dataSink(dataSink),
-                schedulerThread(JoinableThread(voidFunctionForCleanJoinableThreadInitialization)) {
-
-            schedulerThread.safeExit();
+                schedulerThread(JoinableThread(initializeCleanJoinableThread)) {
+            schedulerThread.exitSafely();
             schedulerThread = JoinableThread(&DataProcessingScheduler::start, this);
         }
-
-        /**
-         * @brief The DataProcessingSchedulers are intended to be used as const instances. They shouldn't be moved.
-         */
-        DataProcessingScheduler(DataProcessingScheduler&& other) = delete;
 
         ~DataProcessingScheduler() noexcept = default;
 
         /**
-         * @brief The DataProcessingSchedulers are intended to be used as const instances. They shouldn't be assigned.
+         * @warning The DataProcessingSchedulers are intended to be used as const instances. They shouldn't be moved.
+         */
+        DataProcessingScheduler(DataProcessingScheduler&& other) = delete;
+
+        /**
+         * @warning The DataProcessingSchedulers are intended to be used as const instances. They shouldn't be assigned.
          */
         DataProcessingScheduler(DataProcessingScheduler const& other) = delete;
 
         /**
-         * @brief The DataProcessingSchedulers are intended to be used as const instances. They shouldn't be assigned.
+         * @warning The DataProcessingSchedulers are intended to be used as const instances. They shouldn't be assigned.
          */
         DataProcessingScheduler& operator=(const DataProcessingScheduler& other) = delete;
 
         /**
-         * @brief The DataProcessingSchedulers are intended to be used as const instances. They shouldn't be copied.
+         * @warning The DataProcessingSchedulers are intended to be used as const instances. They shouldn't be copied.
          */
         DataProcessingScheduler& operator=(DataProcessingScheduler&& other) = delete;
 
-        void linkWith(InputBuffer* buffer) override {
+        void linkWith(RingBuffer<T>* inputBuffer) override {
             LockGuard guard(inputBufferStatusMutex);
             validateStillAcceptsInputBuffers();
-            validateBufferIsNotLinked(buffer);
-            validateStatusArrayNotFull();
+            validateMaximumNumberOfInputBuffersIsNotReached();
+            validateInputBufferIsNotLinked(inputBuffer);
             ++numberOfLinkedBuffers;
-            caughtUpInputBuffers.store(buffer);
-            buffer->linkWith(this);
+            notReadyToConsumeInputBuffers.store(inputBuffer);
+            inputBuffer->linkWith(this);
         }
 
-        void activateFor(InputBuffer* buffer) override {
+        void activateFor(RingBuffer<T>* inputBuffer) override {
             LockGuard guard(inputBufferStatusMutex);
-            validateBufferIsLinked(buffer, ExceptionMessage::DATA_PROCESSING_SCHEDULER_ILLEGAL_ACTIVATION_MESSAGE);
-            if (caughtUpInputBuffers.contains(buffer)) {
-                caughtUpInputBuffers.remove(buffer);
-                readyToConsumeInputBuffers.store(buffer);
+            validateInputBufferIsLinked(inputBuffer,
+                                        ExceptionMessage::DATA_PROCESSING_SCHEDULER_ILLEGAL_ACTIVATION_MESSAGE);
+            if (notReadyToConsumeInputBuffers.contains(inputBuffer)) {
+                notReadyToConsumeInputBuffers.remove(inputBuffer);
+                readyToConsumeInputBuffers.store(inputBuffer);
             }
         }
 
-        void deactivateFor(InputBuffer* buffer) override {
+        void deactivateFor(RingBuffer<T>* inputBuffer) override {
             LockGuard guard(inputBufferStatusMutex);
-            validateBufferIsLinked(buffer, ExceptionMessage::DATA_PROCESSING_SCHEDULER_ILLEGAL_DEACTIVATION_MESSAGE);
-            if (readyToConsumeInputBuffers.contains(buffer)) {
-                readyToConsumeInputBuffers.remove(buffer);
-                caughtUpInputBuffers.store(buffer);
+            validateInputBufferIsLinked(inputBuffer,
+                                        ExceptionMessage::DATA_PROCESSING_SCHEDULER_ILLEGAL_DEACTIVATION_MESSAGE);
+            if (readyToConsumeInputBuffers.contains(inputBuffer)) {
+                readyToConsumeInputBuffers.remove(inputBuffer);
+                notReadyToConsumeInputBuffers.store(inputBuffer);
             }
         }
 
@@ -98,7 +94,7 @@ namespace DataFlow {
             if (!terminateOrderHasBeenReceived()) {
                 terminateOrderReceived.store(true);
             }
-            schedulerThread.safeExit();
+            schedulerThread.exitSafely();
         }
 
     private:
@@ -128,25 +124,25 @@ namespace DataFlow {
             }
         }
 
-        bool isBufferLinked(InputBuffer* buffer) const noexcept {
-            return caughtUpInputBuffers.contains(buffer) || readyToConsumeInputBuffers.contains(buffer);
-        }
-
-        void validateBufferIsNotLinked(InputBuffer* buffer) const {
-            if (isBufferLinked(buffer)) {
+        void validateInputBufferIsNotLinked(RingBuffer<T>* inputBuffer) const {
+            if (isInputBufferLinked(inputBuffer)) {
                 throwIllegalActionException(
                         ExceptionMessage::DATA_PROCESSING_SCHEDULER_ILLEGAL_LINKING_OF_ALREADY_LINKED_BUFFER_MESSAGE);
             }
         }
 
-        void validateStatusArrayNotFull() const {
+        bool isInputBufferLinked(RingBuffer<T>* inputBuffer) const noexcept {
+            return notReadyToConsumeInputBuffers.contains(inputBuffer) || readyToConsumeInputBuffers.contains(inputBuffer);
+        }
+
+        void validateMaximumNumberOfInputBuffersIsNotReached() const {
             if (numberOfLinkedBuffers.load() == NUMBER_OF_CONCURRENT_INPUTS) {
                 throwIllegalActionException(ExceptionMessage::DATA_PROCESSING_SCHEDULER_ILLEGAL_NUMBER_OF_INPUT_BUFFER_MESSAGE);
             }
         }
 
-        void validateBufferIsLinked(InputBuffer* buffer, char const* message) const {
-            if (!isBufferLinked(buffer)) {
+        void validateInputBufferIsLinked(RingBuffer<T>* inputBuffer, char const* message) const {
+            if (!isInputBufferLinked(inputBuffer)) {
                 throwIllegalActionException(message);
             }
         }
@@ -156,9 +152,8 @@ namespace DataFlow {
         AtomicFlag terminateOrderReceived;
         Mutex inputBufferStatusMutex;
         AtomicCounter numberOfLinkedBuffers;
-        InputBufferStates readyToConsumeInputBuffers;
-        InputBufferStates caughtUpInputBuffers;
-
+        InputBuffers readyToConsumeInputBuffers;
+        InputBuffers notReadyToConsumeInputBuffers;
         SINK* dataSink;
     };
 }
