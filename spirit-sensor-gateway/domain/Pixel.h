@@ -50,7 +50,10 @@ namespace SpiritProtocol {
 
         std::array<Track, MAXIMUM_NUMBER_OF_TRACK_IN_AWL16_PIXEL>* getTracksAddress();
 
+        void validateNotFull() const;
+
     private:
+        int numberOfTrackInPixel = 0;
         uint16_t ID;
         std::array<Track, MAXIMUM_NUMBER_OF_TRACK_IN_AWL16_PIXEL> tracks;
     };

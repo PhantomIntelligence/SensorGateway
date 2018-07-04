@@ -60,7 +60,9 @@ namespace SpiritProtocol {
     }
 
     void Pixel::addTrack(Track track) {
-        tracks[0] = track;
+        validateNotFull();
+        tracks[numberOfTrackInPixel] = track;
+        numberOfTrackInPixel++;
     }
 
     bool Pixel::doesTrackExist(TrackID trackID)  {
@@ -92,6 +94,13 @@ namespace SpiritProtocol {
     std::array<Track, MAXIMUM_NUMBER_OF_TRACK_IN_AWL16_PIXEL>* Pixel::getTracksAddress()  {
 
         return &tracks;
+    }
+
+    void Pixel::validateNotFull() const {
+        if(numberOfTrackInPixel >= MAXIMUM_NUMBER_OF_TRACK_IN_AWL16_PIXEL){
+            throw std::runtime_error(ExceptionMessage::PIXEL_TRACK_ARRAY_ILLEGAL_STORE_FULL);
+        }
+
     };
 
 }

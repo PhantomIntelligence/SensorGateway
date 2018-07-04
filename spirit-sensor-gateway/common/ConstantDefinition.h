@@ -15,7 +15,6 @@
 #define SPIRITSENSORGATEWAY_CONSTANTDEFINITION_H
 
 #include "TypeDefinition.h"
-#include <iostream>
 #include <vector>
 
 namespace {
