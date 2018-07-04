@@ -17,15 +17,12 @@
 #include "ExceptionMessages.h"
 
 namespace {
-    /**
-     * @brief Allows to start the various JoinableThreads in the constructors without blocking anything
-     */
-    void voidAction() {}
 
     /**
-     * @brief Throws a runtime error with the specified message
-     * @param message that will be in the error
-     */
+      * @warning Allows to start the various JoinableThreads in the constructors without blocking anything
+      */
+    void voidAction() {}
+
     [[noreturn]] void throwIllegalActionException(char const* message) {
         throw std::runtime_error(message);
     }

@@ -20,7 +20,7 @@
 
 #include "ConstantSizedPointerQueue.hpp"
 
-namespace ConstantContainer {
+namespace Container {
 
     /**
      * @brief Constant sized list pointer structure.
@@ -37,8 +37,8 @@ namespace ConstantContainer {
     public:
 
         using super::ConstantSizedAbstractPointerArray;
-        using super::empty;
-        using super::full;
+        using super::isEmpty;
+        using super::isFull;
 
         void store(T* newPointer) override {
             LockGuard guard(contentMutex);
@@ -101,7 +101,7 @@ namespace ConstantContainer {
         }
 
         [[noreturn]] void throwIllegalRemovalException() const {
-            throwIllegalActionException(ExceptionMessage::CONSTANT_SIZED_POINTER_LIST_ILLEGAL_REMOVAL_POINTER_NOT_CONTAINED);
+            throwIllegalActionException(ExceptionMessage::CONSTANT_SIZED_POINTER_LIST_ILLEGAL_REMOVAL_OF_POINTER);
         }
 
         using super::pointers;

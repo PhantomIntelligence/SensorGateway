@@ -17,32 +17,27 @@
 #ifndef SPIRITSENSORGATEWAY_DATASOURCE_HPP
 #define SPIRITSENSORGATEWAY_DATASOURCE_HPP
 
-#include "ThreadSafeRingBuffer.hpp"
+#include "RingBuffer.hpp"
 
 namespace DataFlow {
-/**
- * @brief DataSource interface, has the necessary element (i.e. an OutputBuffer) to be used as an input with ConsumerLink
- */
+
     template<class T>
     class DataSource {
-        using OutputBuffer = DataFlow::RingBuffer<T>;
-    protected:
-        typedef T DATA;
 
     public:
 
         virtual ~DataSource() noexcept = default;
 
-        void linkOutput(ConsumerLink<DATA>* consumer) {
+        void linkConsumer(ConsumerLink<T>* consumer) {
             consumer->linkWith(&outputBuffer);
         }
 
-        virtual void produce(DATA&& data) {
-            outputBuffer.write(std::forward<DATA>(data));
+        virtual void produce(T&& data) {
+            outputBuffer.write(std::forward<T>(data));
         }
 
     protected:
-        OutputBuffer outputBuffer;
+        DataFlow::RingBuffer<T> outputBuffer;
 
     };
 }

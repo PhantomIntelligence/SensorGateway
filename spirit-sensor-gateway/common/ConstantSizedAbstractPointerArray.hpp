@@ -20,7 +20,7 @@
 
 #include "ConstantValuesDefinition.h"
 
-namespace ConstantContainer {
+namespace Container {
 
     template<class T, std::size_t SIZE>
     class ConstantSizedAbstractPointerArray {
@@ -55,13 +55,13 @@ namespace ConstantContainer {
         }
 
         void validateNotFull() const {
-            if (full()) {
+            if (isFull()) {
                 throwIllegalActionException(ExceptionMessage::ABSTRACT_POINTER_ARRAY_ILLEGAL_STORE_FULL);
             }
         }
 
         void validateNotEmpty() const {
-            if (empty()) {
+            if (isEmpty()) {
                 throwIllegalActionException(ExceptionMessage::ABSTRACT_POINTER_ARRAY_ILLEGAL_CONSUMPTION_EMPTY);
             }
         }
@@ -109,11 +109,11 @@ namespace ConstantContainer {
          */
         ConstantSizedAbstractPointerArray& operator=(ConstantSizedAbstractPointerArray&& other) noexcept = delete;
 
-        bool empty() const noexcept {
+        bool isEmpty() const noexcept {
             return numberOfPointersHeld.load() == 0;
         }
 
-        bool full() const noexcept {
+        bool isFull() const noexcept {
             return numberOfPointersHeld.load() == SIZE;
         }
 

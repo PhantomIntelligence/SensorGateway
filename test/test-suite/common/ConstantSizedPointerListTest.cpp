@@ -14,7 +14,6 @@
 	limitations under the License.
 */
 
-
 #ifndef SPIRITSENSORGATEWAY_CONSTANTSIZEDPOINTERLISTTEST_CPP
 #define SPIRITSENSORGATEWAY_CONSTANTSIZEDPOINTERLISTTEST_CPP
 
@@ -38,7 +37,7 @@ public:
 
     static const uint16_t TEST_SIZE = 8;
 
-    using List = ConstantContainer::ConstantSizedPointerList<NativeData, ConstantSizedPointerListTest::TEST_SIZE>;
+    using List = Container::ConstantSizedPointerList<NativeData, ConstantSizedPointerListTest::TEST_SIZE>;
 
     void fillList(List* list) const {
         NativeData data = DataTestUtil::generateRandomNativeData();
@@ -54,7 +53,7 @@ public:
 TEST_F(ConstantSizedPointerListTest, given_anEmptyList_when_askedIfIsEmpty_then_returnsTrue) {
     List list;
 
-    auto empty = list.empty();
+    auto empty = list.isEmpty();
 
     ASSERT_TRUE(empty);
 }
@@ -65,7 +64,7 @@ TEST_F(ConstantSizedPointerListTest, given_aListHoldingOneData_when_askedIfIsEmp
     auto pointer = &data;
     list.store(pointer);
 
-    auto empty = list.empty();
+    auto empty = list.isEmpty();
 
     ASSERT_FALSE(empty);
 }
@@ -73,7 +72,7 @@ TEST_F(ConstantSizedPointerListTest, given_aListHoldingOneData_when_askedIfIsEmp
 TEST_F(ConstantSizedPointerListTest, given_anEmptyList_when_askedIfIsFull_then_returnsFalse) {
     List list;
 
-    auto full = list.full();
+    auto full = list.isFull();
 
     ASSERT_FALSE(full);
 }
@@ -82,7 +81,7 @@ TEST_F(ConstantSizedPointerListTest, given_aFullList_when_askedIfIsFull_then_ret
     List list;
     fillList(&list);
 
-    auto full = list.full();
+    auto full = list.isFull();
 
     ASSERT_TRUE(full);
 }
@@ -114,7 +113,7 @@ TEST_F(ConstantSizedPointerListTest, given_aStoredPointer_when_consumeNext_then_
     ASSERT_EQ(pointer, storedPointer);
 }
 
-TEST_F(ConstantSizedPointerListTest, given_aListOfSizeN_when_storingAndConsumingInAListTwoNTimes_then_dataRemainsCoherent) {
+TEST_F(ConstantSizedPointerListTest, given_aListOfSizeN_when_storingAndConsumingAnAmountOfTimeSuperiorThanTheListSize_then_dataRemainsCoherent) {
     List list;
 
     for (auto j = 0; j < ConstantSizedPointerListTest::TEST_SIZE * 2; ++j) {
@@ -133,7 +132,7 @@ TEST_F(ConstantSizedPointerListTest, given_aFullList_when_readAllTheElementsAndA
     for (auto k = 0; k < ConstantSizedPointerListTest::TEST_SIZE; ++k) {
         list.readNextPointerToConsume();
     }
-    auto full = list.full();
+    auto full = list.isFull();
 
     ASSERT_TRUE(full);
 }
@@ -187,7 +186,7 @@ TEST_F(ConstantSizedPointerListTest, given_aPointerInTheList_when_askedToRemoveI
 
     list.remove(pointer);
 
-    auto empty = list.empty();
+    auto empty = list.isEmpty();
     ASSERT_TRUE(empty);
 }
 
