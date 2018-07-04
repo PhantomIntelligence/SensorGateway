@@ -2469,7 +2469,7 @@ Now, judiciously use the right flag to enable Google Mock serve you better!
 
 ## Running Tests in Emacs ##
 
-If you build and run your tests in Emacs, the source file locations of
+If you build and run your tests in Emacs, the source file consumerLocationsMap of
 Google Mock and [Google Test](http://code.google.com/p/googletest/)
 errors will be highlighted. Just press `<Enter>` on one of them and
 you'll be taken to the offending line. Or, you can just type `C-x ``
