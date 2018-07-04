@@ -52,7 +52,7 @@ public:
 TEST_F(ConstantSizedPointerQueueTest, given_anEmptyQueue_when_askedIfIsEmpty_then_returnsTrue) {
     Queue queue;
 
-    auto empty = queue.empty();
+    auto empty = queue.isEmpty();
 
     ASSERT_TRUE(empty);
 }
@@ -63,7 +63,7 @@ TEST_F(ConstantSizedPointerQueueTest, given_anQueueWithOneElement_when_askedIfIs
     auto pointer = &data;
     queue.store(pointer);
 
-    auto empty = queue.empty();
+    auto empty = queue.isEmpty();
 
     ASSERT_FALSE(empty);
 }
@@ -71,7 +71,7 @@ TEST_F(ConstantSizedPointerQueueTest, given_anQueueWithOneElement_when_askedIfIs
 TEST_F(ConstantSizedPointerQueueTest, given_anEmptyQueue_when_askedIfIsFull_then_returnsFalse) {
     Queue queue;
 
-    auto full = queue.full();
+    auto full = queue.isFull();
 
     ASSERT_FALSE(full);
 }
@@ -80,7 +80,7 @@ TEST_F(ConstantSizedPointerQueueTest, given_aFullQueue_when_askedIfIsFull_then_r
     Queue queue;
     fillQueue(&queue);
 
-    auto full = queue.full();
+    auto full = queue.isFull();
 
     ASSERT_TRUE(full);
 }
@@ -128,7 +128,7 @@ TEST_F(ConstantSizedPointerQueueTest, given_twoPointerStoredInOrder_when_consume
     ASSERT_EQ(secondPointer, secondStoredPointer);
 }
 
-TEST_F(ConstantSizedPointerQueueTest, given__when_consumeNext_then_returnsThePointer) {
+TEST_F(ConstantSizedPointerQueueTest, given_aPointerInTheQueue_when_consumeNext_then_returnsThePointer) {
     Queue queue;
     NativeData data = DataTestUtil::generateRandomNativeData();
     auto pointer = &data;
@@ -139,7 +139,7 @@ TEST_F(ConstantSizedPointerQueueTest, given__when_consumeNext_then_returnsThePoi
     ASSERT_EQ(pointer, storedPointer);
 }
 
-TEST_F(ConstantSizedPointerQueueTest, given__when_fillingAndConsumingTheQueueTwice_then_dataRemainsCoherent) {
+TEST_F(ConstantSizedPointerQueueTest, given_aNonFullQueue_when_fillingAndConsumingTheQueueTwice_then_dataRemainsCoherent) {
     Queue queue;
 
     for (auto j = 0; j < ConstantSizedPointerQueueTest::TEST_SIZE * 2; ++j) {

@@ -36,8 +36,8 @@ namespace Container {
     public:
 
         using super::ConstantSizedAbstractPointerArray;
-        using super::empty;
-        using super::full;
+        using super::isEmpty;
+        using super::isFull;
 
 
         void store(T* newPointer) override {
