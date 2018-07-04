@@ -17,9 +17,22 @@
 #include "spirit-sensor-gateway/common/ConstantFunction.h"
 
 namespace SpiritProtocol {
+
+    namespace DefaultValues{
+        namespace Track {
+            Acceleration const UNINITIALIZED_TRACK_ACCELERATION_VALUE = 0;
+            ConfidenceLevel const UNINITIALIZED_TRACK_CONFIDENCE_VALUE = 0;
+            Distance const UNINITIALIZED_TRACK_DISTANCE_VALUE = 0;
+            TrackID const UNINITIALIZED_TRACK_ID_VALUE = 0;
+            Speed const UNINITIALIZED_TRACK_SPEED_VALUE = 0;
+            Intensity const UNINITIALIZED_TRACK_INTENSITY_VALUE = 0;
+        }
+
+    }
+
     class Track {
         public:
-            Track() = default;
+            Track();
 
             Track(TrackID trackID, ConfidenceLevel confidenceLevel, Intensity intensity);
             ~Track();

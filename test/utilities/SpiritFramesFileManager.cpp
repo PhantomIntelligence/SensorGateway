@@ -38,8 +38,7 @@ void SpiritFramesFileManager::writeFileBlockWithMessage(SpiritProtocol::Frame me
             writeFileLineWithContentLabelAndValue(file, 3, DISTANCE_LABEL.c_str(), track.getDistance());
             writeFileLineWithContentLabelAndValue(file, 3, INTENSITY_LABEL.c_str(), track.getIntensity());
             writeFileLineWithContentLabelAndValue(file, 3, CONFIDENCE_LEVEL_LABEL.c_str(), track.getConfidenceLevel());
-            //TODO: remove comment line once getSpeed return the right value
-//            writeFileLineWithContentLabelAndValue(file, 3, SPEED_LABEL.c_str(), track.second.getSpeed());
+            writeFileLineWithContentLabelAndValue(file, 3, SPEED_LABEL.c_str(), track.getSpeed());
         }
     }
     std::fprintf(file, "%s\n", MESSAGES_SEPARATOR.c_str());

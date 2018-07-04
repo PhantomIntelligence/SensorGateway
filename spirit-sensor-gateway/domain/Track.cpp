@@ -13,9 +13,17 @@
 
 #include "Track.h"
 
+
 namespace SpiritProtocol {
+
+    using namespace DefaultValues::Track;
+
     Track::Track(TrackID trackID, ConfidenceLevel confidenceLevel, Intensity intensity) :
             ID(trackID), confidenceLevel(confidenceLevel), intensity(intensity) {
+    };
+    Track::Track(): ID(UNINITIALIZED_TRACK_ID_VALUE),acceleration(UNINITIALIZED_TRACK_ACCELERATION_VALUE),confidenceLevel(UNINITIALIZED_TRACK_CONFIDENCE_VALUE),
+                    distance(UNINITIALIZED_TRACK_DISTANCE_VALUE),intensity(UNINITIALIZED_TRACK_INTENSITY_VALUE),speed(UNINITIALIZED_TRACK_SPEED_VALUE){
+
     };
 
     Track::~Track() {
@@ -68,6 +76,7 @@ namespace SpiritProtocol {
     };
 
     void Track::setSpeed(Speed speed) {
-        this->speed = speed;
-    };
+            this->speed = speed;
+    }
+
 }

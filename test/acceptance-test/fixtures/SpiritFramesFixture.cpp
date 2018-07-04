@@ -44,27 +44,32 @@ Frame createFrame(FrameID frameID, SystemID systemID, std::vector<Pixel> pixels)
 
 
 std::vector<Frame> spiritFramesFixture = {
-        createFrame(64829, 16, {createPixel(15, {createTrack(14321, 0, 110, 0, 0, 0)}),
-                                createPixel(14, {createTrack(14322, 0, 104, 0, 0, 0)}),
-                                createPixel(13, {createTrack(14302, 0, 115, 0, 0, 0)}),
-                                createPixel(11, {createTrack(14291, 0, 123, 0, 0, 0)}),
-                                createPixel(12, {createTrack(14324, 0, 93, 0, 0, 0)})
+        createFrame(64829, 16, {createPixel(11, {createTrack(14291, 0, 123, 0, 106, 0)}),
+                                createPixel(12, {createTrack(14324, 0, 93, 0, 109, 0)}),
+                                createPixel(13, {createTrack(14302, 0, 115, 0, 109, 0xFFFF)}),
+                                createPixel(14, {createTrack(14322, 0, 104, 0, 115, 0xFFFA)}),
+                                createPixel(15, {createTrack(14321, 0, 110, 0, 117, 0)}),
+
+
+
         }),
-        createFrame(64830, 16, {createPixel(15, {createTrack(14321, 0, 109, 0, 0, 0)}),
-                                createPixel(14, {createTrack(14322, 0, 109, 0, 0, 0)}),
-                                createPixel(13, {createTrack(14302, 0, 114, 0, 0, 0)}),
-                                createPixel(12, {createTrack(14324, 0, 91, 0, 0, 0)}),
-                                createPixel(11, {createTrack(14291, 0, 123, 0, 0, 0)}),
-                                createPixel(10, {createTrack(14290, 0, 125, 0, 0, 0)}),
-                                createPixel(9, {createTrack(14289, 0, 124, 0, 0, 0)}),
-                                createPixel(8, {createTrack(14284, 0, 126, 0, 0, 0)}),
-                                createPixel(7, {createTrack(14320, 0, 110, 0, 0, 0)}),
-                                createPixel(6, {createTrack(14316, 0, 114, 0, 0, 0)}),
-                                createPixel(1, {createTrack(2, 0, 135, 0, 0, 0)}),
-                                createPixel(0, {createTrack(14275, 0, 139, 0, 0, 0)}),
-                                createPixel(2, {createTrack(14286, 0, 125, 0, 0, 0)}),
-                                createPixel(3, {createTrack(14270, 0, 127, 0, 0, 0)}),
-                                createPixel(4, {createTrack(14301, 0, 122, 0, 0, 0)}),
-                                createPixel(5, {createTrack(14272, 0, 120, 0, 0, 0)})
+        createFrame(64830, 16, {createPixel(0, {createTrack(14275, 0, 139, 0, 109, 0)}),
+                                createPixel(1, {createTrack(2, 0, 135, 0, 110, 0)}),
+                                createPixel(2, {createTrack(14286, 0, 125, 0, 105, 0)}),
+                                createPixel(3, {createTrack(14270, 0, 127, 0, 106, 1)}),
+                                createPixel(4, {createTrack(14301, 0, 122, 0, 104, 0)}),
+                                createPixel(5, {createTrack(14272, 0, 120, 0, 108, 0)}),
+                                createPixel(6, {createTrack(14316, 0, 114, 0, 114, 0)}),
+                                createPixel(7, {createTrack(14320, 0, 110, 0, 117, 1)}),
+                                createPixel(8, {createTrack(14284, 0, 126, 0, 111, 0)}),
+                                createPixel(9, {createTrack(14289, 0, 124, 0, 111, 0)}),
+                                createPixel(10, {createTrack(14290, 0, 125, 0, 107, 0)}),
+                                createPixel(11, {createTrack(14291, 0, 123, 0, 106, 0)}),
+                                createPixel(12, {createTrack(14324, 0, 91, 0, 109, 1)}),
+                                createPixel(13, {createTrack(14302, 0, 114, 0, 109, 0)}),
+                                createPixel(14, {createTrack(14322, 0, 109, 0, 116, 0xFFFE)}),
+                                createPixel(15, {createTrack(14321, 0, 109, 0, 117, 0)}),
+
+
         }),
 };

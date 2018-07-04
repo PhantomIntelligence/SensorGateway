@@ -40,7 +40,7 @@ void AWLMessageTranslator::translateDetectionTrackMessage(AWLMessage* awlMessage
     PixelID pixelID = convertTwoBytesToUnsignedBigEndian(awlMessage->data[3], awlMessage->data[4]);
     Pixel pixel = Pixel(pixelID);
     currentFrame->addPixel(pixel);
-    addTrackInPixel(awlMessage, pixelID);
+    addTrackInPixel(awlMessage, pixel.getID());
 }
 
 void AWLMessageTranslator::addTrackInPixel(AWLMessage* awlMessage, PixelID pixelID) {
