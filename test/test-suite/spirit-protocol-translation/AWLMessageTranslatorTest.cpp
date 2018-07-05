@@ -73,16 +73,21 @@ TEST_F(AWLMessageTranslatorTest,given_someVelocityTrackAWLMessage_when_translati
     awlMessageTranslator.translateBasicMessage(&endOfFrameAwlMessage);
 
 
-    auto expectedPixelId = convertTwoBytesToUnsignedBigEndian(detectionTrackAwlMessage.data[3],detectionTrackAwlMessage.data[4]);
-    auto expectedTrackId = convertTwoBytesToUnsignedBigEndian(detectionTrackAwlMessage.data[0],detectionTrackAwlMessage.data[1]);
+    auto expectedPixelID = convertTwoBytesToUnsignedBigEndian(detectionTrackAwlMessage.data[3],detectionTrackAwlMessage.data[4]);
+    auto expectedTrackID = convertTwoBytesToUnsignedBigEndian(detectionTrackAwlMessage.data[0],detectionTrackAwlMessage.data[1]);
+    auto expectedTrackConfidenceLevel = detectionTrackAwlMessage.data[5];
+    auto expectedTrackIntensity = convertTwoBytesToUnsignedBigEndian(detectionTrackAwlMessage.data[6],detectionTrackAwlMessage.data[7]);
     auto expectedTrackDistance = convertTwoBytesToUnsignedBigEndian(detectionVelocityAwlMessage.data[2],detectionVelocityAwlMessage.data[3]);
     Speed expectedTrackSpeed = convertTwoBytesToSignedBigEndian(detectionTrackAwlMessage.data[4],detectionTrackAwlMessage.data[5]);
     Acceleration expectedTrackAcceleration = convertTwoBytesToSignedBigEndian(detectionTrackAwlMessage.data[6],detectionTrackAwlMessage.data[7]);
 
     auto frame = awlMessageTranslator.getFrames().at(0);
-    auto pixel = frame.fetchPixelByID(expectedPixelId);
-    auto track = *(pixel->fetchTrackByID(expectedTrackId));
+    auto pixel = frame.fetchPixelByID(expectedPixelID);
+    auto track = *(pixel->fetchTrackByID(expectedTrackID));
 
+    ASSERT_EQ(expectedTrackID,track.getID());
+    ASSERT_EQ(expectedTrackConfidenceLevel,track.getConfidenceLevel());
+    ASSERT_EQ(expectedTrackIntensity,track.getIntensity());
     ASSERT_EQ(expectedTrackDistance,track.getDistance());
     ASSERT_EQ(expectedTrackSpeed,track.getSpeed());
     ASSERT_EQ(expectedTrackAcceleration,track.getAcceleration());
