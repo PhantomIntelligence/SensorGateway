@@ -60,7 +60,7 @@ TEST_F(AWLMessageTranslatorTest,given_someDetectionTrackAWLMessage_when_translat
     ASSERT_EQ(DEFAULT_SPEED_VALUE,track.getSpeed());
 }
 
-TEST_F(AWLMessageTranslatorTest,given_anAWLMessageWithAnIdofEleven_when_translatingTheAwlMessage_then_setTheCorrectAttributesOfTheTrack) {
+TEST_F(AWLMessageTranslatorTest,given_someVelocityTrackAWLMessage_when_translatingTheAWLMessage_then_setsTheCorrectAttributesOfTheTrack) {
 
     AWLMessageTranslator awlMessageTranslator;
 
@@ -75,9 +75,9 @@ TEST_F(AWLMessageTranslatorTest,given_anAWLMessageWithAnIdofEleven_when_translat
 
     auto expectedPixelId = convertTwoBytesToUnsignedBigEndian(detectionTrackAwlMessage.data[3],detectionTrackAwlMessage.data[4]);
     auto expectedTrackId = convertTwoBytesToUnsignedBigEndian(detectionTrackAwlMessage.data[0],detectionTrackAwlMessage.data[1]);
-    uint16_t expectedTrackDistance = convertTwoBytesToUnsignedBigEndian(detectionVelocityAwlMessage.data[2],detectionVelocityAwlMessage.data[3]);
-    int16_t expectedTrackSpeed = convertTwoBytesToSignedBigEndian(detectionTrackAwlMessage.data[4],detectionTrackAwlMessage.data[5]);
-    int16_t expectedTrackAcceleration = convertTwoBytesToSignedBigEndian(detectionTrackAwlMessage.data[6],detectionTrackAwlMessage.data[7]);
+    auto expectedTrackDistance = convertTwoBytesToUnsignedBigEndian(detectionVelocityAwlMessage.data[2],detectionVelocityAwlMessage.data[3]);
+    Speed expectedTrackSpeed = convertTwoBytesToSignedBigEndian(detectionTrackAwlMessage.data[4],detectionTrackAwlMessage.data[5]);
+    Acceleration expectedTrackAcceleration = convertTwoBytesToSignedBigEndian(detectionTrackAwlMessage.data[6],detectionTrackAwlMessage.data[7]);
 
     auto frame = awlMessageTranslator.getFrames().at(0);
     auto pixel = frame.fetchPixelByID(expectedPixelId);
