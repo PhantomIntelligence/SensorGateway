@@ -11,21 +11,15 @@
 	limitations under the License.
 */
 
-#ifndef SPIRITSENSORGATEWAY_CONSTANTFUNCTIONSDEFINITION_H
-#define SPIRITSENSORGATEWAY_CONSTANTFUNCTIONSDEFINITION_H
+#ifndef SPIRITSENSORGATEWAY_CONSTANTVALUESDEFINITION_H
+#define SPIRITSENSORGATEWAY_CONSTANTVALUESDEFINITION_H
 
-#include "ExceptionMessages.h"
+#include "ConstantFunctionsDefinition.h"
 
 namespace {
-
-    /**
-      * @warning Allows to start the various JoinableThreads in the constructors without blocking anything
-      */
-    void voidAction() {}
-
-    [[noreturn]] void throwIllegalActionException(char const* message) {
-        throw std::runtime_error(message);
-    }
+    uint8_t const MAX_NUMBER_OF_DATA_IN_AWL_MESSAGE = 8;
+    uint8_t const NUMBER_OF_CONCURRENT_INPUT_FOR_SENSOR_ACCESS_LINK_ELEMENTS = 1;
+    size_t const RING_BUFFER_SIZE = 64;
 };
 
-#endif //SPIRITSENSORGATEWAY_CONSTANTFUNCTIONSDEFINITION_H
+#endif //SPIRITSENSORGATEWAY_CONSTANTVALUESDEFINITION_H

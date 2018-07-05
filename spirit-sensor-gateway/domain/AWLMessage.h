@@ -14,7 +14,7 @@
 #ifndef SPIRITSENSORGATEWAY_MESSAGE_H
 #define SPIRITSENSORGATEWAY_MESSAGE_H
 
-#include "spirit-sensor-gateway/common/ConstantDefinition.h"
+#include "spirit-sensor-gateway/common/ConstantValuesDefinition.h"
 
 
 struct AWLMessage{

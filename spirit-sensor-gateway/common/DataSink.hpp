@@ -1,9 +1,12 @@
 /**
 	Copyright 2014-2018 Phantom Intelligence Inc.
+
 	Licensed under the Apache License, Version 2.0 (the "License");
 	you may not use this file except in compliance with the License.
 	You may obtain a copy of the License at
+
 		http://www.apache.org/licenses/LICENSE-2.0
+
 	Unless required by applicable law or agreed to in writing, software
 	distributed under the License is distributed on an "AS IS" BASIS,
 	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -11,13 +14,20 @@
 	limitations under the License.
 */
 
-#ifndef SPIRITSENSORGATEWAY_CONSTANTDEFINITION_H
-#define SPIRITSENSORGATEWAY_CONSTANTDEFINITION_H
+#ifndef SPIRITSENSORGATEWAY_DATASINK_HPP
+#define SPIRITSENSORGATEWAY_DATASINK_HPP
 
-#include "TypeDefinition.h"
+#include "DataSource.hpp"
 
-namespace {
-    const uint8_t MAX_NUMBER_OF_DATA_IN_AWL_MESSAGE = 8;
-};
+namespace DataFlow {
 
-#endif //SPIRITSENSORGATEWAY_CONSTANTDEFINITION_H
+    template<class T>
+    class DataSink {
+    public:
+        virtual ~DataSink() noexcept = default;
+
+        virtual void consume(T&& data) = 0;
+    };
+}
+
+#endif //SPIRITSENSORGATEWAY_DATASINK_HPP

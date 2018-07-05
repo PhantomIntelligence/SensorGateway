@@ -15,13 +15,13 @@
 #define SPIRITSENSORGATEWAY_KVASERCANPROTOCOLSTRATEGY_H
 
 #include <canlib.h>
-#include "CommunicationProtocolStrategy.h"
+#include "CommunicationProtocolStrategy.hpp"
+#include <limits>
 
 
-
-namespace SensorMessageTranslation {
-    class KvaserCanProtocolStrategy : public CommunicationProtocolStrategy<AWLMessage> {
-        const unsigned long CANLIB_READ_WAIT_INFINITE_DELAY = (unsigned long) -1;
+namespace CommunicationProtocolStrategy {
+    class KvaserCanProtocolStrategy : public CommunicationProtocolStrategy {
+        const unsigned long CANLIB_READ_WAIT_INFINITE_DELAY = std::numeric_limits<int>::infinity();
     public:
         KvaserCanProtocolStrategy();
         ~ KvaserCanProtocolStrategy();

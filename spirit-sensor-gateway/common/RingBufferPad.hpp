@@ -18,66 +18,44 @@
 #ifndef SPIRITSENSORGATEWAY_RINGBUFFERPAD_HPP
 #define SPIRITSENSORGATEWAY_RINGBUFFERPAD_HPP
 
-/**
- * @brief Buffer and data containing related classes
- */
+
 namespace DataFlow {
 
     /**
-     * @brief A RingBufferPad is a custom forward-list node used by RingBuffer to ease the circular chaining, allow to read/write data
-     * @template <class T> refers to the data type
-     * @warning Concurrency Warning: No thread safety has been implemented in this class. This is the responsibility of the RingBuffer. It must be assumed any concurrent interaction potentially dangerous is dealt with before instances of this class are called
-     * @see ThreadSafeRingBuffer for the thread safe usage of the RingBuffer and this class.
+     * @warning Concurrency Warning: No thread safety has been implemented in this class. This is the responsibility of
+     * the RingBuffer.
      */
     template<class T>
     class RingBufferPad {
 
-        /**
-         * @brief Name conversion to ease reading in the class. The data held in this call will be reference to by T).
-         */
-        typedef RingBufferPad<T> Pad;
-
     public:
 
-        /**
-         * @brief Default constructor, which sets the currentData to its Default value.
-         * @attention the function "T::returnDefaults()" MUST be implemented in the passed Data type. This function must return an instance with all fields initialized.
-         */
         RingBufferPad() : nextPadSet(false), currentData(T::returnDefaultData()), nextPad(this) {}
 
-        /**
-         * @brief default destructor
-         */
         ~RingBufferPad() = default;
 
         /**
-         * @brief Defaulted move constructor
-         * @param other the other RingBufferPad (to be moved)
+         * @warning The RingBufferPads are intended to be used as const instances. They shouldn't be moved.
          */
         RingBufferPad(RingBufferPad&& other) noexcept = default;
 
 
         /**
-         * @brief The RingBufferPads are intended to be used as const instances. They shouldn't be copied.
+         * @warning The RingBufferPads are intended to be used as const instances. They shouldn't be copied.
          */
         RingBufferPad(RingBufferPad const& other) = delete;
 
         /**
-         * @brief The RingBufferPads are intended to be used as const instances. They shouldn't be assigned.
+         * @warning  The RingBufferPads are intended to be used as const instances. They shouldn't be assigned.
          */
         RingBufferPad& operator=(const RingBufferPad& other) = delete;
 
         /**
-         * @brief The RingBufferPads are intended to be used as const instances. They shouldn't be assigned.
+         * @warning The RingBufferPads are intended to be used as const instances. They shouldn't be assigned.
          */
         RingBufferPad& operator=(RingBufferPad&& other) = delete;
 
 
-        /**
-         * @brief Links this RingBufferPad to the one passed in parameters.
-         * @param nextPad The RingBufferPad pointer which will be obtained on .next() call
-         * @note The "next" RingBufferPad can only be set once. It shall remain this way.
-         */
         void setNext(RingBufferPad* nextBufferPad) {
             if (!nextPadSet) {
                 nextPad = nextBufferPad;
@@ -85,51 +63,25 @@ namespace DataFlow {
             }
         }
 
-        /**
-         * @brief Allows to move forward in the RingBuffer
-         * @return a pointer to the next RingBufferPad, which is set on .setNext() call
-         * @note if the next RingBufferPad hasn't been set, this function will return a pointer to the same instance with which it was called.
-         */
         RingBufferPad* next() {
             return nextPad;
         }
 
-        /**
-         * @brief Replaces the currently held T instance with the passed on
-         * @see RingBufferPad's concurrency warning
-         * @param dataToWrite Universal Reference to the new T.
-         */
         void write(T&& dataToWrite) {
             currentData = dataToWrite;
         }
 
-        /**
-         * @brief Read allows to access the T. It does not modify nor invalidate it.
-         * @see RingBufferPad's concurrency warning
-         * @return A copy of the current T
-         */
         auto read() const -> T const& {
             return currentData;
         }
 
     protected:
-        /**
-         * @brief A flag which is to be set "true" only once, controls the setting of "nextBufferPad"
-         * @see nextBufferPad
-         */
+
         bool nextPadSet;
 
-        /**
-         * @brief The currently held T, which is accessible for both read and write
-         * @see RingBufferPad's concurrency warning
-         */
         T currentData;
 
-        /**
-         * @brief The next RingBufferPad instance in the forward-list. It can be set only once.
-         * @see nextPadSet, setNext()
-         */
-        Pad* nextPad;
+        RingBufferPad<T>* nextPad;
     };
 }
 
