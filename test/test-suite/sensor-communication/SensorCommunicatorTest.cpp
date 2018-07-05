@@ -42,10 +42,15 @@ class MockSensorCommunicationStrategy final : public SensorCommunication::Commun
 
 public:
 
-    MockSensorCommunicationStrategy() : openConnectionCalled(false) {
+    MockSensorCommunicationStrategy() :
+            openConnectionCalled(false),
+            closeConnectionCalled(false),
+            readMessageCalled(false)
+    {
     }
 
     AWLMessage readMessage() override {
+        readMessageCalled.store(true);
         return AWLMessage::returnDefaultData();
     }
 
@@ -54,29 +59,60 @@ public:
     }
 
     void closeConnection() override {
+        closeConnectionCalled.store(true);
     }
+
 
     bool hasOpenConnectionBeenCalled() const {
         return openConnectionCalled.load();
     }
 
+    bool hasCloseConnectionBeenCalled() const {
+        return closeConnectionCalled.load();
+    }
+
+    bool hasReadMessageBeenCalled() const {
+        return readMessageCalled.load();
+    }
+
+
 private:
 
     AtomicFlag openConnectionCalled;
+    AtomicFlag closeConnectionCalled;
+    AtomicFlag readMessageCalled;
 
 };
 
-TEST_F(SensorCommunicatorTest, given_aSensorCommunicationStrategy_when_initializingConnection_then_callsOpenConnectionInStrategy) {
+TEST_F(SensorCommunicatorTest,
+       given_aSensorCommunicationStrategy_when_start_then_callsOpenConnectionInStrategy) {
     MockSensorCommunicationStrategy mockStrategy;
     AWLCommunicator sensorCommunicator(&mockStrategy);
 
-    sensorCommunicator.initializeConnection();
+    sensorCommunicator.start();
 
     auto strategyHasBeenCalled = mockStrategy.hasOpenConnectionBeenCalled();
     ASSERT_TRUE(strategyHasBeenCalled);
 }
 
+TEST_F(SensorCommunicatorTest,
+       given_aSensorCommunicationStrategy_when_terminateAndJoin_then_callsCloseConnectionInStrategy) {
+    MockSensorCommunicationStrategy mockStrategy;
+    AWLCommunicator sensorCommunicator(&mockStrategy);
 
+    sensorCommunicator.terminateAndJoin();
 
+    auto strategyHasBeenCalled = mockStrategy.hasCloseConnectionBeenCalled();
+    ASSERT_TRUE(strategyHasBeenCalled);
+}
+
+TEST_F(SensorCommunicatorTest, given_aSensorCommunicationStrategy_when_start_then_callsReadMessageInStrategy) {
+    MockSensorCommunicationStrategy mockStrategy;
+    AWLCommunicator sensorCommunicator(&mockStrategy);
+
+    sensorCommunicator.start();
+    auto strategyHasBeenCalled = mockStrategy.hasReadMessageBeenCalled();
+    ASSERT_TRUE(strategyHasBeenCalled);
+}
 #endif //SPIRITSENSORGATEWAY_SENSORCOMMUNICATORTEST_CPP
 

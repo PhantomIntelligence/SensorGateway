@@ -34,10 +34,16 @@ namespace SensorAccessLinkElement {
 
         }
 
-        void initializeConnection() {
+        void start() {
             communicationProtocolStrategy->openConnection();
-
+            communicationProtocolStrategy->readMessage();
         };
+
+        void terminateAndJoin() {
+            communicationProtocolStrategy->closeConnection();
+        };
+
+
     private:
         SensorCommunication::CommunicationProtocolStrategy<DATA>* communicationProtocolStrategy;
 
