@@ -41,7 +41,7 @@ namespace SpiritProtocol {
         void validateNotFull() const;
 
     private:
-        int numberOfTrackInPixel = 0;
+        int numberOfTracksInPixel = 0;
         PixelID ID;
         std::array<Track, MAXIMUM_NUMBER_OF_TRACKS_IN_AWL16_PIXEL> tracks;
     };

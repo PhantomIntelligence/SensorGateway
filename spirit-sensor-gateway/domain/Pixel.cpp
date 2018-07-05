@@ -32,8 +32,8 @@ bool Pixel::operator==(const SpiritProtocol::Pixel& other) const {
 
 void Pixel::addTrack(Track track) {
     validateNotFull();
-    tracks[numberOfTrackInPixel] = track;
-    numberOfTrackInPixel++;
+    tracks[numberOfTracksInPixel] = track;
+    numberOfTracksInPixel++;
 }
 
 bool Pixel::doesTrackExist(TrackID trackID) {
@@ -64,7 +64,7 @@ std::array<Track, MAXIMUM_NUMBER_OF_TRACKS_IN_AWL16_PIXEL>* Pixel::getTracksAddr
 }
 
 void Pixel::validateNotFull() const {
-    if (numberOfTrackInPixel >= MAXIMUM_NUMBER_OF_TRACKS_IN_AWL16_PIXEL) {
+    if (numberOfTracksInPixel >= MAXIMUM_NUMBER_OF_TRACKS_IN_AWL16_PIXEL) {
         throw std::runtime_error(ExceptionMessage::PIXEL_TRACK_ARRAY_ILLEGAL_STORE_FULL);
     }
 
