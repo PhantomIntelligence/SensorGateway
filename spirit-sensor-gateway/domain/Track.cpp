@@ -17,7 +17,13 @@ using namespace SpiritProtocol;
 using namespace DefaultValues::Track;
 
 Track::Track(TrackID trackID, ConfidenceLevel confidenceLevel, Intensity intensity) :
-        ID(trackID), confidenceLevel(confidenceLevel), intensity(intensity) {
+        ID(trackID),
+        confidenceLevel(confidenceLevel),
+        intensity(intensity),
+        acceleration(DEFAULT_ACCELERATION_VALUE),
+        speed(DEFAULT_SPEED_VALUE),
+        distance(DEFAULT_DISTANCE_VALUE)
+{
 };
 
 Track::Track() : ID(DEFAULT_ID_VALUE),
