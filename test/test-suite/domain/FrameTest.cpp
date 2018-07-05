@@ -16,7 +16,7 @@ TEST_F(FrameTest,given_anEmptyFrameAndAPixel_when_addingThePixelToTheFrame_then_
     Frame frame;
     Pixel pixel(1);
     frame.addPixel(pixel);
-    ASSERT_EQ(pixel, frame.getPixelsAddress()->at(1));
+    ASSERT_EQ(pixel, frame.getPixels()->at(1));
 }
 
 TEST_F(FrameTest,given_aFrameContainingAPixel_WhenFetchingThePixeById_then_returnsTheCorrectPixel){

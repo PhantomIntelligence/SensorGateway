@@ -33,7 +33,7 @@ FrameID Frame::getFrameID() const {
     return frameID;
 };
 
-std::array<Pixel, NUMBER_OF_PIXELS_IN_AWL16_FRAME>* Frame::getPixelsAddress() {
+std::array<Pixel, NUMBER_OF_PIXELS_IN_AWL16_FRAME>* Frame::getPixels() {
     return &pixels;
 };
 
