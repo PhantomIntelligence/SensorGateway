@@ -34,7 +34,7 @@ using namespace SpiritProtocol;
         std::vector<Frame> frames;
         Frame* currentFrame;
         void addTrackInPixel(AWLMessage* awlMessage, PixelID pixelID);
-        Track* fetchTrack(AWLMessage* awlMessage);
+        Track* fetchTrack (AWLMessage* awlMessage) const;
         void translateDetectionTrackMessage(AWLMessage* awlMessage);
         void translateDetectionVelocityMessage(AWLMessage* awlMessage);
         void translateEndOfFrameMessage(AWLMessage* awlMessage);

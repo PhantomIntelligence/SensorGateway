@@ -14,23 +14,36 @@
 #ifndef SPIRITSENSORGATEWAY_SPIRITPIXEL_H
 #define SPIRITSENSORGATEWAY_SPIRITPIXEL_H
 
-#include <unordered_map>
 #include "Track.h"
 
 namespace SpiritProtocol {
-    class Pixel {
-        public:
-            Pixel(PixelID pixelID);
-            ~Pixel();
-            void addTrack(Track track);
-            bool doesTrackExist(TrackID trackID);
-            Track* fetchTrackByID(TrackID trackID);
-            PixelID getID() const;
-            std::unordered_map<TrackID, Track> getTracks() const;
 
-        private:
-            uint16_t ID;
-            std::unordered_map<TrackID, Track> tracks;
+    class Pixel {
+    public:
+        Pixel(PixelID pixelID);
+
+        ~Pixel();
+
+        Pixel() = default;
+
+        bool operator==(Pixel const& other) const;
+
+        void addTrack(Track track);
+
+        bool doesTrackExist(TrackID trackID);
+
+        Track* fetchTrackByID(TrackID trackID);
+
+        PixelID getID() const;
+
+        std::array<Track, MAXIMUM_NUMBER_OF_TRACKS_IN_AWL16_PIXEL>* getTracks();
+
+        void validateNotFull() const;
+
+    private:
+        int numberOfTracksInPixel = 0;
+        PixelID ID;
+        std::array<Track, MAXIMUM_NUMBER_OF_TRACKS_IN_AWL16_PIXEL> tracks;
     };
 }
 

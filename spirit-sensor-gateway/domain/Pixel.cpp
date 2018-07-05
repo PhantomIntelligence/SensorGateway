@@ -11,36 +11,63 @@
 	limitations under the License.
 */
 
+#include <iostream>
 #include "Pixel.h"
 
-namespace SpiritProtocol {
-    Pixel::Pixel(PixelID pixelID) : ID(pixelID) {};
+using namespace SpiritProtocol;
 
-    Pixel::~Pixel() {
-    };
+Pixel::Pixel(PixelID pixelID) : ID(pixelID) {};
 
-    void Pixel::addTrack(Track track) {
-        tracks.insert(std::make_pair(track.getID(), track));
+Pixel::~Pixel() {
+};
+
+bool Pixel::operator==(Pixel const& other) const {
+    auto sameID = (ID == other.ID);
+    auto sameTracks = true;
+    for (auto i = 0; i < MAXIMUM_NUMBER_OF_TRACKS_IN_AWL16_PIXEL && sameTracks && sameID; ++i) {
+        sameTracks = (tracks[i] == other.tracks[i]);
     }
+    return (sameID && sameTracks);
+}
 
-    bool Pixel::doesTrackExist(TrackID trackID) {
-        bool trackExists = false;
-        if (tracks.find(trackID) != tracks.end()) {
+void Pixel::addTrack(Track track) {
+    validateNotFull();
+    tracks[numberOfTracksInPixel] = track;
+    numberOfTracksInPixel++;
+}
+
+bool Pixel::doesTrackExist(TrackID trackID) {
+    bool trackExists = false;
+    for (auto track:*getTracks()) {
+        if (track.getID() == trackID) {
             trackExists = true;
         }
-        return trackExists;
-    };
+    }
+    return trackExists;
+};
 
-    Track* Pixel::fetchTrackByID(TrackID trackID) {
-        return &tracks.at(trackID);
+Track* Pixel::fetchTrackByID(TrackID trackID) {
+    for (auto i = 0; i < MAXIMUM_NUMBER_OF_TRACKS_IN_AWL16_PIXEL; ++i) {
+        if (tracks[i].getID() == trackID) {
+            return &tracks[i];
+        }
+    }
+    return nullptr;
+}
+
+PixelID Pixel::getID() const {
+    return ID;
+}
+
+std::array<Track, MAXIMUM_NUMBER_OF_TRACKS_IN_AWL16_PIXEL>* Pixel::getTracks() {
+    return &tracks;
+}
+
+void Pixel::validateNotFull() const {
+    if (numberOfTracksInPixel >= MAXIMUM_NUMBER_OF_TRACKS_IN_AWL16_PIXEL) {
+        throw std::runtime_error(ExceptionMessage::PIXEL_TRACK_ARRAY_ILLEGAL_STORE_FULL);
     }
 
-    PixelID Pixel::getID() const {
-        return ID;
-    };
+};
 
-    std::unordered_map<TrackID, Track> Pixel::getTracks() const {
-        return tracks;
-    };
-}
 

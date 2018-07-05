@@ -14,30 +14,58 @@
 #ifndef SPIRITSENSORGATEWAY_SPIRITTRACK_H
 #define SPIRITSENSORGATEWAY_SPIRITTRACK_H
 
-#include "spirit-sensor-gateway/common/TypeDefinition.h"
+#include "spirit-sensor-gateway/common/ConstantFunction.h"
 
 namespace SpiritProtocol {
-    class Track {
-        public:
-            Track(TrackID trackID, ConfidenceLevel confidenceLevel, Intensity intensity);
-            ~Track();
-            Acceleration getAcceleration() const;
-            ConfidenceLevel getConfidenceLevel() const;
-            Distance getDistance() const;
-            TrackID getID() const;
-            Intensity getIntensity() const;
-            Speed getSpeed() const;
-            void setAcceleration(Acceleration acceleration);
-            void setDistance(Distance distance);
-            void setSpeed(Speed speed);
 
-        private:
-            Acceleration acceleration;
-            ConfidenceLevel confidenceLevel;
-            Distance distance;
-            TrackID ID;
-            Intensity intensity;
-            Speed speed;
+    namespace DefaultValues {
+        namespace Track {
+            Acceleration const DEFAULT_ACCELERATION_VALUE = 0;
+            ConfidenceLevel const DEFAULT_CONFIDENCE_VALUE = 0;
+            Distance const DEFAULT_DISTANCE_VALUE = 0;
+            TrackID const DEFAULT_ID_VALUE = 0;
+            Speed const DEFAULT_SPEED_VALUE = 0;
+            Intensity const DEFAULT_INTENSITY_VALUE = 0;
+        }
+    }
+
+    class Track {
+    public:
+        Track();
+
+        Track(TrackID trackID, ConfidenceLevel confidenceLevel, Intensity intensity);
+
+        ~Track();
+
+        bool operator==(Track const& other) const;
+
+        bool operator!=(Track const& other) const;
+
+        Acceleration getAcceleration() const;
+
+        ConfidenceLevel getConfidenceLevel() const;
+
+        Distance getDistance() const;
+
+        TrackID getID() const;
+
+        Intensity getIntensity() const;
+
+        Speed getSpeed() const;
+
+        void setAcceleration(Acceleration const& acceleration);
+
+        void setDistance(Distance const& distance);
+
+        void setSpeed(Speed const& speed);
+
+    private:
+        Acceleration acceleration;
+        ConfidenceLevel confidenceLevel;
+        Distance distance;
+        TrackID ID;
+        Intensity intensity;
+        Speed speed;
     };
 }
 

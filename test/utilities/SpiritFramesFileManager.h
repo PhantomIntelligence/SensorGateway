@@ -29,7 +29,7 @@ namespace TestUtilities {
     private:
         SpiritProtocol::Frame readMessageFromFileBlock(std::string const& fileBlock) override;
 
-        void writeFileBlockWithMessage(SpiritProtocol::Frame const& message, std::FILE* file) override;
+        void writeFileBlockWithMessage(SpiritProtocol::Frame message, std::FILE* file) override;
 
         void writeFileLineWithContentLabel(std::FILE* file, unsigned int numberOfTabulator, char const* contentLabel);
 

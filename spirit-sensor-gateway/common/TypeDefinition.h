@@ -14,7 +14,16 @@
 #ifndef SPIRITSENSORGATEWAY_TYPEDEFINITION_H
 #define SPIRITSENSORGATEWAY_TYPEDEFINITION_H
 
+#include <array>
 #include <mutex>
+#include <iostream>
+#include <unordered_map>
+#include <exception>
+
+#include "ExceptionMessages.h"
+
+
+
 
 namespace {
     typedef std::mutex Mutex;

@@ -10,29 +10,27 @@ class ConstantFunctionTest : public ::testing::Test {
 
 };
 
-TEST_F(ConstantFunctionTest, given_anArray_when_convertFourBytesToBigEndian_then_returnsTheCorrectlyFormated32Integer) {
+TEST_F(ConstantFunctionTest, given_anArray_when_convertingFourBytesToUnsignedBigEndian_then_returnsTheCorrectlyFormated32BitsInteger) {
     uint8_t testBytes[4];
-    // 25 32 FF 0A is 624099082 in little endian
-    testBytes[0] = 0x25;
-    testBytes[1] = 0x32;
-    testBytes[2] = 0xFF;
-    testBytes[3] = 0x0A;
+    testBytes[0] = 37;
+    testBytes[1] = 50;
+    testBytes[2] = 255;
+    testBytes[3] = 10;
 
     uint32_t computedValue;
     convertFourBytesToBigEndian(testBytes, &computedValue);
 
 
-    // 0A FF 32 25 is 184496677 in big endian
-    uint32_t expectedValue = 184496677U;
+    uint32_t expectedValue = 184496677;
     ASSERT_EQ(expectedValue,computedValue);
 }
 
-TEST_F(ConstantFunctionTest,given_twoBytes_when_convertTwoBytesToBigEndian_then_returnTheCorrectlyFormatted16BitsInteger){
+TEST_F(ConstantFunctionTest,given_twoBytes_when_convertingTwoBytesToUnsignedBigEndian_then_returnsTheCorrectlyFormatted16BitsInteger){
     // 10 08 is 4104 in little endian
-    uint8_t firstTestByte = 0x10;
-    uint8_t secondTestByte = 0x08;
+    uint8_t firstTestByte = 16;
+    uint8_t secondTestByte = 8;
 
-    uint16_t computedValue = convertTwoBytesToBigEndian(firstTestByte,secondTestByte);
+    uint16_t computedValue = convertTwoBytesToUnsignedBigEndian(firstTestByte, secondTestByte);
 
     //08 10 is 2064 in big endian
     uint16_t expectedValue = 2064;
@@ -40,5 +38,17 @@ TEST_F(ConstantFunctionTest,given_twoBytes_when_convertTwoBytesToBigEndian_then_
     ASSERT_EQ(expectedValue,computedValue);
 
 }
+
+TEST_F(ConstantFunctionTest,given_twoBytes_when_convertingTwoBytesToSignedBigEndian_then_returnsTheCorrectlyFormatted16BitsInteger){
+    uint8_t firstTestByte = 8;
+    uint8_t secondTestByte = 255;
+
+    int16_t computedValue = convertTwoBytesToSignedBigEndian(firstTestByte, secondTestByte);
+
+    int16_t expectedValue = -248;
+
+    ASSERT_EQ(expectedValue,computedValue);
+}
+
 
 #endif //SPIRITSENSORGATEWAY_CONSTANTFUNCTIONTEST_CPP

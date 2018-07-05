@@ -29,7 +29,7 @@ namespace TestUtilities {
     private:
         AWLMessage readMessageFromFileBlock(std::string const& fileBlock) override;
 
-        void writeFileBlockWithMessage(AWLMessage const& message, std::FILE* file) override;
+        void writeFileBlockWithMessage(AWLMessage message, std::FILE* file) override;
 
         const std::string ID_LABEL = "ID";
 

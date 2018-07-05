@@ -21,28 +21,24 @@ SpiritProtocol::Frame SpiritFramesFileManager::readMessageFromFileBlock(std::str
     return SpiritProtocol::Frame();
 }
 
-void SpiritFramesFileManager::writeFileBlockWithMessage(SpiritProtocol::Frame const& message, std::FILE* file) {
+void SpiritFramesFileManager::writeFileBlockWithMessage(SpiritProtocol::Frame message, std::FILE* file) {
     writeFileLineWithContentLabelAndValue(file, 0, FRAME_ID_LABEL.c_str(), message.getFrameID());
     writeFileLineWithContentLabelAndValue(file, 0, SYSTEM_ID_LABEL.c_str(), message.getSystemID());
 
     //TODO: remove unordered map and ordered map structures once the domain class has been updated.
-    std::unordered_map<SpiritProtocol::PixelID, SpiritProtocol::Pixel> unorderedPixels = message.getPixels();
-    std::map<SpiritProtocol::PixelID, SpiritProtocol::Pixel> orderedPixels(unorderedPixels.begin(), unorderedPixels.end());
+    auto orderedPixels = message.getPixels();
     writeFileLineWithContentLabel(file, 0, PIXELS_LABEL.c_str());
-    for (auto pixel : orderedPixels) {
-        writeFileLineWithContentLabelAndValue(file, 1, PIXEL_ID_LABEL.c_str(), pixel.second.getID());
-        std::unordered_map<SpiritProtocol::TrackID, SpiritProtocol::Track> tracks = pixel.second.getTracks();
-        for (auto track : tracks) {
+    for (auto pixel : *orderedPixels) {
+        writeFileLineWithContentLabelAndValue(file, 1, PIXEL_ID_LABEL.c_str(), pixel.getID());
+        auto tracks = pixel.getTracks();
+        for (auto track : *tracks) {
             writeFileLineWithContentLabel(file, 2, TRACKS_LABEL.c_str());
-            writeFileLineWithContentLabelAndValue(file, 3, TRACK_ID_LABEL.c_str(), track.second.getID());
-            //TODO: remove comment line once getAcceleration return the right value
-//            writeFileLineWithContentLabelAndValue(file, 3, ACCELERATION_LABEL.c_str(), track.second.getAcceleration());
-            //TODO: remove comment line once getDistance return the right value
-//            writeFileLineWithContentLabelAndValue(file, 3, DISTANCE_LABEL.c_str(), track.second.getDistance());
-            writeFileLineWithContentLabelAndValue(file, 3, INTENSITY_LABEL.c_str(), track.second.getIntensity());
-            writeFileLineWithContentLabelAndValue(file, 3, CONFIDENCE_LEVEL_LABEL.c_str(), track.second.getConfidenceLevel());
-            //TODO: remove comment line once getSpeed return the right value
-//            writeFileLineWithContentLabelAndValue(file, 3, SPEED_LABEL.c_str(), track.second.getSpeed());
+            writeFileLineWithContentLabelAndValue(file, 3, TRACK_ID_LABEL.c_str(), track.getID());
+            writeFileLineWithContentLabelAndValue(file, 3, ACCELERATION_LABEL.c_str(), track.getAcceleration());
+            writeFileLineWithContentLabelAndValue(file, 3, DISTANCE_LABEL.c_str(), track.getDistance());
+            writeFileLineWithContentLabelAndValue(file, 3, INTENSITY_LABEL.c_str(), track.getIntensity());
+            writeFileLineWithContentLabelAndValue(file, 3, CONFIDENCE_LEVEL_LABEL.c_str(), track.getConfidenceLevel());
+            writeFileLineWithContentLabelAndValue(file, 3, SPEED_LABEL.c_str(), track.getSpeed());
         }
     }
     std::fprintf(file, "%s\n", MESSAGES_SEPARATOR.c_str());

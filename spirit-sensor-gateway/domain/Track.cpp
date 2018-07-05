@@ -13,47 +13,83 @@
 
 #include "Track.h"
 
-namespace SpiritProtocol {
-    Track::Track(TrackID trackID, ConfidenceLevel confidenceLevel, Intensity intensity) :
-            ID(trackID), confidenceLevel(confidenceLevel), intensity(intensity) {
-    };
+using namespace SpiritProtocol;
+using namespace DefaultValues::Track;
 
-    Track::~Track() {
-    };
+Track::Track(TrackID trackID, ConfidenceLevel confidenceLevel, Intensity intensity) :
+        ID(trackID),
+        confidenceLevel(confidenceLevel),
+        intensity(intensity),
+        acceleration(DEFAULT_ACCELERATION_VALUE),
+        speed(DEFAULT_SPEED_VALUE),
+        distance(DEFAULT_DISTANCE_VALUE) {
+};
 
-    Acceleration Track::getAcceleration() const {
-        return acceleration;
-    };
+Track::Track() : ID(DEFAULT_ID_VALUE),
+                 acceleration(DEFAULT_ACCELERATION_VALUE),
+                 confidenceLevel(DEFAULT_CONFIDENCE_VALUE),
+                 distance(DEFAULT_DISTANCE_VALUE),
+                 intensity(DEFAULT_INTENSITY_VALUE),
+                 speed(DEFAULT_SPEED_VALUE) {
 
-    ConfidenceLevel Track::getConfidenceLevel() const {
-        return confidenceLevel;
-    };
+};
 
-    Distance Track::getDistance() const {
-        return distance;
-    };
+Track::~Track() {
+};
 
-    uint16_t Track::getID() const {
-        return ID;
-    };
-
-    Intensity Track::getIntensity() const {
-        return intensity;
-    };
-
-    Speed Track::getSpeed() const {
-        return speed;
-    };
-
-    void Track::setAcceleration(Acceleration acceleration) {
-        this->acceleration = acceleration;
-    };
-
-    void Track::setDistance(Distance distance) {
-        this->distance = distance;
-    };
-
-    void Track::setSpeed(Speed speed) {
-        this->speed = speed;
-    };
+bool Track::operator==(Track const& other) const {
+    auto sameAcceleration = (acceleration == other.acceleration);
+    auto sameConfidenceLevel = (confidenceLevel == other.confidenceLevel);
+    auto sameDistance = (distance == other.distance);
+    auto sameTrackId = (ID == other.ID);
+    auto sameIntensity = (intensity == other.intensity);
+    auto sameSpeed = (speed == other.speed);
+    bool tracksAreEqual = (sameAcceleration &&
+                           sameConfidenceLevel &&
+                           sameDistance &&
+                           sameTrackId &&
+                           sameIntensity &&
+                           sameSpeed);
+    return tracksAreEqual;
 }
+
+bool Track::operator!=(Track const& other) const {
+    return !(operator==(other));
+}
+
+Acceleration Track::getAcceleration() const {
+    return acceleration;
+};
+
+ConfidenceLevel Track::getConfidenceLevel() const {
+    return confidenceLevel;
+};
+
+Distance Track::getDistance() const {
+    return distance;
+};
+
+TrackID Track::getID() const {
+    return ID;
+};
+
+Intensity Track::getIntensity() const {
+    return intensity;
+};
+
+Speed Track::getSpeed() const {
+    return speed;
+};
+
+void Track::setAcceleration(Acceleration const& acceleration) {
+    this->acceleration = acceleration;
+};
+
+void Track::setDistance(Distance const& distance) {
+    this->distance = distance;
+};
+
+void Track::setSpeed(Speed const& speed) {
+    this->speed = speed;
+}
+

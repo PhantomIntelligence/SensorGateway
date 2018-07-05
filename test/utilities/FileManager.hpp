@@ -93,7 +93,7 @@ namespace TestUtilities {
 
         virtual T readMessageFromFileBlock(std::string const& fileBlock) = 0;
 
-        virtual void writeFileBlockWithMessage(T const& message, std::FILE* file) = 0;
+        virtual void writeFileBlockWithMessage(T message, std::FILE* file) = 0;
 
         const std::string MESSAGES_SEPARATOR =
                 "======================================================================================";

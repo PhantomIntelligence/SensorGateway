@@ -10,12 +10,16 @@
 	See the License for the specific language governing permissions and
 	limitations under the License.
 */
-#ifndef SPIRITSENSORGATEWAY_TRANSLATORPROTOCOLSTRATEGY_H
-#define SPIRITSENSORGATEWAY_TRANSLATORPROTOCOLSTRATEGY_H
+#ifndef SPIRITSENSORGATEWAY_EXCEPTIONMESSAGES_H
+#define SPIRITSENSORGATEWAY_EXCEPTIONMESSAGES_H
 
-    namespace TranslatorProtocolStrategy {
-        class TranslatorProtocolStrategy{
-        public:
-        };
-    }
-#endif //SPIRITSENSORGATEWAY_TRANSLATORPROTOCOLSTRATEGY_H
+
+
+namespace ExceptionMessage{
+
+    static auto PIXEL_TRACK_ARRAY_ILLEGAL_STORE_FULL = "Illegal storing of track: the pixel's track array is full";
+}
+
+
+
+#endif //SPIRITSENSORGATEWAY_EXCEPTIONMESSAGES_H

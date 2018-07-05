@@ -28,7 +28,7 @@ AWLMessage AWLMessagesFileManager::readMessageFromFileBlock(std::string const& f
     return message;
 }
 
-void AWLMessagesFileManager::writeFileBlockWithMessage(AWLMessage const& message, std::FILE* file) {
+void AWLMessagesFileManager::writeFileBlockWithMessage(AWLMessage message, std::FILE* file) {
     std::fprintf(file, "%s%s%d\n", ID_LABEL.c_str(), MESSAGE_LABEL_VALUE_ASSOCIATOR.c_str(), (int)message.id);
     std::fprintf(file, "%s%s%d\n", LENGTH_LABEL.c_str(), MESSAGE_LABEL_VALUE_ASSOCIATOR.c_str(), (int)message.length);
     std::fprintf(file, "%s%s%ld\n", TIMESTAMP_LABEL.c_str(), MESSAGE_LABEL_VALUE_ASSOCIATOR.c_str(), (long)message.timestamp);
