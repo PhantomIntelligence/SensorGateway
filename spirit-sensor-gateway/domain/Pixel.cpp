@@ -21,7 +21,7 @@ Pixel::Pixel(PixelID pixelID) : ID(pixelID) {};
 Pixel::~Pixel() {
 };
 
-bool Pixel::operator==(const SpiritProtocol::Pixel& other) const {
+bool Pixel::operator==(Pixel const& other) const {
     auto sameID = (ID == other.ID);
     auto sameTracks = true;
     for (auto i = 0; i < MAXIMUM_NUMBER_OF_TRACKS_IN_AWL16_PIXEL && sameTracks && sameID; ++i) {

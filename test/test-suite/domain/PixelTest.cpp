@@ -12,7 +12,7 @@ class PixelTest : public ::testing::Test {
 
 };
 
-TEST_F(PixelTest,given_anExistingTrackInAPixel_when_checkingIfTheTrackExists_then_returnTrue) {
+TEST_F(PixelTest,given_anExistingTrackInAPixel_when_checkingIfTheTrackExists_then_returnsTrue) {
     Track track(8,0,0);
     Pixel pixel(1);
     pixel.addTrack(track);
@@ -20,7 +20,7 @@ TEST_F(PixelTest,given_anExistingTrackInAPixel_when_checkingIfTheTrackExists_the
     ASSERT_TRUE(pixel.doesTrackExist(track.getID()));
 }
 
-TEST_F(PixelTest,given_anExistingTrackInAPixel_when_fetchingTheTracByItsId_then_returnAPointerToThisTrack){
+TEST_F(PixelTest,given_anExistingTrackInAPixel_when_fetchingTheTracByItsID_then_returnsAPointerToThisTrack){
     Track track(8,0,0);
     Pixel pixel(1);
     pixel.addTrack(track);
@@ -49,7 +49,7 @@ TEST_F(PixelTest,given_aPixelWithAFullArrayOfTrack_when_addingOneMoreTrack_then_
     ASSERT_THROW(pixel.addTrack(track),std::runtime_error);
 }
 
-TEST_F(PixelTest,given_twoPixelWithTheSameAttributes_when_checkingIfTheyAreEqual_then_returnTrue){
+TEST_F(PixelTest,given_twoPixelsWithTheSameAttributes_when_checkingIfTheyAreEquals_then_returnsTrue){
     Pixel firstPixel(18);
     Pixel secondPixel(18);
 
@@ -58,7 +58,7 @@ TEST_F(PixelTest,given_twoPixelWithTheSameAttributes_when_checkingIfTheyAreEqual
     ASSERT_TRUE(pixelsAreEqual);
 }
 
-TEST_F(PixelTest,given_twoPixelWithDifferentAttributes_when_checkingIfTheyAreEqual_then_returnFalse){
+TEST_F(PixelTest,given_twoPixelsWithDifferentAttributes_when_checkingIfTheyAreEquals_then_returnsFalse){
     Pixel firstPixel(18);
     Pixel secondPixel(19);
 

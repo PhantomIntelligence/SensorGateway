@@ -12,14 +12,14 @@ class FrameTest : public ::testing::Test {
 
 };
 
-TEST_F(FrameTest,given_anEmptyFrameAndAPixel_when_addingThePixelToTheFrame_then_pixelAddedCorrectly){
+TEST_F(FrameTest,given_anEmptyFrameAndAPixel_when_addingThePixelToTheFrame_then_pixelIsAddedCorrectly){
     Frame frame;
     Pixel pixel(1);
     frame.addPixel(pixel);
-    ASSERT_EQ(pixel, frame.getPixels()->at(1));
+    ASSERT_EQ(pixel, frame.getPixels()->at(pixel.getID()));
 }
 
-TEST_F(FrameTest,given_aFrameContainingAPixel_WhenFetchingThePixeById_then_returnsTheCorrectPixel){
+TEST_F(FrameTest,given_aFrameContainingAPixel_whenFetchingThePixeByItsID_then_returnsTheCorrectPixel){
     Frame frame;
     Pixel pixel(1);
     frame.addPixel(pixel);
