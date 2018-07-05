@@ -19,10 +19,11 @@
 
 #include <gtest/gtest.h>
 
-#include "spirit-sensor-gateway/sensor-communication/SensorCommunicator.h"
+#include "spirit-sensor-gateway/sensor-communication/SensorCommunicator.hpp"
 #include "data-model/DataModelFixture.h"
 
-using SensorAccessLinkElement::SensorCommunicator;
+using DataFlow::AWLMessage;
+using AWLCommunicator = SensorAccessLinkElement::SensorCommunicator<AWLMessage>;
 using TestFunctions::DataTestUtil;
 
 /**
@@ -37,9 +38,45 @@ protected:
     virtual ~SensorCommunicatorTest() = default;
 };
 
+class MockSensorCommunicationStrategy final : public SensorCommunication::CommunicationProtocolStrategy<AWLMessage> {
 
-TEST_F(SensorCommunicatorTest, given_aNewPad_when_fetchingNextPad_then_returnsSelf) {
+public:
+
+    MockSensorCommunicationStrategy() : openConnectionCalled(false) {
+    }
+
+    AWLMessage readMessage() override {
+        return AWLMessage::returnDefaultData();
+    }
+
+    void openConnection() override {
+        openConnectionCalled.store(true);
+    }
+
+    void closeConnection() override {
+    }
+
+    bool hasOpenConnectionBeenCalled() const {
+        return openConnectionCalled.load();
+    }
+
+private:
+
+    AtomicFlag openConnectionCalled;
+
+};
+
+TEST_F(SensorCommunicatorTest, given_aSensorCommunicationStrategy_when_initializingConnection_then_callsOpenConnectionInStrategy) {
+    MockSensorCommunicationStrategy mockStrategy;
+    AWLCommunicator sensorCommunicator(&mockStrategy);
+
+    sensorCommunicator.initializeConnection();
+
+    auto strategyHasBeenCalled = mockStrategy.hasOpenConnectionBeenCalled();
+    ASSERT_TRUE(strategyHasBeenCalled);
 }
+
+
 
 #endif //SPIRITSENSORGATEWAY_SENSORCOMMUNICATORTEST_CPP
 

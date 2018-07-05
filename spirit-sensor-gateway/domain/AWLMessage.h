@@ -16,12 +16,40 @@
 
 #include "spirit-sensor-gateway/common/ConstantValuesDefinition.h"
 
+namespace {
+    namespace AWL {
+        using DataArray = std::array<unsigned char, MAX_NUMBER_OF_DATA_IN_AWL_MESSAGE>;
+    }
+}
 
-struct AWLMessage{
-    int64_t id;
-    uint64_t timestamp;
-    uint32_t length;
-    unsigned char data[MAX_NUMBER_OF_DATA_IN_AWL_MESSAGE];
-};
+namespace DataFlow {
+    class AWLMessage {
+    public:
+        explicit AWLMessage(
+                int64_t id,
+                uint64_t timestamp,
+                uint32_t length,
+                AWL::DataArray data
+        );
+
+        AWLMessage static const returnDefaultData() noexcept;
+
+        int64_t id;
+        uint64_t timestamp;
+        uint32_t length;
+        AWL::DataArray data;
+
+    };
+
+}
+
+namespace Defaults {
+    using DataFlow::AWLMessage;
+    int64_t const DEFAULT_ID = 0;
+    uint64_t const DEFAULT_TIMESTAMP = 0;
+    uint32_t const DEFAULT_LENGTH = 0;
+    AWL::DataArray const DEFAULT_AWL_DATA = AWL::DataArray();
+    AWLMessage const DEFAULT_AWLMESSAGE = AWLMessage(DEFAULT_ID, DEFAULT_TIMESTAMP, DEFAULT_LENGTH, DEFAULT_AWL_DATA);
+}
 
 #endif //SPIRITSENSORGATEWAY_MESSAGE_H
