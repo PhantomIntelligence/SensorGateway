@@ -17,16 +17,19 @@
 #define SPIRITSENSORGATEWAY_SENSORCOMMUNICATOR_H
 
 #include <spirit-sensor-gateway/common/DataSource.h>
-#include "CommunicationProtocolStrategy.hpp"
+#include "CommunicationProtocolStrategy.h"
 
 namespace SensorAccessLinkElement {
 
-    template<class TypeOut>
-    class SensorCommunicator : public DataFlow::DataSource<TypeOut> {
+    class SensorCommunicator : public DataFlow::DataSource<AWLMessage> {
     public:
+        DataSource() = default;
+        ~DataSource() = default;
 
-        SensorCommunicator(SensorMessageTranslation::CommunicationProtocolStrategy<TypeOut>* communicationStrategy) :
-                sensorCommunicationStrategy(communicationStrategy), schedulerThread(JoinableThread(voidAction)) {
+
+
+
+        sensorCommunicationStrategy(communicationStrategy), schedulerThread(JoinableThread(voidAction)) {
             schedulerThread.safeExit();
             schedulerThread = JoinableThread(&WorkScheduler::startWorkScheduler, this);
         };
@@ -41,7 +44,6 @@ namespace SensorAccessLinkElement {
 
     private:
         SensorMessageTranslation::CommunicationProtocolStrategy<TypeOut>* sensorCommunicationStrategy;
-        JoinableThread schedulerThread;
 
 
 

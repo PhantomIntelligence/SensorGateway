@@ -15,7 +15,7 @@
 #define SPIRITSENSORGATEWAY_KVASERCANPROTOCOLSTRATEGY_H
 
 #include <canlib.h>
-#include "CommunicationProtocolStrategy.hpp"
+#include "CommunicationProtocolStrategy.h"
 
 
 
