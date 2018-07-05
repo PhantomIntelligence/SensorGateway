@@ -46,8 +46,8 @@ Frame createFrame(FrameID frameID, SystemID systemID, std::vector<Pixel> pixels)
 std::vector<Frame> spiritFramesFixture = {
         createFrame(64829, 16, {createPixel(11, {createTrack(14291, 0, 123, 0, 106, 0)}),
                                 createPixel(12, {createTrack(14324, 0, 93, 0, 109, 0)}),
-                                createPixel(13, {createTrack(14302, 0, 115, 0, 109, 0xFFFF)}),
-                                createPixel(14, {createTrack(14322, 0, 104, 0, 115, 0xFFFA)}),
+                                createPixel(13, {createTrack(14302, 0, 115, 0, 109, -1)}),
+                                createPixel(14, {createTrack(14322, 0, 104, 0, 115, -6)}),
                                 createPixel(15, {createTrack(14321, 0, 110, 0, 117, 0)}),
         }),
         createFrame(64830, 16, {createPixel(0, {createTrack(14275, 0, 139, 0, 109, 0)}),
@@ -64,7 +64,7 @@ std::vector<Frame> spiritFramesFixture = {
                                 createPixel(11, {createTrack(14291, 0, 123, 0, 106, 0)}),
                                 createPixel(12, {createTrack(14324, 0, 91, 0, 109, 1)}),
                                 createPixel(13, {createTrack(14302, 0, 114, 0, 109, 0)}),
-                                createPixel(14, {createTrack(14322, 0, 109, 0, 116, 0xFFFE)}),
+                                createPixel(14, {createTrack(14322, 0, 109, 0, 116, -2)}),
                                 createPixel(15, {createTrack(14321, 0, 109, 0, 117, 0)}),
         }),
 };
