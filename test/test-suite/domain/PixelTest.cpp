@@ -38,6 +38,7 @@ TEST_F(PixelTest,given_anEmptyPixelAndATrack_when_addingTheTrackToThePixel_then_
 
     ASSERT_EQ(track, pixel.getTracksAddress()->at(0));
 }
+
 TEST_F(PixelTest,given_aPixelWithAFullArrayOfTrack_when_addingOneMoreTrack_then_throwsATrackArrayIllegalStoreFullException){
     Pixel pixel(1);
     Track track(8,0,0);
@@ -46,6 +47,24 @@ TEST_F(PixelTest,given_aPixelWithAFullArrayOfTrack_when_addingOneMoreTrack_then_
     }
 
     ASSERT_THROW(pixel.addTrack(track),std::runtime_error);
+}
+
+TEST_F(PixelTest,given_twoPixelWithTheSameAttributes_when_checkingIfTheyAreEqual_then_returnTrue){
+    Pixel firstPixel(18);
+    Pixel secondPixel(18);
+
+    auto pixelsAreEqual = (firstPixel==secondPixel);
+
+    ASSERT_TRUE(pixelsAreEqual);
+}
+
+TEST_F(PixelTest,given_twoPixelWithDifferentAttributes_when_checkingIfTheyAreEqual_then_returnFalse){
+    Pixel firstPixel(18);
+    Pixel secondPixel(19);
+
+    auto pixelsAreEqual = (firstPixel==secondPixel);
+
+    ASSERT_FALSE(pixelsAreEqual);
 }
 
 #endif //SPIRITSENSORGATEWAY_PIXELTEST_CPP
