@@ -25,12 +25,12 @@ TEST_F(AWLMessageTranslatorTest,given_someFrameDoneAWLMessage_when_translatingTh
     awlMessage.data[3] = 16;
 
     awlMessageTranslator.translateBasicMessage(&awlMessage);
-    auto expectedFrameIDOfSpiritFrame = 4114;
-    auto expectedSystemIDOfSpiritFrame = 4096;
+    auto expectedFrameID = 4114;
+    auto expectedSystemID = 4096;
 
     auto spiritFrame = awlMessageTranslator.getFrames()[0];
-    ASSERT_EQ(expectedFrameIDOfSpiritFrame,spiritFrame.getFrameID());
-    ASSERT_EQ(expectedSystemIDOfSpiritFrame,spiritFrame.getSystemID());
+    ASSERT_EQ(expectedFrameID,spiritFrame.getFrameID());
+    ASSERT_EQ(expectedSystemID,spiritFrame.getSystemID());
 
 }
 
