@@ -15,7 +15,7 @@ protected:
 };
 
 
-TEST_F(AWLMessageTranslatorTest,given_someFrameDoneAWLMessage_when_translatingTheAwlMessage_then_setTheCorrectFrameIdAndSystemId){
+TEST_F(AWLMessageTranslatorTest,given_someFrameDoneAWLMessage_when_translatingTheAwlMessage_then_setsTheCorrectFrameIdAndSystemId){
     AWLMessageTranslator awlMessageTranslator;
     AWLMessage awlMessage;
     awlMessage.id = FRAME_DONE;

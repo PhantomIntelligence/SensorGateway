@@ -26,7 +26,7 @@ TEST_F(PixelTest,given_anExistingTrackInAPixel_when_fetchingTheTracByItsId_then_
     pixel.addTrack(track);
 
     auto actualTrackPointer = pixel.fetchTrackByID(track.getID());
-    Track* expectedTrackPointer = &pixel.getTracksAddress()->at(0);
+    Track* expectedTrackPointer = &pixel.getTracks()->at(0);
 
     ASSERT_EQ(expectedTrackPointer, actualTrackPointer);
 }
@@ -36,7 +36,7 @@ TEST_F(PixelTest,given_anEmptyPixelAndATrack_when_addingTheTrackToThePixel_then_
     Pixel pixel(1);
     pixel.addTrack(track);
 
-    ASSERT_EQ(track, pixel.getTracksAddress()->at(0));
+    ASSERT_EQ(track, pixel.getTracks()->at(0));
 }
 
 TEST_F(PixelTest,given_aPixelWithAFullArrayOfTrack_when_addingOneMoreTrack_then_throwsATrackArrayIllegalStoreFullException){

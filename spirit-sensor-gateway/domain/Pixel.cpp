@@ -38,7 +38,7 @@ void Pixel::addTrack(Track track) {
 
 bool Pixel::doesTrackExist(TrackID trackID) {
     bool trackExists = false;
-    for (auto track:*getTracksAddress()) {
+    for (auto track:*getTracks()) {
         if (track.getID() == trackID) {
             trackExists = true;
         }
@@ -59,7 +59,7 @@ PixelID Pixel::getID() const {
     return ID;
 }
 
-std::array<Track, MAXIMUM_NUMBER_OF_TRACKS_IN_AWL16_PIXEL>* Pixel::getTracksAddress() {
+std::array<Track, MAXIMUM_NUMBER_OF_TRACKS_IN_AWL16_PIXEL>* Pixel::getTracks() {
     return &tracks;
 }
 

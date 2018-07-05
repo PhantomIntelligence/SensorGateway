@@ -30,7 +30,7 @@ void SpiritFramesFileManager::writeFileBlockWithMessage(SpiritProtocol::Frame me
     writeFileLineWithContentLabel(file, 0, PIXELS_LABEL.c_str());
     for (auto pixel : *orderedPixels) {
         writeFileLineWithContentLabelAndValue(file, 1, PIXEL_ID_LABEL.c_str(), pixel.getID());
-        auto tracks = pixel.getTracksAddress();
+        auto tracks = pixel.getTracks();
         for (auto track : *tracks) {
             writeFileLineWithContentLabel(file, 2, TRACKS_LABEL.c_str());
             writeFileLineWithContentLabelAndValue(file, 3, TRACK_ID_LABEL.c_str(), track.getID());

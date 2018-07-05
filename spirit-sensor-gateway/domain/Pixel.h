@@ -36,7 +36,7 @@ namespace SpiritProtocol {
 
         PixelID getID() const;
 
-        std::array<Track, MAXIMUM_NUMBER_OF_TRACKS_IN_AWL16_PIXEL>* getTracksAddress();
+        std::array<Track, MAXIMUM_NUMBER_OF_TRACKS_IN_AWL16_PIXEL>* getTracks();
 
         void validateNotFull() const;
 

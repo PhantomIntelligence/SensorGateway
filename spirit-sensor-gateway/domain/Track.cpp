@@ -22,8 +22,7 @@ Track::Track(TrackID trackID, ConfidenceLevel confidenceLevel, Intensity intensi
         intensity(intensity),
         acceleration(DEFAULT_ACCELERATION_VALUE),
         speed(DEFAULT_SPEED_VALUE),
-        distance(DEFAULT_DISTANCE_VALUE)
-{
+        distance(DEFAULT_DISTANCE_VALUE) {
 };
 
 Track::Track() : ID(DEFAULT_ID_VALUE),
@@ -46,11 +45,11 @@ bool Track::operator==(Track const& other) const {
     auto sameIntensity = (intensity == other.intensity);
     auto sameSpeed = (speed == other.speed);
     bool tracksAreEqual = (sameAcceleration &&
-            sameConfidenceLevel &&
-                  sameDistance &&
-                  sameTrackId &&
-                  sameIntensity &&
-                  sameSpeed);
+                           sameConfidenceLevel &&
+                           sameDistance &&
+                           sameTrackId &&
+                           sameIntensity &&
+                           sameSpeed);
     return tracksAreEqual;
 }
 

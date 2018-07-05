@@ -18,7 +18,7 @@
 
 namespace SpiritProtocol {
 
-    namespace DefaultValues{
+    namespace DefaultValues {
         namespace Track {
             Acceleration const DEFAULT_ACCELERATION_VALUE = 0;
             ConfidenceLevel const DEFAULT_CONFIDENCE_VALUE = 0;
@@ -30,29 +30,42 @@ namespace SpiritProtocol {
     }
 
     class Track {
-        public:
-            Track();
-            Track(TrackID trackID, ConfidenceLevel confidenceLevel, Intensity intensity);
-            ~Track();
-            bool operator==(Track const& other) const;
-            bool operator!=(Track const& other) const;
-            Acceleration getAcceleration() const;
-            ConfidenceLevel getConfidenceLevel() const;
-            Distance getDistance() const;
-            TrackID getID() const;
-            Intensity getIntensity() const;
-            Speed getSpeed() const;
-            void setAcceleration(Acceleration const& acceleration);
-            void setDistance(Distance const& distance);
-            void setSpeed(Speed const& speed);
+    public:
+        Track();
 
-        private:
-            Acceleration acceleration;
-            ConfidenceLevel confidenceLevel;
-            Distance distance;
-            TrackID ID;
-            Intensity intensity;
-            Speed speed;
+        Track(TrackID trackID, ConfidenceLevel confidenceLevel, Intensity intensity);
+
+        ~Track();
+
+        bool operator==(Track const& other) const;
+
+        bool operator!=(Track const& other) const;
+
+        Acceleration getAcceleration() const;
+
+        ConfidenceLevel getConfidenceLevel() const;
+
+        Distance getDistance() const;
+
+        TrackID getID() const;
+
+        Intensity getIntensity() const;
+
+        Speed getSpeed() const;
+
+        void setAcceleration(Acceleration const& acceleration);
+
+        void setDistance(Distance const& distance);
+
+        void setSpeed(Speed const& speed);
+
+    private:
+        Acceleration acceleration;
+        ConfidenceLevel confidenceLevel;
+        Distance distance;
+        TrackID ID;
+        Intensity intensity;
+        Speed speed;
     };
 }
 
