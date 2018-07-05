@@ -12,7 +12,7 @@ class FrameTest : public ::testing::Test {
 
 };
 
-TEST_F(FrameTest,given_anEmptyFrameAndAPixel_when_addingThePixelToTheFrame_then_addThePixelToTheFrameCorrectly){
+TEST_F(FrameTest,given_anEmptyFrameAndAPixel_when_addingThePixelToTheFrame_then_pixelAddedCorrectly){
     Frame frame;
     Pixel pixel(1);
     frame.addPixel(pixel);
