@@ -17,12 +17,11 @@
 
 
 //TODO: use typedef to define each type of the AWL attributes
-//TODO: create class AWLMessage if needed, instead of using this function
 AWLMessage createAWLMessage(int id, int length, long timestamp, std::vector<int> data){
     AWLMessage awlMessage = {};
-    awlMessage.id = (int64_t)id;
-    awlMessage.timestamp = (uint64_t)timestamp;
-    awlMessage.length = (uint32_t)length;
+    awlMessage.id = static_cast <int64_t>(id);
+    awlMessage.timestamp = static_cast <uint64_t>(timestamp);
+    awlMessage.length =  static_cast<uint32_t>(length);
     for (auto dataPosition = 0; dataPosition < MAX_NUMBER_OF_DATA_IN_AWL_MESSAGE; dataPosition++) {
         awlMessage.data[dataPosition] = (unsigned char)data[dataPosition];
     }
