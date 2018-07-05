@@ -10,24 +10,16 @@
 	See the License for the specific language governing permissions and
 	limitations under the License.
 */
-
-#ifndef SPIRITSENSORGATEWAY_COMMUNICATIONPROTOCOLSTRATEGY_H
-#define SPIRITSENSORGATEWAY_COMMUNICATIONPROTOCOLSTRATEGY_H
-
-#include "spirit-sensor-gateway/common/ConstantDefinition.h"
-#include "spirit-sensor-gateway/domain/AWLMessage.h"
+#ifndef SPIRITSENSORGATEWAY_EXCEPTIONMESSAGES_H
+#define SPIRITSENSORGATEWAY_EXCEPTIONMESSAGES_H
 
 
-namespace CommunicationProtocolStrategy {
-    class CommunicationProtocolStrategy {
-    public:
-        virtual AWLMessage readMessage() = 0;
 
-        virtual void openConnection() = 0;
+namespace ExceptionMessage{
 
-        virtual void closeConnection() = 0;
-
-    };
+    static auto PIXEL_TRACK_ARRAY_ILLEGAL_STORE_FULL = "Illegal storing of track: the pixel's track array is full";
 }
 
-#endif //SPIRITSENSORGATEWAY_COMMUNICATIONPROTOCOLSTRATEGY_H
+
+
+#endif //SPIRITSENSORGATEWAY_EXCEPTIONMESSAGES_H
