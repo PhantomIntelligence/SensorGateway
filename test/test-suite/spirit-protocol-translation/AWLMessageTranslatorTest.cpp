@@ -19,14 +19,14 @@ TEST_F(AWLMessageTranslatorTest,given_someFrameDoneAWLMessage_when_translatingTh
     AWLMessageTranslator awlMessageTranslator;
     AWLMessage awlMessage;
     awlMessage.id = FRAME_DONE;
-    awlMessage.data[0] = 0x12;
-    awlMessage.data[1] = 0x10;
-    awlMessage.data[2] = 0x00;
-    awlMessage.data[3] = 0x10;
+    awlMessage.data[0] = 18;
+    awlMessage.data[1] = 16;
+    awlMessage.data[2] = 0;
+    awlMessage.data[3] = 16;
 
     awlMessageTranslator.translateBasicMessage(&awlMessage);
-    auto expectedFrameIDOfSpiritFrame = 0x1012;
-    auto expectedSystemIDOfSpiritFrame = 0x1000;
+    auto expectedFrameIDOfSpiritFrame = 4114;
+    auto expectedSystemIDOfSpiritFrame = 4096;
 
     auto spiritFrame = awlMessageTranslator.getFrames()[0];
     ASSERT_EQ(expectedFrameIDOfSpiritFrame,spiritFrame.getFrameID());
@@ -93,14 +93,14 @@ AWLMessage AWLMessageTranslatorTest::createAWLMessageWithID(uint16_t id) const {
 
     AWLMessage awlMessage;
     awlMessage.id = id;
-    awlMessage.data[0] = 0x10;
-    awlMessage.data[1] = 0x20;
-    awlMessage.data[2] = 0x30;
-    awlMessage.data[3] = 0x01;
-    awlMessage.data[4] = 0x00;
-    awlMessage.data[5] = 0x60;
-    awlMessage.data[6] = 0x70;
-    awlMessage.data[7] = 0x80;
+    awlMessage.data[0] = 16;
+    awlMessage.data[1] = 32;
+    awlMessage.data[2] = 48;
+    awlMessage.data[3] = 1;
+    awlMessage.data[4] = 0;
+    awlMessage.data[5] = 96;
+    awlMessage.data[6] = 112;
+    awlMessage.data[7] = 128;
     return awlMessage;
 }
 
