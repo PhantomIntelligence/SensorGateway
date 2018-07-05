@@ -10,7 +10,7 @@ class ConstantFunctionTest : public ::testing::Test {
 
 };
 
-TEST_F(ConstantFunctionTest, given_anArray_when_convertingFourBytesToUnsignedBigEndian_then_returnsTheCorrectlyFormated32BitsInteger) {
+TEST_F(ConstantFunctionTest, given_anArray_when_convertingFourBytesToUnsignedBigEndian_then_returnsTheCorrectlyFormated32BitsUnsignedInteger) {
     uint8_t testBytes[4];
     testBytes[0] = 37;
     testBytes[1] = 50;
@@ -18,14 +18,14 @@ TEST_F(ConstantFunctionTest, given_anArray_when_convertingFourBytesToUnsignedBig
     testBytes[3] = 10;
 
     uint32_t computedValue;
-    convertFourBytesToBigEndian(testBytes, &computedValue);
+    convertFourBytesToUnsignedBigEndian(testBytes, &computedValue);
 
 
     uint32_t expectedValue = 184496677;
     ASSERT_EQ(expectedValue,computedValue);
 }
 
-TEST_F(ConstantFunctionTest,given_twoBytes_when_convertingTwoBytesToUnsignedBigEndian_then_returnsTheCorrectlyFormatted16BitsInteger){
+TEST_F(ConstantFunctionTest,given_twoBytes_when_convertingTwoBytesToUnsignedBigEndian_then_returnsTheCorrectlyFormatted16BitsUnsignedInteger){
     // 10 08 is 4104 in little endian
     uint8_t firstTestByte = 16;
     uint8_t secondTestByte = 8;
@@ -39,7 +39,7 @@ TEST_F(ConstantFunctionTest,given_twoBytes_when_convertingTwoBytesToUnsignedBigE
 
 }
 
-TEST_F(ConstantFunctionTest,given_twoBytes_when_convertingTwoBytesToSignedBigEndian_then_returnsTheCorrectlyFormatted16BitsInteger){
+TEST_F(ConstantFunctionTest,given_twoBytes_when_convertingTwoBytesToSignedBigEndian_then_returnsTheCorrectlyFormatted16BitsSignedInteger){
     uint8_t firstTestByte = 8;
     uint8_t secondTestByte = 255;
 

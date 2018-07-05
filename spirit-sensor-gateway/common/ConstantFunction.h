@@ -11,7 +11,7 @@ namespace {
         return 256U * secondByte + firstByte;
     }
 
-    void convertFourBytesToBigEndian(uint8_t (&littleEndianBytes)[4], uint32_t* bigEndianResult) noexcept {
+    void convertFourBytesToUnsignedBigEndian(uint8_t (& littleEndianBytes)[4], uint32_t* bigEndianResult) noexcept {
         memcpy(bigEndianResult, littleEndianBytes, sizeof *bigEndianResult);
     }
     int16_t convertTwoBytesToSignedBigEndian(uint8_t firstByte, uint8_t secondByte) noexcept {
