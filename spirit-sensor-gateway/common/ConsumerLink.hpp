@@ -14,14 +14,34 @@
 	limitations under the License.
 */
 
-#ifndef SPIRITSENSORGATEWAY_DUMMYCLASS_H
-#define SPIRITSENSORGATEWAY_DUMMYCLASS_H
 
-namespace dummy {
-    class DummyClass {
-    public :
-        bool isTrue() const noexcept;
+#ifndef SPIRITSENSORGATEWAY_CONSUMERLINK_HPP
+#define SPIRITSENSORGATEWAY_CONSUMERLINK_HPP
+
+#include "ConstantDefinition.h"
+
+namespace DataFlow {
+
+    template<class T>
+    class RingBuffer;
+
+    template<class T>
+    class ConsumerLink {
+
+    protected:
+
+        virtual ~ConsumerLink() {}
+
+    public:
+
+        typedef RingBuffer<T> InputBuffer;
+
+        virtual void linkWith(InputBuffer* buffer) = 0;
+
+        virtual void activateFor(InputBuffer* buffer) = 0;
+
+        virtual void deactivateFor(InputBuffer* buffer) = 0;
     };
 }
 
-#endif //SPIRITSENSORGATEWAY_DUMMYCLASS_H
+#endif //SPIRITSENSORGATEWAY_CONSUMERLINK_HPP

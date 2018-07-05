@@ -23,6 +23,7 @@ namespace {
     int const NUMBER_OF_PIXELS_IN_AWL16_FRAME = 16;
     int const MAXIMUM_NUMBER_OF_TRACKS_IN_AWL16_PIXEL = 16;
 
+
 };
 
 namespace SensorSystemID {
