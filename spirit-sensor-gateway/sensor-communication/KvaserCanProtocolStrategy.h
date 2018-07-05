@@ -19,7 +19,7 @@
 #include <limits>
 
 
-namespace CommunicationProtocolStrategy {
+namespace SensorMessageTranslation {
     class KvaserCanProtocolStrategy : public CommunicationProtocolStrategy {
         const unsigned long CANLIB_READ_WAIT_INFINITE_DELAY = std::numeric_limits<int>::infinity();
     public:

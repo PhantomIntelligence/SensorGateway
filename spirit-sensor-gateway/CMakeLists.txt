@@ -5,9 +5,9 @@ configure_file(config.h.in "${CMAKE_CURRENT_BINARY_DIR}/config.h" @ONLY)
 # Select all the source and header files
 file(GLOB COMMON_FILES "${CMAKE_CURRENT_SOURCE_DIR}/common/*")
 file(GLOB DOMAIN_FILES "${CMAKE_CURRENT_SOURCE_DIR}/domain/*")
-file(GLOB COMMUNICATION_PROTOCOL_FILES "${CMAKE_CURRENT_SOURCE_DIR}/communication-protocol/*")
+file(GLOB COMMUNICATION_PROTOCOL_FILES "${CMAKE_CURRENT_SOURCE_DIR}/sensor-communication/*")
 
-add_library(${PROJECT_NAME} SHARED ${COMMON_FILES} ${DOMAIN_FILES} ${COMMUNICATION_PROTOCOL_FILES} config.h.in communication-protocol/SensorCommunicator.h)
+add_library(${PROJECT_NAME} SHARED ${COMMON_FILES} ${DOMAIN_FILES} ${COMMUNICATION_PROTOCOL_FILES} config.h.in sensor-communication/SensorCommunicator.h)
 
 ########## CONAN ######################################
 if(EXISTS ${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)

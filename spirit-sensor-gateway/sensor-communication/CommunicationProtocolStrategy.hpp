@@ -19,14 +19,11 @@
 
 namespace SensorMessageTranslation {
 
-    template<class T>
     class CommunicationProtocolStrategy {
 
-    protected:
-        typedef T SENSOR_MESSAGE;
 
     public:
-        virtual SENSOR_MESSAGE readMessage() = 0;
+        virtual AWLMessage readMessage() = 0;
 
         virtual void openConnection()=0;
 

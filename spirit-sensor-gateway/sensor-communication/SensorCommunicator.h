@@ -16,41 +16,19 @@
 */#ifndef SPIRITSENSORGATEWAY_SENSORCOMMUNICATOR_H
 #define SPIRITSENSORGATEWAY_SENSORCOMMUNICATOR_H
 
-#include <spirit-sensor-gateway/common/DataSource.h>
-#include "CommunicationProtocolStrategy.h"
+#include <spirit-sensor-gateway/common/DataSource.hpp>
+#include "CommunicationProtocolStrategy.hpp"
 
 namespace SensorAccessLinkElement {
 
     class SensorCommunicator : public DataFlow::DataSource<AWLMessage> {
     public:
-        DataSource() = default;
-        ~DataSource() = default;
-
-
-
-
-        sensorCommunicationStrategy(communicationStrategy), schedulerThread(JoinableThread(voidAction)) {
-            schedulerThread.safeExit();
-            schedulerThread = JoinableThread(&WorkScheduler::startWorkScheduler, this);
-        };
-
-        void execute() {
-            while() { //appelle le thread dana sle boucle while pour permettre de le lancer tant que c est pas fini
-                auto sensorMessage = sensorCommunicationStrategy->readMessage();
-                outputBuffer.write(std::move(sensorMessage));
-                break;
-            }
-        }
-
-    private:
-        SensorMessageTranslation::CommunicationProtocolStrategy<TypeOut>* sensorCommunicationStrategy;
-
+        explicit SensorCommunicator();
+        ~SensorCommunicator();
 
 
 
     };
-
-
 }
 
 #endif //SPIRITSENSORGATEWAY_SENSORCOMMUNICATOR_H
