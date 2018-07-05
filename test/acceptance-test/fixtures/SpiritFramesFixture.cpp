@@ -49,9 +49,6 @@ std::vector<Frame> spiritFramesFixture = {
                                 createPixel(13, {createTrack(14302, 0, 115, 0, 109, 0xFFFF)}),
                                 createPixel(14, {createTrack(14322, 0, 104, 0, 115, 0xFFFA)}),
                                 createPixel(15, {createTrack(14321, 0, 110, 0, 117, 0)}),
-
-
-
         }),
         createFrame(64830, 16, {createPixel(0, {createTrack(14275, 0, 139, 0, 109, 0)}),
                                 createPixel(1, {createTrack(2, 0, 135, 0, 110, 0)}),
@@ -69,7 +66,5 @@ std::vector<Frame> spiritFramesFixture = {
                                 createPixel(13, {createTrack(14302, 0, 114, 0, 109, 0)}),
                                 createPixel(14, {createTrack(14322, 0, 109, 0, 116, 0xFFFE)}),
                                 createPixel(15, {createTrack(14321, 0, 109, 0, 117, 0)}),
-
-
         }),
 };

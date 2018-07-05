@@ -19,9 +19,9 @@
 
 namespace {
     unsigned long const READ_WAIT_INFINITE = -1;
-    int const  MAX_NUMBER_OF_DATA_IN_AWL_MESSAGE = 8;
-    int const NUMBER_OF_PIXEL_IN_AWL_16_FRAME = 16;
-    int const MAXIMUM_NUMBER_OF_TRACK_IN_AWL16_PIXEL = 16;
+    int const MAX_NUMBER_OF_DATA_IN_AWL_MESSAGE = 8;
+    int const NUMBER_OF_PIXELS_IN_AWL16_FRAME = 16;
+    int const MAXIMUM_NUMBER_OF_TRACKS_IN_AWL16_PIXEL = 16;
 
 };
 

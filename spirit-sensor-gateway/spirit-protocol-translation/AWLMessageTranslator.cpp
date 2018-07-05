@@ -62,13 +62,12 @@ void AWLMessageTranslator::translateDetectionVelocityMessage(AWLMessage* awlMess
 
 Track* AWLMessageTranslator::fetchTrack(AWLMessage* awlMessage) const {
     TrackID trackID = convertTwoBytesToUnsignedBigEndian(awlMessage->data[0], awlMessage->data[1]);
-    auto pixels = currentFrame->getPixels();
-    for (auto i = 0; i < NUMBER_OF_PIXEL_IN_AWL_16_FRAME; ++i) {
+    auto pixels = currentFrame->getPixelsAddress();
+    for (auto i = 0; i < NUMBER_OF_PIXELS_IN_AWL16_FRAME; ++i) {
         auto pixel = &pixels->at(i);
-        auto trackExists = pixel->doesTrackExist(trackID);
-        if (trackExists) {
+        if(pixel->doesTrackExist(trackID)){
             return pixel->fetchTrackByID(trackID);
         }
     }
-    return nullptr; // TODO: raise exception here
+    return nullptr;
 }

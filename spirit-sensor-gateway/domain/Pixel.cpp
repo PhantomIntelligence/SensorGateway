@@ -14,94 +14,60 @@
 #include <iostream>
 #include "Pixel.h"
 
-namespace SpiritProtocol {
-    Pixel::Pixel(PixelID pixelID) : ID(pixelID) {};
+using namespace SpiritProtocol;
 
-    Pixel::~Pixel() {
-    };
+Pixel::Pixel(PixelID pixelID) : ID(pixelID) {};
 
+Pixel::~Pixel() {
+};
 
-    Pixel::Pixel(Pixel const& other) : ID(other.ID), tracks(other.tracks) {
-
+bool Pixel::operator==(const SpiritProtocol::Pixel& other) const {
+    auto sameID = (ID == other.ID);
+    auto sameTracks = true;
+    for (auto i = 0; i < MAXIMUM_NUMBER_OF_TRACKS_IN_AWL16_PIXEL && sameTracks && sameID; ++i) {
+        sameTracks = (tracks[i] == other.tracks[i]);
     }
-
-    Pixel::Pixel(Pixel&& other) noexcept {
-
-    }
-
-    Pixel& Pixel::operator=(Pixel& other)& {
-        swap(*this, other);
-        return *this;
-    }
-
-    Pixel& Pixel::operator=(Pixel&& other)& noexcept {
-        Pixel temporary(std::move(other));
-        swap(*this, temporary);
-        return *this;
-    };
-
-    void Pixel::swap(Pixel& current, Pixel& other) noexcept {
-        std::swap(current.ID, other.ID);
-        std::swap(current.tracks, other.tracks);
-    }
-
-
-    bool Pixel::operator==(const SpiritProtocol::Pixel& other) const {
-        auto sameID = ID == other.ID;
-        auto sameTracks = true;
-        for (auto i = 0; i < MAXIMUM_NUMBER_OF_TRACK_IN_AWL16_PIXEL && sameTracks; ++i) {
-            sameTracks = tracks[i] == other.tracks[i] && sameTracks;
-        }
-        return (sameID && sameTracks);
-    }
-
-    bool Pixel::operator!=(const SpiritProtocol::Pixel& other) const {
-        return !(operator==(other));
-    }
-
-    void Pixel::addTrack(Track track) {
-        validateNotFull();
-        tracks[numberOfTrackInPixel] = track;
-        numberOfTrackInPixel++;
-    }
-
-    bool Pixel::doesTrackExist(TrackID trackID)  {
-        bool trackExists = false;
-        for (auto track:*getTracksAddress()) {
-            if (track.getID() == trackID) {
-                trackExists = true;
-            }
-        }
-        return trackExists;
-    };
-
-    Track* Pixel::fetchTrackByID(TrackID trackID) {
-        Track* fetchedTrack;
-        for (auto i = 0; i < MAXIMUM_NUMBER_OF_TRACK_IN_AWL16_PIXEL; ++i) {
-            Track* track = &tracks[i];
-            if (track->getID() == trackID) {
-                fetchedTrack = track;
-                break;
-            }
-        }
-        return fetchedTrack;
-    }
-
-    PixelID Pixel::getID() const {
-        return ID;
-    }
-
-    std::array<Track, MAXIMUM_NUMBER_OF_TRACK_IN_AWL16_PIXEL>* Pixel::getTracksAddress()  {
-
-        return &tracks;
-    }
-
-    void Pixel::validateNotFull() const {
-        if(numberOfTrackInPixel >= MAXIMUM_NUMBER_OF_TRACK_IN_AWL16_PIXEL){
-            throw std::runtime_error(ExceptionMessage::PIXEL_TRACK_ARRAY_ILLEGAL_STORE_FULL);
-        }
-
-    };
-
+    return (sameID && sameTracks);
 }
+
+void Pixel::addTrack(Track track) {
+    validateNotFull();
+    tracks[numberOfTrackInPixel] = track;
+    numberOfTrackInPixel++;
+}
+
+bool Pixel::doesTrackExist(TrackID trackID) {
+    bool trackExists = false;
+    for (auto track:*getTracksAddress()) {
+        if (track.getID() == trackID) {
+            trackExists = true;
+        }
+    }
+    return trackExists;
+};
+
+Track* Pixel::fetchTrackByID(TrackID trackID) {
+    for (auto i = 0; i < MAXIMUM_NUMBER_OF_TRACKS_IN_AWL16_PIXEL; ++i) {
+        if (tracks[i].getID() == trackID) {
+            return &tracks[i];
+        }
+    }
+    return nullptr;
+}
+
+PixelID Pixel::getID() const {
+    return ID;
+}
+
+std::array<Track, MAXIMUM_NUMBER_OF_TRACKS_IN_AWL16_PIXEL>* Pixel::getTracksAddress() {
+    return &tracks;
+}
+
+void Pixel::validateNotFull() const {
+    if (numberOfTrackInPixel >= MAXIMUM_NUMBER_OF_TRACKS_IN_AWL16_PIXEL) {
+        throw std::runtime_error(ExceptionMessage::PIXEL_TRACK_ARRAY_ILLEGAL_STORE_FULL);
+    }
+
+};
+
 

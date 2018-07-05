@@ -17,7 +17,7 @@
 
 namespace ExceptionMessage{
 
-    static auto PIXEL_TRACK_ARRAY_ILLEGAL_STORE_FULL = "Illegal store of track: the Track Array of the Pixel is full";
+    static auto PIXEL_TRACK_ARRAY_ILLEGAL_STORE_FULL = "Illegal storing of track: the pixel's track array is full";
 }
 
 

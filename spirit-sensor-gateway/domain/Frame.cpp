@@ -13,38 +13,38 @@
 
 #include "Frame.h"
 
-namespace SpiritProtocol {
-    Frame::Frame() {
-    };
+using namespace SpiritProtocol;
 
-    Frame::~Frame() {
-    };
+Frame::Frame() {
+};
 
-    void Frame::addPixel(Pixel pixel) {
-        pixels[pixel.getID()] = pixel;
-    }
+Frame::~Frame() {
+};
 
-    Pixel* Frame::fetchPixelByID(PixelID pixelID) {
-        return &pixels[pixelID];
-    }
+void Frame::addPixel(Pixel pixel) {
+    pixels[pixel.getID()] = pixel;
+}
 
-    FrameID Frame::getFrameID() const {
-        return frameID;
-    };
+Pixel* Frame::fetchPixelByID(PixelID pixelID) {
+    return &pixels[pixelID];
+}
 
-    std::array<Pixel,NUMBER_OF_PIXEL_IN_AWL_16_FRAME>* Frame::getPixels() {
-        return &pixels;
-    };
+FrameID Frame::getFrameID() const {
+    return frameID;
+};
 
-    SystemID Frame::getSystemID() const {
-        return systemID;
-    };
+std::array<Pixel, NUMBER_OF_PIXELS_IN_AWL16_FRAME>* Frame::getPixelsAddress() {
+    return &pixels;
+};
 
-    void Frame::setFrameID(FrameID frameID) {
-        this->frameID = frameID;
-    }
+SystemID Frame::getSystemID() const {
+    return systemID;
+};
 
-    void Frame::setSystemID(SystemID systemID) {
-        this->systemID = systemID;
-    }
+void Frame::setFrameID(FrameID const& frameID) {
+    this->frameID = frameID;
+}
+
+void Frame::setSystemID(SystemID const& systemID) {
+    this->systemID = systemID;
 }

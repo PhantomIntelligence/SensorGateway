@@ -26,19 +26,7 @@ namespace SpiritProtocol {
 
         Pixel() = default;
 
-        Pixel(Pixel const& other);
-
-        Pixel(Pixel&& other) noexcept;
-
-        Pixel& operator=(Pixel& other)& ;
-
-        Pixel& operator=(Pixel&& other)& noexcept;
-
-        void swap(Pixel& current, Pixel& other) noexcept;
-
         bool operator==(Pixel const& other) const;
-
-        bool operator!=(Pixel const& other) const;
 
         void addTrack(Track track);
 
@@ -48,14 +36,14 @@ namespace SpiritProtocol {
 
         PixelID getID() const;
 
-        std::array<Track, MAXIMUM_NUMBER_OF_TRACK_IN_AWL16_PIXEL>* getTracksAddress();
+        std::array<Track, MAXIMUM_NUMBER_OF_TRACKS_IN_AWL16_PIXEL>* getTracksAddress();
 
         void validateNotFull() const;
 
     private:
         int numberOfTrackInPixel = 0;
-        uint16_t ID;
-        std::array<Track, MAXIMUM_NUMBER_OF_TRACK_IN_AWL16_PIXEL> tracks;
+        PixelID ID;
+        std::array<Track, MAXIMUM_NUMBER_OF_TRACKS_IN_AWL16_PIXEL> tracks;
     };
 }
 

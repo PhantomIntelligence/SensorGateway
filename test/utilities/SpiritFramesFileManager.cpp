@@ -26,7 +26,7 @@ void SpiritFramesFileManager::writeFileBlockWithMessage(SpiritProtocol::Frame me
     writeFileLineWithContentLabelAndValue(file, 0, SYSTEM_ID_LABEL.c_str(), message.getSystemID());
 
     //TODO: remove unordered map and ordered map structures once the domain class has been updated.
-    auto orderedPixels = message.getPixels();
+    auto orderedPixels = message.getPixelsAddress();
     writeFileLineWithContentLabel(file, 0, PIXELS_LABEL.c_str());
     for (auto pixel : *orderedPixels) {
         writeFileLineWithContentLabelAndValue(file, 1, PIXEL_ID_LABEL.c_str(), pixel.getID());

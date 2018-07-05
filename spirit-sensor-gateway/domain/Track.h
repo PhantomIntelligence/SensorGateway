@@ -20,20 +20,18 @@ namespace SpiritProtocol {
 
     namespace DefaultValues{
         namespace Track {
-            Acceleration const UNINITIALIZED_TRACK_ACCELERATION_VALUE = 0;
-            ConfidenceLevel const UNINITIALIZED_TRACK_CONFIDENCE_VALUE = 0;
-            Distance const UNINITIALIZED_TRACK_DISTANCE_VALUE = 0;
-            TrackID const UNINITIALIZED_TRACK_ID_VALUE = 0;
-            Speed const UNINITIALIZED_TRACK_SPEED_VALUE = 0;
-            Intensity const UNINITIALIZED_TRACK_INTENSITY_VALUE = 0;
+            Acceleration const DEFAULT_ACCELERATION_VALUE = 0;
+            ConfidenceLevel const DEFAULT_CONFIDENCE_VALUE = 0;
+            Distance const DEFAULT_DISTANCE_VALUE = 0;
+            TrackID const DEFAULT_ID_VALUE = 0;
+            Speed const DEFAULT_SPEED_VALUE = 0;
+            Intensity const DEFAULT_INTENSITY_VALUE = 0;
         }
-
     }
 
     class Track {
         public:
             Track();
-
             Track(TrackID trackID, ConfidenceLevel confidenceLevel, Intensity intensity);
             ~Track();
             bool operator==(Track const& other) const;
@@ -44,9 +42,9 @@ namespace SpiritProtocol {
             TrackID getID() const;
             Intensity getIntensity() const;
             Speed getSpeed() const;
-            void setAcceleration(Acceleration acceleration);
-            void setDistance(Distance distance);
-            void setSpeed(Speed speed);
+            void setAcceleration(Acceleration const& acceleration);
+            void setDistance(Distance const& distance);
+            void setSpeed(Speed const& speed);
 
         private:
             Acceleration acceleration;

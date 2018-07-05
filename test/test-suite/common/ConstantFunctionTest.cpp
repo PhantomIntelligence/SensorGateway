@@ -42,17 +42,14 @@ TEST_F(ConstantFunctionTest,given_twoBytes_when_convertTwoBytesToUnsignedBigEndi
 }
 
 TEST_F(ConstantFunctionTest,given_twoBytes_when_convertTwoBytesToSignedBigEndian_then_returnTheCorrectlyFormatted16BitsInteger){
-    // 08 FF is 4104 in little endian
     uint8_t firstTestByte = 0x08;
     uint8_t secondTestByte = 0xFF;
 
     int16_t computedValue = convertTwoBytesToSignedBigEndian(firstTestByte, secondTestByte);
 
-    //08 10 is 2064 in big endian
     int16_t expectedValue = -248;
 
     ASSERT_EQ(expectedValue,computedValue);
-
 }
 
 
