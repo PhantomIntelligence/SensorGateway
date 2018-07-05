@@ -10,23 +10,20 @@
 	See the License for the specific language governing permissions and
 	limitations under the License.
 */
-
-#ifndef SPIRITSENSORGATEWAY_COMMUNICATIONPROTOCOLSTRATEGY_H
-#define SPIRITSENSORGATEWAY_COMMUNICATIONPROTOCOLSTRATEGY_H
+#ifndef SPIRITSENSORGATEWAY_UNKNOWNMESSAGEEXCEPTION_H
+#define SPIRITSENSORGATEWAY_UNKNOWNMESSAGEEXCEPTION_H
 
 #include "spirit-sensor-gateway/domain/AWLMessage.h"
 
 
-namespace CommunicationProtocolStrategy {
-    class CommunicationProtocolStrategy {
+class UnknownMessageException : public std::exception {
+
     public:
-        virtual AWLMessage readMessage() = 0;
+        UnknownMessageException(AWLMessage* awlMessage);
+        std::string getMessage();
+    private:
+        std::string message;
+};
 
-        virtual void openConnection() = 0;
 
-        virtual void closeConnection() = 0;
-
-    };
-}
-
-#endif //SPIRITSENSORGATEWAY_COMMUNICATIONPROTOCOLSTRATEGY_H
+#endif //SPIRITSENSORGATEWAY_UNKNOWNMESSAGEEXCEPTION_H

@@ -246,7 +246,7 @@ class StreamMatchResultListener : public MatchResultListener {
 };
 
 // An internal class for implementing Matcher<T>, which will derive
-// from it.  We put functionalities common to all Matcher<T>
+// from it.  We put functionalities utilities to all Matcher<T>
 // specializations here to avoid code duplication.
 template <typename T>
 class MatcherBase {
@@ -2795,7 +2795,7 @@ class PointwiseMatcher {
   GTEST_DISALLOW_ASSIGN_(PointwiseMatcher);
 };
 
-// Holds the logic common to ContainsMatcherImpl and EachMatcherImpl.
+// Holds the logic utilities to ContainsMatcherImpl and EachMatcherImpl.
 template <typename Container>
 class QuantifierMatcherImpl : public MatcherInterface<Container> {
  public:

@@ -18,7 +18,7 @@
 #ifndef SPIRITSENSORGATEWAY_ABSTRACTPOINTERARRAY_HPP
 #define SPIRITSENSORGATEWAY_ABSTRACTPOINTERARRAY_HPP
 
-#include "ConstantValuesDefinition.h"
+#include "ConstantFunctionsDefinition.h"
 
 namespace Container {
 

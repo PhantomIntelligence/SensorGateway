@@ -33,7 +33,7 @@ namespace DataFlow {
                 terminateOrderReceived(false),
                 numberOfLinkedBuffers(0),
                 dataSink(dataSink),
-                schedulerThread(JoinableThread(voidAction)) {
+                schedulerThread(JoinableThread(doNothing)) {
             schedulerThread.exitSafely();
             schedulerThread = JoinableThread(&DataProcessingScheduler::start, this);
         }

@@ -14,12 +14,64 @@
 #ifndef SPIRITSENSORGATEWAY_CONSTANTVALUESDEFINITION_H
 #define SPIRITSENSORGATEWAY_CONSTANTVALUESDEFINITION_H
 
-#include "ConstantFunctionsDefinition.h"
+#include "TypeDefinition.h"
 
 namespace {
     uint8_t const MAX_NUMBER_OF_DATA_IN_AWL_MESSAGE = 8;
     uint8_t const NUMBER_OF_CONCURRENT_INPUT_FOR_SENSOR_ACCESS_LINK_ELEMENTS = 1;
     size_t const RING_BUFFER_SIZE = 64;
+
+    unsigned long const READ_WAIT_INFINITE = -1;
+    int const NUMBER_OF_PIXELS_IN_AWL16_FRAME = 16;
+    int const MAXIMUM_NUMBER_OF_TRACKS_IN_AWL16_PIXEL = 16;
 };
+
+namespace SensorSystemID {
+    uint16_t const AWL16 = 0x0010;
+    uint16_t const AWL7 = 0x0010;
+}
+
+namespace MessageID {
+    using MessageID = uint64_t;
+    MessageID const FRAME_DONE = 0x09;
+    MessageID const DETECTION_TRACK = 0x0A;
+    MessageID const DETECTION_VELOCITY = 0x0B;
+}
+
+namespace CommandID {
+    using CommandID = uint16_t;
+    CommandID const SET_PARAMETER  = 0xC0;
+    CommandID const QUERY_PARAMETER  = 0xC1;
+    CommandID const RESPONSE_PARAMETER = 0x2;
+    CommandID const ERROR_PARAMETER = 0xC3;
+    CommandID const RECORD_RAW = 0xD0;
+    CommandID const PLAYBACK_RAW = 0xD1;
+    CommandID const RECORD_CALIBRATION = 0xDA;
+    CommandID const CLEAR_CALIBRATION = 0xDB;
+    CommandID const DEBUG_DUMP = 0xF0;
+    CommandID const DEBUG_VERBOSE = 0xF1;
+    CommandID const DEBUG_FORCE_REFRESH = 0xF2;
+
+};
+
+namespace CommandType{
+    using CommandType = uint16_t ;
+    CommandType const ALGO_SELECTED = 0x01;
+    CommandType const ALGO_PARAMETER = 0x02;
+    CommandType const SENSOR_REGISTER = 0x03;
+    CommandType const BIAS = 0x04;
+    CommandType const ADC_REGISTER = 0x05;
+    CommandType const PRESET = 0x06;
+    CommandType const GLOBAL_PARAMETER = 0x07;
+    CommandType const GPIO = 0x08;
+    CommandType const TRACKING_ALGO_SELECTED = 0x11;
+    CommandType const TRACKING_ALGO_PARAMETER = 0x12;
+    CommandType const DATE_TIME = 0x20;
+    CommandType const ERROR = 0x70;
+    CommandType const RECORD = 0XD0;
+    CommandType const PLAYBACK = 0xD1;
+    CommandType const TRANSMIT_RAW  = 0xE0;
+    CommandType const TRANSMIT_COOKED = 0xE1;
+}
 
 #endif //SPIRITSENSORGATEWAY_CONSTANTVALUESDEFINITION_H

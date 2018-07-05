@@ -14,17 +14,13 @@
 	limitations under the License.
 */
 
-
 #ifndef SPIRITSENSORGATEWAY_EXCEPTIONMESSAGES_H
 #define SPIRITSENSORGATEWAY_EXCEPTIONMESSAGES_H
-
-#include <iostream>
-#include "TypeDefinition.h"
 
 namespace ExceptionMessage {
 
     static auto ABSTRACT_POINTER_ARRAY_ILLEGAL_CONSUMPTION_EMPTY = "Illegal consumption of pointer: the ConstantSizedAbstractPointerArray is empty.";
-    static auto ABSTRACT_POINTER_ARRAY_ILLEGAL_STORE_FULL = "Illegal store of pointer: the ConstantSizedAbstractPointerArray is isFull.";
+    static auto ABSTRACT_POINTER_ARRAY_ILLEGAL_STORE_FULL = "Illegal store of pointer: the ConstantSizedAbstractPointerArray is full.";
 
     static auto CONSTANT_SIZED_POINTER_LIST_ILLEGAL_REMOVAL_OF_POINTER = "Illegal removal of pointer: the ConstantSizedPointerList does not contain the pointer.";
 
@@ -35,8 +31,9 @@ namespace ExceptionMessage {
     static auto DATA_PROCESSING_SCHEDULER_ILLEGAL_NUMBER_OF_INPUT_BUFFER_MESSAGE = "Illegal linking attempt between DataProcessingScheduler and DataSourceBuffer: The maximum number of DataSourceBuffer has already been reached for this DataProcessingScheduler.";
     static auto DATA_PROCESSING_SCHEDULER_ILLEGAL_ACTIVATION_MESSAGE = "Illegal DataProcessingScheduler activation attempt from an unlinked DataSourceBuffer";
     static auto DATA_PROCESSING_SCHEDULER_ILLEGAL_DEACTIVATION_MESSAGE = "Illegal DataProcessingScheduler deactivation attempt from an unlinked DataSourceBuffer";
+
+    static auto PIXEL_TRACK_ARRAY_ILLEGAL_STORE_FULL = "Illegal storing of track: the pixel's track array is full";
+
 }
-
-
 
 #endif //SPIRITSENSORGATEWAY_EXCEPTIONMESSAGES_H
