@@ -14,7 +14,7 @@
 #include <iostream>
 #include "Pixel.h"
 
-using namespace SpiritProtocol;
+using namespace DataFlow;
 using namespace Defaults::Pixel;
 
 Pixel::Pixel(PixelID pixelID) : ID(pixelID),tracks(DEFAUTL_TRACKS_ARRAY) {};

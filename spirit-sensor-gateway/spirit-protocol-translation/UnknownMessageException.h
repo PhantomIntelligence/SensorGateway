@@ -15,6 +15,7 @@
 
 #include "spirit-sensor-gateway/domain/AWLMessage.h"
 
+using namespace DataFlow;
 
 class UnknownMessageException : public std::exception {
 

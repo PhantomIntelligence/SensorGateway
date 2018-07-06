@@ -2,7 +2,7 @@
 #include <iostream>
 #include <cstdio>
 #include <inttypes.h>
-#include "spirit-sensor-gateway/communication-protocol-strategy/KvaserCanProtocolStrategy.cpp"
+#include "spirit-sensor-gateway/sensor-communication/KvaserCanProtocolStrategy.cpp"
 
 
 int main(){

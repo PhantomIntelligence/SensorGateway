@@ -16,7 +16,7 @@
 
 #include "spirit-sensor-gateway/common/DataProcessingScheduler.hpp"
 
-namespace SpiritProtocol {
+namespace DataFlow {
 
 
     class Track {
@@ -70,7 +70,7 @@ namespace SpiritProtocol {
             TrackID const DEFAULT_ID_VALUE = 0;
             Speed const DEFAULT_SPEED_VALUE = 0;
             Intensity const DEFAULT_INTENSITY_VALUE = 0;
-            SpiritProtocol::Track const DEFAULT_TRACK = SpiritProtocol::Track();
+            DataFlow::Track const DEFAULT_TRACK = DataFlow::Track();
         }
     }
 }

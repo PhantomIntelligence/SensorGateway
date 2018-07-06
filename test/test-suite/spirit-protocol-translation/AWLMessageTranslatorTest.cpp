@@ -17,7 +17,9 @@ protected:
 
 TEST_F(AWLMessageTranslatorTest,given_someFrameDoneAWLMessage_when_translatingTheAwlMessage_then_setsTheCorrectFrameIdAndSystemId){
     AWLMessageToSpiritMessageTranslationStrategy awlMessageTranslator;
-    AWLMessage awlMessage;
+
+    AWLMessage awlMessage = AWLMessage::returnDefaultData();
+
     awlMessage.id = FRAME_DONE;
     awlMessage.data[0] = 18;
     awlMessage.data[1] = 16;
@@ -96,7 +98,7 @@ TEST_F(AWLMessageTranslatorTest,given_someVelocityTrackAWLMessage_when_translati
 
 AWLMessage AWLMessageTranslatorTest::createAWLMessageWithID(uint16_t id) const {
 
-    AWLMessage awlMessage;
+    AWLMessage awlMessage = AWLMessage::returnDefaultData();
     awlMessage.id = id;
     awlMessage.data[0] = 16;
     awlMessage.data[1] = 32;

@@ -13,7 +13,7 @@
 
 #include "spirit-sensor-gateway/domain/Frame.h"
 
-using namespace SpiritProtocol; 
+using namespace DataFlow;
 
 Track createTrack(TrackID trackID, ConfidenceLevel confidenceLevel, Intensity intensity, Acceleration acceleration,
                   Distance distance, Speed speed){

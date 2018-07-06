@@ -6,7 +6,7 @@
 
 #include "spirit-sensor-gateway/domain/Frame.h"
 
-using namespace SpiritProtocol;
+using namespace DataFlow;
 
 class FrameTest : public ::testing::Test {
 

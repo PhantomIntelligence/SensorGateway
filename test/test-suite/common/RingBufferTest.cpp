@@ -3,6 +3,9 @@
 
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
+#include <spirit-sensor-gateway/domain/AWLMessage.h>
+#include <spirit-sensor-gateway/sensor-communication/SensorCommunicator.hpp>
+#include <spirit-sensor-gateway/sensor-communication/KvaserCanProtocolStrategy.h>
 
 #include "spirit-sensor-gateway/common/RingBuffer.hpp"
 #include "data-model/DataModelFixture.h"

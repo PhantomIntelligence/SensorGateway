@@ -17,7 +17,7 @@
 #include "Pixel.h"
 
 
-namespace SpiritProtocol {
+namespace DataFlow {
 
     class Frame {
 
@@ -41,11 +41,11 @@ namespace SpiritProtocol {
 
     namespace Defaults {
         namespace Frame {
-            using SpiritProtocol::Pixel;
+            using DataFlow::Pixel;
             FrameID const DEFAULT_FRAME_ID_VALUE = 0;
             SystemID const DEFAULT_SYSTEM_ID_VALUE = 0;
             std::array<Pixel, NUMBER_OF_PIXELS_IN_AWL16_FRAME> const DEFAULT_PIXELS_ARRAY = std::array<Pixel, NUMBER_OF_PIXELS_IN_AWL16_FRAME>();
-            SpiritProtocol::Frame const DEFAULT_FRAME = SpiritProtocol::Frame();
+            DataFlow::Frame const DEFAULT_FRAME = DataFlow::Frame();
         }
     }
 

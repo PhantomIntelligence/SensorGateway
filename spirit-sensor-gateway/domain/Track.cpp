@@ -13,7 +13,7 @@
 
 #include "Track.h"
 
-using namespace SpiritProtocol;
+using namespace DataFlow;
 using namespace Defaults::Track;
 
 Track::Track(TrackID trackID, ConfidenceLevel confidenceLevel, Intensity intensity) :

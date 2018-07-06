@@ -6,7 +6,7 @@
 
 #include "spirit-sensor-gateway/domain/Pixel.h"
 
-using namespace SpiritProtocol;
+using namespace DataFlow;
 
 class PixelTest : public ::testing::Test {
 

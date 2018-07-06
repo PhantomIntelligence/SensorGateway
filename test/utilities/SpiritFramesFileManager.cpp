@@ -16,12 +16,12 @@
 
 using TestUtilities::SpiritFramesFileManager;
 
-SpiritProtocol::Frame SpiritFramesFileManager::readMessageFromFileBlock(std::string const& fileBlock) {
+DataFlow::Frame SpiritFramesFileManager::readMessageFromFileBlock(std::string const& fileBlock) {
     //TODO: update method when testing SpiritFrames -> AWLMessages
-    return SpiritProtocol::Frame();
+    return DataFlow::Frame();
 }
 
-void SpiritFramesFileManager::writeFileBlockWithMessage(SpiritProtocol::Frame message, std::FILE* file) {
+void SpiritFramesFileManager::writeFileBlockWithMessage(DataFlow::Frame message, std::FILE* file) {
     writeFileLineWithContentLabelAndValue(file, 0, FRAME_ID_LABEL.c_str(), message.getFrameID());
     writeFileLineWithContentLabelAndValue(file, 0, SYSTEM_ID_LABEL.c_str(), message.getSystemID());
 

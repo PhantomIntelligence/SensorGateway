@@ -19,7 +19,7 @@
 
 namespace TestUtilities {
 
-    class SpiritFramesFileManager : public FileManager<SpiritProtocol::Frame> {
+    class SpiritFramesFileManager : public FileManager<DataFlow::Frame> {
 
     public:
         SpiritFramesFileManager() = default;
@@ -27,9 +27,9 @@ namespace TestUtilities {
         ~SpiritFramesFileManager() override = default;
 
     private:
-        SpiritProtocol::Frame readMessageFromFileBlock(std::string const& fileBlock) override;
+        DataFlow::Frame readMessageFromFileBlock(std::string const& fileBlock) override;
 
-        void writeFileBlockWithMessage(SpiritProtocol::Frame message, std::FILE* file) override;
+        void writeFileBlockWithMessage(DataFlow::Frame message, std::FILE* file) override;
 
         void writeFileLineWithContentLabel(std::FILE* file, unsigned int numberOfTabulator, char const* contentLabel);
 

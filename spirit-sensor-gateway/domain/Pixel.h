@@ -16,7 +16,7 @@
 
 #include "Track.h"
 
-namespace SpiritProtocol {
+namespace DataFlow {
 
     class Pixel {
     public:
@@ -51,10 +51,10 @@ namespace SpiritProtocol {
 
     namespace Defaults {
         namespace Pixel {
-            using SpiritProtocol::Track;
+            using DataFlow::Track;
             PixelID const DEFAULT_PIXEL_ID_VALUE = 0;
             std::array<Track, NUMBER_OF_PIXELS_IN_AWL16_FRAME> const DEFAUTL_TRACKS_ARRAY = std::array<Track, NUMBER_OF_PIXELS_IN_AWL16_FRAME>();
-            SpiritProtocol::Pixel const DEFAULT_PIXEL = SpiritProtocol::Pixel(DEFAULT_PIXEL_ID_VALUE);
+            DataFlow::Pixel const DEFAULT_PIXEL = DataFlow::Pixel(DEFAULT_PIXEL_ID_VALUE);
         }
     }
 }

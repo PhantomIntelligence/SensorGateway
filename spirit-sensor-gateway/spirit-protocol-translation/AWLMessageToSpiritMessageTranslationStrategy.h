@@ -21,7 +21,7 @@
 #include "MessageTranslationStrategy.hpp"
 
 using namespace MessageID;
-using namespace SpiritProtocol;
+using namespace DataFlow;
 
     class AWLMessageToSpiritMessageTranslationStrategy : public MessageTranslationStrategy <AWLMessage,Frame> {
     public:

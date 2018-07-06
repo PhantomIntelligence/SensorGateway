@@ -13,7 +13,7 @@
 
 #include "Frame.h"
 
-using namespace SpiritProtocol;
+using namespace DataFlow;
 using namespace Defaults::Frame;
 
 Frame::Frame():systemID(DEFAULT_SYSTEM_ID_VALUE),

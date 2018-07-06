@@ -17,6 +17,8 @@
 #include "FileManager.hpp"
 #include "spirit-sensor-gateway/domain/AWLMessage.h"
 
+using namespace DataFlow;
+
 namespace TestUtilities {
 
     class AWLMessagesFileManager : public FileManager<AWLMessage> {

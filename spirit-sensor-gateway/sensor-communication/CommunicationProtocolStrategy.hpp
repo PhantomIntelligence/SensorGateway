@@ -17,14 +17,20 @@
 #include "spirit-sensor-gateway/domain/AWLMessage.h"
 
 
-namespace CommunicationProtocolStrategy {
+namespace SensorCommunication {
+
+    template<class T>
     class CommunicationProtocolStrategy {
+        typedef T DATA;
     public:
-        virtual AWLMessage readMessage() = 0;
 
-        virtual void openConnection() = 0;
+        virtual ~CommunicationProtocolStrategy() noexcept = default;
 
-        virtual void closeConnection() = 0;
+        virtual DATA readMessage() = 0;
+
+        virtual void openConnection()=0;
+
+        virtual void closeConnection()=0;
 
     };
 }
