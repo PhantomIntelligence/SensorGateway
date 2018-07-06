@@ -113,6 +113,8 @@ TEST_F(AWLMessageToSpiritMessageTranslationStrategyTest,given_someVelocityTrackA
 }
 
 
+
+
 AWLMessage AWLMessageToSpiritMessageTranslationStrategyTest::createAWLMessageWithID(uint16_t id) const {
 
     AWLMessage awlMessage = AWLMessage::returnDefaultData();
