@@ -23,21 +23,32 @@
 using namespace MessageID;
 using namespace DataFlow;
 
-    class AWLMessageToSpiritMessageTranslationStrategy : public MessageTranslationStrategy <AWLMessage,Frame> {
+namespace ProtocolTranslation {
+
+    class AWLMessageToSpiritMessageTranslationStrategy : public MessageTranslationStrategy<AWLMessage, Frame> {
     public:
         AWLMessageToSpiritMessageTranslationStrategy();
+
         ~ AWLMessageToSpiritMessageTranslationStrategy();
+
         std::vector<Frame> getFrames() const;
+
         Frame returnDefaultData();
+
         void translateBasicMessage(AWLMessage* inputMessage) override;
 
     private:
         std::vector<Frame> frames;
+
         void addTrackInPixel(AWLMessage* awlMessage, PixelID pixelID);
-        Track* fetchTrack (AWLMessage* awlMessage) const;
+
+        Track* fetchTrack(AWLMessage* awlMessage) const;
+
         void translateDetectionTrackMessage(AWLMessage* awlMessage);
+
         void translateDetectionVelocityMessage(AWLMessage* awlMessage);
+
         void translateEndOfFrameMessage(AWLMessage* awlMessage);
     };
-
+}
 #endif //SPIRITSENSORGATEWAY_MESSAGEIMPLEMENTATIONSTRATEGY_H

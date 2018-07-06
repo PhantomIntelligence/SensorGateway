@@ -1,3 +1,17 @@
+/**
+	Copyright 2014-2018 Phantom Intelligence Inc.
+	Licensed under the Apache License, Version 2.0 (the "License");
+	you may not use this file except in compliance with the License.
+	You may obtain a copy of the License at
+		http://www.apache.org/licenses/LICENSE-2.0
+	Unless required by applicable law or agreed to in writing, software
+	distributed under the License is distributed on an "AS IS" BASIS,
+	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+	See the License for the specific language governing permissions and
+	limitations under the License.
+*/
+
+
 #ifndef SPIRITSENSORGATEWAY_AWLMESSAGETRANSLATORTEST_CPP
 #define SPIRITSENSORGATEWAY_AWLMESSAGETRANSLATORTEST_CPP
 
@@ -9,13 +23,13 @@
 
 using namespace Defaults::Track;
 
-class AWLMessageTranslatorTest : public ::testing::Test {
+class AWLMessageToSpiritMessageTranslationStrategyTest : public ::testing::Test {
 protected:
     AWLMessage createAWLMessageWithID(uint16_t id) const ;
 };
 
 
-TEST_F(AWLMessageTranslatorTest,given_someFrameDoneAWLMessage_when_translatingTheAwlMessage_then_setsTheCorrectFrameIdAndSystemId){
+TEST_F(AWLMessageToSpiritMessageTranslationStrategyTest,given_someFrameDoneAWLMessage_when_translatingTheAwlMessage_then_setsTheCorrectFrameIdAndSystemId){
     AWLMessageToSpiritMessageTranslationStrategy awlMessageTranslator;
 
     AWLMessage awlMessage = AWLMessage::returnDefaultData();
@@ -36,7 +50,7 @@ TEST_F(AWLMessageTranslatorTest,given_someFrameDoneAWLMessage_when_translatingTh
 
 }
 
-TEST_F(AWLMessageTranslatorTest,given_someDetectionTrackAWLMessage_when_translatingTheAwlMessage_then_setsTheCorrectAttributesOfTheTrack) {
+TEST_F(AWLMessageToSpiritMessageTranslationStrategyTest,given_someDetectionTrackAWLMessage_when_translatingTheAwlMessage_then_setsTheCorrectAttributesOfTheTrack) {
 
     AWLMessageToSpiritMessageTranslationStrategy awlMessageTranslator;
     auto detectionTrackAwlMessage = createAWLMessageWithID(DETECTION_TRACK);
@@ -62,7 +76,7 @@ TEST_F(AWLMessageTranslatorTest,given_someDetectionTrackAWLMessage_when_translat
     ASSERT_EQ(DEFAULT_SPEED_VALUE,track.getSpeed());
 }
 
-TEST_F(AWLMessageTranslatorTest,given_someVelocityTrackAWLMessage_when_translatingTheAWLMessage_then_setsTheCorrectAttributesOfTheTrack) {
+TEST_F(AWLMessageToSpiritMessageTranslationStrategyTest,given_someVelocityTrackAWLMessage_when_translatingTheAWLMessage_then_setsTheCorrectAttributesOfTheTrack) {
 
     AWLMessageToSpiritMessageTranslationStrategy awlMessageTranslator;
 
@@ -96,7 +110,7 @@ TEST_F(AWLMessageTranslatorTest,given_someVelocityTrackAWLMessage_when_translati
 }
 
 
-AWLMessage AWLMessageTranslatorTest::createAWLMessageWithID(uint16_t id) const {
+AWLMessage AWLMessageToSpiritMessageTranslationStrategyTest::createAWLMessageWithID(uint16_t id) const {
 
     AWLMessage awlMessage = AWLMessage::returnDefaultData();
     awlMessage.id = id;

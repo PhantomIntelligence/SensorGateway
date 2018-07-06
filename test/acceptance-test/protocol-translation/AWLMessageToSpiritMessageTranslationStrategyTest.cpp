@@ -22,7 +22,7 @@
 
 using namespace TestUtilities;
 
-class AWLMessageTranslatorTest : public ::testing::Test {
+class AWLMessageToSpiritMessageTranslationStrategyTest : public ::testing::Test {
 protected:
     char const*  AWLMESSAGES_INPUT_FILE_NAME = "AWLMessagesInputFile.txt";
     char const*  EXPECTED_SPIRIT_FRAMES_OUTPUT_FILE_NAME = "ExpectedSpiritFramesOutputFile.txt";
@@ -34,7 +34,7 @@ protected:
     SpiritFramesFileManager spiritFramesFileManager;
 };
 
-TEST_F(AWLMessageTranslatorTest, given_someInputFileContainingValidAWLMessages_when_translatingAWLMessagesIntoSpiritFrames_then_returnCorrespondingSpriritFramesOutputFile) {
+TEST_F(AWLMessageToSpiritMessageTranslationStrategyTest, given_someInputFileContainingValidAWLMessages_when_translatingAWLMessagesIntoSpiritFrames_then_returnCorrespondingSpriritFramesOutputFile) {
     char const* ACTUAL_SPIRIT_FRAMES_OUTPUT_FILE_NAME = "ActualSpiritFramesOutputFile.txt";
     AWLMessageToSpiritMessageTranslationStrategy awlMessageTranslator;
     std::vector<AWLMessage> messages = awlMessagesFileManager.readMessagesFromFile(AWLMESSAGES_INPUT_FILE_NAME);

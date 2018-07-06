@@ -16,15 +16,15 @@
 #include "spirit-sensor-gateway/common/DataSink.hpp"
 #include "MessageTranslationStrategy.hpp"
 
-using namespace DataFlow;
+namespace SensorAccessLinkElement {
 
-template <class INPUT,class OUTPUT>
-    class MessageTranslator: public DataSink<INPUT> {
+    template<class INPUT, class OUTPUT>
+    class MessageTranslator : public DataFlow::DataSink<INPUT> {
 
     public:
 
-        MessageTranslator(MessageTranslationStrategy messageTranslationStrategy):
-                messageTranslationStrategy(messageTranslationStrategy){};
+        MessageTranslator(ProtocolTranslation::MessageTranslationStrategy<INPUT, OUTPUT> messageTranslationStrategy) :
+                messageTranslationStrategy(messageTranslationStrategy) {};
 
         void consume(INPUT&& inputMessage) override {
             messageTranslationStrategy.translateBasicMessage(inputMessage);
@@ -32,9 +32,9 @@ template <class INPUT,class OUTPUT>
 
     private:
 
-        MessageTranslationStrategy messageTranslationStrategy;
+        ProtocolTranslation::MessageTranslationStrategy<INPUT, OUTPUT> messageTranslationStrategy;
 
-};
-
+    };
+}
 
 #endif //SPIRITSENSORGATEWAY_MESSAGETRANSLATOR_H

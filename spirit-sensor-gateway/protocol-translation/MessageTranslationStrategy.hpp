@@ -16,20 +16,21 @@
 
 #include "spirit-sensor-gateway/common/DataSource.hpp"
 
-using namespace DataFlow;
+namespace ProtocolTranslation {
 
-template <class INPUT,class OUTPUT>
-       class MessageTranslationStrategy: public DataSource<OUTPUT> {
-        public:
-            MessageTranslationStrategy() = default ;
+    template<class INPUT, class OUTPUT>
+    class MessageTranslationStrategy : public DataFlow::DataSource<OUTPUT> {
+    public:
+        MessageTranslationStrategy() = default;
 
-            virtual ~MessageTranslationStrategy() = default;
+        virtual ~MessageTranslationStrategy() = default;
 
-            virtual void translateBasicMessage(INPUT* inputMessage) = 0;
+        virtual void translateBasicMessage(INPUT* inputMessage) = 0;
 
-       protected:
+    protected:
 
-            OUTPUT* currentOutputMessage;
-};
+        OUTPUT* currentOutputMessage;
+    };
+}
 
 #endif //SPIRITSENSORGATEWAY_MESSAGETRANSLATIONSTRATEGY_H

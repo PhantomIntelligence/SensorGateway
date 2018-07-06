@@ -1,6 +1,7 @@
 #include "AWLMessageToSpiritMessageTranslationStrategy.h"
 #include "UnknownMessageException.h"
 
+using ProtocolTranslation::AWLMessageToSpiritMessageTranslationStrategy;
 
 AWLMessageToSpiritMessageTranslationStrategy::AWLMessageToSpiritMessageTranslationStrategy() {
     currentOutputMessage = new Frame();
