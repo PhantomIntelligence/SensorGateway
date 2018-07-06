@@ -18,7 +18,7 @@
 #ifndef SPIRITSENSORGATEWAY_CONSUMERLINK_HPP
 #define SPIRITSENSORGATEWAY_CONSUMERLINK_HPP
 
-#include "ConstantDefinition.h"
+#include "ConstantSizedPointerList.hpp"
 
 namespace DataFlow {
 
@@ -30,17 +30,17 @@ namespace DataFlow {
 
     protected:
 
+        ConsumerLink() = default;
+
         virtual ~ConsumerLink() {}
 
     public:
 
-        typedef RingBuffer<T> InputBuffer;
+        virtual void linkWith(RingBuffer<T>* buffer) = 0;
 
-        virtual void linkWith(InputBuffer* buffer) = 0;
+        virtual void activateFor(RingBuffer<T>* buffer) = 0;
 
-        virtual void activateFor(InputBuffer* buffer) = 0;
-
-        virtual void deactivateFor(InputBuffer* buffer) = 0;
+        virtual void deactivateFor(RingBuffer<T>* buffer) = 0;
     };
 }
 

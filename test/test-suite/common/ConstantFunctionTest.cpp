@@ -4,7 +4,7 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
-#include "spirit-sensor-gateway/common/ConstantFunction.h"
+#include "spirit-sensor-gateway/common/ConstantFunctionsDefinition.h"
 
 class ConstantFunctionTest : public ::testing::Test {
 

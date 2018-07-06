@@ -16,12 +16,12 @@
 
 #include <canlib.h>
 #include "CommunicationProtocolStrategy.hpp"
-
+#include <limits>
 
 
 namespace CommunicationProtocolStrategy {
     class KvaserCanProtocolStrategy : public CommunicationProtocolStrategy {
-        const unsigned long CANLIB_READ_WAIT_INFINITE_DELAY = (unsigned long) -1;
+        const unsigned long CANLIB_READ_WAIT_INFINITE_DELAY = std::numeric_limits<int>::infinity();
     public:
         KvaserCanProtocolStrategy();
         ~ KvaserCanProtocolStrategy();
