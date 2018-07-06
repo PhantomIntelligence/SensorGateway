@@ -23,7 +23,7 @@ namespace SensorAccessLinkElement {
 
     public:
 
-        MessageTranslator(ProtocolTranslation::MessageTranslationStrategy<INPUT, OUTPUT> messageTranslationStrategy) :
+        explicit MessageTranslator(ProtocolTranslation::MessageTranslationStrategy<INPUT, OUTPUT>* messageTranslationStrategy) :
                 messageTranslationStrategy(messageTranslationStrategy) {};
 
         ~MessageTranslator(){
@@ -31,12 +31,12 @@ namespace SensorAccessLinkElement {
         }
 
         void consume(INPUT&& inputMessage) override {
-            messageTranslationStrategy.translateBasicMessage(inputMessage);
+            messageTranslationStrategy->translateBasicMessage(std::move(inputMessage));
         };
 
     private:
 
-        ProtocolTranslation::MessageTranslationStrategy<INPUT, OUTPUT> messageTranslationStrategy;
+        ProtocolTranslation::MessageTranslationStrategy<INPUT, OUTPUT>* messageTranslationStrategy;
 
     };
 }

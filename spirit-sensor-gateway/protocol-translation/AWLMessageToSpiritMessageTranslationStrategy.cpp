@@ -14,19 +14,19 @@ std::vector<Frame> AWLMessageToSpiritMessageTranslationStrategy::getFrames() con
     return frames;
 };
 
-void AWLMessageToSpiritMessageTranslationStrategy::translateBasicMessage(AWLMessage* inputMessage) {
-    switch (inputMessage->id) {
+void AWLMessageToSpiritMessageTranslationStrategy::translateBasicMessage(AWLMessage&& inputMessage) {
+    switch (inputMessage.id) {
         case FRAME_DONE:
-            translateEndOfFrameMessage(inputMessage);
+            translateEndOfFrameMessage(&inputMessage);
             break;
         case DETECTION_TRACK :
-            translateDetectionTrackMessage(inputMessage);
+            translateDetectionTrackMessage(&inputMessage);
             break;
         case DETECTION_VELOCITY :
-            translateDetectionVelocityMessage(inputMessage);
+            translateDetectionVelocityMessage(&inputMessage);
             break;
         default:
-            throw UnknownMessageException(inputMessage);
+            throw UnknownMessageException(&inputMessage);
     }
 }
 

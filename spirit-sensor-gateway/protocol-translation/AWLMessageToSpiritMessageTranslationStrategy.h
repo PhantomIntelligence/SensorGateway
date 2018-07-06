@@ -25,8 +25,9 @@ using namespace DataFlow;
 
 namespace ProtocolTranslation {
 
-    class AWLMessageToSpiritMessageTranslationStrategy : public MessageTranslationStrategy<AWLMessage, Frame> {
+    class AWLMessageToSpiritMessageTranslationStrategy final: public MessageTranslationStrategy<AWLMessage, Frame> {
     public:
+
         AWLMessageToSpiritMessageTranslationStrategy();
 
         ~ AWLMessageToSpiritMessageTranslationStrategy();
@@ -35,7 +36,7 @@ namespace ProtocolTranslation {
 
         Frame returnDefaultData();
 
-        void translateBasicMessage(AWLMessage* inputMessage) override;
+        void translateBasicMessage(AWLMessage&& inputMessage) override;
 
     private:
         std::vector<Frame> frames;

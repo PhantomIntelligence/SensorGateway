@@ -21,7 +21,8 @@
 
 #include "spirit-sensor-gateway/protocol-translation/AWLMessageToSpiritMessageTranslationStrategy.h"
 
-using namespace Defaults::Track;
+using DataFlow::Track;
+using ProtocolTranslation::AWLMessageToSpiritMessageTranslationStrategy;
 
 class AWLMessageToSpiritMessageTranslationStrategyTest : public ::testing::Test {
 protected:
@@ -40,7 +41,7 @@ TEST_F(AWLMessageToSpiritMessageTranslationStrategyTest,given_someFrameDoneAWLMe
     awlMessage.data[2] = 0;
     awlMessage.data[3] = 16;
 
-    awlMessageTranslator.translateBasicMessage(&awlMessage);
+    awlMessageTranslator.translateBasicMessage(std::move(awlMessage));
     auto expectedFrameID = 4114;
     auto expectedSystemID = 4096;
 
@@ -56,13 +57,14 @@ TEST_F(AWLMessageToSpiritMessageTranslationStrategyTest,given_someDetectionTrack
     auto detectionTrackAwlMessage = createAWLMessageWithID(DETECTION_TRACK);
     auto endOfFrameAwlMessage = createAWLMessageWithID(FRAME_DONE);
 
-    awlMessageTranslator.translateBasicMessage(&detectionTrackAwlMessage);
-    awlMessageTranslator.translateBasicMessage(&endOfFrameAwlMessage);
-
     auto expectedPixelID = convertTwoBytesToUnsignedBigEndian(detectionTrackAwlMessage.data[3],detectionTrackAwlMessage.data[4]);
     auto expectedTrackID = convertTwoBytesToUnsignedBigEndian(detectionTrackAwlMessage.data[0],detectionTrackAwlMessage.data[1]);
     auto expectedTrackConfidenceLevel = detectionTrackAwlMessage.data[5];
     auto expectedTrackIntensity = convertTwoBytesToUnsignedBigEndian(detectionTrackAwlMessage.data[6],detectionTrackAwlMessage.data[7]);
+
+    awlMessageTranslator.translateBasicMessage(std::move(detectionTrackAwlMessage));
+    awlMessageTranslator.translateBasicMessage(std::move(endOfFrameAwlMessage));
+
     auto frame = awlMessageTranslator.getFrames()[0];
     auto pixel = frame.fetchPixelByID(expectedPixelID);
     auto track = *(pixel->fetchTrackByID(expectedTrackID));
@@ -71,9 +73,9 @@ TEST_F(AWLMessageToSpiritMessageTranslationStrategyTest,given_someDetectionTrack
     ASSERT_EQ(expectedTrackID,track.getID());
     ASSERT_EQ(expectedTrackConfidenceLevel,track.getConfidenceLevel());
     ASSERT_EQ(expectedTrackIntensity,track.getIntensity());
-    ASSERT_EQ(DEFAULT_ACCELERATION_VALUE,track.getAcceleration());
-    ASSERT_EQ(DEFAULT_DISTANCE_VALUE,track.getDistance());
-    ASSERT_EQ(DEFAULT_SPEED_VALUE,track.getSpeed());
+    ASSERT_EQ(Defaults::Track::DEFAULT_ACCELERATION_VALUE,track.getAcceleration());
+    ASSERT_EQ(Defaults::Track::DEFAULT_DISTANCE_VALUE,track.getDistance());
+    ASSERT_EQ(Defaults::Track::DEFAULT_SPEED_VALUE,track.getSpeed());
 }
 
 TEST_F(AWLMessageToSpiritMessageTranslationStrategyTest,given_someVelocityTrackAWLMessage_when_translatingTheAWLMessage_then_setsTheCorrectAttributesOfTheTrack) {
@@ -84,11 +86,6 @@ TEST_F(AWLMessageToSpiritMessageTranslationStrategyTest,given_someVelocityTrackA
     auto detectionVelocityAwlMessage = createAWLMessageWithID(DETECTION_VELOCITY);
     auto endOfFrameAwlMessage = createAWLMessageWithID(FRAME_DONE);
 
-    awlMessageTranslator.translateBasicMessage(&detectionTrackAwlMessage);
-    awlMessageTranslator.translateBasicMessage(&detectionVelocityAwlMessage);
-    awlMessageTranslator.translateBasicMessage(&endOfFrameAwlMessage);
-
-
     auto expectedPixelID = convertTwoBytesToUnsignedBigEndian(detectionTrackAwlMessage.data[3],detectionTrackAwlMessage.data[4]);
     auto expectedTrackID = convertTwoBytesToUnsignedBigEndian(detectionTrackAwlMessage.data[0],detectionTrackAwlMessage.data[1]);
     auto expectedTrackConfidenceLevel = detectionTrackAwlMessage.data[5];
@@ -96,6 +93,12 @@ TEST_F(AWLMessageToSpiritMessageTranslationStrategyTest,given_someVelocityTrackA
     auto expectedTrackDistance = convertTwoBytesToUnsignedBigEndian(detectionVelocityAwlMessage.data[2],detectionVelocityAwlMessage.data[3]);
     Speed expectedTrackSpeed = convertTwoBytesToSignedBigEndian(detectionTrackAwlMessage.data[4],detectionTrackAwlMessage.data[5]);
     Acceleration expectedTrackAcceleration = convertTwoBytesToSignedBigEndian(detectionTrackAwlMessage.data[6],detectionTrackAwlMessage.data[7]);
+
+    awlMessageTranslator.translateBasicMessage(std::move(detectionTrackAwlMessage));
+    awlMessageTranslator.translateBasicMessage(std::move(detectionVelocityAwlMessage));
+    awlMessageTranslator.translateBasicMessage(std::move(endOfFrameAwlMessage));
+
+
 
     auto frame = awlMessageTranslator.getFrames().at(0);
     auto pixel = frame.fetchPixelByID(expectedPixelID);

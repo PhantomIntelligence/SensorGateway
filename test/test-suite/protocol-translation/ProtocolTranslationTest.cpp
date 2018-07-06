@@ -49,8 +49,8 @@ public:
     MockMessageTranslationStrategy() : translateBasicMessageCalled(false),
                                        receivedInputMessage(AWLMessage::returnDefaultData()) {};
 
-    void translateBasicMessage(AWLMessage* inputMessage) override {
-        receivedInputMessage = *inputMessage;
+    void translateBasicMessage(AWLMessage&& inputMessage) override {
+        receivedInputMessage = inputMessage;
         translateBasicMessageCalled.store(true);
 
     };
@@ -74,7 +74,7 @@ TEST_F(ProtocolTranslationTest,
        given_aMessageTranslationStrategy_when_consumingABasicAWLMessage_then_callsTranslateBasicMessageInStrategy) {
 
     MockMessageTranslationStrategy mockStrategy;
-    MessageTranslator<AWLMessage,Frame> messageTranslator(mockStrategy);
+    MessageTranslator<AWLMessage,Frame> messageTranslator(&mockStrategy);
 
     messageTranslator.consume(std::move(awlMessage));
     auto strategyHasBeenCalledWithRightParameter = mockStrategy.hasTranslateBasicMessageBeenCalledWithRightInputMessage(awlMessage);

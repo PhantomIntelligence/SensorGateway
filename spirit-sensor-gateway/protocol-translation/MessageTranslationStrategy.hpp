@@ -24,12 +24,21 @@ namespace ProtocolTranslation {
 
         virtual ~MessageTranslationStrategy() noexcept = default;
 
-        virtual void translateBasicMessage(INPUT* inputMessage) = 0;
+        virtual void translateBasicMessage(INPUT&& inputMessage) = 0;
 
     protected:
 
         OUTPUT* currentOutputMessage;
     };
+    /**
+     * @brief AWL Specialisation
+     */
+
+   /* template <>
+    void  MessageTranslationStrategy<DataFlow::AWLMessage,DataFlow::Track>::translateBasicMessage(
+            DataFlow::AWLMessage* inputMessage){
+
+    };*/
 }
 
 #endif //SPIRITSENSORGATEWAY_MESSAGETRANSLATIONSTRATEGY_H

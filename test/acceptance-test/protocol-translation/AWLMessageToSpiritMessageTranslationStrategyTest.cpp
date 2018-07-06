@@ -21,6 +21,7 @@
 #include "spirit-sensor-gateway/protocol-translation/AWLMessageToSpiritMessageTranslationStrategy.h"
 
 using namespace TestUtilities;
+using ProtocolTranslation::AWLMessageToSpiritMessageTranslationStrategy;
 
 class AWLMessageToSpiritMessageTranslationStrategyTest : public ::testing::Test {
 protected:
@@ -39,7 +40,7 @@ TEST_F(AWLMessageToSpiritMessageTranslationStrategyTest, given_someInputFileCont
     AWLMessageToSpiritMessageTranslationStrategy awlMessageTranslator;
     std::vector<AWLMessage> messages = awlMessagesFileManager.readMessagesFromFile(AWLMESSAGES_INPUT_FILE_NAME);
     for (auto message : messages) {
-        awlMessageTranslator.translateBasicMessage(&message);
+        awlMessageTranslator.translateBasicMessage(std::move(message));
     }
     std::vector<Frame> frames = awlMessageTranslator.getFrames();
     spiritFramesFileManager.writeFileWithMessages(frames, ACTUAL_SPIRIT_FRAMES_OUTPUT_FILE_NAME);
