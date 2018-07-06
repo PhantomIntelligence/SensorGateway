@@ -48,3 +48,7 @@ void Frame::setFrameID(FrameID const& frameID) {
 void Frame::setSystemID(SystemID const& systemID) {
     this->systemID = systemID;
 }
+
+void Frame::returnDefaultData() {
+    return;
+}

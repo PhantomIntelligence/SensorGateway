@@ -18,20 +18,21 @@
 
 #include "spirit-sensor-gateway/domain/Frame.h"
 #include "spirit-sensor-gateway/domain/AWLMessage.h"
+#include "MessageTranslationStrategy.hpp"
 
 using namespace MessageID;
 using namespace SpiritProtocol;
 
-    class AWLMessageTranslator {
+    class AWLMessageToSpiritMessageTranslationStrategy : public MessageTranslationStrategy <AWLMessage,Frame> {
     public:
-        AWLMessageTranslator();
-        ~ AWLMessageTranslator();
+        AWLMessageToSpiritMessageTranslationStrategy();
+        ~ AWLMessageToSpiritMessageTranslationStrategy();
         std::vector<Frame> getFrames() const;
+        Frame returnDefaultData();
         void translateBasicMessage(AWLMessage* awlMessage);
 
     private:
         std::vector<Frame> frames;
-        Frame* currentFrame;
         void addTrackInPixel(AWLMessage* awlMessage, PixelID pixelID);
         Track* fetchTrack (AWLMessage* awlMessage) const;
         void translateDetectionTrackMessage(AWLMessage* awlMessage);

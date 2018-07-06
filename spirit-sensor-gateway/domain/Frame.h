@@ -30,6 +30,7 @@ namespace SpiritProtocol {
             SystemID getSystemID() const;
             void setFrameID(FrameID const& frameID);
             void setSystemID(SystemID const& systemID);
+            void returnDefaultData();
 
         private:
             FrameID frameID;

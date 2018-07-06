@@ -5,7 +5,7 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
-#include "spirit-sensor-gateway/spirit-protocol-translation/AWLMessageTranslator.h"
+#include "spirit-sensor-gateway/spirit-protocol-translation/AWLMessageToSpiritMessageTranslationStrategy.h"
 
 using namespace Defaults::Track;
 
@@ -16,7 +16,7 @@ protected:
 
 
 TEST_F(AWLMessageTranslatorTest,given_someFrameDoneAWLMessage_when_translatingTheAwlMessage_then_setsTheCorrectFrameIdAndSystemId){
-    AWLMessageTranslator awlMessageTranslator;
+    AWLMessageToSpiritMessageTranslationStrategy awlMessageTranslator;
     AWLMessage awlMessage;
     awlMessage.id = FRAME_DONE;
     awlMessage.data[0] = 18;
@@ -36,7 +36,7 @@ TEST_F(AWLMessageTranslatorTest,given_someFrameDoneAWLMessage_when_translatingTh
 
 TEST_F(AWLMessageTranslatorTest,given_someDetectionTrackAWLMessage_when_translatingTheAwlMessage_then_setsTheCorrectAttributesOfTheTrack) {
 
-    AWLMessageTranslator awlMessageTranslator;
+    AWLMessageToSpiritMessageTranslationStrategy awlMessageTranslator;
     auto detectionTrackAwlMessage = createAWLMessageWithID(DETECTION_TRACK);
     auto endOfFrameAwlMessage = createAWLMessageWithID(FRAME_DONE);
 
@@ -62,7 +62,7 @@ TEST_F(AWLMessageTranslatorTest,given_someDetectionTrackAWLMessage_when_translat
 
 TEST_F(AWLMessageTranslatorTest,given_someVelocityTrackAWLMessage_when_translatingTheAWLMessage_then_setsTheCorrectAttributesOfTheTrack) {
 
-    AWLMessageTranslator awlMessageTranslator;
+    AWLMessageToSpiritMessageTranslationStrategy awlMessageTranslator;
 
     auto detectionTrackAwlMessage = createAWLMessageWithID(DETECTION_TRACK);
     auto detectionVelocityAwlMessage = createAWLMessageWithID(DETECTION_VELOCITY);

@@ -18,7 +18,7 @@
 #include "test/utilities/SpiritFramesFileManager.h"
 #include "test/acceptance-test/fixtures/AWLMessagesFixture.cpp"
 #include "test/acceptance-test/fixtures/SpiritFramesFixture.cpp"
-#include "spirit-sensor-gateway/spirit-protocol-translation/AWLMessageTranslator.h"
+#include "spirit-sensor-gateway/spirit-protocol-translation/AWLMessageToSpiritMessageTranslationStrategy.h"
 
 using namespace TestUtilities;
 
@@ -36,7 +36,7 @@ protected:
 
 TEST_F(AWLMessageTranslatorTest, given_someInputFileContainingValidAWLMessages_when_translatingAWLMessagesIntoSpiritFrames_then_returnCorrespondingSpriritFramesOutputFile) {
     char const* ACTUAL_SPIRIT_FRAMES_OUTPUT_FILE_NAME = "ActualSpiritFramesOutputFile.txt";
-    AWLMessageTranslator awlMessageTranslator;
+    AWLMessageToSpiritMessageTranslationStrategy awlMessageTranslator;
     std::vector<AWLMessage> messages = awlMessagesFileManager.readMessagesFromFile(AWLMESSAGES_INPUT_FILE_NAME);
     for (auto message : messages) {
         awlMessageTranslator.translateBasicMessage(&message);

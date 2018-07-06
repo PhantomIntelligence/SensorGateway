@@ -43,6 +43,8 @@ namespace SpiritProtocol {
 
         Speed getSpeed() const;
 
+
+
         void setAcceleration(Acceleration const& acceleration);
 
         void setDistance(Distance const& distance);
