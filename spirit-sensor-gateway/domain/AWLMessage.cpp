@@ -21,14 +21,14 @@ AWLMessage::AWLMessage(AWLMessage&& other) noexcept :
 
 }
 
-AWLMessage& AWLMessage::operator=(AWLMessage other)& {
-    swap(*this, other);
+AWLMessage& AWLMessage::operator=(AWLMessage const& other)& {
+    AWLMessage temporary(std::move(other));
+    swap(*this, temporary);
     return *this;
 }
 
 AWLMessage& AWLMessage::operator=(AWLMessage&& other)& noexcept {
-    AWLMessage temporary(std::move(other));
-    swap(*this, temporary);
+    swap(*this, other);
     return *this;
 }
 

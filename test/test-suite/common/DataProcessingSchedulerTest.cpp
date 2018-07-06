@@ -106,6 +106,12 @@ public:
         return actualNumberOfWrites.load() == numberOfWritesGoal.load();
     };
 
+    void waitUntillReadMessageIsCalled() const {
+        if (!hasBeenCalledExpectedNumberOfTimes()) {
+            numberOfWritesAchieved.get_future().wait();
+        }
+    }
+
 private:
     AtomicCounter actualNumberOfWrites;
     AtomicCounter numberOfWritesGoal;
@@ -273,6 +279,8 @@ TEST_F(DataProcessingSchedulerTest,
         auto nativeData = DataTestUtil::generateRandomNativeData();
         inputBuffer.write(std::move(nativeData));
     }
+
+    mockSink.waitUntillReadMessageIsCalled();
 
     scheduler.terminateAndJoin();
 

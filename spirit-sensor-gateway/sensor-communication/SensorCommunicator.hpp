@@ -27,13 +27,18 @@ namespace SensorAccessLinkElement {
 
     protected:
         typedef T DATA;
+        typedef SensorCommunication::CommunicationProtocolStrategy<DATA> CommunicationProtocolStrategy;
+
         using super = DataFlow::DataSource<DATA>;
         using super::produce;
 
     public:
-        explicit SensorCommunicator(
-                SensorCommunication::CommunicationProtocolStrategy<DATA>* communicationProtocolStrategy)
-                : communicationProtocolStrategy(communicationProtocolStrategy) {}
+        explicit SensorCommunicator(CommunicationProtocolStrategy* communicationProtocolStrategy) :
+                terminateOrderReceived(false),
+                communicationProtocolStrategy(communicationProtocolStrategy),
+                communicatorThread(JoinableThread(voidAction)) {
+            communicatorThread.exitSafely();
+        }
 
         ~SensorCommunicator() {
 
@@ -41,18 +46,38 @@ namespace SensorAccessLinkElement {
 
         void start() {
             communicationProtocolStrategy->openConnection();
-            auto message = communicationProtocolStrategy->readMessage();
-            produce(std::move(message));
+            communicatorThread = JoinableThread(&SensorCommunicator::run, this);
         };
 
         void terminateAndJoin() {
             communicationProtocolStrategy->closeConnection();
+
+            if (!terminateOrderHasBeenReceived()) {
+                terminateOrderReceived.store(true);
+            }
+
+            communicatorThread.exitSafely();
         };
 
 
     private:
-        SensorCommunication::CommunicationProtocolStrategy<DATA>* communicationProtocolStrategy;
 
+        void run() {
+            while (!terminateOrderHasBeenReceived()) {
+                auto message = communicationProtocolStrategy->readMessage();
+                produce(std::move(message));
+            }
+        }
+
+        bool terminateOrderHasBeenReceived() const {
+            return terminateOrderReceived.load();
+        }
+
+        JoinableThread communicatorThread;
+
+        AtomicFlag terminateOrderReceived;
+
+        CommunicationProtocolStrategy* communicationProtocolStrategy;
     };
 }
 
