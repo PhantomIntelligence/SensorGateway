@@ -24,7 +24,7 @@ namespace SpiritProtocol {
 
         ~Pixel();
 
-        Pixel() = default;
+        Pixel();
 
         bool operator==(Pixel const& other) const;
 
@@ -38,13 +38,25 @@ namespace SpiritProtocol {
 
         std::array<Track, MAXIMUM_NUMBER_OF_TRACKS_IN_AWL16_PIXEL>* getTracks();
 
+        Pixel static const returnDefaultData() noexcept;
+
         void validateNotFull() const;
 
     private:
+
         int numberOfTracksInPixel = 0;
         PixelID ID;
         std::array<Track, MAXIMUM_NUMBER_OF_TRACKS_IN_AWL16_PIXEL> tracks;
     };
+
+    namespace Defaults {
+        namespace Pixel {
+            using SpiritProtocol::Track;
+            PixelID const DEFAULT_PIXEL_ID_VALUE = 0;
+            std::array<Track, NUMBER_OF_PIXELS_IN_AWL16_FRAME> const DEFAUTL_TRACKS_ARRAY = std::array<Track, NUMBER_OF_PIXELS_IN_AWL16_FRAME>();
+            SpiritProtocol::Pixel const DEFAULT_PIXEL = SpiritProtocol::Pixel(DEFAULT_PIXEL_ID_VALUE);
+        }
+    }
 }
 
 #endif //SPIRITSENSORGATEWAY_SPIRITPIXEL_H

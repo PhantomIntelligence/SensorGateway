@@ -15,8 +15,9 @@
 #include "Pixel.h"
 
 using namespace SpiritProtocol;
+using namespace Defaults::Pixel;
 
-Pixel::Pixel(PixelID pixelID) : ID(pixelID) {};
+Pixel::Pixel(PixelID pixelID) : ID(pixelID),tracks(DEFAUTL_TRACKS_ARRAY) {};
 
 Pixel::~Pixel() {
 };
@@ -68,6 +69,11 @@ void Pixel::validateNotFull() const {
         throw std::runtime_error(ExceptionMessage::PIXEL_TRACK_ARRAY_ILLEGAL_STORE_FULL);
     }
 
-};
+}
+
+Pixel const Pixel::returnDefaultData() noexcept {
+    return DEFAULT_PIXEL;
+}
+
 
 

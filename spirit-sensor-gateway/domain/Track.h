@@ -43,13 +43,15 @@ namespace SpiritProtocol {
 
         Speed getSpeed() const;
 
-
+        Track static const returnDefaultData() noexcept;
 
         void setAcceleration(Acceleration const& acceleration);
 
         void setDistance(Distance const& distance);
 
         void setSpeed(Speed const& speed);
+
+
 
     private:
         Acceleration acceleration;
@@ -68,6 +70,7 @@ namespace SpiritProtocol {
             TrackID const DEFAULT_ID_VALUE = 0;
             Speed const DEFAULT_SPEED_VALUE = 0;
             Intensity const DEFAULT_INTENSITY_VALUE = 0;
+            SpiritProtocol::Track const DEFAULT_TRACK = SpiritProtocol::Track();
         }
     }
 }

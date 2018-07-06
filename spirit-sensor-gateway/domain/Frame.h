@@ -16,6 +16,7 @@
 
 #include "Pixel.h"
 
+
 namespace SpiritProtocol {
 
     class Frame {
@@ -30,13 +31,25 @@ namespace SpiritProtocol {
             SystemID getSystemID() const;
             void setFrameID(FrameID const& frameID);
             void setSystemID(SystemID const& systemID);
-            void returnDefaultData();
+            Frame static const returnDefaultData() noexcept ;
 
         private:
             FrameID frameID;
             std::array<Pixel, NUMBER_OF_PIXELS_IN_AWL16_FRAME> pixels;
             SystemID systemID;
     };
+
+    namespace Defaults {
+        namespace Frame {
+            using SpiritProtocol::Pixel;
+            FrameID const DEFAULT_FRAME_ID_VALUE = 0;
+            SystemID const DEFAULT_SYSTEM_ID_VALUE = 0;
+            std::array<Pixel, NUMBER_OF_PIXELS_IN_AWL16_FRAME> const DEFAULT_PIXELS_ARRAY = std::array<Pixel, NUMBER_OF_PIXELS_IN_AWL16_FRAME>();
+            SpiritProtocol::Frame const DEFAULT_FRAME = SpiritProtocol::Frame();
+        }
+    }
+
+
 }
 
 #endif //SPIRITSENSORGATEWAY_FRAME_H

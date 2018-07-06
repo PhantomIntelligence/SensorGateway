@@ -93,3 +93,7 @@ void Track::setSpeed(Speed const& speed) {
     this->speed = speed;
 }
 
+Track const Track::returnDefaultData() noexcept {
+    return DEFAULT_TRACK;
+}
+

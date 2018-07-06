@@ -14,9 +14,11 @@
 #include "Frame.h"
 
 using namespace SpiritProtocol;
+using namespace Defaults::Frame;
 
-Frame::Frame() {
-};
+Frame::Frame():systemID(DEFAULT_SYSTEM_ID_VALUE),
+               frameID(DEFAULT_FRAME_ID_VALUE),
+               pixels(DEFAULT_PIXELS_ARRAY){};
 
 Frame::~Frame() {
 };
@@ -49,6 +51,6 @@ void Frame::setSystemID(SystemID const& systemID) {
     this->systemID = systemID;
 }
 
-void Frame::returnDefaultData() {
-    return;
+Frame const Frame::returnDefaultData() noexcept {
+    return DEFAULT_FRAME;
 }
