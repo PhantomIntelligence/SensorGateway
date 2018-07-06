@@ -75,6 +75,9 @@ public:
         return readMessageCalled.load();
     }
 
+    bool hasCloseConnectionBeenNotCalled() const {
+        return closeConnectionCalled.load();
+    }
 
 private:
 
@@ -113,6 +116,25 @@ TEST_F(SensorCommunicatorTest, given_aSensorCommunicationStrategy_when_start_the
     sensorCommunicator.start();
     auto strategyHasBeenCalled = mockStrategy.hasReadMessageBeenCalled();
     ASSERT_TRUE(strategyHasBeenCalled);
+}
+
+TEST_F(SensorCommunicatorTest, given_aSensorCommunicationStrategy_when_untilStopConnection_then_callsReadMessageInStrategy) {
+    MockSensorCommunicationStrategy mockStrategy;
+    AWLCommunicator sensorCommunicator(&mockStrategy);
+    sensorCommunicator.start();
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(5));
+    if si cest vrai
+    sensorCommunicator.terminateAndJoin();
+    //while(startHasBeenCalled){// for un for ou un thread 1 seconde
+        //ASSERT_FALSE(mockStrategy.hasCloseConnectionBeenNotCalled());
+//       if(closeHasBeenCalled){
+//           ASSERT_TRUE(closeHasBeenCalled);
+//       }
+//    }
+
+
+    auto startHasBeenCalled = mockStrategy.hasReadMessageBeenCalled();
 }
 #endif //SPIRITSENSORGATEWAY_SENSORCOMMUNICATORTEST_CPP
 
