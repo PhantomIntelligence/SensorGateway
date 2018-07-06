@@ -19,6 +19,10 @@ using namespace Defaults::Pixel;
 
 Pixel::Pixel(PixelID pixelID) : ID(pixelID),tracks(DEFAUTL_TRACKS_ARRAY) {};
 
+Pixel::Pixel() {
+
+};
+
 Pixel::~Pixel() {
 };
 
@@ -74,6 +78,8 @@ void Pixel::validateNotFull() const {
 Pixel const Pixel::returnDefaultData() noexcept {
     return DEFAULT_PIXEL;
 }
+
+
 
 
 

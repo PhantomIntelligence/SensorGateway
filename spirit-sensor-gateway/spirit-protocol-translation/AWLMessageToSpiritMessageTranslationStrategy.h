@@ -29,7 +29,7 @@ using namespace SpiritProtocol;
         ~ AWLMessageToSpiritMessageTranslationStrategy();
         std::vector<Frame> getFrames() const;
         Frame returnDefaultData();
-        void translateBasicMessage(AWLMessage* awlMessage);
+        void translateBasicMessage(AWLMessage* inputMessage) override;
 
     private:
         std::vector<Frame> frames;

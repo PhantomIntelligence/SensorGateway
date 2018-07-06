@@ -25,7 +25,7 @@ template <class INPUT,class OUTPUT>
 
             virtual ~MessageTranslationStrategy() = default;
 
-            virtual void translateBasicMessage(INPUT inputMessage) = 0;
+            virtual void translateBasicMessage(INPUT* inputMessage) = 0;
 
        protected:
 
