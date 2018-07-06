@@ -26,6 +26,10 @@ namespace SensorAccessLinkElement {
         MessageTranslator(ProtocolTranslation::MessageTranslationStrategy<INPUT, OUTPUT> messageTranslationStrategy) :
                 messageTranslationStrategy(messageTranslationStrategy) {};
 
+        ~MessageTranslator(){
+
+        }
+
         void consume(INPUT&& inputMessage) override {
             messageTranslationStrategy.translateBasicMessage(inputMessage);
         };

@@ -62,6 +62,7 @@ public:
     };
 
 
+
 private:
 
     AtomicFlag translateBasicMessageCalled;

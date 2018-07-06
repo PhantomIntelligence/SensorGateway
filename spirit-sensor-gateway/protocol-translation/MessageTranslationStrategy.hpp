@@ -21,9 +21,8 @@ namespace ProtocolTranslation {
     template<class INPUT, class OUTPUT>
     class MessageTranslationStrategy : public DataFlow::DataSource<OUTPUT> {
     public:
-        MessageTranslationStrategy() = default;
 
-        virtual ~MessageTranslationStrategy() = default;
+        virtual ~MessageTranslationStrategy() noexcept = default;
 
         virtual void translateBasicMessage(INPUT* inputMessage) = 0;
 
