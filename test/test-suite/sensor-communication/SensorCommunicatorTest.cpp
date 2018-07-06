@@ -38,7 +38,13 @@ protected:
 
     virtual ~SensorCommunicatorTest() = default;
 
-    AWLMessage givenOneMessage() const noexcept;
+    AWLMessage givenOneMessage() const noexcept {
+        return givenOneMessage(0);
+    }
+
+    AWLMessage givenOneMessage(uint8_t offsetForDataDifference) const noexcept;
+
+    AWLData givenANumberOfMessages(uint8_t numberOfMessagesToCreate) const noexcept;
 };
 
 class MockSensorCommunicationStrategy final : public SensorCommunication::CommunicationProtocolStrategy<AWLMessage> {
@@ -205,16 +211,48 @@ TEST_F(SensorCommunicatorTest, given_oneMessage_when_start_then_willProduceThisD
     ASSERT_EQ(expectedMessage, producedMessage);
 }
 
-AWLMessage SensorCommunicatorTest::givenOneMessage() const noexcept {
-    int64_t const ARBITRARY_ID = 42;
-    uint64_t const ARBITRARY_LENGTH = 7;
-    int64_t const ARBITRARY_TIMESTAMP = 101010;
+TEST_F(SensorCommunicatorTest, given_severalMessage_when_start_then_willProduceTheseDataInTheSameOrderItConsumedIt) {
+    auto messages = givenANumberOfMessages(3);
+    AWLData expectedMessages = messages;
+
+    MockSensorCommunicationStrategy mockStrategy;
+    mockStrategy.whenCalledReadMessageThenWillReturnTheseMessages(messages);
+
+    AWLSinkMock sink(messages.size());
+    AWLProcessingScheduler scheduler(&sink);
+
+    AWLCommunicator sensorCommunicator(&mockStrategy);
+    sensorCommunicator.linkConsumer(&scheduler);
+    sensorCommunicator.start();
+
+    sink.waitConsumptionGoalToBeReached();
+
+    scheduler.terminateAndJoin();
+    sensorCommunicator.terminateAndJoin();
+
+    auto producedMessages = sink.getConsumedData();
+    ASSERT_EQ(expectedMessages, producedMessages);
+}
+
+AWLMessage SensorCommunicatorTest::givenOneMessage(uint8_t offsetForDataDifference) const noexcept {
+    int64_t const ARBITRARY_ID = 42 + offsetForDataDifference;
+    uint64_t const ARBITRARY_TIMESTAMP = 101010 + offsetForDataDifference;
+    uint32_t const ARBITRARY_LENGTH = 7 + offsetForDataDifference;
 
     AWLMessage message = AWLMessage::returnDefaultData();
     message.id = ARBITRARY_ID;
-    message.length = ARBITRARY_LENGTH;
     message.timestamp = ARBITRARY_TIMESTAMP;
+    message.length = ARBITRARY_LENGTH;
     return message;
+}
+
+AWLData SensorCommunicatorTest::givenANumberOfMessages(uint8_t numberOfMessagesToCreate) const noexcept {
+    AWLData messages;
+    for (uint8_t offset = 0; offset < numberOfMessagesToCreate; ++offset) {
+        auto message = givenOneMessage(offset);
+        messages.push_back(message);
+    }
+    return messages;
 }
 
 #endif //SPIRITSENSORGATEWAY_SENSORCOMMUNICATORTEST_CPP
