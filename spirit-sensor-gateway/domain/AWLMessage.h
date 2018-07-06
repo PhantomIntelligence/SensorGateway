@@ -25,12 +25,23 @@ namespace {
 namespace DataFlow {
     class AWLMessage {
     public:
-        explicit AWLMessage(
-                int64_t id,
-                uint64_t timestamp,
-                uint32_t length,
-                AWL::DataArray data
-        );
+        explicit AWLMessage(int64_t id, uint64_t timestamp, uint32_t length, AWL::DataArray data);
+
+        ~AWLMessage() noexcept = default;
+
+        AWLMessage(AWLMessage const& other);
+
+        AWLMessage(AWLMessage&& other) noexcept;
+
+        AWLMessage& operator=(AWLMessage other)& ;
+
+        AWLMessage& operator=(AWLMessage&& other)& noexcept;
+
+        void swap(AWLMessage& current, AWLMessage& other) noexcept;
+
+        bool operator==(AWLMessage const&) const;
+
+        bool operator!=(AWLMessage const&) const;
 
         AWLMessage static const returnDefaultData() noexcept;
 

@@ -17,14 +17,19 @@
 #ifndef SPIRITSENSORGATEWAY_SENSORCOMMUNICATOR_HPP
 #define SPIRITSENSORGATEWAY_SENSORCOMMUNICATOR_HPP
 
-#include <spirit-sensor-gateway/common/DataSource.hpp>
+#include "spirit-sensor-gateway/common/DataProcessingScheduler.hpp"
 #include "CommunicationProtocolStrategy.hpp"
 
 namespace SensorAccessLinkElement {
 
     template<class T>
     class SensorCommunicator : public DataFlow::DataSource<T> {
+
+    protected:
         typedef T DATA;
+        using super = DataFlow::DataSource<DATA>;
+        using super::produce;
+
     public:
         explicit SensorCommunicator(
                 SensorCommunication::CommunicationProtocolStrategy<DATA>* communicationProtocolStrategy)
@@ -36,7 +41,8 @@ namespace SensorAccessLinkElement {
 
         void start() {
             communicationProtocolStrategy->openConnection();
-            communicationProtocolStrategy->readMessage();
+            auto message = communicationProtocolStrategy->readMessage();
+            produce(std::move(message));
         };
 
         void terminateAndJoin() {

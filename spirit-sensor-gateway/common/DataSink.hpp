@@ -23,10 +23,16 @@ namespace DataFlow {
 
     template<class T>
     class DataSink {
+
+    protected:
+
+        typedef T DATA;
+
     public:
+
         virtual ~DataSink() noexcept = default;
 
-        virtual void consume(T&& data) = 0;
+        virtual void consume(DATA&& data) = 0;
     };
 }
 

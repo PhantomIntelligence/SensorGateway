@@ -23,6 +23,7 @@
 #include "data-model/DataModelFixture.h"
 
 using DataFlow::AWLMessage;
+using AWLData = std::vector<AWLMessage>;
 using AWLCommunicator = SensorAccessLinkElement::SensorCommunicator<AWLMessage>;
 using TestFunctions::DataTestUtil;
 
@@ -36,6 +37,8 @@ protected:
     SensorCommunicatorTest() = default;
 
     virtual ~SensorCommunicatorTest() = default;
+
+    AWLMessage givenOneMessage() const noexcept;
 };
 
 class MockSensorCommunicationStrategy final : public SensorCommunication::CommunicationProtocolStrategy<AWLMessage> {
@@ -45,12 +48,22 @@ public:
     MockSensorCommunicationStrategy() :
             openConnectionCalled(false),
             closeConnectionCalled(false),
-            readMessageCalled(false)
-    {
+            readMessageCalled(false),
+            hasToReturnSpecificData(false) {
+    }
+
+    void whenCalledReadMessageThenWillReturnTheseMessages(AWLData dataToReturn) {
+        hasToReturnSpecificData = true;
+        this->dataToReturn = dataToReturn;
     }
 
     AWLMessage readMessage() override {
         readMessageCalled.store(true);
+        if (hasToReturnSpecificData && !dataToReturn.empty()) {
+            AWLMessage awlMessage = dataToReturn.back();
+            dataToReturn.pop_back();
+            return awlMessage;
+        }
         return AWLMessage::returnDefaultData();
     }
 
@@ -75,16 +88,14 @@ public:
         return readMessageCalled.load();
     }
 
-    bool hasCloseConnectionBeenNotCalled() const {
-        return closeConnectionCalled.load();
-    }
-
 private:
 
     AtomicFlag openConnectionCalled;
     AtomicFlag closeConnectionCalled;
     AtomicFlag readMessageCalled;
 
+    bool hasToReturnSpecificData;
+    AWLData dataToReturn;
 };
 
 TEST_F(SensorCommunicatorTest,
@@ -118,23 +129,93 @@ TEST_F(SensorCommunicatorTest, given_aSensorCommunicationStrategy_when_start_the
     ASSERT_TRUE(strategyHasBeenCalled);
 }
 
-TEST_F(SensorCommunicatorTest, given_aSensorCommunicationStrategy_when_untilStopConnection_then_callsReadMessageInStrategy) {
+using AWLSink = DataFlow::DataSink<AWLMessage>;
+
+class AWLSinkMock : public AWLSink {
+
+protected:
+
+    using AWLSink::DATA;
+
+public:
+
+    AWLSinkMock(uint8_t numberOfDataToConsumeGoal) :
+            actualNumberOfDataConsumed(0),
+            numberOfDataToConsumeGoal(numberOfDataToConsumeGoal) {
+
+    }
+
+    void consume(DATA&& data) override {
+        ++actualNumberOfDataConsumed;
+        if (hasBeenCalledExpectedNumberOfTimes()) {
+            consumptionGoalReached.set_value(true);
+        }
+        consumedData.push_back(data);
+    }
+
+    bool hasBeenCalledExpectedNumberOfTimes() const {
+        return actualNumberOfDataConsumed.load() == numberOfDataToConsumeGoal;
+    };
+
+    void waitConsumptionGoalToBeReached() const {
+        if (!hasBeenCalledExpectedNumberOfTimes()) {
+            consumptionGoalReached.get_future().wait();
+        }
+    }
+
+    AWLData getConsumedData() const noexcept {
+        return consumedData;
+    }
+
+private:
+
+    AtomicCounter actualNumberOfDataConsumed;
+    AtomicCounter numberOfDataToConsumeGoal;
+
+    AWLData consumedData;
+
+    mutable BooleanPromise consumptionGoalReached;
+};
+
+using AWLProcessingScheduler = DataFlow::DataProcessingScheduler<AWLMessage, AWLSinkMock, 1>;
+
+TEST_F(SensorCommunicatorTest, given_oneMessage_when_start_then_willProduceThisData) {
+    auto message = givenOneMessage();
+    AWLMessage expectedMessage = AWLMessage(message);
+
+    AWLData dataToReturn;
+    dataToReturn.push_back(message);
+
     MockSensorCommunicationStrategy mockStrategy;
+    mockStrategy.whenCalledReadMessageThenWillReturnTheseMessages(dataToReturn);
+
+    AWLSinkMock sink(dataToReturn.size());
+    AWLProcessingScheduler scheduler(&sink);
+
     AWLCommunicator sensorCommunicator(&mockStrategy);
+    sensorCommunicator.linkConsumer(&scheduler);
     sensorCommunicator.start();
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(5));
-    if si cest vrai
+    sink.waitConsumptionGoalToBeReached();
+
+    scheduler.terminateAndJoin();
     sensorCommunicator.terminateAndJoin();
-    //while(startHasBeenCalled){// for un for ou un thread 1 seconde
-        //ASSERT_FALSE(mockStrategy.hasCloseConnectionBeenNotCalled());
-//       if(closeHasBeenCalled){
-//           ASSERT_TRUE(closeHasBeenCalled);
-//       }
-//    }
 
-
-    auto startHasBeenCalled = mockStrategy.hasReadMessageBeenCalled();
+    auto producedMessage = sink.getConsumedData().at(0);
+    ASSERT_EQ(expectedMessage, producedMessage);
 }
+
+AWLMessage SensorCommunicatorTest::givenOneMessage() const noexcept {
+    int64_t const ARBITRARY_ID = 42;
+    uint64_t const ARBITRARY_LENGTH = 7;
+    int64_t const ARBITRARY_TIMESTAMP = 101010;
+
+    AWLMessage message = AWLMessage::returnDefaultData();
+    message.id = ARBITRARY_ID;
+    message.length = ARBITRARY_LENGTH;
+    message.timestamp = ARBITRARY_TIMESTAMP;
+    return message;
+}
+
 #endif //SPIRITSENSORGATEWAY_SENSORCOMMUNICATORTEST_CPP
 
