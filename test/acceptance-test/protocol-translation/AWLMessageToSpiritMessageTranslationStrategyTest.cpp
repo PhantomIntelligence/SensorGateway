@@ -18,7 +18,7 @@
 #include "test/utilities/SpiritFramesFileManager.h"
 #include "test/acceptance-test/fixtures/AWLMessagesFixture.cpp"
 #include "test/acceptance-test/fixtures/SpiritFramesFixture.cpp"
-#include "spirit-sensor-gateway/spirit-protocol-translation/AWLMessageToSpiritMessageTranslationStrategy.h"
+#include "spirit-sensor-gateway/protocol-translation/AWLMessageToSpiritMessageTranslationStrategy.h"
 
 using namespace TestUtilities;
 

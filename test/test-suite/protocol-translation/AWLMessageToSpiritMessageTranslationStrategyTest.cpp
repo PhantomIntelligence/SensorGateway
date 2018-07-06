@@ -5,7 +5,7 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
-#include "spirit-sensor-gateway/spirit-protocol-translation/AWLMessageToSpiritMessageTranslationStrategy.h"
+#include "spirit-sensor-gateway/protocol-translation/AWLMessageToSpiritMessageTranslationStrategy.h"
 
 using namespace Defaults::Track;
 
