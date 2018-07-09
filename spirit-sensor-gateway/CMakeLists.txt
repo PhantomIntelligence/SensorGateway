@@ -10,8 +10,6 @@ file(GLOB COMMUNICATION_PROTOCOL_FILES "${CMAKE_CURRENT_SOURCE_DIR}/sensor-commu
 
 add_library(${PROJECT_NAME} SHARED ${COMMON_FILES} ${DOMAIN_FILES} ${SRC_FILES} ${COMMUNICATION_PROTOCOL_FILES} ${SPIRIT_PROTOCOL_FILES} config.h.in sensor-communication/SensorCommunicator.hpp)
 
-
-
 ########## CONAN ######################################
 if(EXISTS ${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
     include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)

@@ -33,7 +33,7 @@ namespace DataFlow {
 
         AWLMessage(AWLMessage&& other) noexcept;
 
-        AWLMessage& operator=(AWLMessage other)& ;
+        AWLMessage& operator=(AWLMessage const& other)& ;
 
         AWLMessage& operator=(AWLMessage&& other)& noexcept;
 

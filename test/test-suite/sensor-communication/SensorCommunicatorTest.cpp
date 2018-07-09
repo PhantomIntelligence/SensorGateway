@@ -18,12 +18,13 @@
 #define SPIRITSENSORGATEWAY_SENSORCOMMUNICATORTEST_CPP
 
 #include <gtest/gtest.h>
+#include <queue>
 
 #include "spirit-sensor-gateway/sensor-communication/SensorCommunicator.hpp"
 #include "data-model/DataModelFixture.h"
 
 using DataFlow::AWLMessage;
-using AWLData = std::vector<AWLMessage>;
+using AWLData = std::queue<AWLMessage>;
 using AWLCommunicator = SensorAccessLinkElement::SensorCommunicator<AWLMessage>;
 using TestFunctions::DataTestUtil;
 
@@ -45,6 +46,8 @@ protected:
     AWLMessage givenOneMessage(uint8_t offsetForDataDifference) const noexcept;
 
     AWLData givenANumberOfMessages(uint8_t numberOfMessagesToCreate) const noexcept;
+
+    void given_aNumberOfMessage_when_start_then_produceTheCorrectNumberOfMessageInTheCorrectOrder(uint8_t number);
 };
 
 class MockSensorCommunicationStrategy final : public SensorCommunication::CommunicationProtocolStrategy<AWLMessage> {
@@ -64,10 +67,10 @@ public:
     }
 
     AWLMessage readMessage() override {
-        readMessageCalled.store(true);
+        acknowledgeReadMessageHasBeenCalled();
         if (hasToReturnSpecificData && !dataToReturn.empty()) {
-            AWLMessage awlMessage = dataToReturn.back();
-            dataToReturn.pop_back();
+            AWLMessage awlMessage = dataToReturn.front();
+            dataToReturn.pop();
             return awlMessage;
         }
         return AWLMessage::returnDefaultData();
@@ -94,11 +97,28 @@ public:
         return readMessageCalled.load();
     }
 
+    void waitUntillReadMessageIsCalled() {
+        if (!hasReadMessageBeenCalled()) {
+            readMessageCalledAcknowledgement.get_future().wait();
+        }
+    }
+
 private:
+
+    void acknowledgeReadMessageHasBeenCalled() {
+        LockGuard guard(readMessageAckMutex);
+        if (!hasReadMessageBeenCalled()) {
+            readMessageCalled.store(true);
+            readMessageCalledAcknowledgement.set_value(true);
+        }
+    }
 
     AtomicFlag openConnectionCalled;
     AtomicFlag closeConnectionCalled;
     AtomicFlag readMessageCalled;
+
+    Mutex readMessageAckMutex;
+    mutable BooleanPromise readMessageCalledAcknowledgement;
 
     bool hasToReturnSpecificData;
     AWLData dataToReturn;
@@ -111,6 +131,7 @@ TEST_F(SensorCommunicatorTest,
 
     sensorCommunicator.start();
 
+    sensorCommunicator.terminateAndJoin();
     auto strategyHasBeenCalled = mockStrategy.hasOpenConnectionBeenCalled();
     ASSERT_TRUE(strategyHasBeenCalled);
 }
@@ -131,13 +152,16 @@ TEST_F(SensorCommunicatorTest, given_aSensorCommunicationStrategy_when_start_the
     AWLCommunicator sensorCommunicator(&mockStrategy);
 
     sensorCommunicator.start();
+
+    mockStrategy.waitUntillReadMessageIsCalled();
     auto strategyHasBeenCalled = mockStrategy.hasReadMessageBeenCalled();
+    sensorCommunicator.terminateAndJoin();
     ASSERT_TRUE(strategyHasBeenCalled);
 }
 
 using AWLSink = DataFlow::DataSink<AWLMessage>;
 
-class FrameSinkMock : public AWLSink {
+class AWLSinkMock : public AWLSink {
 
 protected:
 
@@ -145,7 +169,7 @@ protected:
 
 public:
 
-    FrameSinkMock(uint8_t numberOfDataToConsumeGoal) :
+    AWLSinkMock(uint8_t numberOfDataToConsumeGoal) :
             actualNumberOfDataConsumed(0),
             numberOfDataToConsumeGoal(numberOfDataToConsumeGoal) {
 
@@ -153,17 +177,24 @@ public:
 
     void consume(DATA&& data) override {
         ++actualNumberOfDataConsumed;
+        if (hasBeenCalledLessOrEqualToTheExpectedNumberOfTimes()) {
+            consumedData.push(data);
+        }
         if (hasBeenCalledExpectedNumberOfTimes()) {
             consumptionGoalReached.set_value(true);
         }
-        consumedData.push_back(data);
+    }
+
+    bool hasBeenCalledLessOrEqualToTheExpectedNumberOfTimes() const {
+        return actualNumberOfDataConsumed.load() <= numberOfDataToConsumeGoal;
     }
 
     bool hasBeenCalledExpectedNumberOfTimes() const {
         return actualNumberOfDataConsumed.load() == numberOfDataToConsumeGoal;
     };
 
-    void waitConsumptionGoalToBeReached() const {
+    void waitConsumptionGoalToBeReached() {
+        LockGuard guard(goalReachedMutex);
         if (!hasBeenCalledExpectedNumberOfTimes()) {
             consumptionGoalReached.get_future().wait();
         }
@@ -180,45 +211,21 @@ private:
 
     AWLData consumedData;
 
+    Mutex goalReachedMutex;
     mutable BooleanPromise consumptionGoalReached;
 };
 
-using AWLProcessingScheduler = DataFlow::DataProcessingScheduler<AWLMessage, FrameSinkMock, 1>;
+using AWLProcessingScheduler = DataFlow::DataProcessingScheduler<AWLMessage, AWLSinkMock, 1>;
 
-TEST_F(SensorCommunicatorTest, given_oneMessage_when_start_then_willProduceThisData) {
-    auto message = givenOneMessage();
-    AWLMessage expectedMessage = AWLMessage(message);
 
-    AWLData dataToReturn;
-    dataToReturn.push_back(message);
-
-    MockSensorCommunicationStrategy mockStrategy;
-    mockStrategy.whenCalledReadMessageThenWillReturnTheseMessages(dataToReturn);
-
-    FrameSinkMock sink(dataToReturn.size());
-    AWLProcessingScheduler scheduler(&sink);
-
-    AWLCommunicator sensorCommunicator(&mockStrategy);
-    sensorCommunicator.linkConsumer(&scheduler);
-    sensorCommunicator.start();
-
-    sink.waitConsumptionGoalToBeReached();
-
-    scheduler.terminateAndJoin();
-    sensorCommunicator.terminateAndJoin();
-
-    auto producedMessage = sink.getConsumedData().at(0);
-    ASSERT_EQ(expectedMessage, producedMessage);
-}
-
-TEST_F(SensorCommunicatorTest, given_severalMessage_when_start_then_willProduceTheseDataInTheSameOrderItConsumedIt) {
-    auto messages = givenANumberOfMessages(3);
-    AWLData expectedMessages = messages;
-
+void SensorCommunicatorTest::given_aNumberOfMessage_when_start_then_produceTheCorrectNumberOfMessageInTheCorrectOrder(
+        uint8_t number) {
+    auto messages = givenANumberOfMessages(number);
+    auto expectedMessages = messages;
     MockSensorCommunicationStrategy mockStrategy;
     mockStrategy.whenCalledReadMessageThenWillReturnTheseMessages(messages);
-
-    FrameSinkMock sink(messages.size());
+    
+    AWLSinkMock sink(number);
     AWLProcessingScheduler scheduler(&sink);
 
     AWLCommunicator sensorCommunicator(&mockStrategy);
@@ -227,22 +234,37 @@ TEST_F(SensorCommunicatorTest, given_severalMessage_when_start_then_willProduceT
 
     sink.waitConsumptionGoalToBeReached();
 
-    scheduler.terminateAndJoin();
     sensorCommunicator.terminateAndJoin();
+    scheduler.terminateAndJoin();
 
     auto producedMessages = sink.getConsumedData();
     ASSERT_EQ(expectedMessages, producedMessages);
+}
+
+TEST_F(SensorCommunicatorTest, given_oneMessage_when_start_then_willProduceThisData) {
+    auto numberOfMessage = 1;
+    given_aNumberOfMessage_when_start_then_produceTheCorrectNumberOfMessageInTheCorrectOrder(numberOfMessage);
+}
+
+TEST_F(SensorCommunicatorTest, given_severalMessage_when_start_then_willProduceTheseDataInTheSameOrderItConsumedIt) {
+    auto numberOfMessage = 5;
+    given_aNumberOfMessage_when_start_then_produceTheCorrectNumberOfMessageInTheCorrectOrder(numberOfMessage);
 }
 
 AWLMessage SensorCommunicatorTest::givenOneMessage(uint8_t offsetForDataDifference) const noexcept {
     int64_t const ARBITRARY_ID = 42 + offsetForDataDifference;
     uint64_t const ARBITRARY_TIMESTAMP = 101010 + offsetForDataDifference;
     uint32_t const ARBITRARY_LENGTH = 7 + offsetForDataDifference;
+    AWL::DataArray ARBITRARY_DATA;
+    for(auto k = 0; k < MAX_NUMBER_OF_DATA_IN_AWL_MESSAGE; ++k) {
+        ARBITRARY_DATA.at(k) = static_cast<unsigned char>(k);
+    }
 
     AWLMessage message = AWLMessage::returnDefaultData();
     message.id = ARBITRARY_ID;
     message.timestamp = ARBITRARY_TIMESTAMP;
     message.length = ARBITRARY_LENGTH;
+    message.data = ARBITRARY_DATA;
     return message;
 }
 
@@ -250,7 +272,7 @@ AWLData SensorCommunicatorTest::givenANumberOfMessages(uint8_t numberOfMessagesT
     AWLData messages;
     for (uint8_t offset = 0; offset < numberOfMessagesToCreate; ++offset) {
         auto message = givenOneMessage(offset);
-        messages.push_back(message);
+        messages.push(message);
     }
     return messages;
 }
