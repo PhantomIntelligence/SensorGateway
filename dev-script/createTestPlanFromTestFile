@@ -1,0 +1,22 @@
+#!/bin/sh
+
+TEST_CLASS=$1
+TEST_FILE="${TEST_CLASS}.cpp"
+WORK_FILE="${TEST_CLASS}.tmp"
+
+cat ${TEST_FILE} | grep TEST_F >> ${WORK_FILE}
+
+sed -i 's/TEST_F('${TEST_CLASS}', /*/g' ${WORK_FILE} # Remove the start of line
+sed -i 's/) {//g' ${WORK_FILE} # Remove the end of line
+sed -i 's/[A-Z]/ \L&/g' ${WORK_FILE} # Remove all the useless capitalization
+sed -i 's/given_/given /g' ${WORK_FILE} # Fix given
+sed -i 's/_when_/,\n\twhen /g' ${WORK_FILE} # Fix when
+sed -i 's/_then_/,\n\tthen /g' ${WORK_FILE} # Fix then
+sed -i 's/\n\n/\n/g' ${WORK_FILE} # Fix double-spaces
+
+# Prints the result
+echo ${TEST_CLASS}
+cat ${WORK_FILE}
+
+# Removes the temporary file
+rm ${WORK_FILE}
