@@ -185,11 +185,13 @@ public:
         }
     }
 
-    bool hasBeenCalledLessOrEqualToTheExpectedNumberOfTimes() const {
+    bool hasBeenCalledLessOrEqualToTheExpectedNumberOfTimes(){
+        LockGuard guard(consumptionMutex);
         return actualNumberOfDataConsumed.load() <= numberOfDataToConsumeGoal;
     }
 
-    bool hasBeenCalledExpectedNumberOfTimes() const {
+    bool hasBeenCalledExpectedNumberOfTimes(){
+        LockGuard guard(consumptionMutex);
         return actualNumberOfDataConsumed.load() == numberOfDataToConsumeGoal;
     };
 
@@ -211,6 +213,7 @@ private:
 
     AWLData consumedData;
 
+    Mutex consumptionMutex;
     Mutex goalReachedMutex;
     mutable BooleanPromise consumptionGoalReached;
 };
@@ -220,7 +223,7 @@ using AWLProcessingScheduler = DataFlow::DataProcessingScheduler<AWLMessage, AWL
 void SensorCommunicatorTest::given_aNumberOfMessage_when_start_then_produceTheCorrectNumberOfMessageInTheCorrectOrder(
         uint8_t number) {
     auto messages = givenANumberOfMessages(number);
-    auto expectedMessages = messages;
+    AWLData expectedMessages = messages;
 
     MockSensorCommunicationStrategy mockStrategy;
     mockStrategy.whenCalledReadMessageThenWillReturnTheseMessages(messages);
@@ -230,6 +233,7 @@ void SensorCommunicatorTest::given_aNumberOfMessage_when_start_then_produceTheCo
 
     AWLCommunicator sensorCommunicator(&mockStrategy);
     sensorCommunicator.linkConsumer(&scheduler);
+
     sensorCommunicator.start();
 
     sink.waitConsumptionGoalToBeReached();
@@ -238,6 +242,13 @@ void SensorCommunicatorTest::given_aNumberOfMessage_when_start_then_produceTheCo
     scheduler.terminateAndJoin();
 
     auto producedMessages = sink.getConsumedData();
+
+    for (auto t = 0; t < number; ++t) {
+        ASSERT_EQ(expectedMessages.front(), producedMessages.front());
+        expectedMessages.pop();
+        producedMessages.pop();
+    }
+
     ASSERT_EQ(expectedMessages, producedMessages);
 }
 
@@ -256,7 +267,7 @@ AWLMessage SensorCommunicatorTest::givenOneMessage(uint8_t offsetForDataDifferen
     uint64_t const ARBITRARY_TIMESTAMP = 101010 + offsetForDataDifference;
     uint32_t const ARBITRARY_LENGTH = 7 + offsetForDataDifference;
     AWL::DataArray ARBITRARY_DATA;
-    for(auto k = 0; k < MAX_NUMBER_OF_DATA_IN_AWL_MESSAGE; ++k) {
+    for (auto k = 0; k < MAX_NUMBER_OF_DATA_IN_AWL_MESSAGE; ++k) {
         ARBITRARY_DATA.at(k) = static_cast<unsigned char>(k);
     }
 
