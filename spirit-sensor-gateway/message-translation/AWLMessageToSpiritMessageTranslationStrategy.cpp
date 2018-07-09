@@ -1,7 +1,7 @@
 #include "AWLMessageToSpiritMessageTranslationStrategy.h"
 #include "UnknownMessageException.h"
 
-using ProtocolTranslation::AWLMessageToSpiritMessageTranslationStrategy;
+using MessageTranslation::AWLMessageToSpiritMessageTranslationStrategy;
 
 AWLMessageToSpiritMessageTranslationStrategy::AWLMessageToSpiritMessageTranslationStrategy() {
     currentOutputMessage = new Frame();
@@ -9,7 +9,7 @@ AWLMessageToSpiritMessageTranslationStrategy::AWLMessageToSpiritMessageTranslati
 
 void AWLMessageToSpiritMessageTranslationStrategy::translateBasicMessage(AWLMessage&& inputMessage) {
     switch (inputMessage.id) {
-        case FRAME_DONE:
+        case END_OF_FRAME:
             translateEndOfFrameMessage(&inputMessage);
             break;
         case DETECTION_TRACK :

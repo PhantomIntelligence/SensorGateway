@@ -22,7 +22,7 @@ namespace SensorAccessLinkElement {
     class MessageTranslator : public DataFlow::DataSink<INPUT> {
 
     public:
-        explicit MessageTranslator(ProtocolTranslation::MessageTranslationStrategy<INPUT, OUTPUT>* messageTranslationStrategy) :
+        explicit MessageTranslator(MessageTranslation::MessageTranslationStrategy<INPUT, OUTPUT>* messageTranslationStrategy) :
                 messageTranslationStrategy(messageTranslationStrategy) {};
 
         ~MessageTranslator(){
@@ -34,7 +34,7 @@ namespace SensorAccessLinkElement {
         };
 
     private:
-        ProtocolTranslation::MessageTranslationStrategy<INPUT, OUTPUT>* messageTranslationStrategy;
+        MessageTranslation::MessageTranslationStrategy<INPUT, OUTPUT>* messageTranslationStrategy;
 
     };
 }

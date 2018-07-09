@@ -14,27 +14,24 @@
 #include <gtest/gtest.h>
 #include <spirit-sensor-gateway/domain/AWLMessage.h>
 #include <spirit-sensor-gateway/domain/Frame.h>
-
-#include "spirit-sensor-gateway/protocol-translation/MessageTranslator.hpp"
+#include "spirit-sensor-gateway/message-translation/MessageTranslator.hpp"
+#include "test/utilities/DataStubs.cpp"
 
 using DataFlow::AWLMessage;
 using DataFlow::Frame;
-using ProtocolTranslation::MessageTranslationStrategy;
+using MessageTranslation::MessageTranslationStrategy;
 using SensorAccessLinkElement::MessageTranslator;
 
 class MessageTranslatorTest : public ::testing::Test {
 
 protected:
 
-    AWLMessage awlMessage = givenOneMessage();
+    AWLMessage awlMessage = AWLMessage::returnDefaultData();
 
     MessageTranslatorTest() = default;
 
     virtual ~MessageTranslatorTest() = default;
-
-    AWLMessage givenOneMessage() const noexcept;
-
-    };
+};
 
 class MockMessageTranslationStrategy final : public MessageTranslationStrategy<AWLMessage, Frame> {
 
@@ -56,7 +53,6 @@ public:
     };
 
 
-
 private:
 
     AtomicFlag translateBasicMessageCalled;
@@ -73,16 +69,4 @@ TEST_F(MessageTranslatorTest,
     messageTranslator.consume(std::move(awlMessage));
     auto strategyHasBeenCalledWithRightParameter = mockStrategy.hasTranslateBasicMessageBeenCalledWithRightInputMessage(awlMessage);
     ASSERT_TRUE(strategyHasBeenCalledWithRightParameter);
-}
-
-AWLMessage MessageTranslatorTest::givenOneMessage() const noexcept {
-    int64_t const ARBITRARY_ID = 42;
-    uint64_t const ARBITRARY_LENGTH = 7;
-    int64_t const ARBITRARY_TIMESTAMP = 101010;
-
-    AWLMessage message = AWLMessage::returnDefaultData();
-    message.id = ARBITRARY_ID;
-    message.length = ARBITRARY_LENGTH;
-    message.timestamp = ARBITRARY_TIMESTAMP;
-    return message;
 }

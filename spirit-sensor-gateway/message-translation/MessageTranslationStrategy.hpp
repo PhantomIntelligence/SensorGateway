@@ -16,7 +16,7 @@
 
 #include "spirit-sensor-gateway/common/DataSource.hpp"
 
-namespace ProtocolTranslation {
+namespace MessageTranslation {
 
     template<class INPUT, class OUTPUT>
     class MessageTranslationStrategy : public DataFlow::DataSource<OUTPUT> {

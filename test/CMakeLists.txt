@@ -11,7 +11,7 @@ include_directories(SYSTEM ${GOOGLE_TEST_DIR}/googlemock/include)
 # Select all the test and source files
 file(GLOB TEST_FILES "${CMAKE_CURRENT_SOURCE_DIR}/test-suite/*")
 file(GLOB COMMON_TEST_FILES "${CMAKE_CURRENT_SOURCE_DIR}/test-suite/common/*")
-file(GLOB TRANSLATOR_TEST_FILES "${CMAKE_CURRENT_SOURCE_DIR}/test-suite/protocol-translation/*")
+file(GLOB TRANSLATOR_TEST_FILES "${CMAKE_CURRENT_SOURCE_DIR}/test-suite/message-translation/*")
 file(GLOB DOMAIN_TEST_FILES "${CMAKE_CURRENT_SOURCE_DIR}/test-suite/domain/*")
 file(GLOB UTILITIES_FILES "${CMAKE_CURRENT_SOURCE_DIR}/utilities/files/*")
 file(GLOB TEST_FILES "${CMAKE_CURRENT_SOURCE_DIR}/mock/*")

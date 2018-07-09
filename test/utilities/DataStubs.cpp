@@ -15,9 +15,9 @@
 #ifndef SPIRITSENSORGATEWAY_DATASTUBS_H
 #define SPIRITSENSORGATEWAY_DATASTUBS_H
 
+#include <vector>
 #include "spirit-sensor-gateway/domain/Frame.h"
 #include "spirit-sensor-gateway/domain/AWLMessage.h"
-#include <vector>
 
 using DataFlow::AWLMessage;
 using DataFlow::Track;
@@ -26,24 +26,9 @@ using DataFlow::Frame;
 
 namespace {
 
-    static AWLMessage createAWLMessageWithID(uint16_t id) {
-
-        AWLMessage awlMessage = AWLMessage::returnDefaultData();
-        awlMessage.id = id;
-        awlMessage.data[0] = 16;
-        awlMessage.data[1] = 32;
-        awlMessage.data[2] = 48;
-        awlMessage.data[3] = 1;
-        awlMessage.data[4] = 0;
-        awlMessage.data[5] = 96;
-        awlMessage.data[6] = 112;
-        awlMessage.data[7] = 128;
-        return awlMessage;
-    }
-
     static Track createTrack(DataFlow::TrackID trackID, DataFlow::ConfidenceLevel confidenceLevel,
-                      DataFlow::Intensity intensity, DataFlow::Acceleration acceleration,
-                      DataFlow::Distance distance, DataFlow::Speed speed) {
+                             DataFlow::Intensity intensity, DataFlow::Acceleration acceleration,
+                             DataFlow::Distance distance, DataFlow::Speed speed) {
         Track track = Track(trackID, confidenceLevel, intensity);
         track.setAcceleration(acceleration);
         track.setDistance(distance);

@@ -24,7 +24,7 @@
 using namespace MessageID;
 using namespace DataFlow;
 
-namespace ProtocolTranslation {
+namespace MessageTranslation {
 
     class AWLMessageToSpiritMessageTranslationStrategy final: public MessageTranslationStrategy<AWLMessage, Frame> {
     public:
