@@ -55,17 +55,13 @@ public:
 
     void consume(DATA&& data) override {
         ++actualNumberOfDataConsumed;
-        if (hasBeenCalledExpectedNumberOfTimes()) {
-            consumptionGoalReached.set_value(true);
-        }
         consumedData.push_back(data);
     }
 
     bool hasBeenCalledExpectedNumberOfTimes() const {
         return actualNumberOfDataConsumed.load() == numberOfDataToConsumeGoal;
     };
-
-
+    
 
     std::vector<Frame> getConsumedData() const noexcept {
         return consumedData;
@@ -77,8 +73,6 @@ private:
     AtomicCounter numberOfDataToConsumeGoal;
 
     std::vector<Frame> consumedData;
-
-    mutable BooleanPromise consumptionGoalReached;
 };
 
 using FrameProcessingScheduler = DataFlow::DataProcessingScheduler<Frame, FrameSinkMock, 1>;

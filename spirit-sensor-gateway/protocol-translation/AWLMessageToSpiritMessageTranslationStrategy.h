@@ -33,8 +33,6 @@ namespace ProtocolTranslation {
 
         ~ AWLMessageToSpiritMessageTranslationStrategy();
 
-        std::vector<Frame> getFrames() const;
-
         Frame returnDefaultData();
 
         void translateBasicMessage(AWLMessage&& inputMessage) override;

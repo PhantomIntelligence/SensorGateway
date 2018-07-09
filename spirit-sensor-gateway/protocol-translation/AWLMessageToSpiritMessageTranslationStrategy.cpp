@@ -10,10 +10,6 @@ AWLMessageToSpiritMessageTranslationStrategy::AWLMessageToSpiritMessageTranslati
 AWLMessageToSpiritMessageTranslationStrategy::~AWLMessageToSpiritMessageTranslationStrategy() {
 }
 
-std::vector<Frame> AWLMessageToSpiritMessageTranslationStrategy::getFrames() const {
-    return frames;
-};
-
 void AWLMessageToSpiritMessageTranslationStrategy::translateBasicMessage(AWLMessage&& inputMessage) {
     switch (inputMessage.id) {
         case FRAME_DONE:

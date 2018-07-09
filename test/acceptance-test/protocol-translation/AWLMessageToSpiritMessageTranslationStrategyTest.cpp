@@ -35,14 +35,63 @@ protected:
     SpiritFramesFileManager spiritFramesFileManager;
 };
 
+
+using FrameSink = DataFlow::DataSink<Frame>;
+
+class FrameSinkMock : public FrameSink {
+
+protected:
+
+    using FrameSink::DATA;
+
+public:
+
+    FrameSinkMock(uint8_t numberOfDataToConsumeGoal) :
+            actualNumberOfDataConsumed(0),
+            numberOfDataToConsumeGoal(numberOfDataToConsumeGoal) {
+
+    }
+
+    void consume(DATA&& data) override {
+        ++actualNumberOfDataConsumed;
+        consumedData.push_back(data);
+    }
+
+    bool hasBeenCalledExpectedNumberOfTimes() const {
+        return actualNumberOfDataConsumed.load() == numberOfDataToConsumeGoal;
+    };
+
+
+    std::vector<Frame> getConsumedData() const noexcept {
+        return consumedData;
+    }
+
+private:
+
+    AtomicCounter actualNumberOfDataConsumed;
+    AtomicCounter numberOfDataToConsumeGoal;
+
+    std::vector<Frame> consumedData;
+};
+
+using FrameProcessingScheduler = DataFlow::DataProcessingScheduler<Frame, FrameSinkMock, 1>;
+
 TEST_F(AWLMessageToSpiritMessageTranslationStrategyTest, given_someInputFileContainingValidAWLMessages_when_translatingAWLMessagesIntoSpiritFrames_then_returnCorrespondingSpriritFramesOutputFile) {
     char const* ACTUAL_SPIRIT_FRAMES_OUTPUT_FILE_NAME = "ActualSpiritFramesOutputFile.txt";
     AWLMessageToSpiritMessageTranslationStrategy awlMessageTranslator;
+    FrameSinkMock frameSinkMock(1);
+    FrameProcessingScheduler scheduler(&frameSinkMock);
+    awlMessageTranslator.linkConsumer(&scheduler);
+    
+    
     std::vector<AWLMessage> messages = awlMessagesFileManager.readMessagesFromFile(AWLMESSAGES_INPUT_FILE_NAME);
     for (auto message : messages) {
         awlMessageTranslator.translateBasicMessage(std::move(message));
     }
-    std::vector<Frame> frames = awlMessageTranslator.getFrames();
+
+    scheduler.terminateAndJoin();
+    
+    std::vector<Frame> frames = frameSinkMock.getConsumedData(); 
     spiritFramesFileManager.writeFileWithMessages(frames, ACTUAL_SPIRIT_FRAMES_OUTPUT_FILE_NAME);
     ASSERT_TRUE(spiritFramesFileManager.areFilesEqual(EXPECTED_SPIRIT_FRAMES_OUTPUT_FILE_NAME,
                                                       ACTUAL_SPIRIT_FRAMES_OUTPUT_FILE_NAME));
