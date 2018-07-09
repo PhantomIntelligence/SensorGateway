@@ -24,13 +24,42 @@
 using DataFlow::Track;
 using ProtocolTranslation::AWLMessageToSpiritMessageTranslationStrategy;
 
+
 class AWLMessageToSpiritMessageTranslationStrategyTest : public ::testing::Test {
 protected:
-    AWLMessage createAWLMessageWithID(uint16_t id) const ;
+    AWLMessage createAWLMessageWithID(uint16_t id) const;
 };
 
+class FrameDataSourceMock : public DataFlow::DataSource<Frame> {
 
-TEST_F(AWLMessageToSpiritMessageTranslationStrategyTest,given_someFrameDoneAWLMessage_when_translatingTheAwlMessage_then_setsTheCorrectFrameIdAndSystemId){
+public:
+    FrameDataSourceMock():produceCalled(false) {
+
+    }
+
+    void produce(Frame&& frame) override {
+
+        producedFrames.push_back(frame);
+        produceCalled.store(true);
+    }
+
+    bool hasProduceBeenCalled() const {
+
+        return produceCalled.load();
+    }
+
+private:
+
+    AtomicFlag produceCalled;
+    std::vector<Frame> producedFrames;
+
+
+};
+
+using FrameProcessingScheduler = DataFlow::DataProcessingScheduler<Frame,FrameDataSourceMock,1>;
+
+TEST_F(AWLMessageToSpiritMessageTranslationStrategyTest,
+       given_someFrameDoneAWLMessage_when_translatingTheAwlMessage_then_setsTheCorrectFrameIdAndSystemId) {
     AWLMessageToSpiritMessageTranslationStrategy awlMessageTranslator;
 
     AWLMessage awlMessage = AWLMessage::returnDefaultData();
@@ -46,21 +75,25 @@ TEST_F(AWLMessageToSpiritMessageTranslationStrategyTest,given_someFrameDoneAWLMe
     auto expectedSystemID = 4096;
 
     auto spiritFrame = awlMessageTranslator.getFrames()[0];
-    ASSERT_EQ(expectedFrameID,spiritFrame.getFrameID());
-    ASSERT_EQ(expectedSystemID,spiritFrame.getSystemID());
+    ASSERT_EQ(expectedFrameID, spiritFrame.getFrameID());
+    ASSERT_EQ(expectedSystemID, spiritFrame.getSystemID());
 
 }
 
-TEST_F(AWLMessageToSpiritMessageTranslationStrategyTest,given_someDetectionTrackAWLMessage_when_translatingTheAwlMessage_then_setsTheCorrectAttributesOfTheTrack) {
+TEST_F(AWLMessageToSpiritMessageTranslationStrategyTest,
+       given_someDetectionTrackAWLMessage_when_translatingTheAwlMessage_then_setsTheCorrectAttributesOfTheTrack) {
 
     AWLMessageToSpiritMessageTranslationStrategy awlMessageTranslator;
     auto detectionTrackAwlMessage = createAWLMessageWithID(DETECTION_TRACK);
     auto endOfFrameAwlMessage = createAWLMessageWithID(FRAME_DONE);
 
-    auto expectedPixelID = convertTwoBytesToUnsignedBigEndian(detectionTrackAwlMessage.data[3],detectionTrackAwlMessage.data[4]);
-    auto expectedTrackID = convertTwoBytesToUnsignedBigEndian(detectionTrackAwlMessage.data[0],detectionTrackAwlMessage.data[1]);
+    auto expectedPixelID = convertTwoBytesToUnsignedBigEndian(detectionTrackAwlMessage.data[3],
+                                                              detectionTrackAwlMessage.data[4]);
+    auto expectedTrackID = convertTwoBytesToUnsignedBigEndian(detectionTrackAwlMessage.data[0],
+                                                              detectionTrackAwlMessage.data[1]);
     auto expectedTrackConfidenceLevel = detectionTrackAwlMessage.data[5];
-    auto expectedTrackIntensity = convertTwoBytesToUnsignedBigEndian(detectionTrackAwlMessage.data[6],detectionTrackAwlMessage.data[7]);
+    auto expectedTrackIntensity = convertTwoBytesToUnsignedBigEndian(detectionTrackAwlMessage.data[6],
+                                                                     detectionTrackAwlMessage.data[7]);
 
     awlMessageTranslator.translateBasicMessage(std::move(detectionTrackAwlMessage));
     awlMessageTranslator.translateBasicMessage(std::move(endOfFrameAwlMessage));
@@ -70,15 +103,16 @@ TEST_F(AWLMessageToSpiritMessageTranslationStrategyTest,given_someDetectionTrack
     auto track = *(pixel->fetchTrackByID(expectedTrackID));
 
 
-    ASSERT_EQ(expectedTrackID,track.getID());
-    ASSERT_EQ(expectedTrackConfidenceLevel,track.getConfidenceLevel());
-    ASSERT_EQ(expectedTrackIntensity,track.getIntensity());
-    ASSERT_EQ(Defaults::Track::DEFAULT_ACCELERATION_VALUE,track.getAcceleration());
-    ASSERT_EQ(Defaults::Track::DEFAULT_DISTANCE_VALUE,track.getDistance());
-    ASSERT_EQ(Defaults::Track::DEFAULT_SPEED_VALUE,track.getSpeed());
+    ASSERT_EQ(expectedTrackID, track.getID());
+    ASSERT_EQ(expectedTrackConfidenceLevel, track.getConfidenceLevel());
+    ASSERT_EQ(expectedTrackIntensity, track.getIntensity());
+    ASSERT_EQ(Defaults::Track::DEFAULT_ACCELERATION_VALUE, track.getAcceleration());
+    ASSERT_EQ(Defaults::Track::DEFAULT_DISTANCE_VALUE, track.getDistance());
+    ASSERT_EQ(Defaults::Track::DEFAULT_SPEED_VALUE, track.getSpeed());
 }
 
-TEST_F(AWLMessageToSpiritMessageTranslationStrategyTest,given_someVelocityTrackAWLMessage_when_translatingTheAWLMessage_then_setsTheCorrectAttributesOfTheTrack) {
+TEST_F(AWLMessageToSpiritMessageTranslationStrategyTest,
+       given_someVelocityTrackAWLMessage_when_translatingTheAWLMessage_then_setsTheCorrectAttributesOfTheTrack) {
 
     AWLMessageToSpiritMessageTranslationStrategy awlMessageTranslator;
 
@@ -86,33 +120,60 @@ TEST_F(AWLMessageToSpiritMessageTranslationStrategyTest,given_someVelocityTrackA
     auto detectionVelocityAwlMessage = createAWLMessageWithID(DETECTION_VELOCITY);
     auto endOfFrameAwlMessage = createAWLMessageWithID(FRAME_DONE);
 
-    auto expectedPixelID = convertTwoBytesToUnsignedBigEndian(detectionTrackAwlMessage.data[3],detectionTrackAwlMessage.data[4]);
-    auto expectedTrackID = convertTwoBytesToUnsignedBigEndian(detectionTrackAwlMessage.data[0],detectionTrackAwlMessage.data[1]);
+    auto expectedPixelID = convertTwoBytesToUnsignedBigEndian(detectionTrackAwlMessage.data[3],
+                                                              detectionTrackAwlMessage.data[4]);
+    auto expectedTrackID = convertTwoBytesToUnsignedBigEndian(detectionTrackAwlMessage.data[0],
+                                                              detectionTrackAwlMessage.data[1]);
     auto expectedTrackConfidenceLevel = detectionTrackAwlMessage.data[5];
-    auto expectedTrackIntensity = convertTwoBytesToUnsignedBigEndian(detectionTrackAwlMessage.data[6],detectionTrackAwlMessage.data[7]);
-    auto expectedTrackDistance = convertTwoBytesToUnsignedBigEndian(detectionVelocityAwlMessage.data[2],detectionVelocityAwlMessage.data[3]);
-    Speed expectedTrackSpeed = convertTwoBytesToSignedBigEndian(detectionTrackAwlMessage.data[4],detectionTrackAwlMessage.data[5]);
-    Acceleration expectedTrackAcceleration = convertTwoBytesToSignedBigEndian(detectionTrackAwlMessage.data[6],detectionTrackAwlMessage.data[7]);
+    auto expectedTrackIntensity = convertTwoBytesToUnsignedBigEndian(detectionTrackAwlMessage.data[6],
+                                                                     detectionTrackAwlMessage.data[7]);
+    auto expectedTrackDistance = convertTwoBytesToUnsignedBigEndian(detectionVelocityAwlMessage.data[2],
+                                                                    detectionVelocityAwlMessage.data[3]);
+    Speed expectedTrackSpeed = convertTwoBytesToSignedBigEndian(detectionTrackAwlMessage.data[4],
+                                                                detectionTrackAwlMessage.data[5]);
+    Acceleration expectedTrackAcceleration = convertTwoBytesToSignedBigEndian(detectionTrackAwlMessage.data[6],
+                                                                              detectionTrackAwlMessage.data[7]);
 
     awlMessageTranslator.translateBasicMessage(std::move(detectionTrackAwlMessage));
     awlMessageTranslator.translateBasicMessage(std::move(detectionVelocityAwlMessage));
     awlMessageTranslator.translateBasicMessage(std::move(endOfFrameAwlMessage));
 
 
-
     auto frame = awlMessageTranslator.getFrames().at(0);
     auto pixel = frame.fetchPixelByID(expectedPixelID);
     auto track = *(pixel->fetchTrackByID(expectedTrackID));
 
-    ASSERT_EQ(expectedTrackID,track.getID());
-    ASSERT_EQ(expectedTrackConfidenceLevel,track.getConfidenceLevel());
-    ASSERT_EQ(expectedTrackIntensity,track.getIntensity());
-    ASSERT_EQ(expectedTrackDistance,track.getDistance());
-    ASSERT_EQ(expectedTrackSpeed,track.getSpeed());
-    ASSERT_EQ(expectedTrackAcceleration,track.getAcceleration());
+    ASSERT_EQ(expectedTrackID, track.getID());
+    ASSERT_EQ(expectedTrackConfidenceLevel, track.getConfidenceLevel());
+    ASSERT_EQ(expectedTrackIntensity, track.getIntensity());
+    ASSERT_EQ(expectedTrackDistance, track.getDistance());
+    ASSERT_EQ(expectedTrackSpeed, track.getSpeed());
+    ASSERT_EQ(expectedTrackAcceleration, track.getAcceleration());
 }
 
 
+TEST_F(AWLMessageToSpiritMessageTranslationStrategyTest,
+       given_someFrameDoneAwlMessage_when_translatingTheAwlMessage_then_callsTheProduceMethodOfDataSource) {
+
+    auto detectionTrackAwlMessage = createAWLMessageWithID(DETECTION_TRACK);
+    auto endOfFrameAwlMessage = createAWLMessageWithID(FRAME_DONE);
+    FrameDataSourceMock frameDataSourceMock;
+    FrameProcessingScheduler scheduler(&frameDataSourceMock);
+    AWLMessageToSpiritMessageTranslationStrategy awlMessageTranslator;
+    awlMessageTranslator.linkConsumer(&scheduler);
+
+    awlMessageTranslator.translateBasicMessage(std::move(detectionTrackAwlMessage));
+    awlMessageTranslator.translateBasicMessage(std::move(endOfFrameAwlMessage));
+
+    auto produceHasBeenCalled = frameDataSourceMock.hasProduceBeenCalled();
+
+
+    ASSERT_TRUE(produceHasBeenCalled);
+
+
+
+
+}
 
 
 AWLMessage AWLMessageToSpiritMessageTranslationStrategyTest::createAWLMessageWithID(uint16_t id) const {
