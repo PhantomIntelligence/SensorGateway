@@ -137,7 +137,7 @@ TEST_F(SensorCommunicatorTest, given_aSensorCommunicationStrategy_when_start_the
 
 using AWLSink = DataFlow::DataSink<AWLMessage>;
 
-class AWLSinkMock : public AWLSink {
+class FrameSinkMock : public AWLSink {
 
 protected:
 
@@ -145,7 +145,7 @@ protected:
 
 public:
 
-    AWLSinkMock(uint8_t numberOfDataToConsumeGoal) :
+    FrameSinkMock(uint8_t numberOfDataToConsumeGoal) :
             actualNumberOfDataConsumed(0),
             numberOfDataToConsumeGoal(numberOfDataToConsumeGoal) {
 
@@ -183,7 +183,7 @@ private:
     mutable BooleanPromise consumptionGoalReached;
 };
 
-using AWLProcessingScheduler = DataFlow::DataProcessingScheduler<AWLMessage, AWLSinkMock, 1>;
+using AWLProcessingScheduler = DataFlow::DataProcessingScheduler<AWLMessage, FrameSinkMock, 1>;
 
 TEST_F(SensorCommunicatorTest, given_oneMessage_when_start_then_willProduceThisData) {
     auto message = givenOneMessage();
@@ -195,7 +195,7 @@ TEST_F(SensorCommunicatorTest, given_oneMessage_when_start_then_willProduceThisD
     MockSensorCommunicationStrategy mockStrategy;
     mockStrategy.whenCalledReadMessageThenWillReturnTheseMessages(dataToReturn);
 
-    AWLSinkMock sink(dataToReturn.size());
+    FrameSinkMock sink(dataToReturn.size());
     AWLProcessingScheduler scheduler(&sink);
 
     AWLCommunicator sensorCommunicator(&mockStrategy);
@@ -218,7 +218,7 @@ TEST_F(SensorCommunicatorTest, given_severalMessage_when_start_then_willProduceT
     MockSensorCommunicationStrategy mockStrategy;
     mockStrategy.whenCalledReadMessageThenWillReturnTheseMessages(messages);
 
-    AWLSinkMock sink(messages.size());
+    FrameSinkMock sink(messages.size());
     AWLProcessingScheduler scheduler(&sink);
 
     AWLCommunicator sensorCommunicator(&mockStrategy);

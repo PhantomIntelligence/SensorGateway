@@ -54,3 +54,13 @@ void Frame::setSystemID(SystemID const& systemID) {
 Frame const Frame::returnDefaultData() noexcept {
     return DEFAULT_FRAME;
 }
+
+bool Frame::operator==(Frame const& other) const {
+    bool sameFrameID = (frameID == other.frameID);
+    bool sameSystemID = (systemID == other.systemID);
+    auto samePixels = true;
+    for (auto i = 0; i < NUMBER_OF_PIXELS_IN_AWL16_FRAME && sameFrameID && sameSystemID; ++i) {
+        samePixels = (pixels[i] == other.pixels[i]);
+    }
+    return (sameFrameID && samePixels && samePixels);
+}

@@ -20,6 +20,7 @@
 #include "spirit-sensor-gateway/domain/AWLMessage.h"
 #include "MessageTranslationStrategy.hpp"
 
+
 using namespace MessageID;
 using namespace DataFlow;
 

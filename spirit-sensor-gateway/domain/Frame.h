@@ -32,6 +32,7 @@ namespace DataFlow {
             void setFrameID(FrameID const& frameID);
             void setSystemID(SystemID const& systemID);
             Frame static const returnDefaultData() noexcept ;
+            bool operator==(Frame const& other) const;
 
         private:
             FrameID frameID;
