@@ -31,14 +31,13 @@ namespace ProtocolTranslation {
 
         AWLMessageToSpiritMessageTranslationStrategy();
 
-        ~ AWLMessageToSpiritMessageTranslationStrategy();
+        ~ AWLMessageToSpiritMessageTranslationStrategy() = default;
 
         Frame returnDefaultData();
 
         void translateBasicMessage(AWLMessage&& inputMessage) override;
 
     private:
-        std::vector<Frame> frames;
 
         void addTrackInPixel(AWLMessage* awlMessage, PixelID pixelID);
 

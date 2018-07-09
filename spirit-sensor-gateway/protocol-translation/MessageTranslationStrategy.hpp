@@ -30,15 +30,6 @@ namespace ProtocolTranslation {
 
         OUTPUT* currentOutputMessage;
     };
-    /**
-     * @brief AWL Specialisation
-     */
-
-   /* template <>
-    void  MessageTranslationStrategy<DataFlow::AWLMessage,DataFlow::Track>::translateBasicMessage(
-            DataFlow::AWLMessage* inputMessage){
-
-    };*/
 }
 
 #endif //SPIRITSENSORGATEWAY_MESSAGETRANSLATIONSTRATEGY_H

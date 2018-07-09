@@ -7,9 +7,6 @@ AWLMessageToSpiritMessageTranslationStrategy::AWLMessageToSpiritMessageTranslati
     currentOutputMessage = new Frame();
 }
 
-AWLMessageToSpiritMessageTranslationStrategy::~AWLMessageToSpiritMessageTranslationStrategy() {
-}
-
 void AWLMessageToSpiritMessageTranslationStrategy::translateBasicMessage(AWLMessage&& inputMessage) {
     switch (inputMessage.id) {
         case FRAME_DONE:
@@ -30,7 +27,6 @@ void AWLMessageToSpiritMessageTranslationStrategy::translateEndOfFrameMessage(AW
     currentOutputMessage->setFrameID(convertTwoBytesToUnsignedBigEndian(awlMessage->data[0], awlMessage->data[1]));
     currentOutputMessage->setSystemID(convertTwoBytesToUnsignedBigEndian(awlMessage->data[2], awlMessage->data[3]));
     produce(std::move(*currentOutputMessage));
-    frames.push_back(*currentOutputMessage);
     currentOutputMessage = new Frame();
 }
 

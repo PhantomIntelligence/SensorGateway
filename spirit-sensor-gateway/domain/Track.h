@@ -31,6 +31,7 @@ namespace DataFlow {
 
         bool operator!=(Track const& other) const;
 
+
         Acceleration getAcceleration() const;
 
         ConfidenceLevel getConfidenceLevel() const;

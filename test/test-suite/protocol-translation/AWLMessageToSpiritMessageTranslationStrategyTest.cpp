@@ -20,21 +20,14 @@
 #include <gmock/gmock.h>
 
 #include "spirit-sensor-gateway/protocol-translation/AWLMessageToSpiritMessageTranslationStrategy.h"
+#include "test/utilities/DataStubs.h"
 
 using DataFlow::Track;
 using ProtocolTranslation::AWLMessageToSpiritMessageTranslationStrategy;
 
 
 class AWLMessageToSpiritMessageTranslationStrategyTest : public ::testing::Test {
-protected:
-    AWLMessage createAWLMessageWithID(uint16_t id) const;
 
-    Track createTrack(TrackID trackID, ConfidenceLevel confidenceLevel, Intensity intensity, Acceleration acceleration,
-                      Distance distance, Speed speed);
-
-    Pixel createPixel(PixelID pixelID, std::vector<Track> tracks);
-
-    Frame createFrame(FrameID frameID, SystemID systemID, std::vector<Pixel> pixels);
 };
 
 using FrameSink = DataFlow::DataSink<Frame>;
@@ -250,49 +243,5 @@ TEST_F(AWLMessageToSpiritMessageTranslationStrategyTest,
 
 }
 
-
-AWLMessage AWLMessageToSpiritMessageTranslationStrategyTest::createAWLMessageWithID(uint16_t id) const {
-
-    AWLMessage awlMessage = AWLMessage::returnDefaultData();
-    awlMessage.id = id;
-    awlMessage.data[0] = 16;
-    awlMessage.data[1] = 32;
-    awlMessage.data[2] = 48;
-    awlMessage.data[3] = 1;
-    awlMessage.data[4] = 0;
-    awlMessage.data[5] = 96;
-    awlMessage.data[6] = 112;
-    awlMessage.data[7] = 128;
-    return awlMessage;
-}
-
-Track AWLMessageToSpiritMessageTranslationStrategyTest::createTrack(TrackID trackID, ConfidenceLevel confidenceLevel,
-                                                                    Intensity intensity, Acceleration acceleration,
-                                                                    Distance distance, Speed speed) {
-    Track track = Track(trackID, confidenceLevel, intensity);
-    track.setAcceleration(acceleration);
-    track.setDistance(distance);
-    track.setSpeed(speed);
-    return track;
-}
-
-Pixel AWLMessageToSpiritMessageTranslationStrategyTest::createPixel(PixelID pixelID, std::vector<Track> tracks) {
-    Pixel pixel = Pixel(pixelID);
-    for (auto track : tracks) {
-        pixel.addTrack(track);
-    }
-    return pixel;
-}
-
-Frame AWLMessageToSpiritMessageTranslationStrategyTest::createFrame(FrameID frameID, SystemID systemID,
-                                                                    std::vector<Pixel> pixels) {
-    Frame frame = Frame();
-    frame.setFrameID(frameID);
-    frame.setSystemID(systemID);
-    for (auto pixel : pixels) {
-        frame.addPixel(pixel);
-    }
-    return frame;
-}
 
 #endif //SPIRITSENSORGATEWAY_AWLMESSAGETRANSLATORTEST_CPP

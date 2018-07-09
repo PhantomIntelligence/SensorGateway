@@ -17,26 +17,20 @@
 
 #include "spirit-sensor-gateway/protocol-translation/MessageTranslator.hpp"
 
-
-/**
- * @brief Test Fixture meant to ensure correct behavior of ProtocolTranslation.
- * @note A RingBuffer is used to implement the different tested functions
- */
-
 using DataFlow::AWLMessage;
 using DataFlow::Frame;
 using ProtocolTranslation::MessageTranslationStrategy;
 using SensorAccessLinkElement::MessageTranslator;
 
-class ProtocolTranslationTest : public ::testing::Test {
+class MessageTranslatorTest : public ::testing::Test {
 
 protected:
 
     AWLMessage awlMessage = givenOneMessage();
 
-    ProtocolTranslationTest() = default;
+    MessageTranslatorTest() = default;
 
-    virtual ~ProtocolTranslationTest() = default;
+    virtual ~MessageTranslatorTest() = default;
 
     AWLMessage givenOneMessage() const noexcept;
 
@@ -70,7 +64,7 @@ private:
 
 };
 
-TEST_F(ProtocolTranslationTest,
+TEST_F(MessageTranslatorTest,
        given_aMessageTranslationStrategy_when_consumingABasicAWLMessage_then_callsTranslateBasicMessageInStrategy) {
 
     MockMessageTranslationStrategy mockStrategy;
@@ -81,7 +75,7 @@ TEST_F(ProtocolTranslationTest,
     ASSERT_TRUE(strategyHasBeenCalledWithRightParameter);
 }
 
-AWLMessage ProtocolTranslationTest::givenOneMessage() const noexcept {
+AWLMessage MessageTranslatorTest::givenOneMessage() const noexcept {
     int64_t const ARBITRARY_ID = 42;
     uint64_t const ARBITRARY_LENGTH = 7;
     int64_t const ARBITRARY_TIMESTAMP = 101010;

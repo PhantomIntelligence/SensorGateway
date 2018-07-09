@@ -14,8 +14,8 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 #include <fstream>
-#include "test/utilities/AWLMessagesFileManager.h"
-#include "test/utilities/SpiritFramesFileManager.h"
+#include "test/utilities/files/AWLMessagesFileManager.h"
+#include "test/utilities/files/SpiritFramesFileManager.h"
 #include "test/acceptance-test/fixtures/AWLMessagesFixture.cpp"
 #include "test/acceptance-test/fixtures/SpiritFramesFixture.cpp"
 #include "spirit-sensor-gateway/protocol-translation/AWLMessageToSpiritMessageTranslationStrategy.h"
