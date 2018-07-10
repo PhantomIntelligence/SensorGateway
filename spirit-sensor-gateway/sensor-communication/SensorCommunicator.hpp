@@ -43,6 +43,14 @@ namespace SensorAccessLinkElement {
         ~SensorCommunicator() {
         };
 
+        SensorCommunicator(SensorCommunicator const& other) = delete;
+
+        SensorCommunicator(SensorCommunicator&& other) noexcept = delete;
+
+        SensorCommunicator& operator=(SensorCommunicator const& other)& = delete;
+
+        SensorCommunicator& operator=(SensorCommunicator&& other)& noexcept = delete;
+
         void start() {
             sensorCommunicationStrategy->openConnection();
             communicatorThread = JoinableThread(&SensorCommunicator::run, this);
