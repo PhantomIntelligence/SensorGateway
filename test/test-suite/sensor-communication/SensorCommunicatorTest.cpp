@@ -256,7 +256,7 @@ AWLMessage SensorCommunicatorTest::givenOneMessage(uint8_t offsetForDataDifferen
     uint64_t const ARBITRARY_TIMESTAMP = 101010 + offsetForDataDifference;
     uint32_t const ARBITRARY_LENGTH = 7 + offsetForDataDifference;
     AWL::DataArray ARBITRARY_DATA;
-    for(auto k = 0; k < MAX_NUMBER_OF_DATA_IN_AWL_MESSAGE; ++k) {
+    for(auto k = 0; k < MAXIMUM_NUMBER_OF_DATA_IN_AWL_MESSAGE; ++k) {
         ARBITRARY_DATA.at(k) = static_cast<unsigned char>(k);
     }
 

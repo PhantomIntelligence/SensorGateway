@@ -3,7 +3,6 @@
 
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
-
 #include "spirit-sensor-gateway/domain/Pixel.h"
 
 using namespace DataFlow;
@@ -42,7 +41,7 @@ TEST_F(PixelTest,given_anEmptyPixelAndATrack_when_addingTheTrackToThePixel_then_
 TEST_F(PixelTest,given_aPixelWithAFullArrayOfTrack_when_addingOneMoreTrack_then_throwsATrackArrayIllegalStoreFullException){
     Pixel pixel(1);
     Track track(8,0,0);
-    for(int i; i < MAXIMUM_NUMBER_OF_TRACKS_IN_AWL16_PIXEL; ++i){
+    for(int i; i < NUMBER_OF_TRACKS_IN_AWL16_PIXEL; ++i){
         pixel.addTrack(track);
     }
 

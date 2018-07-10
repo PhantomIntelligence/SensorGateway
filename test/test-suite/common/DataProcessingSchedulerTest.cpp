@@ -22,15 +22,13 @@
 #include "data-model/DataModelFixture.h"
 #include "spirit-sensor-gateway/common/buffer/DataProcessingScheduler.hpp"
 
+using Buffer::NUMBER_OF_CONCURRENT_INPUT_FOR_SENSOR_ACCESS_LINK_ELEMENTS;
 using ExampleDataModel::NativeData;
 using ExampleDataModel::ProcessedData;
-
 using TestFunctions::DataTestUtil;
-
 using NativeBuffer = DataFlow::RingBuffer<NativeData>;
 using OutputProducer = DataFlow::DataSource<ProcessedData>;
 using ProcessingStrategy = DataFlow::DataSink<NativeData>;
-
 using NativeSink = DataFlow::DataSink<NativeData>;
 
 class DataProcessingSchedulerTest : public ::testing::Test {

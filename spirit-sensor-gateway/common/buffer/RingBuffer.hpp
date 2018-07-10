@@ -22,6 +22,7 @@
 #include "spirit-sensor-gateway/common/buffer/ConsumerLink.hpp"
 #include "RingBufferPad.hpp"
 
+using Buffer::RING_BUFFER_SIZE;
 
 namespace DataFlow {
 

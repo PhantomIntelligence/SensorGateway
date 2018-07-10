@@ -18,6 +18,7 @@
 #include "CommunicationProtocolStrategy.hpp"
 #include <limits>
 
+using Sensor::AWL::MAXIMUM_NUMBER_OF_DATA_IN_AWL_MESSAGE;
 
 namespace SensorCommunication {
     using DataFlow::AWLMessage;
@@ -44,7 +45,7 @@ namespace SensorCommunication {
             unsigned long timestamp;
             unsigned int flags;
             unsigned int length;
-            uint8_t data[MAX_NUMBER_OF_DATA_IN_AWL_MESSAGE];
+            uint8_t data[MAXIMUM_NUMBER_OF_DATA_IN_AWL_MESSAGE];
         };
         canHandle communicationChannel;
 
