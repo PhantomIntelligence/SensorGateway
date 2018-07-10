@@ -713,7 +713,7 @@ DeathTest::TestRole WindowsDeathTest::AssumeRole() {
   HANDLE read_handle, write_handle;
   GTEST_DEATH_TEST_CHECK_(
       ::CreatePipe(&read_handle, &write_handle, &handles_are_inheritable,
-                   0)  // Default data-flow size.
+                   0)  // Default buffer size.
       != FALSE);
   set_read_fd(::_open_osfhandle(reinterpret_cast<intptr_t>(read_handle),
                                 O_RDONLY));
