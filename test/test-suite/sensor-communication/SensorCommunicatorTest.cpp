@@ -12,6 +12,7 @@
 	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 	See the License for the specific language governing permissions and
 	limitations under the License.
+
 */
 
 #ifndef SPIRITSENSORGATEWAY_SENSORCOMMUNICATORTEST_CPP
@@ -28,10 +29,6 @@ using AWLData = std::list<AWLMessage>;
 using AWLCommunicator = SensorAccessLinkElement::SensorCommunicator<AWLMessage>;
 using TestFunctions::DataTestUtil;
 
-/**
- * @brief Test Fixture meant to ensure correct behavior of SensorCommunicator.
- * @note A RingBuffer is used to implement the different tested functions
- */
 class SensorCommunicatorTest : public ::testing::Test {
 
 protected:
@@ -45,9 +42,9 @@ protected:
 
     AWLMessage givenOneMessage(uint8_t offsetForDataDifference) const noexcept;
 
-    AWLData givenANumberOfMessages(uint8_t numberOfMessagesToCreate) const noexcept;
+    AWLData createASequenceOfDifferentMessagesOfSize(uint8_t numberOfMessagesToCreate) const noexcept;
 
-    void given_aNumberOfMessage_when_start_then_produceTheCorrectNumberOfMessageInTheCorrectOrder(uint64_t number);
+    void given_aSequenceOfMessages_when_start_then_produceTheCorrectNumberOfMessageInTheCorrectOrder(uint64_t number);
 };
 
 class MockSensorCommunicationStrategy final : public SensorCommunication::CommunicationProtocolStrategy<AWLMessage> {
@@ -61,9 +58,9 @@ public:
             hasToReturnSpecificData(false) {
     }
 
-    void whenCalledReadMessageThenWillReturnTheseMessages(AWLData dataToReturn) {
+    void whenCalledReadMessageThenWillReturnTheseMessages(AWLData&& dataToReturn) {
         hasToReturnSpecificData = true;
-        this->dataToReturn = dataToReturn;
+        this->dataToReturn = std::forward<AWLData>(dataToReturn);
     }
 
     AWLMessage readMessage() override {
@@ -75,11 +72,11 @@ public:
         }
         // The sleep and yield are here to reduce the speed of the strategy mock.
         // The goal of this test class is to ensure the correct data is passed and the order is respected.
-        // This Mock allows to control that, but it's speed is much faster than any real sensor communication is ever going to be.
+        // This Mock allows to control that, but its speed is much faster than any real sensor communication is ever going to be.
         // This creates an occasional problem where the SensorCommunicator writes his data to his OutputBuffer too fast.
         // This specific problem only happens when the rest of the DataProcessingScheduler and the other objects responsible of the consumption are not initialized fast enough.
-        // Once they are, the problem doesn't show.
-        // Thus, this creates a more realistic scenario
+
+        // The implementation of readMessage of this Mock is too fast Reduces the speed of this method when the number is reached
         std::this_thread::sleep_for(std::chrono::milliseconds(5));
         std::this_thread::yield();
         return AWLMessage::returnDefaultData();
@@ -194,12 +191,12 @@ public:
         }
     }
 
-    bool hasBeenCalledLessOrEqualToTheExpectedNumberOfTimes(){
+    bool hasBeenCalledLessOrEqualToTheExpectedNumberOfTimes() {
         LockGuard guard(consumptionMutex);
         return actualNumberOfDataConsumed.load() <= numberOfDataToConsumeGoal.load();
     }
 
-    bool hasBeenCalledExpectedNumberOfTimes(){
+    bool hasBeenCalledExpectedNumberOfTimes() {
         LockGuard guard(consumptionMutex);
         return actualNumberOfDataConsumed.load() == numberOfDataToConsumeGoal.load();
     };
@@ -229,13 +226,13 @@ private:
 
 using AWLProcessingScheduler = DataFlow::DataProcessingScheduler<AWLMessage, AWLSinkMock, 1>;
 
-void SensorCommunicatorTest::given_aNumberOfMessage_when_start_then_produceTheCorrectNumberOfMessageInTheCorrectOrder(
+void SensorCommunicatorTest::given_aSequenceOfMessages_when_start_then_produceTheCorrectNumberOfMessageInTheCorrectOrder(
         uint64_t number) {
-    auto messages = givenANumberOfMessages(number);
+    auto messages = createASequenceOfDifferentMessagesOfSize(number);
     AWLData expectedMessages = messages;
 
     MockSensorCommunicationStrategy mockStrategy;
-    mockStrategy.whenCalledReadMessageThenWillReturnTheseMessages(messages);
+    mockStrategy.whenCalledReadMessageThenWillReturnTheseMessages(std::move(messages));
 
     AWLSinkMock sink(number);
     AWLProcessingScheduler scheduler(&sink);
@@ -261,32 +258,34 @@ void SensorCommunicatorTest::given_aNumberOfMessage_when_start_then_produceTheCo
 
 TEST_F(SensorCommunicatorTest, given_oneMessage_when_start_then_willProduceThisData) {
     auto numberOfMessage = 1;
-    given_aNumberOfMessage_when_start_then_produceTheCorrectNumberOfMessageInTheCorrectOrder(numberOfMessage);
+    given_aSequenceOfMessages_when_start_then_produceTheCorrectNumberOfMessageInTheCorrectOrder(numberOfMessage);
 }
 
-TEST_F(SensorCommunicatorTest, given_severalMessages_when_start_then_willProduceTheseMessagesInTheSameOrderItConsumedThem) {
+TEST_F(SensorCommunicatorTest,
+       given_severalMessages_when_start_then_willProduceTheseMessagesInTheSameOrderItConsumedThem) {
     auto numberOfMessage = 5;
-    given_aNumberOfMessage_when_start_then_produceTheCorrectNumberOfMessageInTheCorrectOrder(numberOfMessage);
+    given_aSequenceOfMessages_when_start_then_produceTheCorrectNumberOfMessageInTheCorrectOrder(numberOfMessage);
 }
 
 AWLMessage SensorCommunicatorTest::givenOneMessage(uint8_t offsetForDataDifference) const noexcept {
-    int64_t const ARBITRARY_ID = 42 + offsetForDataDifference;
-    uint64_t const ARBITRARY_TIMESTAMP = 101010 + offsetForDataDifference;
-    uint32_t const ARBITRARY_LENGTH = 7 + offsetForDataDifference;
-    AWL::DataArray ARBITRARY_DATA;
+    int64_t const arbitraryId = 42 + offsetForDataDifference;
+    uint64_t const arbitraryTimestamp = 101010 + offsetForDataDifference;
+    uint32_t const arbitraryLength = 7 + offsetForDataDifference;
+    AWL::DataArray arbitraryData;
+
     for (auto k = 0; k < MAX_NUMBER_OF_DATA_IN_AWL_MESSAGE; ++k) {
-        ARBITRARY_DATA.at(k) = static_cast<unsigned char>(k);
+        arbitraryData.at(k) = static_cast<unsigned char>(k);
     }
 
     AWLMessage message = AWLMessage::returnDefaultData();
-    message.id = ARBITRARY_ID;
-    message.timestamp = ARBITRARY_TIMESTAMP;
-    message.length = ARBITRARY_LENGTH;
-    message.data = ARBITRARY_DATA;
+    message.id = arbitraryId;
+    message.timestamp = arbitraryTimestamp;
+    message.length = arbitraryLength;
+    message.data = arbitraryData;
     return message;
 }
 
-AWLData SensorCommunicatorTest::givenANumberOfMessages(uint8_t numberOfMessagesToCreate) const noexcept {
+AWLData SensorCommunicatorTest::createASequenceOfDifferentMessagesOfSize(uint8_t numberOfMessagesToCreate) const noexcept {
     AWLData messages;
     for (uint8_t offset = 0; offset < numberOfMessagesToCreate; ++offset) {
         auto message = givenOneMessage(offset);
