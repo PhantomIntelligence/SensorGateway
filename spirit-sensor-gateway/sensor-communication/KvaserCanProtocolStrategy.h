@@ -28,7 +28,7 @@ namespace SensorCommunication {
     public:
         KvaserCanProtocolStrategy();
 
-        ~ KvaserCanProtocolStrategy();
+        ~ KvaserCanProtocolStrategy() = default;
 
         void openConnection();
 

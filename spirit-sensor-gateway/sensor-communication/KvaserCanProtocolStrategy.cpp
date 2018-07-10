@@ -30,8 +30,6 @@ using DataFlow::AWLMessage;
 KvaserCanProtocolStrategy::KvaserCanProtocolStrategy() : communicationChannel() {
 }
 
-KvaserCanProtocolStrategy::~KvaserCanProtocolStrategy() = default;
-
 void KvaserCanProtocolStrategy::openConnection() {
     canInitializeLibrary();
     canHandle communicationChannel = canOpenChannel(CANLIB_CHANNEL_ID, CANLIB_FLAGS_FOR_CHANNEL);

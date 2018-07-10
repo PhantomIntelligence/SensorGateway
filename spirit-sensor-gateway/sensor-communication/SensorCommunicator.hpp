@@ -40,7 +40,7 @@ namespace SensorAccessLinkElement {
             communicatorThread.exitSafely();
         }
 
-        ~SensorCommunicator() {
+        ~SensorCommunicator() = default {
 
         }
 
