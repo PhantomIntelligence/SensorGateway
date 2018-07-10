@@ -47,7 +47,7 @@
 //      global namespace.
 //
 // If none of the above is defined, it will print the debug string of
-// the value if it is a protocol buffer, or print the raw bytes in the
+// the value if it is a protocol data-flow, or print the raw bytes in the
 // value otherwise.
 //
 // To aid debugging: when T is a reference type, the address of the

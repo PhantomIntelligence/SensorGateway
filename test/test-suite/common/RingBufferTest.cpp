@@ -7,7 +7,7 @@
 #include <spirit-sensor-gateway/sensor-communication/SensorCommunicator.hpp>
 #include <spirit-sensor-gateway/sensor-communication/KvaserCanProtocolStrategy.h>
 
-#include "spirit-sensor-gateway/common/buffer/RingBuffer.hpp"
+#include "spirit-sensor-gateway/common/data-flow/RingBuffer.hpp"
 #include "data-model/DataModelFixture.h"
 #include "MockConsumerLink.h"
 
