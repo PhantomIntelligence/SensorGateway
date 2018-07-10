@@ -22,9 +22,9 @@
 #include "test/utilities/StubsGenerator.cpp"
 
 
-using Defaults::Track::DEFAULT_ACCELERATION_VALUE
-using Defaults::Track::DEFAULT_DISTANCE_VALUE
-using Defaults::Track::DEFAULT_SPEED_VALUE
+using Defaults::Track::DEFAULT_ACCELERATION_VALUE;
+using Defaults::Track::DEFAULT_DISTANCE_VALUE;
+using Defaults::Track::DEFAULT_SPEED_VALUE; 
 using Stub::createFrame;
 using Stub::createPixel;
 using Stub::createTrack;
