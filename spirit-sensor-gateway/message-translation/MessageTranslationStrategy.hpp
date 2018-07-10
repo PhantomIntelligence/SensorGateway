@@ -14,7 +14,7 @@
 #define SPIRITSENSORGATEWAY_MESSAGETRANSLATIONSTRATEGY_H
 
 
-#include "spirit-sensor-gateway/common/DataSource.hpp"
+#include "spirit-sensor-gateway/common/buffer/DataSource.hpp"
 
 namespace MessageTranslation {
 

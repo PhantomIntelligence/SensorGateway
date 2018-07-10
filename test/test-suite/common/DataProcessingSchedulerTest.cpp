@@ -20,7 +20,7 @@
 
 #include <gtest/gtest.h>
 #include "data-model/DataModelFixture.h"
-#include "spirit-sensor-gateway/common/DataProcessingScheduler.hpp"
+#include "spirit-sensor-gateway/common/buffer/DataProcessingScheduler.hpp"
 
 using ExampleDataModel::NativeData;
 using ExampleDataModel::ProcessedData;

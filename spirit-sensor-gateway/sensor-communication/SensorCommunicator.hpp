@@ -17,7 +17,7 @@
 #ifndef SPIRITSENSORGATEWAY_SENSORCOMMUNICATOR_HPP
 #define SPIRITSENSORGATEWAY_SENSORCOMMUNICATOR_HPP
 
-#include "spirit-sensor-gateway/common/DataProcessingScheduler.hpp"
+#include "spirit-sensor-gateway/common/buffer/DataProcessingScheduler.hpp"
 #include "CommunicationProtocolStrategy.hpp"
 
 namespace SensorAccessLinkElement {
