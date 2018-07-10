@@ -18,7 +18,7 @@
 #define SPIRITSENSORGATEWAY_SENSORCOMMUNICATOR_HPP
 
 #include "spirit-sensor-gateway/common/data-flow/DataProcessingScheduler.hpp"
-#include "CommunicationProtocolStrategy.hpp"
+#include "SensorCommunicationStrategy.hpp"
 
 namespace SensorAccessLinkElement {
 
@@ -27,7 +27,7 @@ namespace SensorAccessLinkElement {
 
     protected:
         typedef T DATA;
-        typedef SensorCommunication::CommunicationProtocolStrategy<DATA> CommunicationProtocolStrategy;
+        typedef SensorCommunication::SensorCommunicationStrategy<DATA> CommunicationProtocolStrategy;
 
         using super = DataFlow::DataSource<DATA>;
         using super::produce;

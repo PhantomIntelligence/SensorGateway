@@ -19,15 +19,15 @@
 
 #include <canlib.h>
 #include <limits>
-#include "CommunicationProtocolStrategy.hpp"
+#include "SensorCommunicationStrategy.hpp"
 
 namespace SensorCommunication {
     using DataFlow::AWLMessage;
 
-    class KvaserCanProtocolStrategy final : public CommunicationProtocolStrategy<AWLMessage> {
+    class KvaserCanProtocolStrategy final : public SensorCommunicationStrategy<AWLMessage> {
 
         unsigned long const CANLIB_READ_WAIT_INFINITE_DELAY = std::numeric_limits<int>::infinity();
-        using super = CommunicationProtocolStrategy<AWLMessage>;
+        using super = SensorCommunicationStrategy<AWLMessage>;
         using super::MESSAGE;
 
     public:

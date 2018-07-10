@@ -11,8 +11,8 @@
 	limitations under the License.
 */
 
-#ifndef SPIRITSENSORGATEWAY_COMMUNICATIONPROTOCOLSTRATEGY_H
-#define SPIRITSENSORGATEWAY_COMMUNICATIONPROTOCOLSTRATEGY_H
+#ifndef SPIRITSENSORGATEWAY_SENSORCOMMUNICATIONSTRATEGY_H
+#define SPIRITSENSORGATEWAY_SENSORCOMMUNICATIONSTRATEGY_H
 
 #include "spirit-sensor-gateway/domain/AWLMessage.h"
 
@@ -20,11 +20,11 @@
 namespace SensorCommunication {
 
     template<class T>
-    class CommunicationProtocolStrategy {
+    class SensorCommunicationStrategy {
     protected:
         typedef T MESSAGE;
     public:
-        virtual ~CommunicationProtocolStrategy() noexcept = default;
+        virtual ~SensorCommunicationStrategy() noexcept = default;
 
         virtual MESSAGE readMessage() = 0;
 
@@ -35,4 +35,4 @@ namespace SensorCommunication {
     };
 }
 
-#endif //SPIRITSENSORGATEWAY_COMMUNICATIONPROTOCOLSTRATEGY_H
+#endif //SPIRITSENSORGATEWAY_SENSORCOMMUNICATIONSTRATEGY_H

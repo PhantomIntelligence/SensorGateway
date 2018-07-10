@@ -44,7 +44,7 @@ protected:
     AWLMessages returnTheProcessResultMadeBySensorCommunicatorFrom(AWLMessages&& messageSequence);
 };
 
-class MockSensorCommunicationStrategy final : public SensorCommunication::CommunicationProtocolStrategy<AWLMessage> {
+class MockSensorCommunicationStrategy final : public SensorCommunication::SensorCommunicationStrategy<AWLMessage> {
 
 public:
 
