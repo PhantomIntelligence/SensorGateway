@@ -37,7 +37,6 @@ protected:
 
     virtual ~SensorCommunicatorTest() = default;
 
-private:
     AWLMessage createAMessageWithValueOffsetOf(uint8_t dataValueOffset) const noexcept;
 
     AWLMessages createASequenceOfDifferentMessagesOfSize(uint64_t numberOfMessagesToCreate) const noexcept;
@@ -218,13 +217,13 @@ private:
 
 using AWLProcessingScheduler = DataFlow::DataProcessingScheduler<AWLMessage, AWLSinkMock, 1>;
 
-AWLMessages SensorCommunicatorTest::returnTheProcessResultMadeBySensorCommunicatorFrom(AWLMessages&& messages) {
-    auto numberOfMessagesToProcess = messages.size();
+AWLMessages SensorCommunicatorTest::returnTheProcessResultMadeBySensorCommunicatorFrom(AWLMessages&& messageSequence) {
+    auto numberOfMessagesToProcess = messageSequence.size();
     AWLSinkMock sink(numberOfMessagesToProcess);
     AWLProcessingScheduler scheduler(&sink);
 
     MockSensorCommunicationStrategy mockStrategy;
-    mockStrategy.returnThisMessageSequenceWhenReadMessageIsCalled(std::forward<AWLMessages>(messages));
+    mockStrategy.returnThisMessageSequenceWhenReadMessageIsCalled(std::forward<AWLMessages>(messageSequence));
     AWLCommunicator sensorCommunicator(&mockStrategy);
     sensorCommunicator.linkConsumer(&scheduler);
 
