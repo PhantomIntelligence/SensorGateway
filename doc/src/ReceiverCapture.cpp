@@ -284,7 +284,7 @@ void ReceiverCapture::ProcessCompletedFrame() {
 
 void ReceiverCapture::controlSequenceSize() const {
     // Make sure we do not keep too many of those frames around.
-    // Remove the older frame if we exceed the data-flow capacity
+    // Remove the older frame if we exceed the buffer capacity
     if (acquisitionSequence->sensorFrames.size() > maximumSensorFrames) {
         acquisitionSequence->sensorFrames.pop();
     }
