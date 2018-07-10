@@ -21,6 +21,10 @@
 #include "spirit-sensor-gateway/message-translation/AWLMessageToSpiritMessageTranslationStrategy.h"
 #include "test/utilities/StubsGenerator.cpp"
 
+
+using Defaults::Track::DEFAULT_ACCELERATION_VALUE
+using Defaults::Track::DEFAULT_DISTANCE_VALUE
+using Defaults::Track::DEFAULT_SPEED_VALUE
 using Stub::createFrame;
 using Stub::createPixel;
 using Stub::createTrack;
@@ -31,11 +35,14 @@ using Mock::FrameSinkMock;
 class AWLMessageToSpiritMessageTranslationStrategyTest : public ::testing::Test {
 protected:
     unsigned int const INDEX_OF_FRAME = 0;
-    
+
     Frame frameAfterEndOfFrameMessageTranslationStub = createFrame(64829, 16);
 
     Frame frameAfterDetectionTrackAndEndOfFrameMessagesTranslationStub =
-            createFrame(64829, 16, {createPixel(11, {createTrack(14291, 96, 123, 0, 0, 0)})});
+            createFrame(64829, 16, {createPixel(11, {createTrack(14291, 96, 123,
+                                                                 DEFAULT_ACCELERATION_VALUE,
+                                                                 DEFAULT_DISTANCE_VALUE,
+                                                                 DEFAULT_SPEED_VALUE)})});
 
     Frame frameAfterDetectionTrackAndVelocityTrackAndEndOfFrameMessagesTranslationStub =
             createFrame(64829, 16, {createPixel(11, {createTrack(14291, 96, 123, 379, 106, 0)})});
