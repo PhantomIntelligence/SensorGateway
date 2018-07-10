@@ -14,8 +14,8 @@
 	limitations under the License.
 
 */
-#ifndef SPIRITSENSORGATEWAY_KVASERCANPROTOCOLSTRATEGY_H
-#define SPIRITSENSORGATEWAY_KVASERCANPROTOCOLSTRATEGY_H
+#ifndef SPIRITSENSORGATEWAY_KVASERCANCOMMUNICATIONSTRATEGY_H
+#define SPIRITSENSORGATEWAY_KVASERCANCOMMUNICATIONSTRATEGY_H
 
 #include <canlib.h>
 #include <limits>
@@ -24,16 +24,16 @@
 namespace SensorCommunication {
     using DataFlow::AWLMessage;
 
-    class KvaserCanProtocolStrategy final : public SensorCommunicationStrategy<AWLMessage> {
+    class KvaserCanCommunicationStrategy final : public SensorCommunicationStrategy<AWLMessage> {
 
         unsigned long const CANLIB_READ_WAIT_INFINITE_DELAY = std::numeric_limits<int>::infinity();
         using super = SensorCommunicationStrategy<AWLMessage>;
         using super::MESSAGE;
 
     public:
-        KvaserCanProtocolStrategy();
+        KvaserCanCommunicationStrategy();
 
-        ~KvaserCanProtocolStrategy();
+        ~KvaserCanCommunicationStrategy();
 
         void openConnection() override;
 
@@ -55,4 +55,4 @@ namespace SensorCommunication {
         AWLMessage convertCanMessageToAwlMessage(CanMessage canMessage);
     };
 }
-#endif //SPIRITSENSORGATEWAY_KVASERCANPROTOCOLSTRATEGY_H
+#endif //SPIRITSENSORGATEWAY_KVASERCANCOMMUNICATIONSTRATEGY_H

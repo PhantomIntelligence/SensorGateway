@@ -15,9 +15,9 @@
 
 */
 
-#include "KvaserCanProtocolStrategy.h"
+#include "KvaserCanCommunicationStrategy.h"
 
-using SensorCommunication::KvaserCanProtocolStrategy;
+using SensorCommunication::KvaserCanCommunicationStrategy;
 
 const long CANLIB_KVASER_CAN_BIT_RATE = canBITRATE_1M;
 const unsigned int CANLIB_TIME_SEGMENT_1 = 0;
@@ -31,14 +31,14 @@ const int CANLIB_CHANNEL_ID = 0;
 
 using DataFlow::AWLMessage;
 
-KvaserCanProtocolStrategy::KvaserCanProtocolStrategy() : communicationChannel() {
+KvaserCanCommunicationStrategy::KvaserCanCommunicationStrategy() : communicationChannel() {
 }
 
-KvaserCanProtocolStrategy::~KvaserCanProtocolStrategy() {
+KvaserCanCommunicationStrategy::~KvaserCanCommunicationStrategy() {
     closeConnection(); // TODO: This will need to be removed. The destructor should be noexcept, this is not.
 }
 
-void KvaserCanProtocolStrategy::openConnection() {
+void KvaserCanCommunicationStrategy::openConnection() {
     canInitializeLibrary();
     canHandle communicationChannel = canOpenChannel(CANLIB_CHANNEL_ID, CANLIB_FLAGS_FOR_CHANNEL);
     canSetBusParams(communicationChannel, CANLIB_KVASER_CAN_BIT_RATE, CANLIB_TIME_SEGMENT_1, CANLIB_TIME_SEGMENT_2,
@@ -47,14 +47,14 @@ void KvaserCanProtocolStrategy::openConnection() {
     canBusOn(communicationChannel);
 }
 
-AWLMessage KvaserCanProtocolStrategy::readMessage() {
+AWLMessage KvaserCanCommunicationStrategy::readMessage() {
     CanMessage canMessage{};
     canReadWait(communicationChannel, &canMessage.id, &canMessage.data, &canMessage.length, &canMessage.flags,
                 &canMessage.timestamp, CANLIB_READ_WAIT_INFINITE_DELAY);
     return convertCanMessageToAwlMessage(canMessage);
 }
 
-AWLMessage KvaserCanProtocolStrategy::convertCanMessageToAwlMessage(CanMessage canMessage) {
+AWLMessage KvaserCanCommunicationStrategy::convertCanMessageToAwlMessage(CanMessage canMessage) {
     AWL::DataArray data;
     for (auto dataNumber = 0; dataNumber < canMessage.length; ++dataNumber) {
         data[dataNumber] = canMessage.data[dataNumber];
@@ -65,7 +65,7 @@ AWLMessage KvaserCanProtocolStrategy::convertCanMessageToAwlMessage(CanMessage c
     return awlMessage;
 }
 
-void KvaserCanProtocolStrategy::closeConnection() {
+void KvaserCanCommunicationStrategy::closeConnection() {
     canBusOff(communicationChannel);
     canClose(communicationChannel);
 }
