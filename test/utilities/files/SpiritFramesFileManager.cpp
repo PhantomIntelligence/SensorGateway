@@ -25,20 +25,19 @@ void SpiritFramesFileManager::writeFileBlockWithMessage(DataFlow::Frame message,
     writeFileLineWithContentLabelAndValue(file, 0, FRAME_ID_LABEL.c_str(), message.getFrameID());
     writeFileLineWithContentLabelAndValue(file, 0, SYSTEM_ID_LABEL.c_str(), message.getSystemID());
 
-    //TODO: remove unordered map and ordered map structures once the domain class has been updated.
-    auto orderedPixels = message.getPixels();
+    auto pixels = message.getPixels();
     writeFileLineWithContentLabel(file, 0, PIXELS_LABEL.c_str());
-    for (auto pixel : *orderedPixels) {
+    for (auto pixel : *pixels) {
         writeFileLineWithContentLabelAndValue(file, 1, PIXEL_ID_LABEL.c_str(), pixel.getID());
+        writeFileLineWithContentLabel(file, 2, TRACKS_LABEL.c_str());
         auto tracks = pixel.getTracks();
         for (auto track : *tracks) {
-            writeFileLineWithContentLabel(file, 2, TRACKS_LABEL.c_str());
             writeFileLineWithContentLabelAndValue(file, 3, TRACK_ID_LABEL.c_str(), track.getID());
-            writeFileLineWithContentLabelAndValue(file, 3, ACCELERATION_LABEL.c_str(), track.getAcceleration());
-            writeFileLineWithContentLabelAndValue(file, 3, DISTANCE_LABEL.c_str(), track.getDistance());
-            writeFileLineWithContentLabelAndValue(file, 3, INTENSITY_LABEL.c_str(), track.getIntensity());
-            writeFileLineWithContentLabelAndValue(file, 3, CONFIDENCE_LEVEL_LABEL.c_str(), track.getConfidenceLevel());
-            writeFileLineWithContentLabelAndValue(file, 3, SPEED_LABEL.c_str(), track.getSpeed());
+            writeFileLineWithContentLabelAndValue(file, 4, ACCELERATION_LABEL.c_str(), track.getAcceleration());
+            writeFileLineWithContentLabelAndValue(file, 4, DISTANCE_LABEL.c_str(), track.getDistance());
+            writeFileLineWithContentLabelAndValue(file, 4, INTENSITY_LABEL.c_str(), track.getIntensity());
+            writeFileLineWithContentLabelAndValue(file, 4, CONFIDENCE_LEVEL_LABEL.c_str(), track.getConfidenceLevel());
+            writeFileLineWithContentLabelAndValue(file, 4, SPEED_LABEL.c_str(), track.getSpeed());
         }
     }
     std::fprintf(file, "%s\n", MESSAGES_SEPARATOR.c_str());

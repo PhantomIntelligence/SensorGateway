@@ -24,7 +24,7 @@ using DataFlow::Track;
 using DataFlow::Pixel;
 using DataFlow::Frame;
 
-namespace {
+namespace Stub {
 
     static Track createTrack(DataFlow::TrackID trackID, DataFlow::ConfidenceLevel confidenceLevel,
                              DataFlow::Intensity intensity, DataFlow::Acceleration acceleration,
@@ -44,7 +44,7 @@ namespace {
         return pixel;
     }
 
-    static Frame createFrame(DataFlow::FrameID frameID, DataFlow::SystemID systemID, std::vector<Pixel> pixels) {
+    static Frame createFrame(DataFlow::FrameID frameID, DataFlow::SystemID systemID, std::vector<Pixel> pixels = {}) {
         Frame frame = Frame();
         frame.setFrameID(frameID);
         frame.setSystemID(systemID);
@@ -54,6 +54,6 @@ namespace {
         return frame;
     }
 
-#endif //SPIRITSENSORGATEWAY_DATASTUBS_H
-
 }
+
+#endif //SPIRITSENSORGATEWAY_DATASTUBS_H

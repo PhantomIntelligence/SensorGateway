@@ -12,9 +12,12 @@
 */
 
 #include "spirit-sensor-gateway/domain/Frame.h"
-#include "test/utilities/DataStubs.cpp"
+#include "test/utilities/StubsGenerator.cpp"
 
-using namespace DataFlow;
+using DataFlow::Frame;
+using Stub::createFrame;
+using Stub::createPixel;
+using Stub::createTrack;
 
 std::vector<Frame> spiritFramesStub = {
         createFrame(64829, 16, {createPixel(11, {createTrack(14291, 0, 123, 0, 106, 0)}),

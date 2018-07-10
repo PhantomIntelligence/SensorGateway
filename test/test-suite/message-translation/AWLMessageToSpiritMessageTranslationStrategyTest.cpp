@@ -15,92 +15,49 @@
 #ifndef SPIRITSENSORGATEWAY_AWLMESSAGETRANSLATORTEST_CPP
 #define SPIRITSENSORGATEWAY_AWLMESSAGETRANSLATORTEST_CPP
 
-
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 #include "test/mock/FrameSinkMock.h"
 #include "spirit-sensor-gateway/message-translation/AWLMessageToSpiritMessageTranslationStrategy.h"
-#include "test/utilities/DataStubs.cpp"
-#include "test/test-suite/message-translation/stubs/SpiritFramesStub.h"
+#include "test/utilities/StubsGenerator.cpp"
 
-using DataFlow::Track;
-using Defaults::Frame::DEFAULT_FRAME;
-using Defaults::Pixel::DEFAULT_PIXEL;
-using Defaults::Track::DEFAULT_ACCELERATION_VALUE;
-using Defaults::Track::DEFAULT_DISTANCE_VALUE;
-using Defaults::Track::DEFAULT_SPEED_VALUE;
+using Stub::createFrame;
+using Stub::createPixel;
+using Stub::createTrack;
 using MessageTranslation::AWLMessageToSpiritMessageTranslationStrategy;
 using Mock::FrameProcessingScheduler;
 using Mock::FrameSinkMock;
 
 class AWLMessageToSpiritMessageTranslationStrategyTest : public ::testing::Test {
 protected:
-    auto endOfFrameAWLMessage = createAWLMessageWithID(END_OF_FRAME);
-    auto detectionTrackAWLMessage = createAWLMessageWithID(DETECTION_TRACK);
-    auto detectionVelocityAWLMessage = createAWLMessageWithID(DETECTION_VELOCITY);
-    auto const INDEX_OF_FRAME = 0;
+    unsigned int const INDEX_OF_FRAME = 0;
+    
+    Frame frameAfterEndOfFrameMessageTranslationStub = createFrame(64829, 16);
 
-    PixelID expectedPixelID;
-    TrackID expectedTrackID;
-    ConfidenceLevel expectedTrackConfidenceLevel;
-    Intensity expectedTrackIntensity = convertTwoBytesToUnsignedBigEndian(detectionTrackAWLMessage.data[6],
-                                                                     detectionTrackAWLMessage.data[7]);
-    Distance expectedTrackDistance = convertTwoBytesToUnsignedBigEndian(detectionVelocityAWLMessage.data[2],
-                                                                    detectionVelocityAWLMessage.data[3]);
-    Speed expectedTrackSpeed = convertTwoBytesToSignedBigEndian(detectionTrackAWLMessage.data[4],
-                                                                detectionTrackAWLMessage.data[5]);
-    Acceleration expectedTrackAcceleration = convertTwoBytesToSignedBigEndian(detectionTrackAWLMessage.data[6],
-                                                                              detectionTrackAWLMessage.data[7]);
+    Frame frameAfterDetectionTrackAndEndOfFrameMessagesTranslationStub =
+            createFrame(64829, 16, {createPixel(11, {createTrack(14291, 96, 123, 0, 0, 0)})});
 
-    bool framesAreEqual(Frame expectedFrame, Frame actualFrame){
+    Frame frameAfterDetectionTrackAndVelocityTrackAndEndOfFrameMessagesTranslationStub =
+            createFrame(64829, 16, {createPixel(11, {createTrack(14291, 96, 123, 379, 106, 0)})});
 
-        return (expectedFrame.getFrameID() == actualFrame.getFrameID() &&
-                expectedFrame.getSystemID() == actualFrame.getSystemID() &&
-                expectedFrame.getPixels() == actualFrame.getPixels());
+    AWLMessage createDetectionTrackAWLMessage(){
+        return AWLMessage(10, 2188169, 8, {211, 55, 0, 11, 0, 96, 123, 1});
     }
 
-    bool frameAfterDetectionTrackAndEndOfFrameMessagesTranslationIsValid(Frame actualFrame){
-        auto expectedFrame = frameAfterEndOfFrameMessageTranslationStub;
-        auto expectedPixelID = convertTwoBytesToUnsignedBigEndian(detectionTrackAWLMessage.data[3],
-                                                                  detectionTrackAWLMessage.data[4]);
-        auto expectedTrackID = convertTwoBytesToUnsignedBigEndian(detectionTrackAWLMessage.data[0],
-                                                                  detectionTrackAWLMessage.data[1]);
-        auto expectedTrackConfidenceLevel = detectionTrackAWLMessage.data[5];
-        auto expectedTrackIntensity = convertTwoBytesToUnsignedBigEndian(detectionTrackAWLMessage.data[6],
-                                                                          detectionTrackAWLMessage.data[7]);
-
-        return (expectedFrame.getFrameID() == actualFrame.getFrameID() &&
-                expectedFrame.getSystemID() == actualFrame.getSystemID() &&
-                expectedFrame.getPixels() == actualFrame.getPixels());
+    AWLMessage createDetectionVelocityAWLMessage(){
+        return AWLMessage(11, 2188169, 8, {211, 55, 106, 0, 0, 0, 0, 0});
     }
 
-    Frame createExpectedFrameAfterDetectionTrackMessageTranslation(){
-
-        expectedTrackConfidenceLevel = detectionTrackAWLMessage.data[5];
-        expectedTrackIntensity = convertTwoBytesToUnsignedBigEndian(detectionTrackAWLMessage.data[6],
-                                                                    detectionTrackAWLMessage.data[7]);
+    AWLMessage createEndOfFrameAWLMessage(){
+        return AWLMessage(9, 2188170, 8, {61, 253, 16, 0, 0, 0, 0, 0});
     }
 
-    Frame createExpectedFrameAfterDetectionTrackAndDetectionVelocitykMessagesTranslation(){
-
-        expectedTrackDistance = convertTwoBytesToUnsignedBigEndian(detectionVelocityAWLMessage.data[2],
-                                                                   detectionVelocityAWLMessage.data[3]);
-        expectedTrackSpeed = convertTwoBytesToSignedBigEndian(detectionTrackAWLMessage.data[4],
-                                                              detectionTrackAWLMessage.data[5]);
-        expectedTrackAcceleration = convertTwoBytesToSignedBigEndian(detectionTrackAWLMessage.data[6],
-                                                                     detectionTrackAWLMessage.data[7]);
-    }
-
-private:
-    AWLMessage createAWLMessageWithID(uint16_t id){
-        return AWLMessage(id, 0, 8, {18, 16, 0, 16, 0, 0, 0, 0});
-
-    }
 };
 
 TEST_F(AWLMessageToSpiritMessageTranslationStrategyTest,
        given_someEndOfFrameAWLMessage_when_translatingOnlyThisMessage_then_buildsFrameWithValidAttributes) {
 
+    auto endOfFrameAWLMessage = createEndOfFrameAWLMessage();
     auto expectedFrame = frameAfterEndOfFrameMessageTranslationStub;
 
     AWLMessageToSpiritMessageTranslationStrategy translationStrategy;
@@ -113,12 +70,14 @@ TEST_F(AWLMessageToSpiritMessageTranslationStrategyTest,
     scheduler.terminateAndJoin();
     auto actualFrame =  frameSinkMock.getConsumedData().at(INDEX_OF_FRAME);
 
-    ASSERT_TRUE(framesAreEqual(expectedFrame, actualFrame));
+    ASSERT_EQ(expectedFrame, actualFrame);
 }
 
 TEST_F(AWLMessageToSpiritMessageTranslationStrategyTest,
        given_someDetectionTrackAndEndOfFrameAWLMessages_when_translatingThoseMessagesInGivenOrder_then_buildsFrameWithValidAttribute) {
 
+    auto detectionTrackAWLMessage = createDetectionTrackAWLMessage();
+    auto endOfFrameAWLMessage = createEndOfFrameAWLMessage();
     auto expectedFrame = frameAfterDetectionTrackAndEndOfFrameMessagesTranslationStub;
 
     AWLMessageToSpiritMessageTranslationStrategy translationStrategy;
@@ -132,13 +91,15 @@ TEST_F(AWLMessageToSpiritMessageTranslationStrategyTest,
     scheduler.terminateAndJoin();
     auto actualFrame =  frameSinkMock.getConsumedData().at(INDEX_OF_FRAME);
 
-    ASSERT_TRUE(framesAreEqual(expectedFrame, actualFrame));
-
+    ASSERT_EQ(expectedFrame, actualFrame);
 }
 
 TEST_F(AWLMessageToSpiritMessageTranslationStrategyTest,
        given_someDetectionTrackAndDetectionVelocityAndEndOfFrameAWLMessages_when_translatingThoseMessagesInGivenOrder_then_buildsFrameWithValidAttribute) {
 
+    auto detectionTrackAWLMessage = createDetectionTrackAWLMessage();
+    auto detectionVelocityAWLMessage = createDetectionVelocityAWLMessage();
+    auto endOfFrameAWLMessage = createEndOfFrameAWLMessage();
     auto expectedFrame = frameAfterDetectionTrackAndVelocityTrackAndEndOfFrameMessagesTranslationStub;
 
     AWLMessageToSpiritMessageTranslationStrategy translationStrategy;
@@ -153,12 +114,13 @@ TEST_F(AWLMessageToSpiritMessageTranslationStrategyTest,
     scheduler.terminateAndJoin();
     auto actualFrame =  frameSinkMock.getConsumedData().at(INDEX_OF_FRAME);
 
-    ASSERT_TRUE(framesAreEqual(expectedFrame, actualFrame));
+    ASSERT_EQ(expectedFrame, actualFrame);
 }
 
-
 TEST_F(AWLMessageToSpiritMessageTranslationStrategyTest,
-       given_someFrameDoneAwlMessage_when_translatingTheAwlMessage_then_callsTheProduceMethodOfDataSource) {
+       given_someEndOfFrameAWLMessage_when_translatingThisMessage_then_callsProduceOneTime) {
+
+    auto endOfFrameAWLMessage = createEndOfFrameAWLMessage();
 
     AWLMessageToSpiritMessageTranslationStrategy translationStrategy;
     FrameSinkMock frameSinkMock(1);
@@ -170,8 +132,6 @@ TEST_F(AWLMessageToSpiritMessageTranslationStrategyTest,
     scheduler.terminateAndJoin();
 
     ASSERT_EQ(frameSinkMock.hasBeenCalledExpectedNumberOfTimes(),1);
-
 }
-
 
 #endif //SPIRITSENSORGATEWAY_AWLMESSAGETRANSLATORTEST_CPP
