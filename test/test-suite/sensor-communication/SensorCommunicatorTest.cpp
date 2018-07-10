@@ -39,9 +39,9 @@ protected:
 
     AWLMessage createAMessageWithValueOffsetOf(uint8_t offsetForDataDifference) const noexcept;
 
-    AWLMessages createASequenceOfDifferentMessagesOfSize(uint8_t numberOfMessagesToCreate) const noexcept;
+    AWLMessages createASequenceOfDifferentMessagesOfSize(uint64_t numberOfMessagesToCreate) const noexcept;
 
-    void given_aSequenceOfMessages_when_start_then_produceTheCorrectNumberOfMessageInTheCorrectOrder(uint64_t number);
+    AWLMessages returnTheProcessResultMadeBySensorCommunicatorFrom(AWLMessages&& messageSequence);
 };
 
 class MockSensorCommunicationStrategy final : public SensorCommunication::CommunicationProtocolStrategy<AWLMessage> {
@@ -217,17 +217,13 @@ private:
 
 using AWLProcessingScheduler = DataFlow::DataProcessingScheduler<AWLMessage, AWLSinkMock, 1>;
 
-void SensorCommunicatorTest::given_aSequenceOfMessages_when_start_then_produceTheCorrectNumberOfMessageInTheCorrectOrder(
-        uint64_t number) {
-    auto messages = createASequenceOfDifferentMessagesOfSize(number);
-    AWLMessages expectedMessages = messages;
-
-    MockSensorCommunicationStrategy mockStrategy;
-    mockStrategy.returnThisMessageSequenceWhenReadMessageIsCalled(std::move(messages));
-
-    AWLSinkMock sink(number);
+AWLMessages SensorCommunicatorTest::returnTheProcessResultMadeBySensorCommunicatorFrom(AWLMessages&& messages) {
+    auto numberOfMessagesToProcess = messages.size();
+    AWLSinkMock sink(numberOfMessagesToProcess);
     AWLProcessingScheduler scheduler(&sink);
 
+    MockSensorCommunicationStrategy mockStrategy;
+    mockStrategy.returnThisMessageSequenceWhenReadMessageIsCalled(std::forward<AWLMessages>(messages));
     AWLCommunicator sensorCommunicator(&mockStrategy);
     sensorCommunicator.linkConsumer(&scheduler);
 
@@ -238,24 +234,33 @@ void SensorCommunicatorTest::given_aSequenceOfMessages_when_start_then_produceTh
     sensorCommunicator.terminateAndJoin();
     scheduler.terminateAndJoin();
 
-    auto producedMessages = sink.getConsumedData();
+    AWLMessages producedMessages = sink.getConsumedData();
 
-    for (auto t = 0; t < number; ++t) {
-        ASSERT_EQ(expectedMessages.front(), producedMessages.front());
-        expectedMessages.pop_front();
-        producedMessages.pop_front();
-    }
+    return producedMessages;
 }
 
 TEST_F(SensorCommunicatorTest, given_oneMessage_when_start_then_willProduceThisData) {
-    auto numberOfMessage = 1;
-    given_aSequenceOfMessages_when_start_then_produceTheCorrectNumberOfMessageInTheCorrectOrder(numberOfMessage);
+    auto messages = createASequenceOfDifferentMessagesOfSize(1);
+    AWLMessage expectedMessage = AWLMessage(messages.front());
+
+    auto resultingMessage = returnTheProcessResultMadeBySensorCommunicatorFrom(std::move(messages)).front();
+
+    ASSERT_EQ(expectedMessage, resultingMessage);
 }
 
 TEST_F(SensorCommunicatorTest,
        given_severalMessages_when_start_then_willProduceTheseMessagesInTheSameOrderItConsumedThem) {
-    auto numberOfMessage = 5;
-    given_aSequenceOfMessages_when_start_then_produceTheCorrectNumberOfMessageInTheCorrectOrder(numberOfMessage);
+    auto numberOfMessages = 5U;
+    auto messages = createASequenceOfDifferentMessagesOfSize(numberOfMessages);
+    AWLMessages expectedMessages = messages;
+
+    auto resultedMessages = returnTheProcessResultMadeBySensorCommunicatorFrom(std::move(messages));
+
+    for (auto t = 0; t < numberOfMessages; ++t) {
+        ASSERT_EQ(expectedMessages.front(), resultedMessages.front());
+        expectedMessages.pop_front();
+        resultedMessages.pop_front();
+    }
 }
 
 AWLMessage SensorCommunicatorTest::createAMessageWithValueOffsetOf(uint8_t offsetForDataDifference) const noexcept {
@@ -276,7 +281,7 @@ AWLMessage SensorCommunicatorTest::createAMessageWithValueOffsetOf(uint8_t offse
     return message;
 }
 
-AWLMessages SensorCommunicatorTest::createASequenceOfDifferentMessagesOfSize(uint8_t numberOfMessagesToCreate) const noexcept {
+AWLMessages SensorCommunicatorTest::createASequenceOfDifferentMessagesOfSize(uint64_t numberOfMessagesToCreate) const noexcept {
     AWLMessages messages;
     for (uint8_t offset = 0; offset < numberOfMessagesToCreate; ++offset) {
         auto message = createAMessageWithValueOffsetOf(offset);
