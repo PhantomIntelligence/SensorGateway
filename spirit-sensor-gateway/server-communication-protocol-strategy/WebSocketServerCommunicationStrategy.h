@@ -13,11 +13,22 @@
 #ifndef SPIRITSENSORGATEWAY_WEBSOCKETSERVERCOMMUNICATIONSTRATEGY_H
 #define SPIRITSENSORGATEWAY_WEBSOCKETSERVERCOMMUNICATIONSTRATEGY_H
 
+#include "ServerCommunicationProtocolStrategy.hpp"
+
 namespace ServerCommunication {
-    class WebSocketServerCommunicationStrategy {
+    class WebSocketServerCommunicationStrategy: public ServerCommunicationProtocolStrategy {
 
+    public:
 
+        WebSocketServerCommunicationStrategy();
 
+        ~WebSocketServerCommunicationStrategy();
+
+        void openConnection() override ;
+
+        void closeConnection() override ;
+
+        void sendMessage() override ;
     };
 }
 
