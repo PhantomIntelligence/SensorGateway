@@ -1,31 +1,35 @@
 /**
 	Copyright 2014-2018 Phantom Intelligence Inc.
+
 	Licensed under the Apache License, Version 2.0 (the "License");
 	you may not use this file except in compliance with the License.
 	You may obtain a copy of the License at
+
 		http://www.apache.org/licenses/LICENSE-2.0
+
 	Unless required by applicable law or agreed to in writing, software
 	distributed under the License is distributed on an "AS IS" BASIS,
 	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 	See the License for the specific language governing permissions and
 	limitations under the License.
-*/
 
+*/
 #ifndef SPIRITSENSORGATEWAY_MESSAGE_H
 #define SPIRITSENSORGATEWAY_MESSAGE_H
 
 #include "spirit-sensor-gateway/common/ConstantValuesDefinition.h"
 
-namespace {
-    namespace AWL {
-        using DataArray = std::array<unsigned char, MAX_NUMBER_OF_DATA_IN_AWL_MESSAGE>;
-    }
+namespace AWL {
+    using MessageID = int64_t;
+    using MessageTimestamp = int64_t;
+    using MessageLength = int32_t;
+    using DataArray = std::array<unsigned char, MAX_NUMBER_OF_DATA_IN_AWL_MESSAGE>;
 }
 
 namespace DataFlow {
     class AWLMessage {
     public:
-        explicit AWLMessage(int64_t id, uint64_t timestamp, uint32_t length, AWL::DataArray data);
+        explicit AWLMessage(AWL::MessageID id, AWL::MessageTimestamp timestamp, AWL::MessageLength length, AWL::DataArray data) noexcept;
 
         ~AWLMessage() noexcept = default;
 
@@ -45,22 +49,21 @@ namespace DataFlow {
 
         AWLMessage static const returnDefaultData() noexcept;
 
-        int64_t id;
-        uint64_t timestamp;
-        uint32_t length;
+        AWL::MessageID id;
+        AWL::MessageTimestamp timestamp;
+        AWL::MessageLength length;
         AWL::DataArray data;
-
     };
 
 }
 
 namespace Defaults {
     using DataFlow::AWLMessage;
-    int64_t const DEFAULT_ID = 0;
-    uint64_t const DEFAULT_TIMESTAMP = 0;
-    uint32_t const DEFAULT_LENGTH = 0;
+    AWL::MessageID const DEFAULT_ID = 0;
+    AWL::MessageTimestamp const DEFAULT_TIMESTAMP = 0;
+    AWL::MessageLength const DEFAULT_LENGTH = 0;
     AWL::DataArray const DEFAULT_AWL_DATA = AWL::DataArray();
-    AWLMessage const DEFAULT_AWLMESSAGE = AWLMessage(DEFAULT_ID, DEFAULT_TIMESTAMP, DEFAULT_LENGTH, DEFAULT_AWL_DATA);
+    AWLMessage const DEFAULT_AWL_MESSAGE = AWLMessage(DEFAULT_ID, DEFAULT_TIMESTAMP, DEFAULT_LENGTH, DEFAULT_AWL_DATA);
 }
 
 #endif //SPIRITSENSORGATEWAY_MESSAGE_H

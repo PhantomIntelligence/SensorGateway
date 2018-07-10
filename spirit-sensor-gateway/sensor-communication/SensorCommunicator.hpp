@@ -41,8 +41,7 @@ namespace SensorAccessLinkElement {
         }
 
         ~SensorCommunicator() {
-
-        }
+        };
 
         void start() {
             communicationProtocolStrategy->openConnection();

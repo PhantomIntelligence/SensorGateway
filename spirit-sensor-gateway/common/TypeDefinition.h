@@ -31,7 +31,9 @@ namespace {
 
     typedef HighIntegrity::HighIntegrityThread<HighIntegrity::ThreadExecutionType::DETACH> DetachableThread;
     typedef HighIntegrity::HighIntegrityThread<HighIntegrity::ThreadExecutionType::JOIN> JoinableThread;
-
 };
+
+
+
 
 #endif //SPIRITSENSORGATEWAY_TYPEDEFINITION_H

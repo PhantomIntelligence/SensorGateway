@@ -113,7 +113,7 @@ Alternatively, at the command line, enter:
 This will build the "Release" configuration of gtest.framework in your
 default build location.  See the "xcodebuild" man page for more
 information about building different configurations and building in
-different consumerLocationsMap.
+different locations.
 
 If you wish to use the Google Test Xcode project with Xcode 4.x and
 above, you need to either:
