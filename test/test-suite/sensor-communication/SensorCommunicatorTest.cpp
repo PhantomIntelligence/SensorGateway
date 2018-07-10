@@ -41,7 +41,7 @@ protected:
 
     AWLMessages createASequenceOfDifferentMessagesOfSize(uint64_t numberOfMessagesToCreate) const noexcept;
 
-    AWLMessages returnTheProcessResultMadeBySensorCommunicatorFrom(AWLMessages&& messageSequence);
+    AWLMessages fetchMessageProducedBySensorCommunicatorExecution(AWLMessages&& messages);
 };
 
 class MockSensorCommunicationStrategy final : public SensorCommunication::SensorCommunicationStrategy<AWLMessage> {
@@ -217,13 +217,13 @@ private:
 
 using AWLProcessingScheduler = DataFlow::DataProcessingScheduler<AWLMessage, AWLSinkMock, 1>;
 
-AWLMessages SensorCommunicatorTest::returnTheProcessResultMadeBySensorCommunicatorFrom(AWLMessages&& messageSequence) {
-    auto numberOfMessagesToProcess = messageSequence.size();
+AWLMessages SensorCommunicatorTest::fetchMessageProducedBySensorCommunicatorExecution(AWLMessages&& messages) {
+    auto numberOfMessagesToProcess = messages.size();
     AWLSinkMock sink(numberOfMessagesToProcess);
     AWLProcessingScheduler scheduler(&sink);
 
     MockSensorCommunicationStrategy mockStrategy;
-    mockStrategy.returnThisMessageSequenceWhenReadMessageIsCalled(std::forward<AWLMessages>(messageSequence));
+    mockStrategy.returnThisMessageSequenceWhenReadMessageIsCalled(std::forward<AWLMessages>(messages));
     AWLCommunicator sensorCommunicator(&mockStrategy);
     sensorCommunicator.linkConsumer(&scheduler);
 
@@ -243,18 +243,18 @@ TEST_F(SensorCommunicatorTest, given_oneMessage_when_start_then_willProduceThisD
     auto messages = createASequenceOfDifferentMessagesOfSize(1);
     AWLMessage expectedMessage = AWLMessage(messages.front());
 
-    auto resultingMessage = returnTheProcessResultMadeBySensorCommunicatorFrom(std::move(messages)).front();
+    auto resultingMessage = fetchMessageProducedBySensorCommunicatorExecution(std::move(messages)).front();
 
     ASSERT_EQ(expectedMessage, resultingMessage);
 }
 
 TEST_F(SensorCommunicatorTest,
-       given_severalMessages_when_start_then_willProduceTheseMessagesInTheSameOrderItConsumedThem) {
+       given_severalMessages_when_start_then_willProduceTheseMessagesInTheSameOrderTheyAreRead) {
     auto numberOfMessages = 5U;
     auto messages = createASequenceOfDifferentMessagesOfSize(numberOfMessages);
     AWLMessages expectedMessages = messages;
 
-    auto resultedMessages = returnTheProcessResultMadeBySensorCommunicatorFrom(std::move(messages));
+    auto resultedMessages = fetchMessageProducedBySensorCommunicatorExecution(std::move(messages));
 
     for (auto t = 0; t < numberOfMessages; ++t) {
         ASSERT_EQ(expectedMessages.front(), resultedMessages.front());
