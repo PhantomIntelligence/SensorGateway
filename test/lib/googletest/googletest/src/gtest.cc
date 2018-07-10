@@ -977,7 +977,7 @@ Message& Message::operator <<(const ::wstring& wstr) {
 #endif  // GTEST_HAS_GLOBAL_WSTRING
 
 // Gets the text streamed to this object so far as an std::string.
-// Each '\0' character in the data-flow is replaced with "\\0".
+// Each '\0' character in the buffer is replaced with "\\0".
 std::string Message::GetString() const {
   return internal::StringStreamToString(ss_.get());
 }
