@@ -4,6 +4,7 @@
 #include <websocketpp/config/asio_no_tls_client.hpp>
 
 #include <websocketpp/client.hpp>
+#include <spirit-sensor-gateway/common/TypeDefinition.h>
 #include "src/SecureStreaming/KeyPairGenerator.cpp"
 
 #include "src/SecureStreaming/Codec.hpp"
@@ -21,6 +22,7 @@ namespace Demo {
     using Streaming::KeyPairGenerator;
     using Streaming::Codec;
     using Streaming::Logger;
+    using std::string;
 
     struct ConnectionMetadata {
         int id;

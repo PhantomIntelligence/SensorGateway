@@ -13,10 +13,25 @@
 #ifndef SPIRITSENSORGATEWAY_WEBSOCKETSERVERCOMMUNICATIONSTRATEGY_H
 #define SPIRITSENSORGATEWAY_WEBSOCKETSERVERCOMMUNICATIONSTRATEGY_H
 
+#include <websocketpp/config/asio_no_tls_client.hpp>
 #include "ServerCommunicationProtocolStrategy.hpp"
+#include "spirit-sensor-gateway/domain/Frame.h"
+
 
 namespace ServerCommunication {
-    class WebSocketServerCommunicationStrategy: public ServerCommunicationProtocolStrategy {
+    using Client = websocketpp::client<websocketpp::config::asio_client>;
+    using ConnectionHandle = websocketpp::connection_hdl;
+
+    struct ConnectionMetadata {
+        int id;
+        ConnectionHandle handle;
+        std::string status;
+        std::string URI;
+        std::string server;
+        std::string errorReason;
+    };
+
+    class WebSocketServerCommunicationStrategy : public ServerCommunicationProtocolStrategy<SpiritProtocol::Frame> {
 
     public:
 
@@ -24,11 +39,21 @@ namespace ServerCommunication {
 
         ~WebSocketServerCommunicationStrategy();
 
-        void openConnection() override ;
+        void openConnection() override;
 
-        void closeConnection() override ;
+        void closeConnection() override;
 
-        void sendMessage() override ;
+        void sendMessage() override;
+
+        void start();
+
+    private:
+
+        void initializeClientCallbacks();
+
+        ConnectionHandle connectionHandle;
+
+        ConnectionMetadata connectionMetadata;
     };
 }
 

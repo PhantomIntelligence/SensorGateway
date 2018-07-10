@@ -14,9 +14,10 @@
 #define SPIRITSENSORGATEWAY_SERVERCOMMUNICATIONPROTOCOLSTRATEGY_H
 
 namespace ServerCommunication {
-    template <class  T>
-    class ServerCommunicationProtocolStrategy {
 
+    template<class T>
+    class ServerCommunicationProtocolStrategy {
+        typedef T MESSAGE;
     public:
         virtual ~ServerCommunicationProtocolStrategy() noexcept = default;
 
