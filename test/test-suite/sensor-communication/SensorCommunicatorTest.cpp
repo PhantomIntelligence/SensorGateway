@@ -28,10 +28,7 @@ using AWLData = std::list<AWLMessage>;
 using AWLCommunicator = SensorAccessLinkElement::SensorCommunicator<AWLMessage>;
 using TestFunctions::DataTestUtil;
 
-/**
- * @brief Test Fixture meant to ensure correct behavior of SensorCommunicator.
- * @note A RingBuffer is used to implement the different tested functions
- */
+
 class SensorCommunicatorTest : public ::testing::Test {
 
 protected:
@@ -39,13 +36,9 @@ protected:
 
     virtual ~SensorCommunicatorTest() = default;
 
-    AWLMessage givenOneMessage() const noexcept {
-        return givenOneMessage(0);
-    }
+      AWLMessage createOneMessage(uint8_t offsetForDataDifference) const noexcept;
 
-    AWLMessage givenOneMessage(uint8_t offsetForDataDifference) const noexcept;
-
-    AWLData givenANumberOfMessages(uint8_t numberOfMessagesToCreate) const noexcept;
+    AWLData createANumberOfMessages(uint8_t numberOfMessagesToCreate) const noexcept;
 
     void given_aNumberOfMessage_when_start_then_produceTheCorrectNumberOfMessageInTheCorrectOrder(uint64_t number);
 };
@@ -231,7 +224,7 @@ using AWLProcessingScheduler = DataFlow::DataProcessingScheduler<AWLMessage, AWL
 
 void SensorCommunicatorTest::given_aNumberOfMessage_when_start_then_produceTheCorrectNumberOfMessageInTheCorrectOrder(
         uint64_t number) {
-    auto messages = givenANumberOfMessages(number);
+    auto messages = createANumberOfMessages(number);
     AWLData expectedMessages = messages;
 
     MockSensorCommunicationStrategy mockStrategy;
@@ -269,7 +262,7 @@ TEST_F(SensorCommunicatorTest, given_severalMessages_when_start_then_willProduce
     given_aNumberOfMessage_when_start_then_produceTheCorrectNumberOfMessageInTheCorrectOrder(numberOfMessage);
 }
 
-AWLMessage SensorCommunicatorTest::givenOneMessage(uint8_t offsetForDataDifference) const noexcept {
+AWLMessage SensorCommunicatorTest::createOneMessage(uint8_t offsetForDataDifference) const noexcept {
     int64_t const ARBITRARY_ID = 42 + offsetForDataDifference;
     uint64_t const ARBITRARY_TIMESTAMP = 101010 + offsetForDataDifference;
     uint32_t const ARBITRARY_LENGTH = 7 + offsetForDataDifference;
@@ -286,10 +279,10 @@ AWLMessage SensorCommunicatorTest::givenOneMessage(uint8_t offsetForDataDifferen
     return message;
 }
 
-AWLData SensorCommunicatorTest::givenANumberOfMessages(uint8_t numberOfMessagesToCreate) const noexcept {
+AWLData SensorCommunicatorTest::createANumberOfMessages(uint8_t numberOfMessagesToCreate) const noexcept {
     AWLData messages;
     for (uint8_t offset = 0; offset < numberOfMessagesToCreate; ++offset) {
-        auto message = givenOneMessage(offset);
+        auto message = createOneMessage(offset);
         messages.push_back(message);
     }
     return messages;

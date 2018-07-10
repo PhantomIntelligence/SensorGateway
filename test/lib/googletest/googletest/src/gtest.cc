@@ -977,7 +977,7 @@ Message& Message::operator <<(const ::wstring& wstr) {
 #endif  // GTEST_HAS_GLOBAL_WSTRING
 
 // Gets the text streamed to this object so far as an std::string.
-// Each '\0' character in the data-flow is replaced with "\\0".
+// Each '\0' character in the buffer is replaced with "\\0".
 std::string Message::GetString() const {
   return internal::StringStreamToString(ss_.get());
 }
@@ -1682,7 +1682,7 @@ AssertionResult HRESULTFailureHelper(const char* expr,
                                           0,  // no source, we're asking system
                                           hr,  // the error
                                           0,  // no line width restrictions
-                                          error_text,  // output data-flow
+                                          error_text,  // output buffer
                                           kBufSize,  // buf size
                                           NULL);  // no arguments for inserts
   // Trims tailing white space (FormatMessage leaves a trailing CR-LF)
@@ -1977,7 +1977,7 @@ std::string String::FormatByte(unsigned char value) {
   return ss.str();
 }
 
-// Converts the data-flow in a stringstream to an std::string, converting NUL
+// Converts buffer in a stringstream to an std::string, converting NUL
 // bytes to "\\0" along the way.
 std::string StringStreamToString(::std::stringstream* ss) {
   const ::std::string& str = ss->str();
@@ -3558,7 +3558,7 @@ static bool PortableLocaltime(time_t seconds, struct tm* out) {
   return localtime_s(out, &seconds) == 0;
 #elif defined(__MINGW32__) || defined(__MINGW64__)
   // MINGW <time.h> provides neither localtime_r nor localtime_s, but uses
-  // Windows' localtime(), which has a thread-local tm data-flow.
+  // Windows' localtime(), which has a thread-local tm buffer.
   struct tm* tm_ptr = localtime(&seconds);  // NOLINT
   if (tm_ptr == NULL)
     return false;
