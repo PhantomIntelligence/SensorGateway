@@ -64,13 +64,13 @@ namespace Sensor {
         AWLMessageID const DETECTION_TRACK = 0x0A;
         AWLMessageID const DETECTION_VELOCITY = 0x0B;
         int const MAXIMUM_NUMBER_OF_DATA_IN_AWL_MESSAGE = 8;
+        namespace AWL7 {
+            SensorID const AWL7_SENSOR_ID = 0x0010;
+        }
         namespace AWL16 {
             int const NUMBER_OF_PIXELS_IN_AWL16_FRAME = 16;
             int const NUMBER_OF_TRACKS_IN_AWL16_PIXEL = 16;
-            SensorID const AWL16SensorID = 0x0010;
-        }
-        namespace AWL7 {
-            SensorID const AWL7SensorID = 0x0010;
+            SensorID const AWL16_SENSOR_ID = 0x0010;
         }
     }
 }
