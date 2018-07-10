@@ -1,35 +1,48 @@
 /**
 	Copyright 2014-2018 Phantom Intelligence Inc.
+
 	Licensed under the Apache License, Version 2.0 (the "License");
 	you may not use this file except in compliance with the License.
 	You may obtain a copy of the License at
+
 		http://www.apache.org/licenses/LICENSE-2.0
+
 	Unless required by applicable law or agreed to in writing, software
 	distributed under the License is distributed on an "AS IS" BASIS,
 	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 	See the License for the specific language governing permissions and
 	limitations under the License.
-*/
 
-#ifndef SPIRITSENSORGATEWAY_KVASERCANPROTOCOLSTRATEGY_H
-#define SPIRITSENSORGATEWAY_KVASERCANPROTOCOLSTRATEGY_H
+*/
+#ifndef SPIRITSENSORGATEWAY_KVASERCANCOMMUNICATIONSTRATEGY_H
+#define SPIRITSENSORGATEWAY_KVASERCANCOMMUNICATIONSTRATEGY_H
 
 #include <canlib.h>
-#include "CommunicationProtocolStrategy.hpp"
+#include <limits>
+#include "SensorCommunicationStrategy.hpp"
 
+namespace SensorCommunication {
+    using DataFlow::AWLMessage;
 
+    class KvaserCanCommunicationStrategy final : public SensorCommunicationStrategy<AWLMessage> {
 
-namespace CommunicationProtocolStrategy {
-    class KvaserCanProtocolStrategy : public CommunicationProtocolStrategy {
-        const unsigned long CANLIB_READ_WAIT_INFINITE_DELAY = (unsigned long) -1;
+        unsigned long const CANLIB_READ_WAIT_INFINITE_DELAY = std::numeric_limits<int>::infinity();
+        using super = SensorCommunicationStrategy<AWLMessage>;
+        using super::MESSAGE;
+
     public:
-        KvaserCanProtocolStrategy();
-        ~ KvaserCanProtocolStrategy();
-        void openConnection();
-        AWLMessage readMessage();
-        void closeConnection();
+        KvaserCanCommunicationStrategy();
+
+        ~KvaserCanCommunicationStrategy();
+
+        void openConnection() override;
+
+        MESSAGE readMessage() override;
+
+        void closeConnection() override;
 
     private:
+
         struct CanMessage {
             long id;
             unsigned long timestamp;
@@ -38,7 +51,8 @@ namespace CommunicationProtocolStrategy {
             uint8_t data[MAX_NUMBER_OF_DATA_IN_AWL_MESSAGE];
         };
         canHandle communicationChannel;
+
         AWLMessage convertCanMessageToAwlMessage(CanMessage canMessage);
     };
 }
-#endif //SPIRITSENSORGATEWAY_KVASERCANPROTOCOLSTRATEGY_H
+#endif //SPIRITSENSORGATEWAY_KVASERCANCOMMUNICATIONSTRATEGY_H

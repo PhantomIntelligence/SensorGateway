@@ -11,13 +11,28 @@
 	limitations under the License.
 */
 
-#ifndef SPIRITSENSORGATEWAY_CONSTANTDEFINITION_H
-#define SPIRITSENSORGATEWAY_CONSTANTDEFINITION_H
+#ifndef SPIRITSENSORGATEWAY_SENSORCOMMUNICATIONSTRATEGY_H
+#define SPIRITSENSORGATEWAY_SENSORCOMMUNICATIONSTRATEGY_H
 
-#include "TypeDefinition.h"
+#include "spirit-sensor-gateway/domain/AWLMessage.h"
 
-namespace {
-    const uint8_t MAX_NUMBER_OF_DATA_IN_AWL_MESSAGE = 8;
-};
 
-#endif //SPIRITSENSORGATEWAY_CONSTANTDEFINITION_H
+namespace SensorCommunication {
+
+    template<class T>
+    class SensorCommunicationStrategy {
+    protected:
+        typedef T MESSAGE;
+    public:
+        virtual ~SensorCommunicationStrategy() noexcept = default;
+
+        virtual MESSAGE readMessage() = 0;
+
+        virtual void openConnection()=0;
+
+        virtual void closeConnection()=0;
+
+    };
+}
+
+#endif //SPIRITSENSORGATEWAY_SENSORCOMMUNICATIONSTRATEGY_H

@@ -14,37 +14,26 @@
 	limitations under the License.
 */
 
-#ifndef SPIRITSENSORGATEWAY_DATASOURCE_H
-#define SPIRITSENSORGATEWAY_DATASOURCE_H
+#ifndef SPIRITSENSORGATEWAY_DATASINK_HPP
+#define SPIRITSENSORGATEWAY_DATASINK_HPP
 
-#include "RingBuffer.hpp"
+#include "DataSource.hpp"
 
 namespace DataFlow {
-/**
- * @brief DataSource interface, has the necessary element (i.e. an OutputBuffer) to be used as an input with ConsumerLink
- */
+
     template<class T>
-    class DataSource {
-        using OutputBuffer = DataFlow::RingBuffer<T>;
+    class DataSink {
+
     protected:
+
         typedef T DATA;
 
     public:
 
-        virtual ~DataSource() noexcept = default;
+        virtual ~DataSink() noexcept = default;
 
-        void linkOutput(ConsumerLink<DATA>* consumer) {
-            consumer->linkWith(&outputBuffer);
-        }
-
-        virtual void produce(DATA&& data) {
-            outputBuffer.write(std::forward<DATA>(data));
-        }
-
-    protected:
-        OutputBuffer outputBuffer;
-
+        virtual void consume(DATA&& data) = 0;
     };
 }
 
-#endif //SPIRITSENSORGATEWAY_DATASOURCE_H
+#endif //SPIRITSENSORGATEWAY_DATASINK_HPP

@@ -1,10 +1,13 @@
-#ifndef SPIRITSENSORGATEWAY_RINGBUFFERTEST_H
-#define SPIRITSENSORGATEWAY_RINGBUFFERTEST_H
+#ifndef SPIRITSENSORGATEWAY_RINGBUFFERTEST_CPP
+#define SPIRITSENSORGATEWAY_RINGBUFFERTEST_CPP
 
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
+#include <spirit-sensor-gateway/domain/AWLMessage.h>
+#include <spirit-sensor-gateway/sensor-communication/SensorCommunicator.hpp>
+#include <spirit-sensor-gateway/sensor-communication/KvaserCanCommunicationStrategy.h>
 
-#include "spirit-sensor-gateway/common/RingBuffer.hpp"
+#include "spirit-sensor-gateway/common/data-flow/RingBuffer.hpp"
 #include "data-model/DataModelFixture.h"
 #include "MockConsumerLink.h"
 
@@ -163,4 +166,4 @@ TEST_F(RingBufferTest, given_aFullBuffer_when_writesMoreThanOneData_then_overwri
     ASSERT_NE(secondDataCopy, lastWrittenData);
 }
 
-#endif //SPIRITSENSORGATEWAY_RINGBUFFERTEST_H
+#endif //SPIRITSENSORGATEWAY_RINGBUFFERTEST_CPP

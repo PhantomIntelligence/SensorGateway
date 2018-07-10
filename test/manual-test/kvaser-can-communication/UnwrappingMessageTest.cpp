@@ -2,7 +2,7 @@
 #include <iostream>
 #include <cstdio>
 #include <inttypes.h>
-#include "spirit-sensor-gateway/communication-protocol-strategy/KvaserCanProtocolStrategy.cpp"
+#include "spirit-sensor-gateway/sensor-communication/KvaserCanCommunicationStrategy.cpp"
 
 
 int main() {
@@ -12,7 +12,7 @@ int main() {
     auto jsonFile = std::fopen("AWLMessages.json", "w+");
 
 
-    KvaserCanProtocolStrategy kvaserCanProtocolStrategy;
+    KvaserCanCommunicationStrategy kvaserCanProtocolStrategy;
     kvaserCanProtocolStrategy.openConnection();
 
     //FOR GENERATING TXT FILE
