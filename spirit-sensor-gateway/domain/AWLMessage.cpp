@@ -40,10 +40,10 @@ void AWLMessage::swap(AWLMessage& current, AWLMessage& other) noexcept {
 }
 
 bool DataFlow::AWLMessage::operator==(AWLMessage const& other) const  {
-    auto sameId = id == other.id;
-    auto sameTimestamp = timestamp == other.timestamp;
-    auto sameLength = length == other.length;
-    auto sameData = data == other.data;
+    auto sameId = (id == other.id);
+    auto sameTimestamp = (timestamp == other.timestamp);
+    auto sameLength = (length == other.length);
+    auto sameData = (data == other.data);
     auto equal = (sameId && sameTimestamp && sameLength && sameData);
     return equal;
 }
