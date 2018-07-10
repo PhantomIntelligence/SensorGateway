@@ -14,32 +14,34 @@
 	limitations under the License.
 */
 
-#ifndef SPIRITSENSORGATEWAY_DATASOURCE_HPP
-#define SPIRITSENSORGATEWAY_DATASOURCE_HPP
 
-#include "ThreadSafeRingBuffer.hpp"
+#ifndef SPIRITSENSORGATEWAY_CONSUMERLINK_HPP
+#define SPIRITSENSORGATEWAY_CONSUMERLINK_HPP
+
+#include "spirit-sensor-gateway/common/data-structure/ConstantSizedPointerList.hpp"
 
 namespace DataFlow {
 
     template<class T>
-    class DataSource {
+    class RingBuffer;
+
+    template<class T>
+    class ConsumerLink {
+
+    protected:
+
+        ConsumerLink() = default;
+
+        virtual ~ConsumerLink() {}
 
     public:
 
-        virtual ~DataSource() noexcept = default;
+        virtual void linkWith(RingBuffer<T>* buffer) = 0;
 
-        void linkConsumer(ConsumerLink<T>* consumer) {
-            consumer->linkWith(&outputBuffer);
-        }
+        virtual void activateFor(RingBuffer<T>* buffer) = 0;
 
-        virtual void produce(T&& data) {
-            outputBuffer.write(std::forward<T>(data));
-        }
-
-    protected:
-        DataFlow::RingBuffer<T> outputBuffer;
-
+        virtual void deactivateFor(RingBuffer<T>* buffer) = 0;
     };
 }
 
-#endif //SPIRITSENSORGATEWAY_DATASOURCE_HPP
+#endif //SPIRITSENSORGATEWAY_CONSUMERLINK_HPP
