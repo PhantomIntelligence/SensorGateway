@@ -2802,7 +2802,7 @@ obvious that the third `EXPECT_CALL` is written wrong. Case solved.
 
 ## Running Tests in Emacs ##
 
-If you build and run your tests in Emacs, the source file consumerLocationsMap of
+If you build and run your tests in Emacs, the source file locations of
 Google Mock and [Google Test](../../googletest/)
 errors will be highlighted. Just press `<Enter>` on one of them and
 you'll be taken to the offending line. Or, you can just type `C-x ``

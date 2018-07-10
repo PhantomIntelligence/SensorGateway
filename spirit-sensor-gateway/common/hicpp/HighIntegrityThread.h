@@ -29,7 +29,7 @@ namespace HighIntegrity {
     };
 
     /**
-     * @brief Delete safe implementation of std::threads. Only this implementation shall be used in the project
+     * @warning Delete safe implementation of std::threads. Only this implementation shall be used in the project
      */
     template<ThreadExecutionType TYPE>
     class HighIntegrityThread {

@@ -34,7 +34,9 @@ using DataFlow::AWLMessage;
 KvaserCanProtocolStrategy::KvaserCanProtocolStrategy() : communicationChannel() {
 }
 
-KvaserCanProtocolStrategy::~KvaserCanProtocolStrategy() = default;
+KvaserCanProtocolStrategy::~KvaserCanProtocolStrategy() {
+    closeConnection(); // TODO: This will need to be removed. The destructor should be noexcept, this is not.
+}
 
 void KvaserCanProtocolStrategy::openConnection() {
     canInitializeLibrary();
@@ -67,3 +69,4 @@ void KvaserCanProtocolStrategy::closeConnection() {
     canBusOff(communicationChannel);
     canClose(communicationChannel);
 }
+

@@ -1,4 +1,4 @@
-/**
+#include "AWLMessage.h"/**
 	Copyright 2014-2018 Phantom Intelligence Inc.
 
 	Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,11 +14,12 @@
 	limitations under the License.
 
 */
+
 #include "AWLMessage.h"
 
 using DataFlow::AWLMessage;
 
-AWLMessage::AWLMessage(int64_t id, uint64_t timestamp, uint32_t length, AWL::DataArray data) noexcept :
+AWLMessage::AWLMessage(AWL::MessageID id, AWL::MessageTimestamp timestamp, AWL::MessageLength length, AWL::DataArray data) noexcept :
         id(id),
         timestamp(timestamp),
         length(length),

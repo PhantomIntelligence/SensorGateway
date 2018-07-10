@@ -29,16 +29,13 @@ using AWLMessages = std::list<AWLMessage>;
 using AWLCommunicator = SensorAccessLinkElement::SensorCommunicator<AWLMessage>;
 using TestFunctions::DataTestUtil;
 
+
 class SensorCommunicatorTest : public ::testing::Test {
 
 protected:
     SensorCommunicatorTest() = default;
 
     virtual ~SensorCommunicatorTest() = default;
-
-    AWLMessage givenOneMessage() const noexcept {
-        return createAMessageWithValueOffsetOf(0);
-    }
 
     AWLMessage createAMessageWithValueOffsetOf(uint8_t offsetForDataDifference) const noexcept;
 
@@ -169,7 +166,7 @@ protected:
 
 public:
 
-    AWLSinkMock(uint8_t numberOfDataToConsume) :
+    explicit AWLSinkMock(uint8_t numberOfDataToConsume) :
             actualNumberOfDataConsumed(0),
             numberOfDataToConsume(numberOfDataToConsume) {
 
