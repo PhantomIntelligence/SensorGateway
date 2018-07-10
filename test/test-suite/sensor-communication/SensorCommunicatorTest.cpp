@@ -37,6 +37,7 @@ protected:
 
     virtual ~SensorCommunicatorTest() = default;
 
+private:
     AWLMessage createAMessageWithValueOffsetOf(uint8_t dataValueOffset) const noexcept;
 
     AWLMessages createASequenceOfDifferentMessagesOfSize(uint64_t numberOfMessagesToCreate) const noexcept;
