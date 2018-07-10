@@ -239,7 +239,7 @@ AWLMessages SensorCommunicatorTest::fetchMessageProducedBySensorCommunicatorExec
     return producedMessages;
 }
 
-TEST_F(SensorCommunicatorTest, given_oneMessage_when_start_then_willProduceThisData) {
+TEST_F(SensorCommunicatorTest, given_aSequenceOfOneIncomingMessage_when_start_then_willProduceThisData) {
     auto messages = createASequenceOfDifferentMessagesOfSize(1);
     AWLMessage expectedMessage = AWLMessage(messages.front());
 
@@ -249,7 +249,7 @@ TEST_F(SensorCommunicatorTest, given_oneMessage_when_start_then_willProduceThisD
 }
 
 TEST_F(SensorCommunicatorTest,
-       given_severalMessages_when_start_then_willProduceTheseMessagesInTheSameOrderTheyAreRead) {
+       given_aSequenceOfSeveralIncomingMessages_when_start_then_willProduceTheseMessagesInTheSameOrderTheyAreRead) {
     auto numberOfMessages = 5U;
     auto messages = createASequenceOfDifferentMessagesOfSize(numberOfMessages);
     AWLMessages expectedMessages = messages;
