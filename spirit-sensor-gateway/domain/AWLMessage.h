@@ -16,16 +16,17 @@
 
 #include "spirit-sensor-gateway/common/ConstantValuesDefinition.h"
 
-namespace {
     namespace AWL {
-        using DataArray = std::array<unsigned char, MAX_NUMBER_OF_DATA_IN_AWL_MESSAGE>;
-    }
-}
+        using AwlMessageID = int64_t;
+        using AwlMessageTimestamp = int64_t;
+        using AwlMessageLength = int32_t;
+        using DataArray = std::array<unsigned char, MAX_NUMBER_OF_DATA_IN_AWL_MESSAGE> ;
+        }
 
 namespace DataFlow {
     class AWLMessage {
     public:
-        explicit AWLMessage(int64_t id, uint64_t timestamp, uint32_t length, AWL::DataArray data);
+        explicit AWLMessage(AWL::AwlMessageID id, AWL::AwlMessageTimestamp timestamp, AWL::AwlMessageLength length, AWL::DataArray data);
 
         ~AWLMessage() noexcept = default;
 
@@ -45,22 +46,21 @@ namespace DataFlow {
 
         AWLMessage static const returnDefaultData() noexcept;
 
-        int64_t id;
-        uint64_t timestamp;
-        uint32_t length;
+        AWL::AwlMessageID id;
+        AWL::AwlMessageTimestamp timestamp;
+        AWL::AwlMessageLength length;
         AWL::DataArray data;
-
     };
 
 }
 
 namespace Defaults {
     using DataFlow::AWLMessage;
-    int64_t const DEFAULT_ID = 0;
-    uint64_t const DEFAULT_TIMESTAMP = 0;
-    uint32_t const DEFAULT_LENGTH = 0;
+    AWL::AwlMessageID const DEFAULT_ID = 0;
+    AWL::AwlMessageTimestamp const DEFAULT_TIMESTAMP = 0;
+    AWL::AwlMessageLength const DEFAULT_LENGTH = 0;
     AWL::DataArray const DEFAULT_AWL_DATA = AWL::DataArray();
-    AWLMessage const DEFAULT_AWLMESSAGE = AWLMessage(DEFAULT_ID, DEFAULT_TIMESTAMP, DEFAULT_LENGTH, DEFAULT_AWL_DATA);
+    AWLMessage const DEFAULT_AWL_MESSAGE = AWLMessage(DEFAULT_ID, DEFAULT_TIMESTAMP, DEFAULT_LENGTH, DEFAULT_AWL_DATA);
 }
 
 #endif //SPIRITSENSORGATEWAY_MESSAGE_H

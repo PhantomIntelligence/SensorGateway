@@ -15,9 +15,8 @@
 #define SPIRITSENSORGATEWAY_KVASERCANPROTOCOLSTRATEGY_H
 
 #include <canlib.h>
-#include "CommunicationProtocolStrategy.hpp"
 #include <limits>
-
+#include "CommunicationProtocolStrategy.hpp"
 
 namespace SensorCommunication {
     using DataFlow::AWLMessage;
