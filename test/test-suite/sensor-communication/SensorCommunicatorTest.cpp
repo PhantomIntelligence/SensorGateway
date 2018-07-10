@@ -37,7 +37,7 @@ protected:
 
     virtual ~SensorCommunicatorTest() = default;
 
-    AWLMessage createAMessageWithValueOffsetOf(uint8_t dataOffset) const noexcept;
+    AWLMessage createAMessageWithValueOffsetOf(uint8_t dataValueOffset) const noexcept;
 
     AWLMessages createASequenceOfDifferentMessagesOfSize(uint64_t numberOfMessagesToCreate) const noexcept;
 
@@ -263,10 +263,10 @@ TEST_F(SensorCommunicatorTest,
     }
 }
 
-AWLMessage SensorCommunicatorTest::createAMessageWithValueOffsetOf(uint8_t dataOffset) const noexcept {
-    int64_t const arbitraryId = 42 + dataOffset;
-    uint64_t const arbitraryTimestamp = 101010 + dataOffset;
-    uint32_t const arbitraryLength = 7 + dataOffset;
+AWLMessage SensorCommunicatorTest::createAMessageWithValueOffsetOf(uint8_t dataValueOffset) const noexcept {
+    int64_t const arbitraryId = 42 + dataValueOffset;
+    uint64_t const arbitraryTimestamp = 101010 + dataValueOffset;
+    uint32_t const arbitraryLength = 7 + dataValueOffset;
     AWL::DataArray arbitraryData;
 
     for (auto k = 0; k < MAX_NUMBER_OF_DATA_IN_AWL_MESSAGE; ++k) {
