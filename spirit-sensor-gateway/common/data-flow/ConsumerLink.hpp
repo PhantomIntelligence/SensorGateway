@@ -18,7 +18,7 @@
 #ifndef SPIRITSENSORGATEWAY_CONSUMERLINK_HPP
 #define SPIRITSENSORGATEWAY_CONSUMERLINK_HPP
 
-#include "spirit-sensor-gateway/common/data-structure/ConstantSizedPointerList.hpp"
+#include "spirit-sensor-gateway/common/container/ConstantSizedPointerList.hpp"
 
 namespace DataFlow {
 

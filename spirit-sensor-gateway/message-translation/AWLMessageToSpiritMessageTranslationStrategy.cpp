@@ -73,7 +73,7 @@ void AWLMessageToSpiritMessageTranslationStrategy::translateDetectionVelocityMes
 Track* AWLMessageToSpiritMessageTranslationStrategy::fetchTrack(AWLMessage* awlMessage) const {
     TrackID trackID = convertTwoBytesToUnsignedBigEndian(awlMessage->data[0], awlMessage->data[1]);
     auto pixels = currentOutputMessage->getPixels();
-    for (auto i = 0; i < NUMBER_OF_PIXELS_IN_AWL16_FRAME; ++i) {
+    for (auto i = 0; i < NUMBER_OF_PIXELS_IN_FRAME; ++i) {
         auto pixel = &pixels->at(i);
         if(pixel->doesTrackExist(trackID)){
             return pixel->fetchTrackByID(trackID);

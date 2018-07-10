@@ -190,7 +190,7 @@ class GTEST_API_ Message {
 #endif  // GTEST_HAS_GLOBAL_WSTRING
 
   // Gets the text streamed to this object so far as an std::string.
-  // Each '\0' character in the buffer is replaced with "\\0".
+  // Each '\0' character in the data-flow is replaced with "\\0".
   //
   // INTERNAL IMPLEMENTATION - DO NOT USE IN A USER PROGRAM.
   std::string GetString() const;

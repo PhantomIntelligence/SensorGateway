@@ -19,7 +19,7 @@
 
 #include <gtest/gtest.h>
 
-#include "spirit-sensor-gateway/common/data-structure/ConstantSizedPointerList.hpp"
+#include "spirit-sensor-gateway/common/container/ConstantSizedPointerList.hpp"
 #include "data-model/DataModelFixture.h"
 
 using ExampleDataModel::NativeData;

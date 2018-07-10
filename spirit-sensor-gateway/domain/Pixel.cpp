@@ -29,7 +29,7 @@ Pixel::~Pixel() {
 bool Pixel::operator==(Pixel const& other) const {
     auto sameID = (ID == other.ID);
     auto sameTracks = true;
-    for (auto i = 0; i < NUMBER_OF_TRACKS_IN_AWL16_PIXEL && sameTracks && sameID; ++i) {
+    for (auto i = 0; i < NUMBER_OF_TRACKS_IN_PIXEL && sameTracks && sameID; ++i) {
         sameTracks = (tracks[i] == other.tracks[i]);
     }
     return (sameID && sameTracks);
@@ -52,7 +52,7 @@ bool Pixel::doesTrackExist(TrackID trackID) {
 };
 
 Track* Pixel::fetchTrackByID(TrackID trackID) {
-    for (auto i = 0; i < NUMBER_OF_TRACKS_IN_AWL16_PIXEL; ++i) {
+    for (auto i = 0; i < NUMBER_OF_TRACKS_IN_PIXEL; ++i) {
         if (tracks[i].getID() == trackID) {
             return &tracks[i];
         }
@@ -64,12 +64,12 @@ PixelID Pixel::getID() const {
     return ID;
 }
 
-std::array<Track, NUMBER_OF_TRACKS_IN_AWL16_PIXEL>* Pixel::getTracks() {
+std::array<Track, NUMBER_OF_TRACKS_IN_PIXEL>* Pixel::getTracks() {
     return &tracks;
 }
 
 void Pixel::validateNotFull() const {
-    if (numberOfTracksInPixel >= NUMBER_OF_TRACKS_IN_AWL16_PIXEL) {
+    if (numberOfTracksInPixel >= NUMBER_OF_TRACKS_IN_PIXEL) {
         throw std::runtime_error(ExceptionMessage::PIXEL_TRACK_ARRAY_ILLEGAL_STORE_FULL);
     }
 

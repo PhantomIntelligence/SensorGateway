@@ -14,7 +14,7 @@
 #ifndef SPIRITSENSORGATEWAY_FRAMESINKMOCK_H
 #define SPIRITSENSORGATEWAY_FRAMESINKMOCK_H
 
-#include "spirit-sensor-gateway/common/buffer/DataSink.hpp"
+#include "spirit-sensor-gateway/common/data-flow/DataSink.hpp"
 #include "spirit-sensor-gateway/domain/Frame.h"
 
 using DataFlow::DataSink;

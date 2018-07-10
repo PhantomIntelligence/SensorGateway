@@ -19,7 +19,7 @@
 #define SPIRITSENSORGATEWAY_RINGBUFFER_H
 
 #include <unordered_map>
-#include "spirit-sensor-gateway/common/buffer/ConsumerLink.hpp"
+#include "spirit-sensor-gateway/common/data-flow/ConsumerLink.hpp"
 #include "RingBufferPad.hpp"
 
 using Buffer::RING_BUFFER_SIZE;

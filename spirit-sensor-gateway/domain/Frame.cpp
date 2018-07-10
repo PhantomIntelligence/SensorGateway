@@ -35,7 +35,7 @@ FrameID Frame::getFrameID() const {
     return frameID;
 };
 
-std::array<Pixel, NUMBER_OF_PIXELS_IN_AWL16_FRAME>* Frame::getPixels() {
+std::array<Pixel, NUMBER_OF_PIXELS_IN_FRAME>* Frame::getPixels() {
     return &pixels;
 };
 
@@ -59,7 +59,7 @@ bool Frame::operator==(Frame const& other) const {
     bool sameFrameID = (frameID == other.frameID);
     bool sameSystemID = (systemID == other.systemID);
     auto samePixels = true;
-    for (auto i = 0; i < NUMBER_OF_PIXELS_IN_AWL16_FRAME && sameFrameID && sameSystemID; ++i) {
+    for (auto i = 0; i < NUMBER_OF_PIXELS_IN_FRAME && sameFrameID && sameSystemID; ++i) {
         samePixels = (pixels[i] == other.pixels[i]);
     }
     return (sameFrameID && samePixels && samePixels);

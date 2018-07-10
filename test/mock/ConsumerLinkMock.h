@@ -17,7 +17,7 @@
 #ifndef SPIRITSENSORGATEWAY_CONSUMERLINKMOCK_H
 #define SPIRITSENSORGATEWAY_CONSUMERLINKMOCK_H
 
-#include "spirit-sensor-gateway/common/buffer/ConsumerLink.hpp"
+#include "spirit-sensor-gateway/common/data-flow/ConsumerLink.hpp"
 
 namespace Mock {
 

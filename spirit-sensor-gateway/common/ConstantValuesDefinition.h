@@ -59,18 +59,18 @@ namespace CommandType {
 namespace Sensor {
     using SensorID = uint16_t;
     namespace AWL {
-        using AWLMessageID = uint64_t;
-        AWLMessageID const END_OF_FRAME = 0x09;
-        AWLMessageID const DETECTION_TRACK = 0x0A;
-        AWLMessageID const DETECTION_VELOCITY = 0x0B;
-        int const MAXIMUM_NUMBER_OF_DATA_IN_AWL_MESSAGE = 8;
-        namespace AWL7 {
-            SensorID const AWL7_SENSOR_ID = 0x0010;
+        using MessageID = uint64_t;
+        MessageID const END_OF_FRAME = 0x09;
+        MessageID const DETECTION_TRACK = 0x0A;
+        MessageID const DETECTION_VELOCITY = 0x0B;
+        int const MAXIMUM_NUMBER_OF_DATA_IN_MESSAGE = 8;
+        namespace _7 {
+            SensorID const SENSOR_ID = 0x0010;
         }
-        namespace AWL16 {
-            int const NUMBER_OF_PIXELS_IN_AWL16_FRAME = 16;
-            int const NUMBER_OF_TRACKS_IN_AWL16_PIXEL = 16;
-            SensorID const AWL16_SENSOR_ID = 0x0010;
+        namespace _16 {
+            int const NUMBER_OF_PIXELS_IN_FRAME = 16;
+            int const NUMBER_OF_TRACKS_IN_PIXEL = 16;
+            SensorID const SENSOR_ID = 0x0010;
         }
     }
 }

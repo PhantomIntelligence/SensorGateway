@@ -1632,7 +1632,7 @@ static void SetEnv(const char* name, const char* value) {
   // We use an std::map to do so.
   static std::map<std::string, std::string*> added_env;
 
-  // Because putenv stores a pointer to the string buffer, we can't delete the
+  // Because putenv stores a pointer to the string data-flow, we can't delete the
   // previous string (if present) until after it's replaced.
   std::string *prev_env = NULL;
   if (added_env.find(name) != added_env.end()) {

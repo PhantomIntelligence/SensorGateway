@@ -14,7 +14,7 @@
 #ifndef SPIRITSENSORGATEWAY_SPIRITTRACK_H
 #define SPIRITSENSORGATEWAY_SPIRITTRACK_H
 
-#include "spirit-sensor-gateway/common/buffer/DataProcessingScheduler.hpp"
+#include "spirit-sensor-gateway/common/data-flow/DataProcessingScheduler.hpp"
 
 namespace DataFlow {
 

@@ -27,7 +27,7 @@ namespace DataFlow {
             void addPixel(Pixel pixel);
             Pixel* fetchPixelByID(PixelID pixelID);
             FrameID getFrameID() const;
-            std::array<Pixel, NUMBER_OF_PIXELS_IN_AWL16_FRAME>* getPixels() ;
+            std::array<Pixel, NUMBER_OF_PIXELS_IN_FRAME>* getPixels() ;
             SystemID getSystemID() const;
             void setFrameID(FrameID const& frameID);
             void setSystemID(SystemID const& systemID);
@@ -36,7 +36,7 @@ namespace DataFlow {
 
         private:
             FrameID frameID;
-            std::array<Pixel, NUMBER_OF_PIXELS_IN_AWL16_FRAME> pixels;
+            std::array<Pixel, NUMBER_OF_PIXELS_IN_FRAME> pixels;
             SystemID systemID;
     };
 
@@ -45,7 +45,7 @@ namespace DataFlow {
             using DataFlow::Pixel;
             FrameID const DEFAULT_FRAME_ID_VALUE = 0;
             SystemID const DEFAULT_SYSTEM_ID_VALUE = 0;
-            std::array<Pixel, NUMBER_OF_PIXELS_IN_AWL16_FRAME> const DEFAULT_PIXELS_ARRAY = std::array<Pixel, NUMBER_OF_PIXELS_IN_AWL16_FRAME>();
+            std::array<Pixel, NUMBER_OF_PIXELS_IN_FRAME> const DEFAULT_PIXELS_ARRAY = std::array<Pixel, NUMBER_OF_PIXELS_IN_FRAME>();
             DataFlow::Frame const DEFAULT_FRAME = DataFlow::Frame();
         }
     }

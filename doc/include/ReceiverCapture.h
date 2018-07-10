@@ -173,7 +173,7 @@ namespace awl {
     class ReceiverCapture : public Publisher {
     public:
 
-        static const int maximumSensorFrames;  // Maximum number of frames kept in frame buffer
+        static const int maximumSensorFrames;  // Maximum number of frames kept in frame data-flow
         typedef std::shared_ptr<ReceiverCapture> Ptr;
         typedef std::shared_ptr<ReceiverCapture> ConstPtr;
         typedef std::vector<ReceiverCapture::Ptr> List;

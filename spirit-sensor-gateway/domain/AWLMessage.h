@@ -16,11 +16,11 @@
 
 #include "spirit-sensor-gateway/common/ConstantValuesDefinition.h"
 
-using Sensor::AWL::MAXIMUM_NUMBER_OF_DATA_IN_AWL_MESSAGE;
+using Sensor::AWL::MAXIMUM_NUMBER_OF_DATA_IN_MESSAGE;
 
 namespace {
     namespace AWL {
-        using DataArray = std::array<unsigned char, MAXIMUM_NUMBER_OF_DATA_IN_AWL_MESSAGE>;
+        using DataArray = std::array<unsigned char, MAXIMUM_NUMBER_OF_DATA_IN_MESSAGE>;
     }
 }
 
