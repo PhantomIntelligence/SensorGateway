@@ -23,16 +23,17 @@ else ()
 endif ()
 #######################################################
 
+########## uws ########################################
 find_package(uws CONFIG REQUIRED)
 if (uws_FOUND)
     message(STATUS "Found uWS")
     message(STATUS "LIBRARIES ${uws_LIBRARIES}")
     message(STATUS "INCLUDE_DIRS ${uws_INCLUDE_DIRS}")
+    include_directories(${uws_INCLUDE_DIRS})
 else ()
     message(FATAL "uWS is required")
 endif ()
-
-include_directories(${uws_INCLUDE_DIRS})
+#######################################################
 
 target_link_libraries(${PROJECT_NAME} canlib ${uws_LIBRARIES})
 
