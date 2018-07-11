@@ -33,7 +33,7 @@ add_executable(runtests ${TEST_FILES} ${COMMON_TEST_FILES} ${TRANSLATOR_TEST_FIL
 
 
 find_package(SpiritSensorGateway)
-target_link_libraries(runtests gtest gmock_main ${SpiritSensorGateway_LIBRARIES} ${CONAN_LIBS} ${uWS_TARGET_LINKS})
+target_link_libraries(runtests gtest gmock_main ${SpiritSensorGateway_LIBRARIES} ${CONAN_LIBS} uws)
 
 install(TARGETS runtests
         # IMPORTANT: Add the runtests executable to the "export-set"

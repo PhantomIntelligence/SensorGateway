@@ -12,22 +12,32 @@ file(GLOB SPIRIT_PROTOCOL_FILES "${CMAKE_CURRENT_SOURCE_DIR}/spirit-protocol-tra
 add_library(${PROJECT_NAME} SHARED ${COMMON_FILES} ${DOMAIN_FILES} ${SRC_FILES} ${COMMUNICATION_PROTOCOL_FILES} ${SPIRIT_PROTOCOL_FILES} config.h.in)
 
 ########## CONAN ######################################
-if(EXISTS ${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
+if (EXISTS ${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
     include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
     conan_basic_setup(TARGETS)
 
     message(STATUS "Linking the following libs from conan: ${CONAN_LIBS}")
     conan_target_link_libraries(${PROJECT_NAME})
-else()
+else ()
     message(WARNING "The file conanbuildinfo.cmake doesn't exist, you have to run conan install first")
-endif()
+endif ()
 #######################################################
 
-#target_link_libraries(${PROJECT_NAME} canlib)
-target_link_libraries(${PROJECT_NAME} canlib ${uWS_TARGET_LINKS})
+find_package(uws CONFIG REQUIRED)
+if (uws_FOUND)
+    message(STATUS "Found uWS")
+    message(STATUS "LIBRARIES ${uws_LIBRARIES}")
+    message(STATUS "INCLUDE_DIRS ${uws_INCLUDE_DIRS}")
+else ()
+    message(FATAL "uWS is required")
+endif ()
+
+include_directories(${uws_INCLUDE_DIRS})
+
+target_link_libraries(${PROJECT_NAME} canlib ${uws_LIBRARIES})
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
-                      PUBLIC_HEADER "${HEADER_FILES};${CMAKE_CURRENT_BINARY_DIR}/config.h")
+        PUBLIC_HEADER "${HEADER_FILES};${CMAKE_CURRENT_BINARY_DIR}/config.h")
 
 install(TARGETS ${PROJECT_NAME}
         # IMPORTANT: Add the library to the "export-set"
