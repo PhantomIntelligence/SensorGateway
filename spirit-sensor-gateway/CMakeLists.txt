@@ -36,7 +36,7 @@ else ()
 endif ()
 #######################################################
 
-target_link_libraries(${PROJECT_NAME} canlib ${uws_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} canlib uws)
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
         PUBLIC_HEADER "${HEADER_FILES};${CMAKE_CURRENT_BINARY_DIR}/config.h")

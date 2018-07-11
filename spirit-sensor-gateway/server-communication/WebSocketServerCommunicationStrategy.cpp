@@ -1,4 +1,4 @@
-#include <websocketpp/client.hpp>
+//#include <websocketpp/client.hpp>
 #include "WebSocketServerCommunicationStrategy.h"
 
 using ServerCommunication::WebSocketServerCommunicationStrategy;
@@ -30,17 +30,17 @@ void WebSocketServerCommunicationStrategy::start() {
 
 void WebSocketServerCommunicationStrategy::initializeClientCallbacks() {
     //Set the endpoint logging behavior to silent
-    client.clear_access_channels(websocketpp::log::alevel::all);
-    client.clear_error_channels(websocketpp::log::alevel::all);
+//    client.clear_access_channels(websocketpp::log::alevel::all);
+//    client.clear_error_channels(websocketpp::log::alevel::all);
 
-    client.init_asio();
-    client.start_perpetual();
-
-}
-
-void WebSocketServerCommunicationStrategy::onOpen(ConnectionHandle connectionHandle){
+//    client.init_asio();
+//    client.start_perpetual();
 
 }
+
+//void WebSocketServerCommunicationStrategy::onOpen(ConnectionHandle connectionHandle){
+
+//}
 
 void WebSocketServerCommunicationStrategy::processMessage(SpiritProtocol::Frame&& message) {
 
