@@ -20,20 +20,18 @@ using DataFlow::PixelID;
 using Defaults::Pixel::DEFAULT_PIXEL;
 using Defaults::Pixel::DEFAULT_TRACKS_ARRAY;
 
-Pixel::Pixel(PixelID pixelID) : ID(pixelID),tracks(DEFAULT_TRACKS_ARRAY), numberOfTracksInPixel(0){};
+Pixel::Pixel(PixelID pixelID) : ID(pixelID),tracks(DEFAULT_TRACKS_ARRAY), currentNumberOfTracksInPixel(0){};
 
-Pixel::Pixel(PixelID pixelID, TracksArray tracks, int numberOfTracksInPixel): ID(pixelID),
-                                                                              tracks(tracks),
-                                                                              numberOfTracksInPixel(numberOfTracksInPixel){
+Pixel::Pixel(PixelID pixelID, TracksArray tracks): ID(pixelID), tracks(tracks), currentNumberOfTracksInPixel(tracks.size()){
 
 };
 
-Pixel::Pixel(Pixel const& other): Pixel(other.ID, other.tracks, other.numberOfTracksInPixel){
+Pixel::Pixel(Pixel const& other): Pixel(other.ID, other.tracks){
 
 };
 
 Pixel::Pixel(Pixel&& other) noexcept: ID(std::move(other.ID)),tracks(std::move(other.tracks)),
-                                      numberOfTracksInPixel(std::move(other.numberOfTracksInPixel)){
+                                      currentNumberOfTracksInPixel(std::move(other.currentNumberOfTracksInPixel)){
 
 };
 
@@ -51,17 +49,13 @@ Pixel& Pixel::operator=(Pixel&& other)& noexcept {
 void Pixel::swap(Pixel& current, Pixel& other) noexcept {
     std::swap(current.ID, other.ID);
     std::swap(current.tracks, other.tracks);
-    std::swap(current.numberOfTracksInPixel, other.numberOfTracksInPixel);
+    std::swap(current.currentNumberOfTracksInPixel, other.currentNumberOfTracksInPixel);
 };
 
 bool Pixel::operator == (Pixel const& other) const {
     auto samePixelID = (ID == other.ID);
-    auto sameNumberOfTracksInPixel = (numberOfTracksInPixel == other.numberOfTracksInPixel);
-    auto sameTracks = true;
-    for (auto trackIndex = 0; trackIndex < NUMBER_OF_TRACKS_IN_PIXEL && sameTracks; ++trackIndex) {
-        sameTracks = (tracks[trackIndex] == other.tracks[trackIndex]);
-    }
-    auto pixelsAreEqual = (samePixelID && sameTracks && sameNumberOfTracksInPixel);
+    auto sameTracks = (tracks == other.tracks);
+    auto pixelsAreEqual = (samePixelID && sameTracks);
     return pixelsAreEqual;
 }
 
@@ -71,8 +65,8 @@ bool Pixel::operator != (Pixel const& other) const {
 
 void Pixel::addTrack(Track track) {
     validateNotFull();
-    tracks[numberOfTracksInPixel] = track;
-    numberOfTracksInPixel++;
+    tracks[currentNumberOfTracksInPixel] = track;
+    currentNumberOfTracksInPixel++;
 }
 
 bool Pixel::doesTrackExist(TrackID trackID) {
@@ -103,7 +97,7 @@ TracksArray* Pixel::getTracks() {
 }
 
 void Pixel::validateNotFull() const {
-    if (numberOfTracksInPixel >= NUMBER_OF_TRACKS_IN_PIXEL) {
+    if (currentNumberOfTracksInPixel >= NUMBER_OF_TRACKS_IN_PIXEL) {
         throw std::runtime_error(ExceptionMessage::PIXEL_TRACK_ARRAY_ILLEGAL_STORE_FULL);
     }
 }

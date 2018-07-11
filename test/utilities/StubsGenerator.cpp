@@ -19,14 +19,22 @@
 #include "spirit-sensor-gateway/domain/Frame.h"
 
 using DataFlow::Track;
+using DataFlow::TrackID;
+using DataFlow::ConfidenceLevel;
+using DataFlow::Acceleration;
+using DataFlow::Distance;
+using DataFlow::Speed;
+using DataFlow::Intensity;
 using DataFlow::Pixel;
+using DataFlow::PixelID;
 using DataFlow::Frame;
+using DataFlow::FrameID;
+using DataFlow::SystemID;
 
 namespace Stub {
 
-    static Track createTrack(DataFlow::TrackID trackID, DataFlow::ConfidenceLevel confidenceLevel,
-                             DataFlow::Intensity intensity, DataFlow::Acceleration acceleration,
-                             DataFlow::Distance distance, DataFlow::Speed speed) {
+    static Track createTrack(TrackID trackID, ConfidenceLevel confidenceLevel, Intensity intensity,
+                             Acceleration acceleration, Distance distance, Speed speed) {
         Track track = Track(trackID, confidenceLevel, intensity);
         track.setAcceleration(acceleration);
         track.setDistance(distance);
@@ -34,7 +42,7 @@ namespace Stub {
         return track;
     }
 
-    static Pixel createPixel(DataFlow::PixelID pixelID, std::vector<Track> tracks) {
+    static Pixel createPixel(PixelID pixelID, std::vector<Track> tracks) {
         Pixel pixel = Pixel(pixelID);
         for (auto track : tracks) {
             pixel.addTrack(track);
@@ -42,7 +50,7 @@ namespace Stub {
         return pixel;
     }
 
-    static Frame createFrame(DataFlow::FrameID frameID, DataFlow::SystemID systemID, std::vector<Pixel> pixels = {}) {
+    static Frame createFrame(FrameID frameID, SystemID systemID, std::vector<Pixel> pixels = {}) {
         Frame frame = Frame();
         frame.setFrameID(frameID);
         frame.setSystemID(systemID);
@@ -51,7 +59,6 @@ namespace Stub {
         }
         return frame;
     }
-
 }
 
 #endif //SPIRITSENSORGATEWAY_DATASTUBS_H

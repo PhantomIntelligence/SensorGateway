@@ -30,7 +30,7 @@ namespace DataFlow {
     public:
         Pixel(PixelID pixelID);
 
-        Pixel(PixelID pixelID, TracksArray tracks, int numberOfTracksInPixel);
+        Pixel(PixelID pixelID, TracksArray tracks);
 
         Pixel() = default;
 
@@ -65,7 +65,7 @@ namespace DataFlow {
     private:
         PixelID ID;
         TracksArray tracks;
-        int numberOfTracksInPixel;
+        int currentNumberOfTracksInPixel;
         void validateNotFull() const;
     };
 }
