@@ -21,7 +21,10 @@ namespace SensorCommunication {
 
     template<class T>
     class CommunicationProtocolStrategy {
+
+    protected:
         typedef T DATA;
+
     public:
 
         virtual ~CommunicationProtocolStrategy() noexcept = default;

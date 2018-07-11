@@ -18,8 +18,12 @@
 
 namespace SensorAccessLinkElement {
 
-    template<class INPUT, class OUTPUT>
-    class MessageTranslator : public DataFlow::DataSink<INPUT> {
+    template<class I, class O>
+    class MessageTranslator : public DataFlow::DataSink<I> {
+
+    protected:
+        typedef I INPUT;
+        typedef O OUTPUT;
 
     public:
         explicit MessageTranslator(MessageTranslation::MessageTranslationStrategy<INPUT, OUTPUT>* messageTranslationStrategy) :
@@ -29,7 +33,7 @@ namespace SensorAccessLinkElement {
 
         }
 
-        void consume(INPUT&& inputMessage) override {
+        void consume(I&& inputMessage) override {
             messageTranslationStrategy->translateBasicMessage(std::move(inputMessage));
         };
 

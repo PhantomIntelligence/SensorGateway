@@ -17,8 +17,13 @@
 
 namespace MessageTranslation {
 
-    template<class INPUT, class OUTPUT>
-    class MessageTranslationStrategy : public DataFlow::DataSource<OUTPUT> {
+    template<class I, class O>
+    class MessageTranslationStrategy : public DataFlow::DataSource<O> {
+
+    protected:
+        typedef I INPUT;
+        typedef O OUTPUT;
+
     public:
 
         virtual ~MessageTranslationStrategy() noexcept = default;
