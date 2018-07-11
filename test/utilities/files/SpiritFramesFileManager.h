@@ -36,27 +36,27 @@ namespace TestUtilities {
         void writeFileLineWithContentLabelAndValue(std::FILE* file, unsigned int numberOfTabulator,
                                                    char const* contentLabel, unsigned int contentValue);
 
-        const std::string FRAME_ID_LABEL = "Frame SENSOR_ID";
+        std::string const  FRAME_ID_LABEL = "Frame ID";
 
-        const std::string SYSTEM_ID_LABEL = "System SENSOR_ID";
+        std::string const  SYSTEM_ID_LABEL = "System ID";
 
-        const std::string PIXELS_LABEL = "Pixels";
+        std::string const  PIXELS_LABEL = "Pixels";
 
-        const std::string PIXEL_ID_LABEL = "Pixel SENSOR_ID";
+        std::string const  PIXEL_ID_LABEL = "Pixel ID";
 
-        const std::string TRACKS_LABEL = "Tracks";
+        std::string const  TRACKS_LABEL = "Tracks";
 
-        const std::string TRACK_ID_LABEL = "Track SENSOR_ID";
+        std::string const  TRACK_ID_LABEL = "Track ID";
 
-        const std::string INTENSITY_LABEL = "Ìntensity";
+        std::string const  INTENSITY_LABEL = "Ìntensity";
 
-        const std::string CONFIDENCE_LEVEL_LABEL = "Confidence Level";
+        std::string const  CONFIDENCE_LEVEL_LABEL = "Confidence Level";
 
-        const std::string DISTANCE_LABEL = "Distance";
+        std::string const  DISTANCE_LABEL = "Distance";
 
-        const std::string ACCELERATION_LABEL = "Acceleration";
+        std::string const  ACCELERATION_LABEL = "Acceleration";
 
-        const std::string SPEED_LABEL = "Speed";
+        std::string const  SPEED_LABEL = "Speed";
     };
 }
 

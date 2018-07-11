@@ -33,15 +33,15 @@ namespace TestUtilities {
 
         void writeFileBlockWithMessage(AWLMessage message, std::FILE* file) override;
 
-        const std::string ID_LABEL = "SENSOR_ID";
+        std::string const ID_LABEL = "ID";
 
-        const std::string LENGTH_LABEL = "Length";
+        std::string const LENGTH_LABEL = "Length";
 
-        const std::string TIMESTAMP_LABEL = "Timestamp";
+        std::string const TIMESTAMP_LABEL = "Timestamp";
 
-        const std::string DATA_LABEL = "Data";
+        std::string const DATA_LABEL = "Data";
 
-        const std::string DATA_POSITION_LABEL = "Position";
+        std::string const DATA_POSITION_LABEL = "Position";
     };
 }
 

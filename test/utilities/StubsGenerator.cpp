@@ -17,9 +17,7 @@
 
 #include <vector>
 #include "spirit-sensor-gateway/domain/Frame.h"
-#include "spirit-sensor-gateway/domain/AWLMessage.h"
 
-using DataFlow::AWLMessage;
 using DataFlow::Track;
 using DataFlow::Pixel;
 using DataFlow::Frame;

@@ -18,8 +18,8 @@ using TestUtilities::AWLMessagesFileManager;
 
 AWLMessage AWLMessagesFileManager::readMessageFromFileBlock(std::string const& fileBlock) {
     auto id = std::stoi(fetchSubstringBetweenDelimiters(fileBlock, ID_LABEL+MESSAGE_LABEL_VALUE_ASSOCIATOR, "\n"));
-    auto length = static_cast<unsigned>(std::stoi(fetchSubstringBetweenDelimiters(fileBlock, LENGTH_LABEL+MESSAGE_LABEL_VALUE_ASSOCIATOR, "\n")));
-    auto timestamp = static_cast<unsigned> (std::stoi(fetchSubstringBetweenDelimiters(fileBlock, TIMESTAMP_LABEL+MESSAGE_LABEL_VALUE_ASSOCIATOR, "\n")));
+    auto length = static_cast<unsigned int>(std::stoi(fetchSubstringBetweenDelimiters(fileBlock, LENGTH_LABEL+MESSAGE_LABEL_VALUE_ASSOCIATOR, "\n")));
+    auto timestamp = static_cast<unsigned int> (std::stoi(fetchSubstringBetweenDelimiters(fileBlock, TIMESTAMP_LABEL+MESSAGE_LABEL_VALUE_ASSOCIATOR, "\n")));
     AWL::DataArray data;
     for (auto dataPosition = 0; dataPosition < MAXIMUM_NUMBER_OF_DATA_IN_MESSAGE; dataPosition++) {
         auto dataValue = std::stoi(fetchSubstringBetweenDelimiters(fileBlock, DATA_POSITION_LABEL+ " " +std::to_string(dataPosition + 1) +MESSAGE_LABEL_VALUE_ASSOCIATOR, "\n"));
