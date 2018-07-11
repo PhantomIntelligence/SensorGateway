@@ -13,7 +13,7 @@
 	See the License for the specific language governing permissions and
 	limitations under the License.
 */
-#include "src/ChatClient.cpp"
+#include "ChatClient.cpp"
 #include "src/SecureStreaming/SpdLogWriter.cpp"
 #include "src/SecureStreaming/Logger.cpp"
 

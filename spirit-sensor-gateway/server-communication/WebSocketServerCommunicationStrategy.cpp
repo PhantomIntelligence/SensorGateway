@@ -1,31 +1,51 @@
 #include <websocketpp/client.hpp>
 #include "WebSocketServerCommunicationStrategy.h"
 
+using ServerCommunication::WebSocketServerCommunicationStrategy;
 
-ServerCommunication::WebSocketServerCommunicationStrategy::WebSocketServerCommunicationStrategy() {
+
+WebSocketServerCommunicationStrategy::WebSocketServerCommunicationStrategy(){
+    initializeClientCallbacks();
+}
+
+WebSocketServerCommunicationStrategy::~WebSocketServerCommunicationStrategy() {
 
 }
 
-ServerCommunication::WebSocketServerCommunicationStrategy::~WebSocketServerCommunicationStrategy() {
+void WebSocketServerCommunicationStrategy::openConnection() {
 
 }
 
-void ServerCommunication::WebSocketServerCommunicationStrategy::openConnection() {
+void WebSocketServerCommunicationStrategy::closeConnection() {
 
 }
 
-void ServerCommunication::WebSocketServerCommunicationStrategy::closeConnection() {
+void WebSocketServerCommunicationStrategy::sendMessage(MESSAGE&& message) {
 
 }
 
-void ServerCommunication::WebSocketServerCommunicationStrategy::sendMessage() {
+void WebSocketServerCommunicationStrategy::start() {
 
 }
 
-void ServerCommunication::WebSocketServerCommunicationStrategy::start() {
+void WebSocketServerCommunicationStrategy::initializeClientCallbacks() {
+    //Set the endpoint logging behavior to silent
+    client.clear_access_channels(websocketpp::log::alevel::all);
+    client.clear_error_channels(websocketpp::log::alevel::all);
+
+    client.init_asio();
+    client.start_perpetual();
 
 }
 
-void ServerCommunication::WebSocketServerCommunicationStrategy::initializeClientCallbacks() {
+void WebSocketServerCommunicationStrategy::onOpen(ConnectionHandle connectionHandle){
 
+}
+
+void WebSocketServerCommunicationStrategy::processMessage(SpiritProtocol::Frame&& message) {
+
+}
+
+int WebSocketServerCommunicationStrategy::connect(std::string const& serverAddress) {
+    return 0;
 }

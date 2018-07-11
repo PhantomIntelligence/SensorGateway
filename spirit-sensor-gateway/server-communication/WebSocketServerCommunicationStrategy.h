@@ -19,12 +19,17 @@
 
 
 namespace ServerCommunication {
+
     using Client = websocketpp::client<websocketpp::config::asio_client>;
     using ConnectionHandle = websocketpp::connection_hdl;
+    using websocketpp::lib::error_code;
+    using MessagePointer = Client::message_ptr;
+
+    std::string const SERVER_ADDRRESS = "ws://localhost:8080/connect-gateway";
 
     struct ConnectionMetadata {
         int id;
-        ConnectionHandle handle;
+        ConnectionHandle connectionHandler;
         std::string status;
         std::string URI;
         std::string server;
@@ -32,6 +37,11 @@ namespace ServerCommunication {
     };
 
     class WebSocketServerCommunicationStrategy : public ServerCommunicationProtocolStrategy<SpiritProtocol::Frame> {
+
+    protected:
+        using super = ServerCommunicationProtocolStrategy<SpiritProtocol::Frame>;
+
+        using super::MESSAGE;
 
     public:
 
@@ -43,17 +53,28 @@ namespace ServerCommunication {
 
         void closeConnection() override;
 
-        void sendMessage() override;
+        void processMessage(MESSAGE&& message);
 
         void start();
 
+        int connect(std::string const& serverAddress);
+
     private:
 
+
         void initializeClientCallbacks();
+
+        void sendMessage(MESSAGE&& message) override;
 
         ConnectionHandle connectionHandle;
 
         ConnectionMetadata connectionMetadata;
+
+        void onOpen(ConnectionHandle connectionHandle);
+
+        Client client;
+
+        std::string serverAddrress = SERVER_ADDRRESS;
     };
 }
 

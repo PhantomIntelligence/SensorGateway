@@ -24,8 +24,10 @@ Pixel::~Pixel() {
 bool Pixel::operator==(Pixel const& other) const {
     auto sameID = (ID == other.ID);
     auto sameTracks = true;
-    for (auto i = 0; i < MAXIMUM_NUMBER_OF_TRACKS_IN_AWL16_PIXEL && sameTracks && sameID; ++i) {
-        sameTracks = (tracks[i] == other.tracks[i]);
+    if (sameID) {
+        for (auto i = 0; i < MAXIMUM_NUMBER_OF_TRACKS_IN_AWL16_PIXEL && sameTracks && sameID; ++i) {
+            sameTracks = (tracks[i] == other.tracks[i]);
+        }
     }
     return (sameID && sameTracks);
 }
