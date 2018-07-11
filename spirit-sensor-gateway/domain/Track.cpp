@@ -69,13 +69,13 @@ Track::Track(Track&& other) noexcept: ID(std::move(other.ID)),
                                       speed(std::move(other.speed)) {
 };
 
-Track& Track::operator=(Track const& other)& {
+Track& Track::operator = (Track const& other)& {
     Track temporary(std::move(other));
     swap(*this, temporary);
     return *this;
 };
 
-Track& Track::operator=(Track&& other)& noexcept {
+Track& Track::operator = (Track&& other)& noexcept {
     swap(*this, other);
     return *this;
 };
@@ -89,7 +89,7 @@ void Track::swap(Track& current, Track& other) noexcept{
     std::swap(current.speed, other.speed);
 };
 
-bool Track::operator==(Track const& other) const {
+bool Track::operator == (Track const& other) const {
     auto sameTrackID = (ID == other.ID);
     auto sameConfidenceLevel = (confidenceLevel == other.confidenceLevel);
     auto sameIntensity = (intensity == other.intensity);
@@ -105,7 +105,7 @@ bool Track::operator==(Track const& other) const {
     return tracksAreEqual;
 }
 
-bool Track::operator!=(Track const& other) const {
+bool Track::operator != (Track const& other) const {
     return !(operator==(other));
 }
 

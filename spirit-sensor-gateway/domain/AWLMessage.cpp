@@ -52,16 +52,16 @@ void AWLMessage::swap(AWLMessage& current, AWLMessage& other) noexcept {
     std::swap(current.data, other.data);
 }
 
-bool DataFlow::AWLMessage::operator==(AWLMessage const& other) const  {
-    auto sameId = id == other.id;
-    auto sameTimestamp = timestamp == other.timestamp;
-    auto sameLength = length == other.length;
-    auto sameData = data == other.data;
-    auto equal = (sameId && sameTimestamp && sameLength && sameData);
-    return equal;
+bool DataFlow::AWLMessage::operator == (AWLMessage const& other) const  {
+    auto sameId = (id == other.id);
+    auto sameTimestamp = (timestamp == other.timestamp);
+    auto sameLength = (length == other.length);
+    auto sameData = (data == other.data);
+    auto messagesAreEqual = (sameId && sameTimestamp && sameLength && sameData);
+    return messagesAreEqual;
 }
 
-bool DataFlow::AWLMessage::operator!=(AWLMessage const& other) const  {
+bool DataFlow::AWLMessage::operator != (AWLMessage const& other) const  {
     return !operator==(other);
 }
 

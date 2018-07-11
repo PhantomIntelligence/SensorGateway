@@ -19,10 +19,10 @@
 #define SPIRITSENSORGATEWAY_RINGBUFFER_H
 
 #include <unordered_map>
-#include "spirit-sensor-gateway/common/data-flow/ConsumerLink.hpp"
+#include "ConsumerLink.hpp"
 #include "RingBufferPad.hpp"
 
-using Buffer::RING_BUFFER_SIZE;
+using DataFlow::RING_BUFFER_SIZE;
 
 namespace DataFlow {
 

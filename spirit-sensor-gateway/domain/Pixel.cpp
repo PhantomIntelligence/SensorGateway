@@ -54,17 +54,18 @@ void Pixel::swap(Pixel& current, Pixel& other) noexcept {
     std::swap(current.numberOfTracksInPixel, other.numberOfTracksInPixel);
 };
 
-bool Pixel::operator==(Pixel const& other) const {
+bool Pixel::operator == (Pixel const& other) const {
     auto samePixelID = (ID == other.ID);
     auto sameNumberOfTracksInPixel = (numberOfTracksInPixel == other.numberOfTracksInPixel);
     auto sameTracks = true;
-    for (auto trackNumber = 0; trackNumber < NUMBER_OF_TRACKS_IN_PIXEL && sameTracks; ++trackNumber) {
-        sameTracks = (tracks[trackNumber] == other.tracks[trackNumber]);
+    for (auto trackIndex = 0; trackIndex < NUMBER_OF_TRACKS_IN_PIXEL && sameTracks; ++trackIndex) {
+        sameTracks = (tracks[trackIndex] == other.tracks[trackIndex]);
     }
-    return (samePixelID && sameTracks && sameNumberOfTracksInPixel);
+    auto pixelsAreEqual = (samePixelID && sameTracks && sameNumberOfTracksInPixel);
+    return pixelsAreEqual;
 }
 
-bool Pixel::operator!=(Pixel const& other) const {
+bool Pixel::operator != (Pixel const& other) const {
     return !(operator==(other));
 }
 

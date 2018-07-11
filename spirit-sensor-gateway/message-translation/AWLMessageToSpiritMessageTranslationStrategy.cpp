@@ -15,6 +15,9 @@
 #include "UnknownMessageException.h"
 
 using MessageTranslation::AWLMessageToSpiritMessageTranslationStrategy;
+using DataFlow::TrackID;
+using DataFlow::ConfidenceLevel;
+using DataFlow::Intensity;
 using Sensor::AWL::END_OF_FRAME;
 using Sensor::AWL::DETECTION_TRACK;
 using Sensor::AWL::DETECTION_VELOCITY;

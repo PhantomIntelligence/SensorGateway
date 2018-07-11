@@ -38,15 +38,15 @@ namespace DataFlow {
 
         Frame(Frame&& other) noexcept;
 
-        Frame& operator=(Frame const& other)& ;
+        Frame& operator = (Frame const& other)& ;
 
-        Frame& operator=(Frame&& other)& noexcept;
+        Frame& operator = (Frame&& other)& noexcept;
 
         void swap(Frame& current, Frame& other) noexcept;
 
-        bool operator==(Frame const& other) const;
+        bool operator == (Frame const& other) const;
 
-        bool operator!=(Frame const& other) const;
+        bool operator != (Frame const& other) const;
 
         void addPixel(Pixel pixel);
 

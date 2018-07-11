@@ -48,7 +48,7 @@ Frame& Frame::operator=(Frame const& other)& {
     return *this;
 };
 
-Frame& Frame::operator=(Frame&& other)& noexcept {
+Frame& Frame::operator = (Frame&& other)& noexcept {
     swap(*this, other);
     return *this;
 };
@@ -59,17 +59,18 @@ void Frame::swap(Frame& current, Frame& other) noexcept {
     std::swap(current.pixels, other.pixels);
 };
 
-bool Frame::operator==(Frame const& other) const {
-    bool sameFrameID = (frameID == other.frameID);
-    bool sameSystemID = (systemID == other.systemID);
+bool Frame::operator == (Frame const& other) const {
+    auto sameFrameID = (frameID == other.frameID);
+    auto sameSystemID = (systemID == other.systemID);
     auto samePixels = true;
-    for (auto i = 0; i < NUMBER_OF_PIXELS_IN_FRAME && samePixels; ++i) {
-        samePixels = (pixels[i] == other.pixels[i]);
+    for (auto pixelIndex = 0; pixelIndex < NUMBER_OF_PIXELS_IN_FRAME && samePixels; ++pixelIndex) {
+        samePixels = (pixels[pixelIndex] == other.pixels[pixelIndex]);
     }
-    return (sameFrameID && sameSystemID && samePixels);
+    auto framesAreEqual = (sameFrameID && sameSystemID && samePixels);
+    return framesAreEqual;
 }
 
-bool Frame::operator!=(Frame const& other) const {
+bool Frame::operator != (Frame const& other) const {
     return !(operator==(other));
 }
 

@@ -22,7 +22,7 @@
 #include "data-model/DataModelFixture.h"
 #include "spirit-sensor-gateway/common/data-flow/DataProcessingScheduler.hpp"
 
-using Buffer::NUMBER_OF_CONCURRENT_INPUT_FOR_SENSOR_ACCESS_LINK_ELEMENTS;
+using DataFlow::NUMBER_OF_CONCURRENT_INPUT_FOR_SENSOR_ACCESS_LINK_ELEMENTS;
 using ExampleDataModel::NativeData;
 using ExampleDataModel::ProcessedData;
 using TestFunctions::DataTestUtil;

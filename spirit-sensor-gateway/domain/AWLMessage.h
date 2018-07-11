@@ -35,15 +35,15 @@ namespace DataFlow {
 
         AWLMessage(AWLMessage&& other) noexcept;
 
-        AWLMessage& operator=(AWLMessage const& other)& ;
+        AWLMessage& operator = (AWLMessage const& other)& ;
 
-        AWLMessage& operator=(AWLMessage&& other)& noexcept;
+        AWLMessage& operator = (AWLMessage&& other)& noexcept;
 
         void swap(AWLMessage& current, AWLMessage& other) noexcept;
 
-        bool operator==(AWLMessage const&) const;
+        bool operator ==(AWLMessage const&) const;
 
-        bool operator!=(AWLMessage const&) const;
+        bool operator != (AWLMessage const&) const;
 
         static AWLMessage const& returnDefaultData() noexcept;
 

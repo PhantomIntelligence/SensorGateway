@@ -40,15 +40,15 @@ namespace DataFlow {
 
         Pixel(Pixel&& other) noexcept;
 
-        Pixel& operator=(Pixel const& other)& ;
+        Pixel& operator = (Pixel const& other)& ;
 
-        Pixel& operator=(Pixel&& other)& noexcept;
+        Pixel& operator = (Pixel&& other)& noexcept;
 
         void swap(Pixel& current, Pixel& other) noexcept;
 
-        bool operator==(Pixel const& other) const;
+        bool operator == (Pixel const& other) const;
 
-        bool operator!=(Pixel const& other) const;
+        bool operator != (Pixel const& other) const;
 
         void addTrack(Track track);
 

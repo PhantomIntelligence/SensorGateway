@@ -33,15 +33,15 @@ namespace DataFlow {
 
         Track(Track&& other) noexcept;
 
-        Track& operator=(Track const& other)& ;
+        Track& operator = (Track const& other)& ;
 
-        Track& operator=(Track&& other)& noexcept;
+        Track& operator = (Track&& other)& noexcept;
 
         void swap(Track& current, Track& other) noexcept;
 
-        bool operator==(Track const& other) const;
+        bool operator == (Track const& other) const;
 
-        bool operator!=(Track const& other) const;
+        bool operator != (Track const& other) const;
 
         Acceleration getAcceleration() const;
 
