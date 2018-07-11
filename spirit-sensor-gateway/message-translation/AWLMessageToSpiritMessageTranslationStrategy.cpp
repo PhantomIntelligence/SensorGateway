@@ -15,9 +15,6 @@
 #include "UnknownMessageException.h"
 
 using MessageTranslation::AWLMessageToSpiritMessageTranslationStrategy;
-using DataFlow::TrackID;
-using DataFlow::ConfidenceLevel;
-using DataFlow::Intensity;
 using Sensor::AWL::END_OF_FRAME;
 using Sensor::AWL::DETECTION_TRACK;
 using Sensor::AWL::DETECTION_VELOCITY;
@@ -43,38 +40,43 @@ void AWLMessageToSpiritMessageTranslationStrategy::translateBasicMessage(AWLMess
 }
 
 void AWLMessageToSpiritMessageTranslationStrategy::translateEndOfFrameMessage(AWLMessage* awlMessage) {
-    currentOutputMessage->setFrameID(convertTwoBytesToUnsignedBigEndian(awlMessage->data[0], awlMessage->data[1]));
-    currentOutputMessage->setSystemID(convertTwoBytesToUnsignedBigEndian(awlMessage->data[2], awlMessage->data[3]));
+    auto frameID = convertTwoBytesToUnsignedBigEndian(awlMessage->data[0], awlMessage->data[1]);
+    auto systemID = convertTwoBytesToUnsignedBigEndian(awlMessage->data[2], awlMessage->data[3]);
+    currentOutputMessage->setFrameID(frameID);
+    currentOutputMessage->setSystemID(systemID);
     produce(std::move(*currentOutputMessage));
     currentOutputMessage = new Frame();
 }
 
 void AWLMessageToSpiritMessageTranslationStrategy::translateDetectionTrackMessage(AWLMessage* awlMessage) {
-    PixelID pixelID = convertTwoBytesToUnsignedBigEndian(awlMessage->data[3], awlMessage->data[4]);
-    Pixel pixel = Pixel(pixelID);
+    auto pixelID = convertTwoBytesToUnsignedBigEndian(awlMessage->data[3], awlMessage->data[4]);
+    auto pixel = Pixel(pixelID);
     currentOutputMessage->addPixel(pixel);
     addTrackInPixel(awlMessage, pixel.getID());
 }
 
 void AWLMessageToSpiritMessageTranslationStrategy::addTrackInPixel(AWLMessage* awlMessage, PixelID pixelID) {
-    TrackID trackID = convertTwoBytesToUnsignedBigEndian(awlMessage->data[0], awlMessage->data[1]);
-    ConfidenceLevel confidenceLevel = awlMessage->data[5];
-    Intensity intensity = convertTwoBytesToUnsignedBigEndian(awlMessage->data[6], awlMessage->data[7]);
-    Track track = Track(trackID, confidenceLevel, intensity);
-    Pixel* pixel = currentOutputMessage->fetchPixelByID(pixelID);
+    auto trackID = convertTwoBytesToUnsignedBigEndian(awlMessage->data[0], awlMessage->data[1]);
+    auto confidenceLevel = awlMessage->data[5];
+    auto intensity = convertTwoBytesToUnsignedBigEndian(awlMessage->data[6], awlMessage->data[7]);
+    auto track = Track(trackID, confidenceLevel, intensity);
+    auto pixel = currentOutputMessage->fetchPixelByID(pixelID);
     pixel->addTrack(track);
 };
 
 void AWLMessageToSpiritMessageTranslationStrategy::translateDetectionVelocityMessage(AWLMessage* awlMessage) {
     auto track = fetchTrack(awlMessage);
-    track->setDistance(convertTwoBytesToUnsignedBigEndian(awlMessage->data[2], awlMessage->data[3]));
-    track->setSpeed(convertTwoBytesToSignedBigEndian(awlMessage->data[4], awlMessage->data[5]));
-    track->setAcceleration(convertTwoBytesToSignedBigEndian(awlMessage->data[6], awlMessage->data[7]));
+    auto distance = convertTwoBytesToUnsignedBigEndian(awlMessage->data[2], awlMessage->data[3]);
+    auto speed = convertTwoBytesToSignedBigEndian(awlMessage->data[4], awlMessage->data[5]);
+    auto acceleration = convertTwoBytesToSignedBigEndian(awlMessage->data[6], awlMessage->data[7]);
+    track->setDistance(distance);
+    track->setSpeed(speed);
+    track->setAcceleration(acceleration);
 }
 
 
 Track* AWLMessageToSpiritMessageTranslationStrategy::fetchTrack(AWLMessage* awlMessage) const {
-    TrackID trackID = convertTwoBytesToUnsignedBigEndian(awlMessage->data[0], awlMessage->data[1]);
+    auto trackID = convertTwoBytesToUnsignedBigEndian(awlMessage->data[0], awlMessage->data[1]);
     auto pixels = currentOutputMessage->getPixels();
     for (auto i = 0; i < NUMBER_OF_PIXELS_IN_FRAME; ++i) {
         auto pixel = &pixels->at(i);

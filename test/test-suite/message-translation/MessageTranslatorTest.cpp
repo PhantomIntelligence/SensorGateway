@@ -26,8 +26,6 @@ class MessageTranslatorTest : public ::testing::Test {
 
 protected:
 
-    AWLMessage awlMessage = AWLMessage::returnDefaultData();
-
     MessageTranslatorTest() = default;
 
     virtual ~MessageTranslatorTest() = default;
@@ -62,6 +60,7 @@ private:
 
 TEST_F(MessageTranslatorTest,
        given_aMessageTranslationStrategy_when_consumingABasicAWLMessage_then_callsTranslateBasicMessageInStrategy) {
+    AWLMessage awlMessage = AWLMessage::returnDefaultData();
 
     MockMessageTranslationStrategy mockStrategy;
     MessageTranslator<AWLMessage,Frame> messageTranslator(&mockStrategy);
