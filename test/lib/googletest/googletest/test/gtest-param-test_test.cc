@@ -985,7 +985,7 @@ INSTANTIATE_TEST_CASE_P(InstantiationWithComments,
                         CommentTest,
                         Values(Unstreamable(1)));
 
-// Verify that we can create a hierarchy of test stubs, where the base
+// Verify that we can create a hierarchy of test fixtures, where the base
 // class fixture is not parameterized and the derived class is. In this case
 // ParameterizedDerivedTest inherits from NonParameterizedBaseTest.  We
 // perform simple tests on both.

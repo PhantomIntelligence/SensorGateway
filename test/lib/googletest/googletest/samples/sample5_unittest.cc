@@ -30,14 +30,14 @@
 // Author: wan@google.com (Zhanyong Wan)
 
 // This sample teaches how to reuse a test fixture in multiple test
-// cases by deriving sub-stubs from it.
+// cases by deriving sub-fixtures from it.
 //
 // When you define a test fixture, you specify the name of the test
 // case that will use this fixture.  Therefore, a test fixture can
 // be used by only one test case.
 //
 // Sometimes, more than one test cases may want to use the same or
-// slightly different test stubs.  For example, you may want to
+// slightly different test fixtures.  For example, you may want to
 // make sure that all tests for a GUI library don't leak important
 // system resources like fonts and brushes.  In Google Test, you do
 // this by putting the shared logic in a super (as in "super class")
@@ -56,10 +56,10 @@
 //
 // We put the code for timing a test in a test fixture called
 // "QuickTest".  QuickTest is intended to be the super fixture that
-// other stubs derive from, therefore there is no test case with
+// other fixtures derive from, therefore there is no test case with
 // the name "QuickTest".  This is OK.
 //
-// Later, we will derive multiple test stubs from QuickTest.
+// Later, we will derive multiple test fixtures from QuickTest.
 class QuickTest : public testing::Test {
  protected:
   // Remember that SetUp() is run immediately before a test starts.
@@ -192,7 +192,7 @@ TEST_F(QueueTest, Dequeue) {
   delete n;
 }
 
-// If necessary, you can derive further test stubs from a derived
+// If necessary, you can derive further test fixtures from a derived
 // fixture itself.  For example, you can derive another fixture from
 // QueueTest.  Google Test imposes no limit on how deep the hierarchy
 // can be.  In practice, however, you probably don't want it to be too
