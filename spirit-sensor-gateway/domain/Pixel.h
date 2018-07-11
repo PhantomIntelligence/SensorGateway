@@ -30,11 +30,25 @@ namespace DataFlow {
     public:
         Pixel(PixelID pixelID);
 
-        ~Pixel();
+        Pixel(PixelID pixelID, TracksArray tracks, int numberOfTracksInPixel);
 
-        Pixel();
+        Pixel() = default;
+
+        ~Pixel() = default;
+
+        Pixel(Pixel const& other);
+
+        Pixel(Pixel&& other) noexcept;
+
+        Pixel& operator=(Pixel const& other)& ;
+
+        Pixel& operator=(Pixel&& other)& noexcept;
+
+        void swap(Pixel& current, Pixel& other) noexcept;
 
         bool operator==(Pixel const& other) const;
+
+        bool operator!=(Pixel const& other) const;
 
         void addTrack(Track track);
 
@@ -44,17 +58,15 @@ namespace DataFlow {
 
         PixelID getID() const;
 
-        std::array<Track, NUMBER_OF_TRACKS_IN_PIXEL>* getTracks();
+        TracksArray* getTracks();
 
         static Pixel const& returnDefaultData() noexcept;
 
-        void validateNotFull() const;
-
     private:
-
-        int numberOfTracksInPixel;
         PixelID ID;
         TracksArray tracks;
+        int numberOfTracksInPixel;
+        void validateNotFull() const;
     };
 }
 

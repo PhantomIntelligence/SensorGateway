@@ -20,11 +20,24 @@ namespace DataFlow {
 
     class Track {
     public:
-        Track();
-
         Track(TrackID trackID, ConfidenceLevel confidenceLevel, Intensity intensity);
 
-        ~Track();
+        Track(TrackID trackID, ConfidenceLevel confidenceLevel, Intensity intensity, Acceleration acceleration,
+              Distance distance, Speed speed);
+
+        Track();
+
+        ~Track() = default;
+
+        Track(Track const& other);
+
+        Track(Track&& other) noexcept;
+
+        Track& operator=(Track const& other)& ;
+
+        Track& operator=(Track&& other)& noexcept;
+
+        void swap(Track& current, Track& other) noexcept;
 
         bool operator==(Track const& other) const;
 
@@ -42,21 +55,21 @@ namespace DataFlow {
 
         Speed getSpeed() const;
 
-        static Track const& returnDefaultData() noexcept;
-
         void setAcceleration(Acceleration const& acceleration);
 
         void setDistance(Distance const& distance);
 
         void setSpeed(Speed const& speed);
 
+        static Track const& returnDefaultData() noexcept;
+
 
     private:
-        Acceleration acceleration;
-        ConfidenceLevel confidenceLevel;
-        Distance distance;
         TrackID ID;
+        ConfidenceLevel confidenceLevel;
         Intensity intensity;
+        Acceleration acceleration;
+        Distance distance;
         Speed speed;
     };
 }

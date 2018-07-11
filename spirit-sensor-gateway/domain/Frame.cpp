@@ -19,14 +19,59 @@ using Defaults::Frame::DEFAULT_FRAME;
 using Defaults::Frame::DEFAULT_FRAME_ID;
 using Defaults::Frame::DEFAULT_PIXELS_ARRAY;
 using Defaults::Frame::DEFAULT_SYSTEM_ID;
+using DataFlow::PixelsArray;
 using DataFlow::SystemID;
+
+Frame::Frame(FrameID frameID, SystemID systemID, PixelsArray pixels): frameID(frameID), systemID(systemID),
+                                                                      pixels(pixels) {
+
+};
 
 Frame::Frame():systemID(DEFAULT_SYSTEM_ID),
                frameID(DEFAULT_FRAME_ID),
-               pixels(DEFAULT_PIXELS_ARRAY){};
+               pixels(DEFAULT_PIXELS_ARRAY){
 
-Frame::~Frame() {
 };
+
+Frame::Frame(Frame const& other): Frame(other.frameID, other.systemID, other.pixels){
+
+};
+
+Frame::Frame(Frame&& other) noexcept: frameID(std::move(other.frameID)), systemID(std::move(systemID)),
+                                      pixels(std::move(other.pixels)){
+
+};
+
+Frame& Frame::operator=(Frame const& other)& {
+    Frame temporary(std::move(other));
+    swap(*this, temporary);
+    return *this;
+};
+
+Frame& Frame::operator=(Frame&& other)& noexcept {
+    swap(*this, other);
+    return *this;
+};
+
+void Frame::swap(Frame& current, Frame& other) noexcept {
+    std::swap(current.frameID, other.frameID);
+    std::swap(current.systemID, other.systemID);
+    std::swap(current.pixels, other.pixels);
+};
+
+bool Frame::operator==(Frame const& other) const {
+    bool sameFrameID = (frameID == other.frameID);
+    bool sameSystemID = (systemID == other.systemID);
+    auto samePixels = true;
+    for (auto i = 0; i < NUMBER_OF_PIXELS_IN_FRAME && samePixels; ++i) {
+        samePixels = (pixels[i] == other.pixels[i]);
+    }
+    return (sameFrameID && sameSystemID && samePixels);
+}
+
+bool Frame::operator!=(Frame const& other) const {
+    return !(operator==(other));
+}
 
 void Frame::addPixel(Pixel pixel) {
     pixels[pixel.getID()] = pixel;
@@ -40,12 +85,12 @@ FrameID Frame::getFrameID() const {
     return frameID;
 };
 
-std::array<Pixel, NUMBER_OF_PIXELS_IN_FRAME>* Frame::getPixels() {
-    return &pixels;
-};
-
 SystemID Frame::getSystemID() const {
     return systemID;
+};
+
+PixelsArray* Frame::getPixels() {
+    return &pixels;
 };
 
 void Frame::setFrameID(FrameID const& frameID) {
@@ -60,12 +105,3 @@ Frame const& Frame::returnDefaultData() noexcept {
     return DEFAULT_FRAME;
 }
 
-bool Frame::operator==(Frame const& other) const {
-    bool sameFrameID = (frameID == other.frameID);
-    bool sameSystemID = (systemID == other.systemID);
-    auto samePixels = true;
-    for (auto i = 0; i < NUMBER_OF_PIXELS_IN_FRAME && sameFrameID && sameSystemID; ++i) {
-        samePixels = (pixels[i] == other.pixels[i]);
-    }
-    return (sameFrameID && samePixels && samePixels);
-}

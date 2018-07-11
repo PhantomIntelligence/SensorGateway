@@ -28,9 +28,25 @@ namespace DataFlow {
     class Frame {
 
     public:
+        Frame(FrameID frameID, SystemID systemID, PixelsArray pixels);
+
         Frame();
 
-        ~Frame();
+        ~Frame() = default;
+
+        Frame(Frame const& other);
+
+        Frame(Frame&& other) noexcept;
+
+        Frame& operator=(Frame const& other)& ;
+
+        Frame& operator=(Frame&& other)& noexcept;
+
+        void swap(Frame& current, Frame& other) noexcept;
+
+        bool operator==(Frame const& other) const;
+
+        bool operator!=(Frame const& other) const;
 
         void addPixel(Pixel pixel);
 
@@ -38,9 +54,9 @@ namespace DataFlow {
 
         FrameID getFrameID() const;
 
-        std::array<Pixel, NUMBER_OF_PIXELS_IN_FRAME>* getPixels();
-
         SystemID getSystemID() const;
+
+        PixelsArray* getPixels();
 
         void setFrameID(FrameID const& frameID);
 
@@ -48,12 +64,11 @@ namespace DataFlow {
 
         static Frame const& returnDefaultData() noexcept;
 
-        bool operator==(Frame const& other) const;
 
     private:
         FrameID frameID;
-        PixelsArray pixels;
         SystemID systemID;
+        PixelsArray pixels;
     };
 }
 
