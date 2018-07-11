@@ -14,11 +14,34 @@
 #ifndef SPIRITSENSORGATEWAY_TYPEDEFINITION_H
 #define SPIRITSENSORGATEWAY_TYPEDEFINITION_H
 
+
+#include <array>
 #include <mutex>
+#include <iostream>
+#include <unordered_map>
+#include <exception>
+
+#include "ExceptionMessages.h"
+
+
+
+
 
 namespace {
     typedef std::mutex Mutex;
     typedef std::lock_guard<Mutex> LockGuard;
+};
+
+namespace  SpiritProtocol {
+    typedef int16_t Acceleration;
+    typedef uint8_t ConfidenceLevel;
+    typedef uint16_t Distance;
+    typedef uint16_t FrameID;
+    typedef uint16_t Intensity;
+    typedef uint16_t PixelID;
+    typedef int16_t Speed;
+    typedef uint16_t SystemID;
+    typedef uint16_t TrackID;
 };
 
 #endif //SPIRITSENSORGATEWAY_TYPEDEFINITION_H
