@@ -14,11 +14,10 @@
 #ifndef SPIRITSENSORGATEWAY_MESSAGEIMPLEMENTATIONSTRATEGY_H
 #define SPIRITSENSORGATEWAY_MESSAGEIMPLEMENTATIONSTRATEGY_H
 
-#include "spirit-sensor-gateway/common/ConstantFunction.h"
-#include "spirit-sensor-gateway/domain/AWLMessage.h"
-#include "spirit-sensor-gateway/domain/Frame.h"
 #include <vector>
-#include <stdexcept>
+
+#include "spirit-sensor-gateway/domain/Frame.h"
+#include "spirit-sensor-gateway/domain/AWLMessage.h"
 
 using namespace MessageID;
 using namespace SpiritProtocol;
@@ -27,7 +26,7 @@ using namespace SpiritProtocol;
     public:
         AWLMessageTranslator();
         ~ AWLMessageTranslator();
-        std::vector <Frame> getFrames() const;
+        std::vector<Frame> getFrames() const;
         void translateBasicMessage(AWLMessage* awlMessage);
 
     private:

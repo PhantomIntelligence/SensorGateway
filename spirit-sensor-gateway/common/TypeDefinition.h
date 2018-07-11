@@ -16,20 +16,28 @@
 
 
 #include <array>
+#include <atomic>
+#include <future>
 #include <mutex>
+
 #include <iostream>
 #include <unordered_map>
 #include <exception>
+#include <cstring>
 
+#include "hicpp/HighIntegrityThread.h"
 #include "ExceptionMessages.h"
-
-
-
-
 
 namespace {
     typedef std::mutex Mutex;
     typedef std::lock_guard<Mutex> LockGuard;
+
+    typedef std::atomic_uint8_t AtomicCounter;
+    typedef std::atomic<bool> AtomicFlag;
+    typedef std::promise<bool> BooleanPromise;
+
+    typedef HighIntegrity::HighIntegrityThread<HighIntegrity::ThreadExecutionType::DETACH> DetachableThread;
+    typedef HighIntegrity::HighIntegrityThread<HighIntegrity::ThreadExecutionType::JOIN> JoinableThread;
 };
 
 namespace  SpiritProtocol {

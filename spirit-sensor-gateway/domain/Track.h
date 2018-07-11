@@ -14,20 +14,10 @@
 #ifndef SPIRITSENSORGATEWAY_SPIRITTRACK_H
 #define SPIRITSENSORGATEWAY_SPIRITTRACK_H
 
-#include "spirit-sensor-gateway/common/ConstantFunction.h"
+#include "spirit-sensor-gateway/common/DataProcessingScheduler.hpp"
 
 namespace SpiritProtocol {
 
-    namespace DefaultValues {
-        namespace Track {
-            Acceleration const DEFAULT_ACCELERATION_VALUE = 0;
-            ConfidenceLevel const DEFAULT_CONFIDENCE_VALUE = 0;
-            Distance const DEFAULT_DISTANCE_VALUE = 0;
-            TrackID const DEFAULT_ID_VALUE = 0;
-            Speed const DEFAULT_SPEED_VALUE = 0;
-            Intensity const DEFAULT_INTENSITY_VALUE = 0;
-        }
-    }
 
     class Track {
     public:
@@ -67,6 +57,17 @@ namespace SpiritProtocol {
         Intensity intensity;
         Speed speed;
     };
+
+    namespace Defaults {
+        namespace Track {
+            Acceleration const DEFAULT_ACCELERATION_VALUE = 0;
+            ConfidenceLevel const DEFAULT_CONFIDENCE_VALUE = 0;
+            Distance const DEFAULT_DISTANCE_VALUE = 0;
+            TrackID const DEFAULT_ID_VALUE = 0;
+            Speed const DEFAULT_SPEED_VALUE = 0;
+            Intensity const DEFAULT_INTENSITY_VALUE = 0;
+        }
+    }
 }
 
 #endif //SPIRITSENSORGATEWAY_SPIRITTRACK_H

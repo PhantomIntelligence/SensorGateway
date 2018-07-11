@@ -10,23 +10,24 @@
 	See the License for the specific language governing permissions and
 	limitations under the License.
 */
+#ifndef SPIRITSENSORGATEWAY_SERVERCOMMUNICATIONPROTOCOLSTRATEGY_H
+#define SPIRITSENSORGATEWAY_SERVERCOMMUNICATIONPROTOCOLSTRATEGY_H
 
-#ifndef SPIRITSENSORGATEWAY_COMMUNICATIONPROTOCOLSTRATEGY_H
-#define SPIRITSENSORGATEWAY_COMMUNICATIONPROTOCOLSTRATEGY_H
+namespace ServerCommunication {
 
-#include "spirit-sensor-gateway/domain/AWLMessage.h"
-
-
-namespace CommunicationProtocolStrategy {
-    class CommunicationProtocolStrategy {
+    template<class T>
+    class ServerCommunicationProtocolStrategy {
+    protected:
+        typedef T MESSAGE;
     public:
-        virtual AWLMessage readMessage() = 0;
+        virtual ~ServerCommunicationProtocolStrategy() noexcept = default;
+
+        virtual void sendMessage(MESSAGE&& message) = 0;
 
         virtual void openConnection() = 0;
 
         virtual void closeConnection() = 0;
-
     };
 }
 
-#endif //SPIRITSENSORGATEWAY_COMMUNICATIONPROTOCOLSTRATEGY_H
+#endif //SPIRITSENSORGATEWAY_SERVERCOMMUNICATIONPROTOCOLSTRATEGY_H

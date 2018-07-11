@@ -7,7 +7,7 @@
 
 #include "spirit-sensor-gateway/spirit-protocol-translation/AWLMessageTranslator.h"
 
-using namespace DefaultValues::Track;
+using namespace Defaults::Track;
 
 class AWLMessageTranslatorTest : public ::testing::Test {
 protected:

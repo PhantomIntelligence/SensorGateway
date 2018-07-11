@@ -14,7 +14,7 @@
 #include "Track.h"
 
 using namespace SpiritProtocol;
-using namespace DefaultValues::Track;
+using namespace Defaults::Track;
 
 Track::Track(TrackID trackID, ConfidenceLevel confidenceLevel, Intensity intensity) :
         ID(trackID),

@@ -23,9 +23,7 @@
 namespace DataFlow {
 
     /**
-     * @brief Thread safe variant of the RingBuffer. This is a Multiple-Producer-Multiple-Consumer structure.
-     * @template <class T> refers to the data type that this buffer will contain.
-     * @note Use this class ONLY when more than one thread needs to write to the RingBuffer
+     * @warning Use this class ONLY when more than one thread needs to write to the RingBuffer
      */
     template<class T>
     class ThreadSafeRingBuffer : public RingBuffer<T> {
@@ -36,35 +34,26 @@ namespace DataFlow {
         ThreadSafeRingBuffer() : super() {
         }
 
-        /**
-         * @brief Defaulted move constructor
-         * @param other the other RingBuffer (to be moved)
-         */
         ThreadSafeRingBuffer(ThreadSafeRingBuffer&& other) noexcept = default;
 
         virtual ~ThreadSafeRingBuffer() = default;
 
         /**
-         * @brief The ThreadSafeRingBuffer are intended to be used as const instances. They shouldn't be assigned.
+         * @brief The ThreadSafeRingBuffers are intended to be used as const instances. They shouldn't be assigned.
          */
         ThreadSafeRingBuffer(ThreadSafeRingBuffer const& other) = delete;
 
         /**
-         * @brief The ThreadSafeRingBuffer are intended to be used as const instances. They shouldn't be assigned.
+         * @brief The ThreadSafeRingBuffers are intended to be used as const instances. They shouldn't be assigned.
          */
         ThreadSafeRingBuffer& operator=(ThreadSafeRingBuffer const& other) = delete;
 
         /**
-         * @brief The ThreadSafeRingBuffer are intended to be used as const instances. They shouldn't be copied.
+         * @brief The ThreadSafeRingBuffers are intended to be used as const instances. They shouldn't be copied.
          */
         ThreadSafeRingBuffer& operator=(ThreadSafeRingBuffer&& other) = delete;
 
-
-        /**
-        * @brief Writes the data to the RingBufferPad the writer is currently on, moves the writer and notifies all subscribed consumers they can be activated and start to read.
-        * @param data The data that will be written
-        */
-        void write(DATA&& data) override {
+        void write(T&& data) override {
             LockGuard guard(writeMutex);
             super::write(std::forward(data));
         }
