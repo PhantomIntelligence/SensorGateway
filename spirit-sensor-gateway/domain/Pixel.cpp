@@ -14,10 +14,12 @@
 #include <iostream>
 #include "Pixel.h"
 
-using namespace DataFlow;
-using namespace Defaults::Pixel;
+using DataFlow::Pixel;
+using DataFlow::PixelID;
+using Defaults::Pixel::DEFAULT_PIXEL;
+using Defaults::Pixel::DEFAULT_TRACKS_ARRAY;
 
-Pixel::Pixel(PixelID pixelID) : ID(pixelID),tracks(DEFAULT_TRACKS_ARRAY) {};
+Pixel::Pixel(PixelID pixelID) : ID(pixelID),tracks(DEFAULT_TRACKS_ARRAY), numberOfTracksInPixel(0){};
 
 Pixel::Pixel() {
 
@@ -75,7 +77,7 @@ void Pixel::validateNotFull() const {
 
 }
 
-Pixel const Pixel::returnDefaultData() noexcept {
+Pixel const& Pixel::returnDefaultData() noexcept {
     return DEFAULT_PIXEL;
 }
 

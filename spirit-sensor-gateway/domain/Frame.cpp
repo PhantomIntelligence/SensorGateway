@@ -13,11 +13,16 @@
 
 #include "Frame.h"
 
-using namespace DataFlow;
-using namespace Defaults::Frame;
+using DataFlow::Frame;
+using DataFlow::FrameID;
+using Defaults::Frame::DEFAULT_FRAME;
+using Defaults::Frame::DEFAULT_FRAME_ID;
+using Defaults::Frame::DEFAULT_PIXELS_ARRAY;
+using Defaults::Frame::DEFAULT_SYSTEM_ID;
+using DataFlow::SystemID;
 
-Frame::Frame():systemID(DEFAULT_SYSTEM_ID_VALUE),
-               frameID(DEFAULT_FRAME_ID_VALUE),
+Frame::Frame():systemID(DEFAULT_SYSTEM_ID),
+               frameID(DEFAULT_FRAME_ID),
                pixels(DEFAULT_PIXELS_ARRAY){};
 
 Frame::~Frame() {
@@ -51,7 +56,7 @@ void Frame::setSystemID(SystemID const& systemID) {
     this->systemID = systemID;
 }
 
-Frame const Frame::returnDefaultData() noexcept {
+Frame const& Frame::returnDefaultData() noexcept {
     return DEFAULT_FRAME;
 }
 

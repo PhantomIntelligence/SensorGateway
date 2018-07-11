@@ -22,9 +22,9 @@
 #include "test/utilities/StubsGenerator.cpp"
 
 
-using Defaults::Track::DEFAULT_ACCELERATION_VALUE;
-using Defaults::Track::DEFAULT_DISTANCE_VALUE;
-using Defaults::Track::DEFAULT_SPEED_VALUE; 
+using Defaults::Track::DEFAULT_ACCELERATION;
+using Defaults::Track::DEFAULT_DISTANCE;
+using Defaults::Track::DEFAULT_SPEED;
 using Stub::createFrame;
 using Stub::createPixel;
 using Stub::createTrack;
@@ -40,9 +40,9 @@ protected:
 
     Frame frameAfterDetectionTrackAndEndOfFrameMessagesTranslationStub =
             createFrame(64829, 16, {createPixel(11, {createTrack(14291, 96, 123,
-                                                                 DEFAULT_ACCELERATION_VALUE,
-                                                                 DEFAULT_DISTANCE_VALUE,
-                                                                 DEFAULT_SPEED_VALUE)})});
+                                                                 DEFAULT_ACCELERATION,
+                                                                 DEFAULT_DISTANCE,
+                                                                 DEFAULT_SPEED)})});
 
     Frame frameAfterDetectionTrackAndVelocityTrackAndEndOfFrameMessagesTranslationStub =
             createFrame(64829, 16, {createPixel(11, {createTrack(14291, 96, 123, 379, 106, 0)})});

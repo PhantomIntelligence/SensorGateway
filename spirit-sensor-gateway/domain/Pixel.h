@@ -15,11 +15,14 @@
 #define SPIRITSENSORGATEWAY_SPIRITPIXEL_H
 
 #include "spirit-sensor-gateway/common/ConstantValuesDefinition.h"
+#include "Track.h"
 
-using Sensor::AWL::_16::NUMBER_OF_PIXELS_IN_FRAME;
+using DataFlow::Track;
 using Sensor::AWL::_16::NUMBER_OF_TRACKS_IN_PIXEL;
 
-#include "Track.h"
+namespace DataFlow {
+    using TracksArray =  std::array<Track, NUMBER_OF_TRACKS_IN_PIXEL>;
+}
 
 namespace DataFlow {
 
@@ -43,24 +46,26 @@ namespace DataFlow {
 
         std::array<Track, NUMBER_OF_TRACKS_IN_PIXEL>* getTracks();
 
-        Pixel static const returnDefaultData() noexcept;
+        static Pixel const& returnDefaultData() noexcept;
 
         void validateNotFull() const;
 
     private:
 
-        int numberOfTracksInPixel = 0;
+        int numberOfTracksInPixel;
         PixelID ID;
-        std::array<Track, NUMBER_OF_TRACKS_IN_PIXEL> tracks;
+        TracksArray tracks;
     };
+}
 
-    namespace Defaults {
-        namespace Pixel {
-            using DataFlow::Track;
-            PixelID const DEFAULT_PIXEL_ID_VALUE = 0;
-            std::array<Track, NUMBER_OF_PIXELS_IN_FRAME> const DEFAULT_TRACKS_ARRAY = std::array<Track, NUMBER_OF_PIXELS_IN_FRAME>();
-            DataFlow::Pixel const DEFAULT_PIXEL = DataFlow::Pixel(DEFAULT_PIXEL_ID_VALUE);
-        }
+namespace Defaults {
+    namespace Pixel {
+        using DataFlow::Pixel;
+        using DataFlow::PixelID;
+        using DataFlow::TracksArray;
+        PixelID const DEFAULT_PIXEL_ID = 0;
+        TracksArray const DEFAULT_TRACKS_ARRAY = TracksArray();
+        Pixel const DEFAULT_PIXEL = Pixel(DEFAULT_PIXEL_ID);
     }
 }
 

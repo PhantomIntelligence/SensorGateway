@@ -13,7 +13,6 @@
 #ifndef SPIRITSENSORGATEWAY_MESSAGETRANSLATIONSTRATEGY_H
 #define SPIRITSENSORGATEWAY_MESSAGETRANSLATIONSTRATEGY_H
 
-
 #include "spirit-sensor-gateway/common/data-flow/DataSource.hpp"
 
 namespace MessageTranslation {

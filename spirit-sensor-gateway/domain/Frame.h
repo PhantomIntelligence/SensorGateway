@@ -16,41 +16,58 @@
 
 #include "Pixel.h"
 
+using DataFlow::Pixel;
+using Sensor::AWL::_16::NUMBER_OF_PIXELS_IN_FRAME;
+
+namespace DataFlow {
+    using PixelsArray =  std::array<Pixel, NUMBER_OF_PIXELS_IN_FRAME>;
+}
 
 namespace DataFlow {
 
     class Frame {
 
     public:
-            Frame();
-            ~Frame();
-            void addPixel(Pixel pixel);
-            Pixel* fetchPixelByID(PixelID pixelID);
-            FrameID getFrameID() const;
-            std::array<Pixel, NUMBER_OF_PIXELS_IN_FRAME>* getPixels() ;
-            SystemID getSystemID() const;
-            void setFrameID(FrameID const& frameID);
-            void setSystemID(SystemID const& systemID);
-            Frame static const returnDefaultData() noexcept ;
-            bool operator==(Frame const& other) const;
+        Frame();
 
-        private:
-            FrameID frameID;
-            std::array<Pixel, NUMBER_OF_PIXELS_IN_FRAME> pixels;
-            SystemID systemID;
+        ~Frame();
+
+        void addPixel(Pixel pixel);
+
+        Pixel* fetchPixelByID(PixelID pixelID);
+
+        FrameID getFrameID() const;
+
+        std::array<Pixel, NUMBER_OF_PIXELS_IN_FRAME>* getPixels();
+
+        SystemID getSystemID() const;
+
+        void setFrameID(FrameID const& frameID);
+
+        void setSystemID(SystemID const& systemID);
+
+        static Frame const& returnDefaultData() noexcept;
+
+        bool operator==(Frame const& other) const;
+
+    private:
+        FrameID frameID;
+        PixelsArray pixels;
+        SystemID systemID;
     };
+}
 
-    namespace Defaults {
-        namespace Frame {
-            using DataFlow::Pixel;
-            FrameID const DEFAULT_FRAME_ID_VALUE = 0;
-            SystemID const DEFAULT_SYSTEM_ID_VALUE = 0;
-            std::array<Pixel, NUMBER_OF_PIXELS_IN_FRAME> const DEFAULT_PIXELS_ARRAY = std::array<Pixel, NUMBER_OF_PIXELS_IN_FRAME>();
-            DataFlow::Frame const DEFAULT_FRAME = DataFlow::Frame();
-        }
+namespace Defaults {
+    namespace Frame {
+        using DataFlow::Frame;
+        using DataFlow::FrameID;
+        using DataFlow::SystemID;
+        using DataFlow::PixelsArray;
+        FrameID const DEFAULT_FRAME_ID = 0;
+        SystemID const DEFAULT_SYSTEM_ID = 0;
+        PixelsArray const DEFAULT_PIXELS_ARRAY = PixelsArray();
+        Frame const DEFAULT_FRAME = Frame();
     }
-
-
 }
 
 #endif //SPIRITSENSORGATEWAY_FRAME_H

@@ -18,11 +18,11 @@
 
 using Sensor::AWL::MAXIMUM_NUMBER_OF_DATA_IN_MESSAGE;
 
-namespace {
-    namespace AWL {
-        using DataArray = std::array<unsigned char, MAXIMUM_NUMBER_OF_DATA_IN_MESSAGE>;
-    }
+
+namespace AWL {
+    using DataArray = std::array<unsigned char, MAXIMUM_NUMBER_OF_DATA_IN_MESSAGE>;
 }
+
 
 namespace DataFlow {
     class AWLMessage {
@@ -45,7 +45,7 @@ namespace DataFlow {
 
         bool operator!=(AWLMessage const&) const;
 
-        AWLMessage static const returnDefaultData() noexcept;
+        static AWLMessage const& returnDefaultData() noexcept;
 
         int64_t id;
         uint64_t timestamp;
@@ -60,7 +60,7 @@ namespace Defaults {
     uint64_t const DEFAULT_TIMESTAMP = 0;
     uint32_t const DEFAULT_LENGTH = 0;
     AWL::DataArray const DEFAULT_AWL_DATA = AWL::DataArray();
-    AWLMessage const DEFAULT_AWLMESSAGE = AWLMessage(DEFAULT_ID, DEFAULT_TIMESTAMP, DEFAULT_LENGTH, DEFAULT_AWL_DATA);
+    AWLMessage const DEFAULT_AWL_MESSAGE = AWLMessage(DEFAULT_ID, DEFAULT_TIMESTAMP, DEFAULT_LENGTH, DEFAULT_AWL_DATA);
 }
 
 }

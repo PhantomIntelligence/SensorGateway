@@ -18,7 +18,6 @@
 
 namespace DataFlow {
 
-
     class Track {
     public:
         Track();
@@ -30,7 +29,6 @@ namespace DataFlow {
         bool operator==(Track const& other) const;
 
         bool operator!=(Track const& other) const;
-
 
         Acceleration getAcceleration() const;
 
@@ -44,14 +42,13 @@ namespace DataFlow {
 
         Speed getSpeed() const;
 
-        Track static const returnDefaultData() noexcept;
+        static Track const& returnDefaultData() noexcept;
 
         void setAcceleration(Acceleration const& acceleration);
 
         void setDistance(Distance const& distance);
 
         void setSpeed(Speed const& speed);
-
 
 
     private:
@@ -62,17 +59,24 @@ namespace DataFlow {
         Intensity intensity;
         Speed speed;
     };
+}
 
-    namespace Defaults {
-        namespace Track {
-            Acceleration const DEFAULT_ACCELERATION_VALUE = 0;
-            ConfidenceLevel const DEFAULT_CONFIDENCE_VALUE = 0;
-            Distance const DEFAULT_DISTANCE_VALUE = 0;
-            TrackID const DEFAULT_ID_VALUE = 0;
-            Speed const DEFAULT_SPEED_VALUE = 0;
-            Intensity const DEFAULT_INTENSITY_VALUE = 0;
-            DataFlow::Track const DEFAULT_TRACK = DataFlow::Track();
-        }
+namespace Defaults {
+    namespace Track {
+        using DataFlow::Acceleration;
+        using DataFlow::ConfidenceLevel;
+        using DataFlow::Distance;
+        using DataFlow:: TrackID;
+        using DataFlow::Speed;
+        using DataFlow::Intensity;
+        using DataFlow::Track;
+        Acceleration const DEFAULT_ACCELERATION = 0;
+        ConfidenceLevel const DEFAULT_CONFIDENCE = 0;
+        Distance const DEFAULT_DISTANCE = 0;
+        TrackID const DEFAULT_ID = 0;
+        Speed const DEFAULT_SPEED = 0;
+        Intensity const DEFAULT_INTENSITY = 0;
+        Track const DEFAULT_TRACK = Track();
     }
 }
 

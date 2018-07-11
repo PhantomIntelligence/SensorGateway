@@ -13,25 +13,37 @@
 
 #include "Track.h"
 
-using namespace DataFlow;
-using namespace Defaults::Track;
+using DataFlow::Acceleration;
+using DataFlow::ConfidenceLevel;
+using DataFlow::Distance;
+using DataFlow:: TrackID;
+using DataFlow::Speed;
+using DataFlow::Intensity;
+using DataFlow::Track;
+using Defaults::Track::DEFAULT_ID;
+using Defaults::Track::DEFAULT_ACCELERATION;
+using Defaults::Track::DEFAULT_SPEED;
+using Defaults::Track::DEFAULT_DISTANCE;
+using Defaults::Track::DEFAULT_CONFIDENCE;
+using Defaults::Track::DEFAULT_INTENSITY;
+using Defaults::Track::DEFAULT_TRACK;
+
 
 Track::Track(TrackID trackID, ConfidenceLevel confidenceLevel, Intensity intensity) :
         ID(trackID),
         confidenceLevel(confidenceLevel),
         intensity(intensity),
-        acceleration(DEFAULT_ACCELERATION_VALUE),
-        speed(DEFAULT_SPEED_VALUE),
-        distance(DEFAULT_DISTANCE_VALUE) {
+        acceleration(DEFAULT_ACCELERATION),
+        speed(DEFAULT_SPEED),
+        distance(DEFAULT_DISTANCE) {
 };
 
-Track::Track() : ID(DEFAULT_ID_VALUE),
-                 acceleration(DEFAULT_ACCELERATION_VALUE),
-                 confidenceLevel(DEFAULT_CONFIDENCE_VALUE),
-                 distance(DEFAULT_DISTANCE_VALUE),
-                 intensity(DEFAULT_INTENSITY_VALUE),
-                 speed(DEFAULT_SPEED_VALUE) {
-
+Track::Track() : ID(DEFAULT_ID),
+                 acceleration(DEFAULT_ACCELERATION),
+                 confidenceLevel(DEFAULT_CONFIDENCE),
+                 distance(DEFAULT_DISTANCE),
+                 intensity(DEFAULT_INTENSITY),
+                 speed(DEFAULT_SPEED) {
 };
 
 
@@ -94,7 +106,7 @@ void Track::setSpeed(Speed const& speed) {
     this->speed = speed;
 }
 
-Track const Track::returnDefaultData() noexcept {
+Track const& Track::returnDefaultData() noexcept {
     return DEFAULT_TRACK;
 }
 

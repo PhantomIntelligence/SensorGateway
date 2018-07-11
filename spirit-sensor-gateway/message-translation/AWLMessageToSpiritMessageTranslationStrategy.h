@@ -20,7 +20,9 @@
 #include "spirit-sensor-gateway/domain/AWLMessage.h"
 #include "MessageTranslationStrategy.hpp"
 
-using namespace DataFlow;
+using DataFlow::AWLMessage;
+using DataFlow::Frame;
+using DataFlow::PixelID;
 
 namespace MessageTranslation {
 
