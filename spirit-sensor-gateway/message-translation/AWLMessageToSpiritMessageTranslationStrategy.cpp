@@ -15,76 +15,83 @@
 #include "UnknownMessageException.h"
 
 using MessageTranslation::AWLMessageToSpiritMessageTranslationStrategy;
+using DataFlow::FrameID;
+using DataFlow::SystemID;
+using DataFlow::TrackID;
+using DataFlow::Intensity;
+using DataFlow::Distance;
+using DataFlow::Acceleration;
+using DataFlow::Speed;
+using DataFlow::ConfidenceLevel;
 using Sensor::AWL::END_OF_FRAME;
 using Sensor::AWL::DETECTION_TRACK;
 using Sensor::AWL::DETECTION_VELOCITY;
 
-AWLMessageToSpiritMessageTranslationStrategy::AWLMessageToSpiritMessageTranslationStrategy() {
-    currentOutputMessage = new Frame();
-}
+AWLMessageToSpiritMessageTranslationStrategy::AWLMessageToSpiritMessageTranslationStrategy() :
+        super() {}
 
 void AWLMessageToSpiritMessageTranslationStrategy::translateBasicMessage(AWLMessage&& inputMessage) {
     switch (inputMessage.id) {
         case END_OF_FRAME:
-            translateEndOfFrameMessage(&inputMessage);
+            translateEndOfFrameMessage(std::forward<INPUT>(inputMessage));
             break;
         case DETECTION_TRACK :
-            translateDetectionTrackMessage(&inputMessage);
+            translateDetectionTrackMessage(std::forward<INPUT>(inputMessage));
             break;
         case DETECTION_VELOCITY :
-            translateDetectionVelocityMessage(&inputMessage);
+            translateDetectionVelocityMessage(std::forward<INPUT>(inputMessage));
             break;
         default:
-            throw UnknownMessageException(&inputMessage);
+            throw UnknownMessageException(std::forward<INPUT>(inputMessage));
     }
 }
 
-void AWLMessageToSpiritMessageTranslationStrategy::translateEndOfFrameMessage(AWLMessage* awlMessage) {
-    auto frameID = convertTwoBytesToUnsignedBigEndian(awlMessage->data[0], awlMessage->data[1]);
-    auto systemID = convertTwoBytesToUnsignedBigEndian(awlMessage->data[2], awlMessage->data[3]);
-    currentOutputMessage->setFrameID(frameID);
-    currentOutputMessage->setSystemID(systemID);
-    produce(std::move(*currentOutputMessage));
-    currentOutputMessage = new Frame();
+void AWLMessageToSpiritMessageTranslationStrategy::translateEndOfFrameMessage(AWLMessage&& awlMessage) {
+    FrameID frameID = convertTwoBytesToUnsignedBigEndian(awlMessage.data[0], awlMessage.data[1]);
+    SystemID systemID = convertTwoBytesToUnsignedBigEndian(awlMessage.data[2], awlMessage.data[3]);
+    currentOutputMessage.setFrameID(frameID);
+    currentOutputMessage.setSystemID(systemID);
+    produce(std::move(currentOutputMessage));
+    currentOutputMessage = Frame::returnDefaultData();
 }
 
-void AWLMessageToSpiritMessageTranslationStrategy::translateDetectionTrackMessage(AWLMessage* awlMessage) {
-    auto pixelID = convertTwoBytesToUnsignedBigEndian(awlMessage->data[3], awlMessage->data[4]);
-    auto pixel = Pixel(pixelID);
-    currentOutputMessage->addPixel(pixel);
-    addTrackInPixel(awlMessage, pixel.getID());
+void AWLMessageToSpiritMessageTranslationStrategy::translateDetectionTrackMessage(AWLMessage&& awlMessage) {
+    PixelID pixelID = convertTwoBytesToUnsignedBigEndian(awlMessage.data[3], awlMessage.data[4]);
+    addTrackInPixel(std::forward<INPUT>(awlMessage), pixelID);
 }
 
-void AWLMessageToSpiritMessageTranslationStrategy::addTrackInPixel(AWLMessage* awlMessage, PixelID pixelID) {
-    auto trackID = convertTwoBytesToUnsignedBigEndian(awlMessage->data[0], awlMessage->data[1]);
-    auto confidenceLevel = awlMessage->data[5];
-    auto intensity = convertTwoBytesToUnsignedBigEndian(awlMessage->data[6], awlMessage->data[7]);
-    auto track = Track(trackID, confidenceLevel, intensity);
-    auto pixel = currentOutputMessage->fetchPixelByID(pixelID);
-    pixel->addTrack(track);
+void AWLMessageToSpiritMessageTranslationStrategy::addTrackInPixel(AWLMessage&& awlMessage, PixelID pixelID) {
+    TrackID trackID = convertTwoBytesToUnsignedBigEndian(awlMessage.data[0], awlMessage.data[1]);
+    ConfidenceLevel confidenceLevel = awlMessage.data[5];
+    Intensity intensity = convertTwoBytesToUnsignedBigEndian(awlMessage.data[6], awlMessage.data[7]);
+    Track track;
+    track.ID = trackID;
+    track.confidenceLevel = confidenceLevel;
+    track.intensity = intensity;
+    currentOutputMessage.addTrackToPixelWithID(pixelID, std::move(track));
 };
 
-void AWLMessageToSpiritMessageTranslationStrategy::translateDetectionVelocityMessage(AWLMessage* awlMessage) {
-    auto track = fetchTrack(awlMessage);
-    auto distance = convertTwoBytesToUnsignedBigEndian(awlMessage->data[2], awlMessage->data[3]);
-    auto speed = convertTwoBytesToSignedBigEndian(awlMessage->data[4], awlMessage->data[5]);
-    auto acceleration = convertTwoBytesToSignedBigEndian(awlMessage->data[6], awlMessage->data[7]);
-    track->setDistance(distance);
-    track->setSpeed(speed);
-    track->setAcceleration(acceleration);
+void AWLMessageToSpiritMessageTranslationStrategy::translateDetectionVelocityMessage(AWLMessage&& awlMessage) {
+    Distance distance = convertTwoBytesToUnsignedBigEndian(awlMessage.data[2], awlMessage.data[3]);
+    Speed speed = convertTwoBytesToSignedBigEndian(awlMessage.data[4], awlMessage.data[5]);
+    Acceleration acceleration = convertTwoBytesToSignedBigEndian(awlMessage.data[6], awlMessage.data[7]);
+    TrackID trackID = convertTwoBytesToUnsignedBigEndian(awlMessage.data[0], awlMessage.data[1]);
+    auto track = fetchTrack(trackID);
+    track->distance = distance;
+    track->speed = speed;
+    track->acceleration = acceleration;
 }
 
 
-Track* AWLMessageToSpiritMessageTranslationStrategy::fetchTrack(AWLMessage* awlMessage) const {
-    auto trackID = convertTwoBytesToUnsignedBigEndian(awlMessage->data[0], awlMessage->data[1]);
-    auto pixels = currentOutputMessage->getPixels();
+Track* AWLMessageToSpiritMessageTranslationStrategy::fetchTrack(TrackID const& trackID) {
+    auto pixels = currentOutputMessage.getPixels();
     for (auto i = 0; i < NUMBER_OF_PIXELS_IN_FRAME; ++i) {
         auto pixel = &pixels->at(i);
-        if(pixel->doesTrackExist(trackID)){
+        if (pixel->doesTrackExist(trackID)) {
             return pixel->fetchTrackByID(trackID);
         }
     }
-    return nullptr;
+    return nullptr; // TODO Throw exception instead of return null, this behavior is currently unhandled and WILL crash the program
 }
 
 Frame AWLMessageToSpiritMessageTranslationStrategy::returnDefaultData() {

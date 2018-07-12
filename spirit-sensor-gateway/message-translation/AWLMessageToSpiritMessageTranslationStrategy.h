@@ -26,7 +26,11 @@ using DataFlow::PixelID;
 
 namespace MessageTranslation {
 
-    class AWLMessageToSpiritMessageTranslationStrategy final: public MessageTranslationStrategy<AWLMessage, Frame> {
+    class AWLMessageToSpiritMessageTranslationStrategy final : public MessageTranslationStrategy<AWLMessage, Frame> {
+    protected:
+        using super = MessageTranslationStrategy<AWLMessage, Frame>;
+        using super::INPUT;
+        using super::OUTPUT;
     public:
 
         AWLMessageToSpiritMessageTranslationStrategy();
@@ -35,19 +39,21 @@ namespace MessageTranslation {
 
         Frame returnDefaultData();
 
-        void translateBasicMessage(AWLMessage&& inputMessage) override;
+        void translateBasicMessage(INPUT&& inputMessage) override;
 
     private:
 
-        void addTrackInPixel(AWLMessage* awlMessage, PixelID pixelID);
+        using super::currentOutputMessage;
 
-        Track* fetchTrack(AWLMessage* awlMessage) const;
+        void addTrackInPixel(AWLMessage&& awlMessage, PixelID pixelID);
 
-        void translateDetectionTrackMessage(AWLMessage* awlMessage);
+        Track* fetchTrack(DataFlow::TrackID const& trackID);
 
-        void translateDetectionVelocityMessage(AWLMessage* awlMessage);
+        void translateDetectionTrackMessage(AWLMessage&& awlMessage);
 
-        void translateEndOfFrameMessage(AWLMessage* awlMessage);
+        void translateDetectionVelocityMessage(AWLMessage&& awlMessage);
+
+        void translateEndOfFrameMessage(AWLMessage&& awlMessage);
     };
 }
 #endif //SPIRITSENSORGATEWAY_MESSAGEIMPLEMENTATIONSTRATEGY_H

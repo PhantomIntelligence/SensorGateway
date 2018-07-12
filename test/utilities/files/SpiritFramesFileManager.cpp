@@ -32,12 +32,12 @@ void SpiritFramesFileManager::writeFileBlockWithMessage(DataFlow::Frame message,
         writeFileLineWithContentLabel(file, 2, TRACKS_LABEL.c_str());
         auto tracks = pixel.getTracks();
         for (auto track : *tracks) {
-            writeFileLineWithContentLabelAndValue(file, 3, TRACK_ID_LABEL.c_str(), track.getID());
-            writeFileLineWithContentLabelAndValue(file, 4, ACCELERATION_LABEL.c_str(), track.getAcceleration());
-            writeFileLineWithContentLabelAndValue(file, 4, DISTANCE_LABEL.c_str(), track.getDistance());
-            writeFileLineWithContentLabelAndValue(file, 4, INTENSITY_LABEL.c_str(), track.getIntensity());
-            writeFileLineWithContentLabelAndValue(file, 4, CONFIDENCE_LEVEL_LABEL.c_str(), track.getConfidenceLevel());
-            writeFileLineWithContentLabelAndValue(file, 4, SPEED_LABEL.c_str(), track.getSpeed());
+            writeFileLineWithContentLabelAndValue(file, 3, TRACK_ID_LABEL.c_str(), track.ID);
+            writeFileLineWithContentLabelAndValue(file, 4, ACCELERATION_LABEL.c_str(), track.acceleration);
+            writeFileLineWithContentLabelAndValue(file, 4, DISTANCE_LABEL.c_str(), track.distance);
+            writeFileLineWithContentLabelAndValue(file, 4, INTENSITY_LABEL.c_str(), track.intensity);
+            writeFileLineWithContentLabelAndValue(file, 4, CONFIDENCE_LEVEL_LABEL.c_str(), track.confidenceLevel);
+            writeFileLineWithContentLabelAndValue(file, 4, SPEED_LABEL.c_str(), track.speed);
         }
     }
     std::fprintf(file, "%s\n", MESSAGES_SEPARATOR.c_str());

@@ -16,7 +16,6 @@
 
 #include <canlib.h>
 #include "CommunicationProtocolStrategy.hpp"
-#include <limits>
 
 using Sensor::AWL::MAXIMUM_NUMBER_OF_DATA_IN_MESSAGE;
 

@@ -15,6 +15,7 @@
 #include "AWLMessagesFileManager.h"
 
 using TestUtilities::AWLMessagesFileManager;
+using DataFlow::AWLMessage;
 
 AWLMessage AWLMessagesFileManager::readMessageFromFileBlock(std::string const& fileBlock) {
     auto id = std::stoi(fetchSubstringBetweenDelimiters(fileBlock, ID_LABEL+MESSAGE_LABEL_VALUE_ASSOCIATOR, "\n"));

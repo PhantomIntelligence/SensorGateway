@@ -15,7 +15,6 @@
 #include <spirit-sensor-gateway/domain/AWLMessage.h>
 #include <spirit-sensor-gateway/domain/Frame.h>
 #include "spirit-sensor-gateway/message-translation/MessageTranslator.hpp"
-#include "test/utilities/StubsGenerator.cpp"
 
 using DataFlow::AWLMessage;
 using DataFlow::Frame;

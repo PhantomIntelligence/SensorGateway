@@ -20,6 +20,7 @@ using DataFlow::Pixel;
 using Sensor::AWL::_16::NUMBER_OF_PIXELS_IN_FRAME;
 
 namespace DataFlow {
+
     using PixelsArray =  std::array<Pixel, NUMBER_OF_PIXELS_IN_FRAME>;
 }
 
@@ -28,7 +29,7 @@ namespace DataFlow {
     class Frame {
 
     public:
-        Frame(FrameID frameID, SystemID systemID, PixelsArray pixels);
+        explicit Frame(FrameID frameID, SystemID systemID, PixelsArray pixels);
 
         Frame();
 
@@ -38,23 +39,21 @@ namespace DataFlow {
 
         Frame(Frame&& other) noexcept;
 
-        Frame& operator = (Frame const& other)& ;
+        Frame& operator=(Frame const& other)& ;
 
-        Frame& operator = (Frame&& other)& noexcept;
+        Frame& operator=(Frame&& other)& noexcept;
 
-        void swap(Frame& current, Frame& other) noexcept;
+        static void swap(Frame& current, Frame& other) noexcept;
 
-        bool operator == (Frame const& other) const;
+        bool operator==(Frame const& other) const;
 
-        bool operator != (Frame const& other) const;
+        bool operator!=(Frame const& other) const;
 
-        void addPixel(Pixel pixel);
+        void addTrackToPixelWithID(PixelID const& pixelID, Track&& trackToAdd);
 
-        Pixel* fetchPixelByID(PixelID pixelID);
+        FrameID const& getFrameID() const;
 
-        FrameID getFrameID() const;
-
-        SystemID getSystemID() const;
+        SystemID const& getSystemID() const;
 
         PixelsArray* getPixels();
 
@@ -66,6 +65,9 @@ namespace DataFlow {
 
 
     private:
+
+        void updatePixelID(PixelID const& pixelID);
+
         FrameID frameID;
         SystemID systemID;
         PixelsArray pixels;
@@ -81,7 +83,7 @@ namespace Defaults {
         FrameID const DEFAULT_FRAME_ID = 0;
         SystemID const DEFAULT_SYSTEM_ID = 0;
         PixelsArray const DEFAULT_PIXELS_ARRAY = PixelsArray();
-        Frame const DEFAULT_FRAME = Frame();
+        Frame const DEFAULT_FRAME = Frame(DEFAULT_FRAME_ID, DEFAULT_SYSTEM_ID, DEFAULT_PIXELS_ARRAY);
     }
 }
 

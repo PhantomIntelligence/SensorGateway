@@ -19,42 +19,62 @@
 #include <gmock/gmock.h>
 #include "test/mock/FrameSinkMock.h"
 #include "spirit-sensor-gateway/message-translation/AWLMessageToSpiritMessageTranslationStrategy.h"
-#include "test/utilities/StubsGenerator.cpp"
 
 using Defaults::Track::DEFAULT_ACCELERATION;
 using Defaults::Track::DEFAULT_DISTANCE;
 using Defaults::Track::DEFAULT_SPEED;
-using Stub::createFrame;
-using Stub::createPixel;
-using Stub::createTrack;
 using MessageTranslation::AWLMessageToSpiritMessageTranslationStrategy;
 using Mock::FrameProcessingScheduler;
 using Mock::FrameSinkMock;
+using AWL::DataArray;
 
 class AWLMessageToSpiritMessageTranslationStrategyTest : public ::testing::Test {
 protected:
     unsigned int const INDEX_OF_FRAME = 0;
 
-    Frame frameAfterEndOfFrameMessageTranslationStub = createFrame(64829, 16);
+    Frame frameAfterEndOfFrameMessageTranslationStub = Frame(64829, 16, {});
 
     Frame frameAfterDetectionTrackAndEndOfFrameMessagesTranslationStub =
-            createFrame(64829, 16, {createPixel(11, {createTrack(14291, 96, 123,
-                                                                 DEFAULT_ACCELERATION,
-                                                                 DEFAULT_DISTANCE,
-                                                                 DEFAULT_SPEED)})});
+            Frame(64829, 16, {
+                    Pixel::returnDefaultData(),
+                    Pixel::returnDefaultData(),
+                    Pixel::returnDefaultData(),
+                    Pixel::returnDefaultData(),
+                    Pixel::returnDefaultData(),
+                    Pixel::returnDefaultData(),
+                    Pixel::returnDefaultData(),
+                    Pixel::returnDefaultData(),
+                    Pixel::returnDefaultData(),
+                    Pixel::returnDefaultData(),
+                    Pixel::returnDefaultData(),
+                    Pixel(11, {Track(14291, 96, 379, DEFAULT_ACCELERATION, DEFAULT_DISTANCE, DEFAULT_SPEED)}, 1)
+            });
 
     Frame frameAfterDetectionTrackAndVelocityTrackAndEndOfFrameMessagesTranslationStub =
-            createFrame(64829, 16, {createPixel(11, {createTrack(14291, 96, 123, 379, 106, 0)})});
+            Frame(64829, 16, {
+                    Pixel::returnDefaultData(),
+                    Pixel::returnDefaultData(),
+                    Pixel::returnDefaultData(),
+                    Pixel::returnDefaultData(),
+                    Pixel::returnDefaultData(),
+                    Pixel::returnDefaultData(),
+                    Pixel::returnDefaultData(),
+                    Pixel::returnDefaultData(),
+                    Pixel::returnDefaultData(),
+                    Pixel::returnDefaultData(),
+                    Pixel::returnDefaultData(),
+                    Pixel(11, {Track(14291, 96, 379, 256, 106, 0)}, 1)
+            });
 
-    AWLMessage createDetectionTrackAWLMessage(){
+    AWLMessage createDetectionTrackAWLMessage() {
         return AWLMessage(10, 2188169, 8, {211, 55, 0, 11, 0, 96, 123, 1});
     }
 
-    AWLMessage createDetectionVelocityAWLMessage(){
-        return AWLMessage(11, 2188169, 8, {211, 55, 106, 0, 0, 0, 0, 0});
+    AWLMessage createDetectionVelocityAWLMessage() {
+        return AWLMessage(11, 2188169, 8, {211, 55, 106, 0, 0, 0, 0, 1});
     }
 
-    AWLMessage createEndOfFrameAWLMessage(){
+    AWLMessage createEndOfFrameAWLMessage() {
         return AWLMessage(9, 2188170, 8, {61, 253, 16, 0, 0, 0, 0, 0});
     }
 
@@ -74,13 +94,13 @@ TEST_F(AWLMessageToSpiritMessageTranslationStrategyTest,
     translationStrategy.translateBasicMessage(std::move(endOfFrameAWLMessage));
 
     scheduler.terminateAndJoin();
-    auto actualFrame =  frameSinkMock.getConsumedData().at(INDEX_OF_FRAME);
+    auto actualFrame = frameSinkMock.getConsumedData().at(INDEX_OF_FRAME);
 
     ASSERT_EQ(expectedFrame, actualFrame);
 }
 
 TEST_F(AWLMessageToSpiritMessageTranslationStrategyTest,
-       given_someDetectionTrackAndEndOfFrameAWLMessages_when_translatingThoseMessagesInGivenOrder_then_buildsFrameWithValidAttribute) {
+       given_someDetectionTrackAndEndOfFrameAWLMessages_when_translatingThoseMessagesInGivenOrder_then_builtFrameContainsTheCorrectTrackInTheCorrectPixel) {
 
     auto detectionTrackAWLMessage = createDetectionTrackAWLMessage();
     auto endOfFrameAWLMessage = createEndOfFrameAWLMessage();
@@ -95,7 +115,8 @@ TEST_F(AWLMessageToSpiritMessageTranslationStrategyTest,
     translationStrategy.translateBasicMessage(std::move(endOfFrameAWLMessage));
 
     scheduler.terminateAndJoin();
-    auto actualFrame =  frameSinkMock.getConsumedData().at(INDEX_OF_FRAME);
+
+    auto actualFrame = frameSinkMock.getConsumedData().at(INDEX_OF_FRAME);
 
     ASSERT_EQ(expectedFrame, actualFrame);
 }
@@ -118,7 +139,7 @@ TEST_F(AWLMessageToSpiritMessageTranslationStrategyTest,
     translationStrategy.translateBasicMessage(std::move(endOfFrameAWLMessage));
 
     scheduler.terminateAndJoin();
-    auto actualFrame =  frameSinkMock.getConsumedData().at(INDEX_OF_FRAME);
+    auto actualFrame = frameSinkMock.getConsumedData().at(INDEX_OF_FRAME);
 
     ASSERT_EQ(expectedFrame, actualFrame);
 }
@@ -137,7 +158,7 @@ TEST_F(AWLMessageToSpiritMessageTranslationStrategyTest,
 
     scheduler.terminateAndJoin();
 
-    ASSERT_EQ(frameSinkMock.hasBeenCalledExpectedNumberOfTimes(),1);
+    ASSERT_EQ(frameSinkMock.hasBeenCalledExpectedNumberOfTimes(), 1);
 }
 
 #endif //SPIRITSENSORGATEWAY_AWLMESSAGETRANSLATORTEST_CPP

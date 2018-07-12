@@ -20,10 +20,9 @@ namespace DataFlow {
 
     class Track {
     public:
-        Track(TrackID trackID, ConfidenceLevel confidenceLevel, Intensity intensity);
 
-        Track(TrackID trackID, ConfidenceLevel confidenceLevel, Intensity intensity, Acceleration acceleration,
-              Distance distance, Speed speed);
+        explicit Track(TrackID trackID, ConfidenceLevel confidenceLevel, Intensity intensity,
+              Acceleration acceleration, Distance distance, Speed speed);
 
         Track();
 
@@ -33,38 +32,18 @@ namespace DataFlow {
 
         Track(Track&& other) noexcept;
 
-        Track& operator = (Track const& other)& ;
+        Track& operator=(Track const& other)& ;
 
-        Track& operator = (Track&& other)& noexcept;
+        Track& operator=(Track&& other)& noexcept;
 
-        void swap(Track& current, Track& other) noexcept;
+        static void swap(Track& current, Track& other) noexcept;
 
-        bool operator == (Track const& other) const;
+        bool operator==(Track const& other) const;
 
-        bool operator != (Track const& other) const;
-
-        Acceleration getAcceleration() const;
-
-        ConfidenceLevel getConfidenceLevel() const;
-
-        Distance getDistance() const;
-
-        TrackID getID() const;
-
-        Intensity getIntensity() const;
-
-        Speed getSpeed() const;
-
-        void setAcceleration(Acceleration const& acceleration);
-
-        void setDistance(Distance const& distance);
-
-        void setSpeed(Speed const& speed);
+        bool operator!=(Track const& other) const;
 
         static Track const& returnDefaultData() noexcept;
 
-
-    private:
         TrackID ID;
         ConfidenceLevel confidenceLevel;
         Intensity intensity;
@@ -79,17 +58,19 @@ namespace Defaults {
         using DataFlow::Acceleration;
         using DataFlow::ConfidenceLevel;
         using DataFlow::Distance;
-        using DataFlow:: TrackID;
+        using DataFlow::TrackID;
         using DataFlow::Speed;
         using DataFlow::Intensity;
         using DataFlow::Track;
-        Acceleration const DEFAULT_ACCELERATION = 0;
+        TrackID const UNDEFINED_TRACK_ID = std::numeric_limits<TrackID>::infinity();
+        TrackID const DEFAULT_ID = UNDEFINED_TRACK_ID;
         ConfidenceLevel const DEFAULT_CONFIDENCE = 0;
-        Distance const DEFAULT_DISTANCE = 0;
-        TrackID const DEFAULT_ID = 0;
-        Speed const DEFAULT_SPEED = 0;
         Intensity const DEFAULT_INTENSITY = 0;
-        Track const DEFAULT_TRACK = Track();
+        Acceleration const DEFAULT_ACCELERATION = 0;
+        Distance const DEFAULT_DISTANCE = 0;
+        Speed const DEFAULT_SPEED = 0;
+        Track const DEFAULT_TRACK = Track(DEFAULT_ID, DEFAULT_CONFIDENCE, DEFAULT_INTENSITY, DEFAULT_ACCELERATION,
+                                          DEFAULT_DISTANCE, DEFAULT_SPEED);
     }
 }
 

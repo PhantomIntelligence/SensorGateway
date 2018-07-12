@@ -25,6 +25,8 @@ namespace MessageTranslation {
         typedef O OUTPUT;
 
     public:
+        MessageTranslationStrategy() :
+                currentOutputMessage(OUTPUT::returnDefaultData()) {}
 
         virtual ~MessageTranslationStrategy() noexcept = default;
 
@@ -32,7 +34,7 @@ namespace MessageTranslation {
 
     protected:
 
-        OUTPUT* currentOutputMessage;
+        OUTPUT currentOutputMessage;
     };
 }
 

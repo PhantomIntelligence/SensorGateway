@@ -22,33 +22,26 @@ using Defaults::Frame::DEFAULT_SYSTEM_ID;
 using DataFlow::PixelsArray;
 using DataFlow::SystemID;
 
-Frame::Frame(FrameID frameID, SystemID systemID, PixelsArray pixels): frameID(frameID), systemID(systemID),
-                                                                      pixels(pixels) {
+Frame::Frame(FrameID frameID, SystemID systemID, PixelsArray pixels) :
+        frameID(frameID), systemID(systemID), pixels(pixels) {};
 
-};
+Frame::Frame() : Frame(Frame::returnDefaultData()) {};
 
-Frame::Frame():systemID(DEFAULT_SYSTEM_ID),
-               frameID(DEFAULT_FRAME_ID),
-               pixels(DEFAULT_PIXELS_ARRAY){
+Frame::Frame(Frame const& other) :
+        Frame(other.frameID, other.systemID, other.pixels) {};
 
-};
+Frame::Frame(Frame&& other) noexcept:
+        frameID(std::move(other.frameID)),
+        systemID(std::move(systemID)),
+        pixels(std::move(other.pixels)) {};
 
-Frame::Frame(Frame const& other): Frame(other.frameID, other.systemID, other.pixels){
-
-};
-
-Frame::Frame(Frame&& other) noexcept: frameID(std::move(other.frameID)), systemID(std::move(systemID)),
-                                      pixels(std::move(other.pixels)){
-
-};
-
-Frame& Frame::operator = (Frame const& other)& {
+Frame& Frame::operator=(Frame const& other)& {
     Frame temporary(std::move(other));
     swap(*this, temporary);
     return *this;
 };
 
-Frame& Frame::operator = (Frame&& other)& noexcept {
+Frame& Frame::operator=(Frame&& other)& noexcept {
     swap(*this, other);
     return *this;
 };
@@ -59,7 +52,7 @@ void Frame::swap(Frame& current, Frame& other) noexcept {
     std::swap(current.pixels, other.pixels);
 };
 
-bool Frame::operator == (Frame const& other) const {
+bool Frame::operator==(Frame const& other) const {
     auto sameFrameID = (frameID == other.frameID);
     auto sameSystemID = (systemID == other.systemID);
     auto samePixels = (pixels == other.pixels);
@@ -67,23 +60,20 @@ bool Frame::operator == (Frame const& other) const {
     return framesAreEqual;
 }
 
-bool Frame::operator != (Frame const& other) const {
+bool Frame::operator!=(Frame const& other) const {
     return !(operator==(other));
 }
 
-void Frame::addPixel(Pixel pixel) {
-    pixels[pixel.getID()] = pixel;
+void Frame::addTrackToPixelWithID(PixelID const& pixelID, Track&& trackToAdd) {
+    updatePixelID(pixelID);
+    pixels[pixelID].addTrack(std::forward<Track>(trackToAdd)); // TODO: Assert test still validate this
 }
 
-Pixel* Frame::fetchPixelByID(PixelID pixelID) {
-    return &pixels[pixelID];
-}
-
-FrameID Frame::getFrameID() const {
+FrameID const& Frame::getFrameID() const {
     return frameID;
 };
 
-SystemID Frame::getSystemID() const {
+SystemID const& Frame::getSystemID() const {
     return systemID;
 };
 
@@ -103,3 +93,6 @@ Frame const& Frame::returnDefaultData() noexcept {
     return DEFAULT_FRAME;
 }
 
+void Frame::updatePixelID(PixelID const& pixelID) {
+    pixels[pixelID].ID = pixelID;
+}

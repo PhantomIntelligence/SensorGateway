@@ -24,6 +24,7 @@
 #include <unordered_map>
 #include <exception>
 #include <cstring>
+#include <limits>
 
 #include "hicpp/HighIntegrityThread.h"
 #include "ExceptionMessages.h"

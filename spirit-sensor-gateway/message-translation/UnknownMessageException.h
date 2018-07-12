@@ -20,7 +20,7 @@ using DataFlow::AWLMessage;
 class UnknownMessageException : public std::exception {
 
     public:
-        UnknownMessageException(AWLMessage* awlMessage);
+        UnknownMessageException(AWLMessage&& awlMessage);
         std::string getMessage();
     private:
         std::string message;

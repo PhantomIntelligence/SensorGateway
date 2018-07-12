@@ -1,9 +1,12 @@
 /**
 	Copyright 2014-2018 Phantom Intelligence Inc.
+
 	Licensed under the Apache License, Version 2.0 (the "License");
 	you may not use this file except in compliance with the License.
 	You may obtain a copy of the License at
+
 		http://www.apache.org/licenses/LICENSE-2.0
+
 	Unless required by applicable law or agreed to in writing, software
 	distributed under the License is distributed on an "AS IS" BASIS,
 	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -27,12 +30,12 @@ namespace DataFlow {
 namespace DataFlow {
 
     class Pixel {
+
     public:
-        Pixel(PixelID pixelID);
 
-        Pixel(PixelID pixelID, TracksArray tracks);
+        explicit Pixel(PixelID pixelID, TracksArray tracks, int currentNumberOfTracks);
 
-        Pixel() = default;
+        Pixel();
 
         ~Pixel() = default;
 
@@ -40,32 +43,35 @@ namespace DataFlow {
 
         Pixel(Pixel&& other) noexcept;
 
-        Pixel& operator = (Pixel const& other)& ;
+        Pixel& operator=(Pixel const& other)& ;
 
-        Pixel& operator = (Pixel&& other)& noexcept;
+        Pixel& operator=(Pixel&& other)& noexcept;
 
-        void swap(Pixel& current, Pixel& other) noexcept;
+        static void swap(Pixel& current, Pixel& other) noexcept;
 
-        bool operator == (Pixel const& other) const;
+        bool operator==(Pixel const& other) const;
 
-        bool operator != (Pixel const& other) const;
+        bool operator!=(Pixel const& other) const;
 
-        void addTrack(Track track);
+        void addTrack(Track&& track);
 
-        bool doesTrackExist(TrackID trackID);
+        bool doesTrackExist(TrackID const& trackID);
 
-        Track* fetchTrackByID(TrackID trackID);
+        Track* fetchTrackByID(TrackID const& trackID);
 
-        PixelID getID() const;
+        PixelID const& getID() const;
 
         TracksArray* getTracks();
 
         static Pixel const& returnDefaultData() noexcept;
 
-    private:
         PixelID ID;
+
+    private:
+
         TracksArray tracks;
         int currentNumberOfTracksInPixel;
+
         void validateNotFull() const;
     };
 }
@@ -75,9 +81,11 @@ namespace Defaults {
         using DataFlow::Pixel;
         using DataFlow::PixelID;
         using DataFlow::TracksArray;
-        PixelID const DEFAULT_PIXEL_ID = 0;
+        PixelID const UNDEFINED_PIXEL_ID = std::numeric_limits<PixelID>::infinity();
+        PixelID const DEFAULT_ID = UNDEFINED_PIXEL_ID;
         TracksArray const DEFAULT_TRACKS_ARRAY = TracksArray();
-        Pixel const DEFAULT_PIXEL = Pixel(DEFAULT_PIXEL_ID);
+        int const DEFAULT_CURRENT_NUMBER_OF_TRACKS = 0;
+        Pixel const DEFAULT_PIXEL = Pixel(DEFAULT_ID, DEFAULT_TRACKS_ARRAY, DEFAULT_CURRENT_NUMBER_OF_TRACKS);
     }
 }
 

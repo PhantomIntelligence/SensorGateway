@@ -12,35 +12,35 @@
 */
 
 #include "spirit-sensor-gateway/domain/Frame.h"
-#include "test/utilities/StubsGenerator.cpp"
 
 using DataFlow::Frame;
-using Stub::createFrame;
-using Stub::createPixel;
-using Stub::createTrack;
+using DataFlow::Pixel;
+using DataFlow::Track;
 
 std::vector<Frame> spiritFramesStub = {
-        createFrame(64829, 16, {createPixel(11, {createTrack(14291, 0, 123, 0, 106, 0)}),
-                                createPixel(12, {createTrack(14324, 0, 93, 0, 109, 0)}),
-                                createPixel(13, {createTrack(14302, 0, 115, 0, 109, -1)}),
-                                createPixel(14, {createTrack(14322, 0, 104, 0, 115, -6)}),
-                                createPixel(15, {createTrack(14321, 0, 110, 0, 117, 0)}),
+        Frame(64829, 16, {
+                Pixel(11, {Track(14291, 0, 123, 0, 106, 0)}, 1),
+                Pixel(12, {Track(14324, 0, 93, 0, 109, 0)}, 1),
+                Pixel(13, {Track(14302, 0, 115, 0, 109, -1)}, 1),
+                Pixel(14, {Track(14322, 0, 104, 0, 115, -6)}, 1),
+                Pixel(15, {Track(14321, 0, 110, 0, 117, 0)}, 1),
         }),
-        createFrame(64830, 16, {createPixel(0, {createTrack(14275, 0, 139, 0, 109, 0)}),
-                                createPixel(1, {createTrack(2, 0, 135, 0, 110, 0)}),
-                                createPixel(2, {createTrack(14286, 0, 125, 0, 105, 0)}),
-                                createPixel(3, {createTrack(14270, 0, 127, 0, 106, 1)}),
-                                createPixel(4, {createTrack(14301, 0, 122, 0, 104, 0)}),
-                                createPixel(5, {createTrack(14272, 0, 120, 0, 108, 0)}),
-                                createPixel(6, {createTrack(14316, 0, 114, 0, 114, 0)}),
-                                createPixel(7, {createTrack(14320, 0, 110, 0, 117, 1)}),
-                                createPixel(8, {createTrack(14284, 0, 126, 0, 111, 0)}),
-                                createPixel(9, {createTrack(14289, 0, 124, 0, 111, 0)}),
-                                createPixel(10, {createTrack(14290, 0, 125, 0, 107, 0)}),
-                                createPixel(11, {createTrack(14291, 0, 123, 0, 106, 0)}),
-                                createPixel(12, {createTrack(14324, 0, 91, 0, 109, 1)}),
-                                createPixel(13, {createTrack(14302, 0, 114, 0, 109, 0)}),
-                                createPixel(14, {createTrack(14322, 0, 109, 0, 116, -2)}),
-                                createPixel(15, {createTrack(14321, 0, 109, 0, 117, 0)}),
+        Frame(64830, 16, {
+                Pixel(0, {Track(14275, 0, 139, 0, 109, 0)}, 1),
+                Pixel(1, {Track(2, 0, 135, 0, 110, 0)}, 1),
+                Pixel(2, {Track(14286, 0, 125, 0, 105, 0)}, 1),
+                Pixel(3, {Track(14270, 0, 127, 0, 106, 1)}, 1),
+                Pixel(4, {Track(14301, 0, 122, 0, 104, 0)}, 1),
+                Pixel(5, {Track(14272, 0, 120, 0, 108, 0)}, 1),
+                Pixel(6, {Track(14316, 0, 114, 0, 114, 0)}, 1),
+                Pixel(7, {Track(14320, 0, 110, 0, 117, 1)}, 1),
+                Pixel(8, {Track(14284, 0, 126, 0, 111, 0)}, 1),
+                Pixel(9, {Track(14289, 0, 124, 0, 111, 0)}, 1),
+                Pixel(10, {Track(14290, 0, 125, 0, 107, 0)}, 1),
+                Pixel(11, {Track(14291, 0, 123, 0, 106, 0)}, 1),
+                Pixel(12, {Track(14324, 0, 91, 0, 109, 1)}, 1),
+                Pixel(13, {Track(14302, 0, 114, 0, 109, 0)}, 1),
+                Pixel(14, {Track(14322, 0, 109, 0, 116, -2)}, 1),
+                Pixel(15, {Track(14321, 0, 109, 0, 117, 0)}, 1),
         }),
 };
