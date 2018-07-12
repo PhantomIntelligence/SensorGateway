@@ -20,7 +20,6 @@ using DataFlow::Pixel;
 using Sensor::AWL::_16::NUMBER_OF_PIXELS_IN_FRAME;
 
 namespace DataFlow {
-
     using PixelsArray =  std::array<Pixel, NUMBER_OF_PIXELS_IN_FRAME>;
 }
 
@@ -29,6 +28,7 @@ namespace DataFlow {
     class Frame {
 
     public:
+
         explicit Frame(FrameID frameID, SystemID systemID, PixelsArray pixels);
 
         Frame();
@@ -66,11 +66,11 @@ namespace DataFlow {
 
     private:
 
-        void updatePixelID(PixelID const& pixelID);
-
         FrameID frameID;
         SystemID systemID;
         PixelsArray pixels;
+
+        void updatePixelID(PixelID const& pixelID);
     };
 }
 

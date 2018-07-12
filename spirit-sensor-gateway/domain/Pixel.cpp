@@ -20,11 +20,11 @@ using DataFlow::PixelID;
 using Defaults::Pixel::DEFAULT_PIXEL;
 using Defaults::Pixel::DEFAULT_TRACKS_ARRAY;
 
-Pixel::Pixel() : Pixel(Pixel::returnDefaultData()) {}
-
 Pixel::Pixel(PixelID pixelID, TracksArray tracks, int currentNumberOfTracks) :
         ID(pixelID), tracks(tracks), currentNumberOfTracksInPixel(currentNumberOfTracks) {
 };
+
+Pixel::Pixel() : Pixel(Pixel::returnDefaultData()) {};
 
 Pixel::Pixel(Pixel const& other) :
         Pixel(other.ID, other.tracks, other.currentNumberOfTracksInPixel) {
@@ -83,30 +83,26 @@ bool Pixel::doesTrackExist(TrackID const& trackID) {
 };
 
 Track* Pixel::fetchTrackByID(TrackID const& trackID) {
-    for (auto i = 0; i < NUMBER_OF_TRACKS_IN_PIXEL; ++i) {
-        if (tracks[i].ID == trackID) {
-            return &tracks[i];
+    for (auto trackIndex = 0; trackIndex < NUMBER_OF_TRACKS_IN_PIXEL; ++trackIndex) {
+        if (tracks[trackIndex].ID == trackID) {
+            return &tracks[trackIndex];
         }
     }
     return nullptr;
-}
-
-PixelID const& Pixel::getID() const {
-    return ID;
 }
 
 TracksArray* Pixel::getTracks() {
     return &tracks;
 }
 
+Pixel const& Pixel::returnDefaultData() noexcept {
+    return DEFAULT_PIXEL;
+}
+
 void Pixel::validateNotFull() const {
     if (currentNumberOfTracksInPixel >= NUMBER_OF_TRACKS_IN_PIXEL) {
         throw std::runtime_error(ExceptionMessage::PIXEL_TRACK_ARRAY_ILLEGAL_STORE_FULL);
     }
-}
-
-Pixel const& Pixel::returnDefaultData() noexcept {
-    return DEFAULT_PIXEL;
 }
 
 

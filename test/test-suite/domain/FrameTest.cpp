@@ -10,15 +10,16 @@ using DataFlow::PixelID;
 using DataFlow::FrameID;
 using DataFlow::SystemID;
 using DataFlow::TracksArray;
+using DataFlow::TrackID;
 using DataFlow::PixelsArray;
 
 class FrameTest : public ::testing::Test {
 
 protected:
-    PixelID const ARBITRARY_TRACK_ID = 2;
-    Track const SOME_TRACK = Track(ARBITRARY_TRACK_ID, 0, 135, 0, 110, 0);
-    PixelID const ARBITRARY_PIXEL_ID = 1;
-    Pixel const SOME_PIXEL = Pixel(ARBITRARY_PIXEL_ID, TracksArray({SOME_TRACK}), 1);
+    TrackID const SOME_TRACK_ID = 2;
+    Track const SOME_TRACK = Track(SOME_TRACK_ID, 0, 135, 0, 110, 0);
+    PixelID const SOME_PIXEL_ID = 1;
+    Pixel const SOME_PIXEL = Pixel(SOME_PIXEL_ID, TracksArray({SOME_TRACK}), 1);
     Pixel const SOME_OTHER_PIXEL = Pixel(2, TracksArray({SOME_TRACK}), 1);
     FrameID const SOME_FRAME_ID = 64830;
     FrameID const SOME_OTHER_FRAME_ID = 63830;
@@ -28,26 +29,16 @@ protected:
     PixelsArray const SOME_OTHER_PIXELS_ARRAY = PixelsArray({SOME_PIXEL, SOME_OTHER_PIXEL});
 };
 
-TEST_F(FrameTest, given_aTrackAndAPixelID_when_addingTheTrackToThePixel_then_aPixelWithTheCorrectIDIsInTheFrame) {
+TEST_F(FrameTest, given_aTrackAndAPixelID_when_addingTheTrackToThePixelWithCorrespondingID_then_trackIsAddedCorrectlyAtRightPositionInPixel) {
     Frame frame;
     Track track;
-    frame.addTrackToPixelWithID(ARBITRARY_PIXEL_ID, std::move(track));
+    auto expectedAddedTrack = track;
+    auto trackPosition = 0;
 
-    auto actualAddedPixel = frame.getPixels()->at(ARBITRARY_PIXEL_ID);
-    auto expectedAddedPixelID = ARBITRARY_PIXEL_ID;
+    frame.addTrackToPixelWithID(SOME_PIXEL_ID, std::move(track));
 
-    ASSERT_EQ(expectedAddedPixelID, actualAddedPixel.ID);
-}
-
-TEST_F(FrameTest, given_aTrackAndAPixelID_when_addingTheTrackToThePixel_then_thePixelContainsTheTrack) {
-    Frame frame;
-    auto trackCopy = Track(SOME_TRACK);
-    frame.addTrackToPixelWithID(ARBITRARY_PIXEL_ID, std::move(trackCopy));
-
-    auto addedTrack = *(frame.getPixels()->at(ARBITRARY_PIXEL_ID).fetchTrackByID(ARBITRARY_TRACK_ID));
-
-    auto expectedTrack = SOME_TRACK;
-    ASSERT_EQ(expectedTrack, addedTrack);
+    auto actualAddedTrack = frame.getPixels()->at(SOME_PIXEL_ID).getTracks()->at(trackPosition);
+    ASSERT_EQ(expectedAddedTrack, actualAddedTrack);
 }
 
 

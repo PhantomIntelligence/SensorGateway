@@ -59,8 +59,6 @@ namespace DataFlow {
 
         Track* fetchTrackByID(TrackID const& trackID);
 
-        PixelID const& getID() const;
-
         TracksArray* getTracks();
 
         static Pixel const& returnDefaultData() noexcept;
@@ -81,8 +79,8 @@ namespace Defaults {
         using DataFlow::Pixel;
         using DataFlow::PixelID;
         using DataFlow::TracksArray;
-        PixelID const UNDEFINED_PIXEL_ID = std::numeric_limits<PixelID>::infinity();
-        PixelID const DEFAULT_ID = UNDEFINED_PIXEL_ID;
+        PixelID const UNDEFINED_ID = std::numeric_limits<PixelID>::infinity();
+        PixelID const DEFAULT_ID = UNDEFINED_ID;
         TracksArray const DEFAULT_TRACKS_ARRAY = TracksArray();
         int const DEFAULT_CURRENT_NUMBER_OF_TRACKS = 0;
         Pixel const DEFAULT_PIXEL = Pixel(DEFAULT_ID, DEFAULT_TRACKS_ARRAY, DEFAULT_CURRENT_NUMBER_OF_TRACKS);

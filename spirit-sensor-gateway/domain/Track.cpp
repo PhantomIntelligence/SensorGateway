@@ -27,12 +27,10 @@ using Defaults::Track::DEFAULT_ID;
 using Defaults::Track::DEFAULT_ACCELERATION;
 using Defaults::Track::DEFAULT_SPEED;
 using Defaults::Track::DEFAULT_DISTANCE;
-using Defaults::Track::DEFAULT_CONFIDENCE;
+using Defaults::Track::DEFAULT_CONFIDENCE_LEVEL;
 using Defaults::Track::DEFAULT_INTENSITY;
 using Defaults::Track::DEFAULT_TRACK;
 
-
-Track::Track() : Track(Track::returnDefaultData()) {};
 
 Track::Track(TrackID trackID, ConfidenceLevel confidenceLevel, Intensity intensity,
              Acceleration acceleration, Distance distance, Speed speed) : ID(trackID),
@@ -44,6 +42,7 @@ Track::Track(TrackID trackID, ConfidenceLevel confidenceLevel, Intensity intensi
 
 };
 
+Track::Track() : Track(Track::returnDefaultData()) {};
 
 Track::Track(Track const& other) : Track(other.ID, other.confidenceLevel, other.intensity,
                                          other.acceleration, other.distance, other.speed) {

@@ -66,7 +66,7 @@ bool Frame::operator!=(Frame const& other) const {
 
 void Frame::addTrackToPixelWithID(PixelID const& pixelID, Track&& trackToAdd) {
     updatePixelID(pixelID);
-    pixels[pixelID].addTrack(std::forward<Track>(trackToAdd)); // TODO: Assert test still validate this
+    pixels[pixelID].addTrack(std::forward<Track>(trackToAdd));
 }
 
 FrameID const& Frame::getFrameID() const {

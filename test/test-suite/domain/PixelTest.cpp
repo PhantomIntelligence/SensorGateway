@@ -23,7 +23,7 @@ protected:
 };
 
 TEST_F(PixelTest, given_anExistingTrackInAPixel_when_checkingIfTheTrackExists_then_returnsTrue) {
-    Pixel pixel(SOME_ID, {SOME_TRACK}, 1);
+    Pixel pixel(SOME_ID, {SOME_TRACK}, SOME_CURRENT_NUMBER_OF_TRACKS);
 
     auto trackExists = pixel.doesTrackExist(SOME_TRACK.ID);
 
@@ -39,7 +39,7 @@ TEST_F(PixelTest, given_noExistingTrackInAPixel_when_checkingIfTheTrackExists_th
 }
 
 TEST_F(PixelTest, given_anExistingTrackInAPixel_when_fetchingTheTrackByItsID_then_returnsAPointerToThisTrack) {
-    Pixel pixel(SOME_ID, {SOME_TRACK}, 1);
+    Pixel pixel(SOME_ID, {SOME_TRACK}, SOME_CURRENT_NUMBER_OF_TRACKS);
     auto trackPosition = 0;
     Track* expectedTrackPointer = &pixel.getTracks()->at(trackPosition);
 
@@ -69,7 +69,6 @@ TEST_F(PixelTest,
 
     ASSERT_EQ(expectedAddedTrack, actualAddedTrack);
 }
-
 
 TEST_F(PixelTest,
        given_aPixelWithAFullTracksArrayAndATrack_when_addingTheTrackToThePixel_then_throwsATrackArrayIllegalStoreFullException) {

@@ -28,7 +28,7 @@ void SpiritFramesFileManager::writeFileBlockWithMessage(DataFlow::Frame message,
     auto pixels = message.getPixels();
     writeFileLineWithContentLabel(file, 0, PIXELS_LABEL.c_str());
     for (auto pixel : *pixels) {
-        writeFileLineWithContentLabelAndValue(file, 1, PIXEL_ID_LABEL.c_str(), pixel.getID());
+        writeFileLineWithContentLabelAndValue(file, 1, PIXEL_ID_LABEL.c_str(), pixel.ID);
         writeFileLineWithContentLabel(file, 2, TRACKS_LABEL.c_str());
         auto tracks = pixel.getTracks();
         for (auto track : *tracks) {
