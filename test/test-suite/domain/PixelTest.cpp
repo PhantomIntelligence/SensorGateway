@@ -67,4 +67,6 @@ TEST_F(PixelTest,given_twoPixelsWithDifferentAttributes_when_checkingIfTheyAreEq
     ASSERT_FALSE(pixelsAreEqual);
 }
 
+
+
 #endif //SPIRITSENSORGATEWAY_PIXELTEST_CPP

@@ -68,6 +68,22 @@ void Pixel::validateNotFull() const {
         throw std::runtime_error(ExceptionMessage::PIXEL_TRACK_ARRAY_ILLEGAL_STORE_FULL);
     }
 
+}
+
+
+void Pixel::calculatePositionOnLayer() {
+    positionOnLayer = (ID%AWL16_NUMBER_OF_PIXEL_PER_LAYER);
+}
+
+void Pixel::calculateAngles() {
+
+    if(positionOnLayer < (NUMBER_OF_PIXELS_IN_AWL16_FRAME/2)){
+        angleStart = (HORIZONTAL_FIELD_OF_VIEW/-2)+(positionOnLayer*AWL_16_ANGLE_RANGE);
+    }
+    else{
+        angleStart = AWL_16_ANGLE_RANGE * (positionOnLayer-(NUMBER_OF_PIXELS_IN_AWL16_FRAME/2.0));
+    }
+    angleEnd = angleStart + AWL_16_ANGLE_RANGE;
 };
 
 

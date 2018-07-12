@@ -20,10 +20,15 @@ namespace {
     uint8_t const MAX_NUMBER_OF_DATA_IN_AWL_MESSAGE = 8;
     uint8_t const NUMBER_OF_CONCURRENT_INPUT_FOR_SENSOR_ACCESS_LINK_ELEMENTS = 1;
     size_t const RING_BUFFER_SIZE = 64;
+    float const HORIZONTAL_FIELD_OF_VIEW = 30.4;
+    int const AWL16_NUMBER_OF_PIXEL_PER_LAYER = 8;
 
     unsigned long const READ_WAIT_INFINITE = -1;
     int const NUMBER_OF_PIXELS_IN_AWL16_FRAME = 16;
     int const MAXIMUM_NUMBER_OF_TRACKS_IN_AWL16_PIXEL = 16;
+
+    float const AWL_16_ANGLE_RANGE = (HORIZONTAL_FIELD_OF_VIEW/NUMBER_OF_PIXELS_IN_AWL16_FRAME);
+
 };
 
 namespace SensorSystemID {
