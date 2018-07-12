@@ -1,5 +1,4 @@
 [requires]
-websocketpp/0.7.0@bincrafters/stable
 
 [generators]
 cmake

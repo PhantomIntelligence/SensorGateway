@@ -13,23 +13,23 @@
 #ifndef SPIRITSENSORGATEWAY_WEBSOCKETSERVERCOMMUNICATIONSTRATEGY_H
 #define SPIRITSENSORGATEWAY_WEBSOCKETSERVERCOMMUNICATIONSTRATEGY_H
 
-#include <websocketpp/config/asio_no_tls_client.hpp>
+#include <uWS.h>
 #include "ServerCommunicationProtocolStrategy.hpp"
 #include "spirit-sensor-gateway/domain/Frame.h"
 
 
 namespace ServerCommunication {
 
-    using Client = websocketpp::client<websocketpp::config::asio_client>;
-    using ConnectionHandle = websocketpp::connection_hdl;
-    using websocketpp::lib::error_code;
-    using MessagePointer = Client::message_ptr;
+//    using Client = websocketpp::client<websocketpp::config::asio_client>;
+//    using ConnectionHandle = websocketpp::connection_hdl;
+//    using websocketpp::lib::error_code;
+//    using MessagePointer = Client::message_ptr;
 
     std::string const SERVER_ADDRRESS = "ws://localhost:8080/connect-gateway";
 
     struct ConnectionMetadata {
         int id;
-        ConnectionHandle connectionHandler;
+//        ConnectionHandle connectionHandler;
         std::string status;
         std::string URI;
         std::string server;
@@ -66,13 +66,13 @@ namespace ServerCommunication {
 
         void sendMessage(MESSAGE&& message) override;
 
-        ConnectionHandle connectionHandle;
+//        ConnectionHandle connectionHandle;
 
         ConnectionMetadata connectionMetadata;
 
-        void onOpen(ConnectionHandle connectionHandle);
-
-        Client client;
+//        void onOpen(ConnectionHandle connectionHandle);
+//
+//        Client client;
 
         std::string serverAddrress = SERVER_ADDRRESS;
     };
