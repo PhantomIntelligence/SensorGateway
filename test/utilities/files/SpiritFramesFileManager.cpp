@@ -16,6 +16,16 @@
 
 using TestUtilities::SpiritFramesFileManager;
 
+void
+SpiritFramesFileManager::writeFileWithFrames(TestUtilities::Structures::Frames frames, std::string const& filename) {
+    auto file = std::fopen(filename.c_str(), "w+");
+    for (auto frame : frames) {
+        writeFileBlockWithMessage(frame, file);
+    }
+    fflush(file);
+    fclose(file);
+}
+
 DataFlow::Frame SpiritFramesFileManager::readMessageFromFileBlock(std::string const& fileBlock) {
     //TODO: update method when testing SpiritFrames -> AWLMessages
     return DataFlow::Frame();
@@ -45,19 +55,20 @@ void SpiritFramesFileManager::writeFileBlockWithMessage(DataFlow::Frame message,
 
 void TestUtilities::SpiritFramesFileManager::writeFileLineWithContentLabel(std::FILE* file,
                                                                            unsigned int numberOfTabulator,
-                                                                           char const* contentLabel){
-    for (auto tabulatorNumber = 0; tabulatorNumber < numberOfTabulator; tabulatorNumber++){
+                                                                           char const* contentLabel) {
+    for (auto tabulatorNumber = 0; tabulatorNumber < numberOfTabulator; tabulatorNumber++) {
         std::fprintf(file, "%s", MESSAGE_CONTENT_TABULATOR.c_str());
     }
     std::fprintf(file, "%s%s\n", contentLabel, MESSAGE_LABEL_VALUE_ASSOCIATOR.c_str());
 }
 
-void TestUtilities::SpiritFramesFileManager::writeFileLineWithContentLabelAndValue(std::FILE* file,
-                                                                                   unsigned int numberOfTabulator,
-                                                                                   char const* contentLabel,
-                                                                                   unsigned int contentValue) {
-    for (auto tabulatorNumber = 0; tabulatorNumber < numberOfTabulator; tabulatorNumber++){
+void SpiritFramesFileManager::writeFileLineWithContentLabelAndValue(std::FILE* file,
+                                                                    unsigned int numberOfTabulator,
+                                                                    char const* contentLabel,
+                                                                    unsigned int contentValue) {
+    for (auto tabulatorNumber = 0; tabulatorNumber < numberOfTabulator; tabulatorNumber++) {
         std::fprintf(file, "%s", MESSAGE_CONTENT_TABULATOR.c_str());
     }
     std::fprintf(file, "%s%s%d\n", contentLabel, MESSAGE_LABEL_VALUE_ASSOCIATOR.c_str(), contentValue);
 }
+

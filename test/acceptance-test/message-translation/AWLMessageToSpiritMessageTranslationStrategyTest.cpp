@@ -41,34 +41,26 @@ protected:
     SpiritFramesFileManager spiritFramesFileManager;
 };
 
-
 TEST_F(AWLMessageToSpiritMessageTranslationStrategyTest,
        given_someInputFileContainingValidAWLMessages_when_translatingAWLMessagesIntoSpiritFrames_then_returnCorrespondingSpriritFramesOutputFile) {
-    char const* ACTUAL_SPIRIT_FRAMES_OUTPUT_FILE_NAME = "ActualSpiritFramesOutputFile.txt";
+    auto ACTUAL_SPIRIT_FRAMES_OUTPUT_FILE_NAME = "ActualSpiritFramesOutputFile.txt";
     AWLMessageToSpiritMessageTranslationStrategy awlMessageTranslator;
     FrameSinkMock frameSinkMock(1);
     FrameProcessingScheduler scheduler(&frameSinkMock);
     awlMessageTranslator.linkConsumer(&scheduler);
     int counter = 0;
 
-    std::vector<AWLMessage> messages = awlMessagesFileManager.readMessagesFromFile(AWLMESSAGES_INPUT_FILE_NAME);
+    auto messages = awlMessagesFileManager.readMessagesFromFile(AWLMESSAGES_INPUT_FILE_NAME);
     for (auto message : messages) {
         awlMessageTranslator.translateBasicMessage(std::move(message));
-        if (counter == 43){
-            awlMessageTranslator.translateBasicMessage(std::move(message));
-        }
-        counter = counter  + 1;
+        ++counter;
     }
 
     scheduler.terminateAndJoin();
 
-    std::vector<Frame> frames = frameSinkMock.getConsumedData();
-    std::cout << frames.at(0).systemID << std::endl;
-    std::cout << frames.at(1).systemID << std::endl;
-    spiritFramesFileManager.writeFileWithMessages(frames, ACTUAL_SPIRIT_FRAMES_OUTPUT_FILE_NAME);
+    auto frames = frameSinkMock.getConsumedData();
+
+    spiritFramesFileManager.writeFileWithFrames(frames, ACTUAL_SPIRIT_FRAMES_OUTPUT_FILE_NAME);
     ASSERT_TRUE(spiritFramesFileManager.areFilesEqual(EXPECTED_SPIRIT_FRAMES_OUTPUT_FILE_NAME,
                                                       ACTUAL_SPIRIT_FRAMES_OUTPUT_FILE_NAME));
 }
-
-
-

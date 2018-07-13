@@ -51,7 +51,6 @@ void AWLMessageToSpiritMessageTranslationStrategy::translateEndOfFrameMessage(AW
     SystemID systemID = convertTwoBytesToUnsignedBigEndian(awlMessage.data[2], awlMessage.data[3]);
     currentOutputMessage.systemID = systemID;
     currentOutputMessage.frameID = frameID;
-    std::cout  << currentOutputMessage.systemID << std::endl;
     produce(std::move(currentOutputMessage));
     currentOutputMessage = Frame::returnDefaultData();
 }

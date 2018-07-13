@@ -48,11 +48,11 @@ std::vector<Frame> spiritFramesStub = {
                      }
    ),
 
-    createFrame(64829, 16, { TracksInPixel(0, {Track(14275, 0, 139, 0, 109, 0)}),
+    createFrame(64830, 16, { TracksInPixel(0, {Track(14275, 0, 139, 0, 109, 0)}),
                        TracksInPixel(1, {Track(2, 0, 135, 0, 110, 0)}),
                        TracksInPixel(2, {Track(14286, 0, 125, 0, 105, 0)}),
                        TracksInPixel(3, {Track(14270, 0, 127, 0, 106, 1)}),
-                       TracksInPixel(4, {Track(14321, 0, 110, 0, 117, 0)}),
+                       TracksInPixel(4, {Track(14301, 0, 122, 0, 104, 0)}),
                        TracksInPixel(5, {Track(14272, 0, 120, 0, 108, 0)}),
                        TracksInPixel(6, {Track(14316, 0, 114, 0, 114, 0)}),
                        TracksInPixel(7, {Track(14320, 0, 110, 0, 117, 1)}),

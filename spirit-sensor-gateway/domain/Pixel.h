@@ -17,7 +17,6 @@
 #ifndef SPIRITSENSORGATEWAY_SPIRITPIXEL_H
 #define SPIRITSENSORGATEWAY_SPIRITPIXEL_H
 
-#include "spirit-sensor-gateway/common/ConstantValuesDefinition.h"
 #include "Track.h"
 
 using DataFlow::Track;

@@ -15,26 +15,28 @@
 #define SPIRITSENSORGATEWAY_FRAMESINKMOCK_H
 
 #include "spirit-sensor-gateway/common/data-flow/DataSink.hpp"
-#include "spirit-sensor-gateway/domain/Frame.h"
+#include "test/utilities/files/SpiritFramesFileManager.h"
 
 using DataFlow::DataSink;
 using DataFlow::Frame;
+using TestUtilities::Structures::Frames;
 
 namespace Mock {
 
     class FrameSinkMock : public DataSink<Frame> {
+    protected:
+
 
     public:
 
-        FrameSinkMock(uint8_t numberOfDataToConsume) :
+        explicit FrameSinkMock(uint8_t numberOfDataToConsume) :
                 actualNumberOfDataConsumed(0),
                 numberOfDataToConsume(numberOfDataToConsume) {
-
         }
 
         void consume(DATA&& data) override {
+            consumedData.at(actualNumberOfDataConsumed) = data;
             ++actualNumberOfDataConsumed;
-            consumedData.push_back(data);
         }
 
         bool hasBeenCalledExpectedNumberOfTimes() const {
@@ -42,15 +44,14 @@ namespace Mock {
         };
 
 
-        std::vector<Frame> getConsumedData() const noexcept {
+        Frames const& getConsumedData() const noexcept {
             return consumedData;
         }
-
 
     private:
         AtomicCounter actualNumberOfDataConsumed;
         AtomicCounter numberOfDataToConsume;
-        std::vector<Frame> consumedData;
+        Frames consumedData;
     };
 
     using FrameProcessingScheduler = DataFlow::DataProcessingScheduler<Frame, FrameSinkMock, 1>;

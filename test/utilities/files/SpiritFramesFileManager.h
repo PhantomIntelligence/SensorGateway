@@ -19,12 +19,19 @@
 
 namespace TestUtilities {
 
+    namespace Structures {
+        static size_t const MAX_NUMBER_OF_FRAMES_CURRENTLY_NEEDED_FOR_TEST = 2;
+        using Frames = std::array<DataFlow::Frame, MAX_NUMBER_OF_FRAMES_CURRENTLY_NEEDED_FOR_TEST>;
+    }
+
     class SpiritFramesFileManager : public FileManager<DataFlow::Frame> {
 
     public:
         SpiritFramesFileManager() = default;
 
         ~SpiritFramesFileManager() override = default;
+
+        void writeFileWithFrames(Structures::Frames frames, std::string const& filename);
 
     private:
         DataFlow::Frame readMessageFromFileBlock(std::string const& fileBlock) override;
