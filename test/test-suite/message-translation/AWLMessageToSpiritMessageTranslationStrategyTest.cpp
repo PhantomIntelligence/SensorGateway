@@ -73,7 +73,7 @@ TEST_F(AWLMessageToSpiritMessageTranslationStrategyTest,
 }
 
 TEST_F(AWLMessageToSpiritMessageTranslationStrategyTest,
-       given_someDetectionTrackAndEndOfFrameAWLMessages_when_translatingThoseMessagesInGivenOrder_then_builtFrameContainsTheCorrectTrackInTheCorrectPixel) {
+       given_someDetectionTrackAndEndOfFrameAWLMessages_when_translatingThoseMessagesInGivenOrder_then_buildsFrameWithValidAttribute) {
 
     auto detectionTrackAWLMessage = SOME_DETECTION_TRACK_AWL_MESSAGE;
     auto endOfFrameAWLMessage = SOME_END_FRAME_AWL_MESSAGE;

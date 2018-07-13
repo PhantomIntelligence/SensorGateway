@@ -73,7 +73,7 @@ namespace Defaults {
         using DataFlow::SystemID;
         using DataFlow::PixelsArray;
         FrameID const DEFAULT_FRAME_ID = 0;
-        SystemID const DEFAULT_SYSTEM_ID = 5;
+        SystemID const DEFAULT_SYSTEM_ID = -1;
         PixelsArray const DEFAULT_PIXELS_ARRAY = PixelsArray();
         Frame const DEFAULT_FRAME = Frame(DEFAULT_FRAME_ID, DEFAULT_SYSTEM_ID, DEFAULT_PIXELS_ARRAY);
     }
