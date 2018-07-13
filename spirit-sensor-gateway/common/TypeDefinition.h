@@ -50,6 +50,10 @@ namespace  SpiritProtocol {
     typedef int16_t Speed;
     typedef uint16_t SystemID;
     typedef uint16_t TrackID;
+    typedef float AngleStart;
+    typedef float AngleEnd;
+    typedef int PositionOnLayer;
+    typedef int Layer;
 };
 
 #endif //SPIRITSENSORGATEWAY_TYPEDEFINITION_H

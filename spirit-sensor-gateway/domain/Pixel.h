@@ -49,13 +49,16 @@ namespace SpiritProtocol {
     private:
         int numberOfTracksInPixel = 0;
 
-        float angleStart;
+        AngleStart angleStart;
 
-        float angleEnd;
+        AngleEnd angleEnd;
 
-        float positionOnLayer;
+        Layer layer;
+
+        PositionOnLayer positionOnLayer;
 
         PixelID ID;
+
         std::array<Track, MAXIMUM_NUMBER_OF_TRACKS_IN_AWL16_PIXEL> tracks;
     };
 }

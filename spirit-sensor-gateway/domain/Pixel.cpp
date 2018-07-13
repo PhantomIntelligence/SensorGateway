@@ -72,16 +72,19 @@ void Pixel::validateNotFull() const {
 
 
 void Pixel::calculatePositionOnLayer() {
-    positionOnLayer = (ID%AWL16_NUMBER_OF_PIXEL_PER_LAYER);
+    if (ID <= (7)) {
+        layer = 0;
+    } else {
+        layer = 1;
+    }
+    positionOnLayer = (ID % AWL16_NUMBER_OF_PIXEL_PER_LAYER);
 }
 
 void Pixel::calculateAngles() {
-
-    if(positionOnLayer < (NUMBER_OF_PIXELS_IN_AWL16_FRAME/2)){
-        angleStart = (HORIZONTAL_FIELD_OF_VIEW/-2)+(positionOnLayer*AWL_16_ANGLE_RANGE);
-    }
-    else{
-        angleStart = AWL_16_ANGLE_RANGE * (positionOnLayer-(NUMBER_OF_PIXELS_IN_AWL16_FRAME/2.0));
+    if (positionOnLayer < (NUMBER_OF_PIXELS_IN_AWL16_FRAME / 2)) {
+        angleStart = (HORIZONTAL_FIELD_OF_VIEW / -2) + (positionOnLayer * AWL_16_ANGLE_RANGE);
+    } else {
+        angleStart = AWL_16_ANGLE_RANGE * (positionOnLayer - (NUMBER_OF_PIXELS_IN_AWL16_FRAME / 2.0));
     }
     angleEnd = angleStart + AWL_16_ANGLE_RANGE;
 };
