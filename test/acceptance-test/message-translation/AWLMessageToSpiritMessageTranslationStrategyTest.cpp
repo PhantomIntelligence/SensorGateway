@@ -63,6 +63,8 @@ TEST_F(AWLMessageToSpiritMessageTranslationStrategyTest,
     scheduler.terminateAndJoin();
 
     std::vector<Frame> frames = frameSinkMock.getConsumedData();
+    std::cout << frames.at(0).systemID << std::endl;
+    std::cout << frames.at(1).systemID << std::endl;
     spiritFramesFileManager.writeFileWithMessages(frames, ACTUAL_SPIRIT_FRAMES_OUTPUT_FILE_NAME);
     ASSERT_TRUE(spiritFramesFileManager.areFilesEqual(EXPECTED_SPIRIT_FRAMES_OUTPUT_FILE_NAME,
                                                       ACTUAL_SPIRIT_FRAMES_OUTPUT_FILE_NAME));
