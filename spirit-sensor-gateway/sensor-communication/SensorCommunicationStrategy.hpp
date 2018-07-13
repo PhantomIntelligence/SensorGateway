@@ -20,16 +20,16 @@
 namespace SensorCommunication {
 
     template<class T>
-    class CommunicationProtocolStrategy {
+    class SensorCommunicationStrategy {
 
     protected:
         typedef T DATA;
 
     public:
 
-        virtual ~CommunicationProtocolStrategy() noexcept = default;
+        virtual ~SensorCommunicationStrategy() noexcept = default;
 
-        virtual MESSAGE readMessage() = 0;
+        virtual DATA readMessage() = 0;
 
         virtual void openConnection()=0;
 

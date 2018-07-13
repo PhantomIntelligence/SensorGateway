@@ -18,7 +18,7 @@
 #define SPIRITSENSORGATEWAY_KVASERCANCOMMUNICATIONSTRATEGY_H
 
 #include <canlib.h>
-#include "CommunicationProtocolStrategy.hpp"
+#include "SensorCommunicationStrategy.hpp"
 
 using Sensor::AWL::MAXIMUM_NUMBER_OF_DATA_IN_MESSAGE;
 
@@ -29,7 +29,7 @@ namespace SensorCommunication {
 
         unsigned long const CANLIB_READ_WAIT_INFINITE_DELAY = std::numeric_limits<int>::infinity();
         using super = SensorCommunicationStrategy<AWLMessage>;
-        using super::MESSAGE;
+        using super::DATA;
 
     public:
         KvaserCanCommunicationStrategy();
@@ -38,7 +38,7 @@ namespace SensorCommunication {
 
         void openConnection() override;
 
-        MESSAGE readMessage() override;
+        DATA readMessage() override;
 
         void closeConnection() override;
 

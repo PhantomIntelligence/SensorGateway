@@ -36,7 +36,7 @@ namespace SensorAccessLinkElement {
         explicit SensorCommunicator(SensorCommunicationStrategy* sensorCommunicationStrategy) :
                 terminateOrderReceived(false),
                 sensorCommunicationStrategy(sensorCommunicationStrategy),
-                communicatorThread(JoinableThread(voidAction)) {
+                communicatorThread(JoinableThread(doNothing)) {
             communicatorThread.exitSafely();
         }
 

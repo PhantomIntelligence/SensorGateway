@@ -269,7 +269,7 @@ AWLMessage SensorCommunicatorTest::createAMessageWithValueOffsetOf(uint8_t dataV
     uint32_t const arbitraryLength = 7 + dataValueOffset;
     AWL::DataArray arbitraryData;
 
-    for (auto k = 0; k < MAX_NUMBER_OF_DATA_IN_AWL_MESSAGE; ++k) {
+    for (auto k = 0; k < MAXIMUM_NUMBER_OF_DATA_IN_MESSAGE; ++k) {
         arbitraryData.at(k) = static_cast<unsigned char>(k);
     }
 
