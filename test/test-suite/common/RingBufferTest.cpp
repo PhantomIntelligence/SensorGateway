@@ -9,7 +9,7 @@
 
 #include "spirit-sensor-gateway/common/data-flow/RingBuffer.hpp"
 #include "data-model/DataModelFixture.h"
-#include "MockConsumerLink.h"
+#include "ConsumerLinkMock.h"
 
 using ExampleDataModel::NativeData;
 using ExampleDataModel::ProcessedData;
@@ -17,7 +17,7 @@ using ExampleDataModel::Data;
 using TestFunctions::DataTestUtil;
 
 using NativeBuffer = DataFlow::RingBuffer<NativeData>;
-using MockConsumerLink = Mock::MockConsumerLink<NativeData>;
+using MockConsumerLink = Mock::ConsumerLinkMock<NativeData>;
 
 class RingBufferTest : public ::testing::Test {
 

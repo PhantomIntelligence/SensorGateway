@@ -25,11 +25,9 @@ namespace DataFlow {
     class DataSink {
 
     protected:
-
         typedef T DATA;
 
     public:
-
         virtual ~DataSink() noexcept = default;
 
         virtual void consume(DATA&& data) = 0;

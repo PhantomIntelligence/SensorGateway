@@ -14,18 +14,34 @@
 #ifndef SPIRITSENSORGATEWAY_CONSTANTFUNCTIONSDEFINITION_H
 #define SPIRITSENSORGATEWAY_CONSTANTFUNCTIONSDEFINITION_H
 
-#include "ExceptionMessages.h"
+#include "ConstantValuesDefinition.h"
 
 namespace {
+    uint16_t convertTwoBytesToUnsignedBigEndian(uint8_t firstByte, uint8_t secondByte) noexcept {
+        auto shift = static_cast<uint16_t>(256U);
+        uint16_t unsignedBigEndianNumber = shift * secondByte + firstByte;
+        return unsignedBigEndianNumber;
+    }
+
+    void convertFourBytesToUnsignedBigEndian(uint8_t (&littleEndianBytes)[4], uint32_t *bigEndianResult) noexcept {
+        memcpy(bigEndianResult, littleEndianBytes, sizeof *bigEndianResult);
+    }
+
+    int16_t convertTwoBytesToSignedBigEndian(uint8_t firstByte, uint8_t secondByte) noexcept {
+        auto shift = static_cast<int16_t>(256);
+        int16_t signedBigEndianNumber = shift * secondByte + firstByte;
+        return signedBigEndianNumber;
+    }
 
     /**
       * @warning Allows to start the various JoinableThreads in the constructors without blocking anything
       */
-    void voidAction() {}
+    void doNothing() {}
 
-    [[noreturn]] void throwIllegalActionException(char const* message) {
+    [[noreturn]] void throwIllegalActionException(char const *message) {
         throw std::runtime_error(message);
     }
+
 };
 
 #endif //SPIRITSENSORGATEWAY_CONSTANTFUNCTIONSDEFINITION_H

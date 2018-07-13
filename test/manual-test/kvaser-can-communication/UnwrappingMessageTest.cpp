@@ -5,11 +5,10 @@
 #include "spirit-sensor-gateway/sensor-communication/KvaserCanCommunicationStrategy.cpp"
 
 
-int main() {
+int main(){
 
     const int NUMBER_DETECTION = 1000;
-    auto file = std::fopen("AWLMessages.txt", "w+");
-    auto jsonFile = std::fopen("AWLMessages.json", "w+");
+    auto file = std::fopen("AWLMessagesCustom.txt", "w+");
 
 
     KvaserCanCommunicationStrategy kvaserCanProtocolStrategy;
@@ -19,7 +18,7 @@ int main() {
     for (auto i = 0; i < NUMBER_DETECTION; i++) {
         AWLMessage message = kvaserCanProtocolStrategy.readMessage();
         std::fprintf(file, "=================================================================================== \n");
-        std::fprintf(file, "ID : %" PRIu64 "\n", message.id);
+        std::fprintf(file, "SENSOR_ID : %" PRIu64 "\n", message.id);
         std::fprintf(file, "length : %d \n", message.length);
         std::fprintf(file, "timestamp : %" PRIu64 "\n", message.timestamp);
         for (int j = 0; j < message.length; j++) {
@@ -33,40 +32,8 @@ int main() {
     }
 
 
-
-    //FOR GENERATING JSON FILE
-    std::fprintf(jsonFile, "[\n");
-    std::fprintf(jsonFile,"{ \"id\": 33, \"length\": 8, \"timestamp\": 3973015, \"data\": [4, 0, 64, 6, 0, 0, 117, 0]},\n");    for (auto i = 0; i < NUMBER_DETECTION; i++) {
-        AWLMessage message = kvaserCanProtocolStrategy.readMessage();
-        std::fprintf(jsonFile, "{");
-        std::fprintf(jsonFile, " \"id\": %" PRIu64 ",", message.id);
-        std::fprintf(jsonFile, " \"length\": %d,", message.length);
-        std::fprintf(jsonFile, " \"timestamp\": %" PRIu64 ",", message.timestamp);
-        std::fprintf(jsonFile, " \"data\": [");
-        for (int j = 0; j < message.length; j++) {
-            std::fprintf(jsonFile, "%d",message.data[j]);
-
-            if (j < message.length - 1) {
-                std::fprintf(jsonFile, ", ");
-            }
-        }
-        std::fprintf(jsonFile, "]");
-        if (i < NUMBER_DETECTION - 1) {
-            std::fprintf(jsonFile, "}, \n");
-            if(i == NUMBER_DETECTION/2){
-                std::fprintf(jsonFile,"{ \"id\": 27, \"length\": 8, \"timestamp\": 3973015, \"data\": [4, 0, 64, 6, 0, 0, 117, 0]},\n");
-            }
-        }
-        else{
-            std::fprintf(jsonFile, "} \n");
-        }
-    }
-    std::fprintf(jsonFile, "]");
-
     kvaserCanProtocolStrategy.closeConnection();
     fflush(file);
     fclose(file);
-    fflush(jsonFile);
-    fclose(jsonFile);
     return 0;
 };

@@ -17,7 +17,7 @@
 #ifndef SPIRITSENSORGATEWAY_DATASOURCE_HPP
 #define SPIRITSENSORGATEWAY_DATASOURCE_HPP
 
-#include "spirit-sensor-gateway/common/data-flow/ThreadSafeRingBuffer.hpp"
+#include "ThreadSafeRingBuffer.hpp"
 
 namespace DataFlow {
 

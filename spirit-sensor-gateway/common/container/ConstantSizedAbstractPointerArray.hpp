@@ -18,7 +18,7 @@
 #ifndef SPIRITSENSORGATEWAY_ABSTRACTPOINTERARRAY_HPP
 #define SPIRITSENSORGATEWAY_ABSTRACTPOINTERARRAY_HPP
 
-#include "spirit-sensor-gateway/common/ConstantValuesDefinition.h"
+#include "spirit-sensor-gateway/common/ConstantFunctionsDefinition.h"
 
 namespace Container {
 
