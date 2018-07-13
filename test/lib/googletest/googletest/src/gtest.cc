@@ -1977,7 +1977,7 @@ std::string String::FormatByte(unsigned char value) {
   return ss.str();
 }
 
-// Converts the data-flow in a stringstream to an std::string, converting NUL
+// Converts buffer in a stringstream to an std::string, converting NUL
 // bytes to "\\0" along the way.
 std::string StringStreamToString(::std::stringstream* ss) {
   const ::std::string& str = ss->str();

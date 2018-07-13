@@ -2,7 +2,7 @@
 #include <iostream>
 #include <cstdio>
 #include <inttypes.h>
-#include "spirit-sensor-gateway/sensor-communication/KvaserCanProtocolStrategy.cpp"
+#include "spirit-sensor-gateway/sensor-communication/KvaserCanCommunicationStrategy.cpp"
 
 
 int main(){
@@ -10,7 +10,8 @@ int main(){
     const int NUMBER_DETECTION = 1000;
     auto file = std::fopen("AWLMessagesCustom.txt", "w+");
 
-    KvaserCanProtocolStrategy kvaserCanProtocolStrategy;
+
+    KvaserCanCommunicationStrategy kvaserCanProtocolStrategy;
     kvaserCanProtocolStrategy.openConnection();
 
     //FOR GENERATING TXT FILE
