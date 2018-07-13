@@ -22,8 +22,8 @@ DataFlow::Frame SpiritFramesFileManager::readMessageFromFileBlock(std::string co
 }
 
 void SpiritFramesFileManager::writeFileBlockWithMessage(DataFlow::Frame message, std::FILE* file) {
-    writeFileLineWithContentLabelAndValue(file, 0, FRAME_ID_LABEL.c_str(), message.getFrameID());
-    writeFileLineWithContentLabelAndValue(file, 0, SYSTEM_ID_LABEL.c_str(), message.getSystemID());
+    writeFileLineWithContentLabelAndValue(file, 0, FRAME_ID_LABEL.c_str(), message.frameID);
+    writeFileLineWithContentLabelAndValue(file, 0, SYSTEM_ID_LABEL.c_str(), message.systemID);
 
     auto pixels = message.getPixels();
     writeFileLineWithContentLabel(file, 0, PIXELS_LABEL.c_str());

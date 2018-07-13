@@ -50,24 +50,16 @@ namespace DataFlow {
         bool operator!=(Frame const& other) const;
 
         void addTrackToPixelWithID(PixelID const& pixelID, Track&& trackToAdd);
-
-        FrameID const& getFrameID() const;
-
-        SystemID const& getSystemID() const;
-
+        
         PixelsArray* getPixels();
-
-        void setFrameID(FrameID const& frameID);
-
-        void setSystemID(SystemID const& systemID);
 
         static Frame const& returnDefaultData() noexcept;
 
-
-    private:
-
         FrameID frameID;
         SystemID systemID;
+
+
+    private:
         PixelsArray pixels;
 
         void updatePixelID(PixelID const& pixelID);

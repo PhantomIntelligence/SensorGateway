@@ -69,25 +69,9 @@ void Frame::addTrackToPixelWithID(PixelID const& pixelID, Track&& trackToAdd) {
     pixels[pixelID].addTrack(std::forward<Track>(trackToAdd));
 }
 
-FrameID const& Frame::getFrameID() const {
-    return frameID;
-};
-
-SystemID const& Frame::getSystemID() const {
-    return systemID;
-};
-
 PixelsArray* Frame::getPixels() {
     return &pixels;
 };
-
-void Frame::setFrameID(FrameID const& frameID) {
-    this->frameID = frameID;
-}
-
-void Frame::setSystemID(SystemID const& systemID) {
-    this->systemID = systemID;
-}
 
 Frame const& Frame::returnDefaultData() noexcept {
     return DEFAULT_FRAME;

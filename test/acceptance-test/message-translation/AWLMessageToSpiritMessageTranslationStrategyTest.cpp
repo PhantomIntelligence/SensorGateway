@@ -49,10 +49,15 @@ TEST_F(AWLMessageToSpiritMessageTranslationStrategyTest,
     FrameSinkMock frameSinkMock(1);
     FrameProcessingScheduler scheduler(&frameSinkMock);
     awlMessageTranslator.linkConsumer(&scheduler);
+    int counter = 0;
 
     std::vector<AWLMessage> messages = awlMessagesFileManager.readMessagesFromFile(AWLMESSAGES_INPUT_FILE_NAME);
     for (auto message : messages) {
         awlMessageTranslator.translateBasicMessage(std::move(message));
+        if (counter == 43){
+            awlMessageTranslator.translateBasicMessage(std::move(message));
+        }
+        counter = counter  + 1;
     }
 
     scheduler.terminateAndJoin();

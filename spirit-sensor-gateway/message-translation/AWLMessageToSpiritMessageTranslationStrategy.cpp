@@ -49,8 +49,9 @@ void AWLMessageToSpiritMessageTranslationStrategy::translateBasicMessage(AWLMess
 void AWLMessageToSpiritMessageTranslationStrategy::translateEndOfFrameMessage(AWLMessage&& awlMessage) {
     FrameID frameID = convertTwoBytesToUnsignedBigEndian(awlMessage.data[0], awlMessage.data[1]);
     SystemID systemID = convertTwoBytesToUnsignedBigEndian(awlMessage.data[2], awlMessage.data[3]);
-    currentOutputMessage.setFrameID(frameID);
-    currentOutputMessage.setSystemID(systemID);
+    currentOutputMessage.systemID = systemID;
+    currentOutputMessage.frameID = frameID;
+    std::cout  << currentOutputMessage.systemID << std::endl;
     produce(std::move(currentOutputMessage));
     currentOutputMessage = Frame::returnDefaultData();
 }
@@ -91,7 +92,7 @@ Track* AWLMessageToSpiritMessageTranslationStrategy::fetchTrack(TrackID const& t
             return pixel->fetchTrackByID(trackID);
         }
     }
-    return nullptr; // TODO Throw exception instead of return null, this behavior is currently unhandled and WILL crash the program
+    return nullptr;
 }
 
 Frame AWLMessageToSpiritMessageTranslationStrategy::returnDefaultData() {
