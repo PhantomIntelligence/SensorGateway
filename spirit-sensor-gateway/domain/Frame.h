@@ -16,26 +16,67 @@
 
 #include "Pixel.h"
 
-namespace SpiritProtocol {
+using DataFlow::Pixel;
+using Sensor::AWL::_16::NUMBER_OF_PIXELS_IN_FRAME;
+
+namespace DataFlow {
+    using PixelsArray =  std::array<Pixel, NUMBER_OF_PIXELS_IN_FRAME>;
+}
+
+namespace DataFlow {
 
     class Frame {
 
     public:
-            Frame();
-            ~Frame();
-            void addPixel(Pixel pixel);
-            Pixel* fetchPixelByID(PixelID pixelID);
-            FrameID getFrameID() const;
-            std::array<Pixel, NUMBER_OF_PIXELS_IN_AWL16_FRAME>* getPixels() ;
-            SystemID getSystemID() const;
-            void setFrameID(FrameID const& frameID);
-            void setSystemID(SystemID const& systemID);
 
-        private:
-            FrameID frameID;
-            std::array<Pixel, NUMBER_OF_PIXELS_IN_AWL16_FRAME> pixels;
-            SystemID systemID;
+        explicit Frame(FrameID frameID, SystemID systemID, PixelsArray pixels);
+
+        Frame();
+
+        ~Frame() = default;
+
+        Frame(Frame const& other);
+
+        Frame(Frame&& other) noexcept;
+
+        Frame& operator=(Frame const& other)& ;
+
+        Frame& operator=(Frame&& other)& noexcept;
+
+        static void swap(Frame& current, Frame& other) noexcept;
+
+        bool operator==(Frame const& other) const;
+
+        bool operator!=(Frame const& other) const;
+
+        void addTrackToPixelWithID(PixelID const& pixelID, Track&& trackToAdd);
+        
+        PixelsArray* getPixels();
+
+        static Frame const& returnDefaultData() noexcept;
+
+        FrameID frameID;
+        SystemID systemID;
+
+
+    private:
+        PixelsArray pixels;
+
+        void updatePixelID(PixelID const& pixelID);
     };
+}
+
+namespace Defaults {
+    namespace Frame {
+        using DataFlow::Frame;
+        using DataFlow::FrameID;
+        using DataFlow::SystemID;
+        using DataFlow::PixelsArray;
+        FrameID const DEFAULT_FRAME_ID = 0;
+        SystemID const DEFAULT_SYSTEM_ID = -1;
+        PixelsArray const DEFAULT_PIXELS_ARRAY = PixelsArray();
+        Frame const DEFAULT_FRAME = Frame(DEFAULT_FRAME_ID, DEFAULT_SYSTEM_ID, DEFAULT_PIXELS_ARRAY);
+    }
 }
 
 #endif //SPIRITSENSORGATEWAY_FRAME_H

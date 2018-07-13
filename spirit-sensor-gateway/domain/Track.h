@@ -14,59 +14,64 @@
 #ifndef SPIRITSENSORGATEWAY_SPIRITTRACK_H
 #define SPIRITSENSORGATEWAY_SPIRITTRACK_H
 
-#include "spirit-sensor-gateway/common/DataProcessingScheduler.hpp"
+#include "spirit-sensor-gateway/common/data-flow/DataProcessingScheduler.hpp"
 
-namespace SpiritProtocol {
-
+namespace DataFlow {
 
     class Track {
+
     public:
+
+        explicit Track(TrackID trackID, ConfidenceLevel confidenceLevel, Intensity intensity,
+                       Acceleration acceleration, Distance distance, Speed speed);
+
         Track();
 
-        Track(TrackID trackID, ConfidenceLevel confidenceLevel, Intensity intensity);
+        ~Track() = default;
 
-        ~Track();
+        Track(Track const& other);
+
+        Track(Track&& other) noexcept;
+
+        Track& operator=(Track const& other)& ;
+
+        Track& operator=(Track&& other)& noexcept;
+
+        static void swap(Track& current, Track& other) noexcept;
 
         bool operator==(Track const& other) const;
 
         bool operator!=(Track const& other) const;
 
-        Acceleration getAcceleration() const;
+        static Track const& returnDefaultData() noexcept;
 
-        ConfidenceLevel getConfidenceLevel() const;
-
-        Distance getDistance() const;
-
-        TrackID getID() const;
-
-        Intensity getIntensity() const;
-
-        Speed getSpeed() const;
-
-        void setAcceleration(Acceleration const& acceleration);
-
-        void setDistance(Distance const& distance);
-
-        void setSpeed(Speed const& speed);
-
-    private:
-        Acceleration acceleration;
-        ConfidenceLevel confidenceLevel;
-        Distance distance;
         TrackID ID;
+        ConfidenceLevel confidenceLevel;
         Intensity intensity;
+        Acceleration acceleration;
+        Distance distance;
         Speed speed;
     };
+}
 
-    namespace Defaults {
-        namespace Track {
-            Acceleration const DEFAULT_ACCELERATION_VALUE = 0;
-            ConfidenceLevel const DEFAULT_CONFIDENCE_VALUE = 0;
-            Distance const DEFAULT_DISTANCE_VALUE = 0;
-            TrackID const DEFAULT_ID_VALUE = 0;
-            Speed const DEFAULT_SPEED_VALUE = 0;
-            Intensity const DEFAULT_INTENSITY_VALUE = 0;
-        }
+namespace Defaults {
+    namespace Track {
+        using DataFlow::Track;
+        using DataFlow::TrackID;
+        using DataFlow::ConfidenceLevel;
+        using DataFlow::Intensity;
+        using DataFlow::Acceleration;
+        using DataFlow::Distance;
+        using DataFlow::Speed;
+        TrackID const UNDEFINED_ID = std::numeric_limits<TrackID>::infinity();
+        TrackID const DEFAULT_ID = UNDEFINED_ID;
+        ConfidenceLevel const DEFAULT_CONFIDENCE_LEVEL = 0;
+        Intensity const DEFAULT_INTENSITY = 0;
+        Acceleration const DEFAULT_ACCELERATION = 0;
+        Distance const DEFAULT_DISTANCE = 0;
+        Speed const DEFAULT_SPEED = 0;
+        Track const DEFAULT_TRACK = Track(DEFAULT_ID, DEFAULT_CONFIDENCE_LEVEL, DEFAULT_INTENSITY, DEFAULT_ACCELERATION,
+                                          DEFAULT_DISTANCE, DEFAULT_SPEED);
     }
 }
 

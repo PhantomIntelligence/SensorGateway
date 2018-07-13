@@ -14,20 +14,20 @@
 	limitations under the License.
 */
 
-#ifndef SPIRITSENSORGATEWAY_MOCKCONSUMERLINK_H
-#define SPIRITSENSORGATEWAY_MOCKCONSUMERLINK_H
+#ifndef SPIRITSENSORGATEWAY_CONSUMERLINKMOCK_H
+#define SPIRITSENSORGATEWAY_CONSUMERLINKMOCK_H
 
-#include "spirit-sensor-gateway/common/ConsumerLink.hpp"
+#include "spirit-sensor-gateway/common/data-flow/ConsumerLink.hpp"
 
 namespace Mock {
 
     template<class DATA>
-    class MockConsumerLink : public DataFlow::ConsumerLink<DATA> {
+    class ConsumerLinkMock : public DataFlow::ConsumerLink<DATA> {
 
         using Buffer = DataFlow::RingBuffer<DATA>;
 
     public:
-        MockConsumerLink() : active(false) {}
+        ConsumerLinkMock() : active(false) {}
 
         void linkWith(Buffer* buffer) {
             buffer->linkWith(this);
@@ -50,4 +50,4 @@ namespace Mock {
     };
 }
 
-#endif //SPIRITSENSORGATEWAY_MOCKCONSUMERLINK_H
+#endif //SPIRITSENSORGATEWAY_CONSUMERLINKMOCK_H

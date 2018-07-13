@@ -2183,7 +2183,7 @@ TEST_F(GMockVerboseFlagTest, InvalidFlagIsTreatedAsWarning) {
 
 // A helper class that generates a failure when printed.  We use it to
 // ensure that Google Mock doesn't print a value (even to an internal
-// buffer) when it is not supposed to do so.
+// data-flow) when it is not supposed to do so.
 class PrintMeNot {};
 
 void PrintTo(PrintMeNot /* dummy */, ::std::ostream* /* os */) {
