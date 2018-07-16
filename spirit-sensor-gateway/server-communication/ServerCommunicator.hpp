@@ -13,8 +13,11 @@
 #ifndef SPIRITSENSORGATEWAY_SERVERCOMMUNICATOR_H
 #define SPIRITSENSORGATEWAY_SERVERCOMMUNICATOR_H
 
+#include "spirit-sensor-gateway/common/data-flow/DataProcessingScheduler.hpp"
 #include "spirit-sensor-gateway/common/data-flow/DataSink.hpp"
 #include "ServerCommunicationStrategy.hpp"
+
+using ServerCommunication::ServerCommunicationStrategy;
 
 namespace SensorAccessLinkElement {
 
@@ -24,12 +27,12 @@ namespace SensorAccessLinkElement {
     protected:
 
         typedef T MESSAGE;
-        typedef ServerCommunication::ServerCommunicationStrategy ServerCommunicationProtocolStrategy;
 
     public:
 
-        explicit ServerCommunicator(ServerCommunicationProtocolStrategy* serverCommunicationProtocolStrategy):
-                 serverCommunicationProtocolStrategy(serverCommunicationProtocolStrategy) {
+        explicit ServerCommunicator(ServerCommunicationStrategy* serverCommunicationProtocolStrategy) :
+                serverCommunicationStrategy(serverCommunicationProtocolStrategy),
+                communicatorThread(JoinableThread(doNothing)) {
         };
 
         ~ServerCommunicator() noexcept {};
@@ -43,15 +46,33 @@ namespace SensorAccessLinkElement {
         ServerCommunicator& operator=(ServerCommunicator&& other)& noexcept = delete;
 
         void consume(MESSAGE&& message) override {
+            serverCommunicationStrategy->sendMessage(message);
+        }
 
+        void start() {
+            serverCommunicationStrategy->openConnection();
+            communicatorThread = JoinableThread(&ServerCommunicator::run, this);
         };
-
 
 
     private:
 
-        ServerCommunicationProtocolStrategy* serverCommunicationProtocolStrategy;
-    };
+        void run() {
+            while (!terminateOrderHasBeenReceived()) {
+                auto message = serverCommunicationStrategy->readMessage();
+            }
+        }
+
+        bool terminateOrderHasBeenReceived() const {
+            return terminateOrderReceived.load();
+        }
+
+        AtomicFlag terminateOrderReceived;
+
+        ServerCommunicationStrategy* serverCommunicationStrategy;
+
+        JoinableThread communicatorThread;
+    }
 }
 
 #endif //SPIRITSENSORGATEWAY_SERVERCOMMUNICATOR_H

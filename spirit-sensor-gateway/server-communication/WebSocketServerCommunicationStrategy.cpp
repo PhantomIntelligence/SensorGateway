@@ -13,6 +13,7 @@ WebSocketServerCommunicationStrategy::~WebSocketServerCommunicationStrategy() {
 }
 
 void WebSocketServerCommunicationStrategy::openConnection() {
+    //TODO call connect with right server address
 
 }
 

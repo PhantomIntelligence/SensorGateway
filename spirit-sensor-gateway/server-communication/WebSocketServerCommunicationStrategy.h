@@ -54,17 +54,13 @@ namespace ServerCommunication {
 
         struct ConnectionMetadata {
             int id;
-//        ConnectionHandle connectionHandler;
             std::string status;
             std::string URI;
             std::string server;
             std::string errorReason;
         };
-        ConnectionMetadata connectionMetadata;
 
-//        void onOpen(ConnectionHandle connectionHandle);
-//
-//        Client client;
+        ConnectionMetadata connectionMetadata;
 
         std::string serverAddrress = SERVER_ADDRRESS;
     };
