@@ -13,9 +13,8 @@
 #ifndef SPIRITSENSORGATEWAY_SERVERCOMMUNICATOR_H
 #define SPIRITSENSORGATEWAY_SERVERCOMMUNICATOR_H
 
-#include "spirit-sensor-gateway/common/DataProcessingScheduler.hpp"
-#include "ServerCommunicator.hpp"
-#include "ServerCommunicationProtocolStrategy.hpp"
+#include "spirit-sensor-gateway/common/data-flow/DataSink.hpp"
+#include "ServerCommunicationStrategy.hpp"
 
 namespace SensorAccessLinkElement {
 
@@ -25,7 +24,7 @@ namespace SensorAccessLinkElement {
     protected:
 
         typedef T MESSAGE;
-        typedef ServerCommunication::ServerCommunicationProtocolStrategy ServerCommunicationProtocolStrategy;
+        typedef ServerCommunication::ServerCommunicationStrategy ServerCommunicationProtocolStrategy;
 
     public:
 
