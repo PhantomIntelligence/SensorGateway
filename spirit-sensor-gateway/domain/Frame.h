@@ -62,7 +62,11 @@ namespace DataFlow {
     private:
         PixelsArray pixels;
 
+        void updatePixelAngles(PixelID const& pixelID);
+
         void updatePixelID(PixelID const& pixelID);
+        
+        void updatePixelPositionOnLayer(PixelID const& pixelID);
     };
 }
 
