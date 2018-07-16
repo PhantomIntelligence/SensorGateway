@@ -26,7 +26,7 @@ using DataFlow::ConfidenceLevel;
 using Sensor::AWL::END_OF_FRAME;
 using Sensor::AWL::DETECTION_TRACK;
 using Sensor::AWL::DETECTION_VELOCITY;
-using Sensor::AWL::_16::NUMBER_OF_PIXEL_PER_LAYER;
+using Sensor::AWL::_16::NUMBER_OF_PIXELS_IN_LAYER;
 using Sensor::AWL::_16::NUMBER_OF_PIXELS_IN_FRAME;
 using Sensor::AWL::_16::HORIZONTAL_FIELD_OF_VIEW;
 using Sensor::AWL::_16::ANGLE_RANGE;

@@ -70,11 +70,13 @@ namespace Sensor {
             SensorID const SENSOR_ID = 0x0010;
         }
         namespace _16 {
-            float const HORIZONTAL_FIELD_OF_VIEW = 30.4;
-            int const NUMBER_OF_PIXEL_PER_LAYER = 8;
+            int const MULTIPLICATIVE_CONSTANT = 10;
+            int const HORIZONTAL_FIELD_OF_VIEW = static_cast<int>(30.4*MULTIPLICATIVE_CONSTANT);
+            int const NUMBER_OF_LAYER = 2;
+            int const NUMBER_OF_PIXELS_IN_LAYER = 8;
             int const NUMBER_OF_PIXELS_IN_FRAME = 16;
             int const NUMBER_OF_TRACKS_IN_PIXEL = 16;
-            float const ANGLE_RANGE = (HORIZONTAL_FIELD_OF_VIEW/NUMBER_OF_PIXELS_IN_FRAME);
+            int const ANGLE_RANGE = HORIZONTAL_FIELD_OF_VIEW / NUMBER_OF_PIXELS_IN_LAYER;
             SensorID const SENSOR_ID = 0x0010;
         }
     }

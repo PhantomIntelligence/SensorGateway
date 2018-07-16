@@ -51,8 +51,8 @@ namespace  DataFlow {
     typedef int16_t Speed;
     typedef uint16_t SystemID;
     typedef uint16_t TrackID;
-    typedef float AngleStart;
-    typedef float AngleEnd;
+    typedef double AngleStart;
+    typedef double AngleEnd;
     typedef int PositionOnLayer;
     typedef int Layer;
 };

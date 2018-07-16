@@ -19,10 +19,12 @@ using DataFlow::TracksArray;
 using DataFlow::PixelID;
 using Defaults::Pixel::DEFAULT_PIXEL;
 using Defaults::Pixel::DEFAULT_TRACKS_ARRAY;
-using Sensor::AWL::_16::NUMBER_OF_PIXEL_PER_LAYER;
+using Sensor::AWL::_16::NUMBER_OF_PIXELS_IN_LAYER;
 using Sensor::AWL::_16::NUMBER_OF_PIXELS_IN_FRAME;
 using Sensor::AWL::_16::HORIZONTAL_FIELD_OF_VIEW;
 using Sensor::AWL::_16::ANGLE_RANGE;
+using Sensor::AWL::_16::NUMBER_OF_LAYER;
+using Sensor::AWL::_16::MULTIPLICATIVE_CONSTANT;
 
 Pixel::Pixel(PixelID pixelID, TracksArray tracks, int currentNumberOfTracks) :
         ID(pixelID), tracks(tracks), currentNumberOfTracksInPixel(currentNumberOfTracks) {
@@ -110,22 +112,22 @@ void Pixel::validateNotFull() const {
 }
 
 void Pixel::calculateAngles() {
-    if (positionOnLayer < (NUMBER_OF_PIXELS_IN_FRAME / 2)) {
-        angleStart = (HORIZONTAL_FIELD_OF_VIEW / -2) + (positionOnLayer * ANGLE_RANGE);
+    if (positionOnLayer < (NUMBER_OF_PIXELS_IN_LAYER)) {
+        angleStart = (HORIZONTAL_FIELD_OF_VIEW / -NUMBER_OF_LAYER) + (positionOnLayer * ANGLE_RANGE);
     } else {
-        angleStart = ANGLE_RANGE * (positionOnLayer - (NUMBER_OF_PIXELS_IN_FRAME / 2.0));
+        angleStart = ANGLE_RANGE * (positionOnLayer - NUMBER_OF_PIXELS_IN_LAYER);
     }
     angleEnd = angleStart + ANGLE_RANGE;
 }
 
 void Pixel::calculatePositionOnLayer() {
     
-    if (ID < (NUMBER_OF_PIXEL_PER_LAYER)) {
+    if (ID < (NUMBER_OF_PIXELS_IN_LAYER)) {
         layer = 0;
     } else {
         layer = 1;
     }
-    positionOnLayer = (ID % NUMBER_OF_PIXEL_PER_LAYER);
+    positionOnLayer = (ID % NUMBER_OF_PIXELS_IN_LAYER);
 }
 
 
