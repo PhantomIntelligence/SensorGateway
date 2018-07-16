@@ -13,9 +13,9 @@
 
 #include "KvaserCanProtocolStrategy.h"
 
-using CommunicationProtocolStrategy::KvaserCanProtocolStrategy;
+using SensorCommunication::KvaserCanProtocolStrategy;
 
-const long CANLIB_KVASER_CAN_BIT_RATE =  canBITRATE_1M;
+const long CANLIB_KVASER_CAN_BIT_RATE = canBITRATE_1M;
 const unsigned int CANLIB_TIME_SEGMENT_1 = 0;
 const unsigned int CANLIB_TIME_SEGMENT_2 = 0;
 const unsigned int CANLIB_SYNCHRONIZATION_JUMP_WIDTH = 0;
@@ -25,34 +25,36 @@ const int CANLIB_FLAGS_FOR_CHANNEL = canOPEN_EXCLUSIVE;
 const unsigned int CANLIB_CAN_DRIVER_TYPE = canDRIVER_NORMAL;
 const int CANLIB_CHANNEL_ID = 0;
 
+using DataFlow::AWLMessage;
 
-KvaserCanProtocolStrategy::KvaserCanProtocolStrategy(): communicationChannel(){
+KvaserCanProtocolStrategy::KvaserCanProtocolStrategy() : communicationChannel() {
 }
 
-KvaserCanProtocolStrategy:: ~KvaserCanProtocolStrategy()=default;
+KvaserCanProtocolStrategy::~KvaserCanProtocolStrategy() = default;
 
 void KvaserCanProtocolStrategy::openConnection() {
     canInitializeLibrary();
     canHandle communicationChannel = canOpenChannel(CANLIB_CHANNEL_ID, CANLIB_FLAGS_FOR_CHANNEL);
-    canSetBusParams(communicationChannel, CANLIB_KVASER_CAN_BIT_RATE, CANLIB_TIME_SEGMENT_1, CANLIB_TIME_SEGMENT_2, CANLIB_SYNCHRONIZATION_JUMP_WIDTH, CANLIB_NUMBER_OF_SAMPLING_POINTS, CANLIB_SYNCMODE);
+    canSetBusParams(communicationChannel, CANLIB_KVASER_CAN_BIT_RATE, CANLIB_TIME_SEGMENT_1, CANLIB_TIME_SEGMENT_2,
+                    CANLIB_SYNCHRONIZATION_JUMP_WIDTH, CANLIB_NUMBER_OF_SAMPLING_POINTS, CANLIB_SYNCMODE);
     canSetBusOutputControl(communicationChannel, CANLIB_CAN_DRIVER_TYPE);
     canBusOn(communicationChannel);
 }
 
-AWLMessage KvaserCanProtocolStrategy::readMessage(){
+AWLMessage KvaserCanProtocolStrategy::readMessage() {
     CanMessage canMessage{};
-    canReadWait(communicationChannel, &canMessage.id, &canMessage.data, &canMessage.length, &canMessage.flags, &canMessage.timestamp, CANLIB_READ_WAIT_INFINITE_DELAY);
+    canReadWait(communicationChannel, &canMessage.id, &canMessage.data, &canMessage.length, &canMessage.flags,
+                &canMessage.timestamp, CANLIB_READ_WAIT_INFINITE_DELAY);
     return convertCanMessageToAwlMessage(canMessage);
 }
 
 AWLMessage KvaserCanProtocolStrategy::convertCanMessageToAwlMessage(CanMessage canMessage) {
-    AWLMessage awlMessage{};
-    awlMessage.id = canMessage.id;
-    awlMessage.timestamp = canMessage.timestamp;
-    awlMessage.length = canMessage.length;
+    AWL::DataArray data;
     for (auto dataNumber = 0; dataNumber < canMessage.length; ++dataNumber) {
-        awlMessage.data[dataNumber] = canMessage.data[dataNumber];
+        data[dataNumber] = canMessage.data[dataNumber];
     }
+
+    AWLMessage awlMessage(canMessage.id, canMessage.timestamp, canMessage.length, data);
 
     return awlMessage;
 }

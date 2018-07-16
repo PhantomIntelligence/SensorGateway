@@ -15,8 +15,8 @@
 #define SPIRITSENSORGATEWAY_FILEMANAGER_H
 
 #include <fstream>
-#include <vector>
 #include <iostream>
+#include <vector>
 
 namespace TestUtilities {
 
@@ -49,8 +49,8 @@ namespace TestUtilities {
             return messages;
         }
 
-        void writeFileWithMessages(std::vector<T> messages, char const* filename) {
-            auto file = std::fopen(filename, "w+");
+        void writeFileWithMessages(std::vector<T> messages, std::string filename) {
+            auto file = std::fopen(filename.c_str(), "w+");
             for (auto message : messages) {
                 writeFileBlockWithMessage(message, file);
             }
@@ -67,7 +67,7 @@ namespace TestUtilities {
                 std::string lineFromFirstFile;
                 std::string lineFromSecondFile;
                 while (std::getline(firstFile, lineFromFirstFile) and std::getline(secondFile, lineFromSecondFile)) {
-                    if (lineFromFirstFile.compare(lineFromSecondFile) != 0){
+                    if (lineFromFirstFile.compare(lineFromSecondFile) != 0) {
                         filesAreEqual = false;
                         break;
                     }
@@ -81,13 +81,13 @@ namespace TestUtilities {
 
     protected:
         std::string fetchSubstringBetweenDelimiters(std::string const& fileBlock, std::string const& firstDelimiter,
-                                                 std::string const& secondDelimiter) {
+                                                    std::string const& secondDelimiter) {
             auto startPositionOfFirstDelimiter = fileBlock.find(firstDelimiter);
             auto endPositionOfFirstDelimiter = startPositionOfFirstDelimiter + firstDelimiter.length();
             auto restOfFileBlockAfterFirstDelimiter = fileBlock.substr(endPositionOfFirstDelimiter);
             auto startPositionOfSecondDelimiter = restOfFileBlockAfterFirstDelimiter.find(secondDelimiter);
-            auto fetchedSubstring =  fileBlock.substr(endPositionOfFirstDelimiter,
-                    startPositionOfSecondDelimiter - endPositionOfFirstDelimiter);
+            auto fetchedSubstring = fileBlock.substr(endPositionOfFirstDelimiter,
+                                                     startPositionOfSecondDelimiter - endPositionOfFirstDelimiter);
             return fetchedSubstring;
         }
 

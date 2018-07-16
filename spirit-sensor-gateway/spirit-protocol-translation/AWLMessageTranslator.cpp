@@ -39,8 +39,6 @@ void AWLMessageTranslator::translateEndOfFrameMessage(AWLMessage* awlMessage) {
 void AWLMessageTranslator::translateDetectionTrackMessage(AWLMessage* awlMessage) {
     PixelID pixelID = convertTwoBytesToUnsignedBigEndian(awlMessage->data[3], awlMessage->data[4]);
     Pixel pixel = Pixel(pixelID);
-    pixel.calculateAngles();
-    pixel.calculatePositionOnLayer();
     currentFrame->addPixel(pixel);
     addTrackInPixel(awlMessage, pixel.getID());
 }

@@ -19,44 +19,51 @@
 
 namespace TestUtilities {
 
-    class SpiritFramesFileManager : public FileManager<SpiritProtocol::Frame> {
+    namespace Structures {
+        static size_t const MAX_NUMBER_OF_FRAMES_CURRENTLY_NEEDED_FOR_TEST = 2;
+        using Frames = std::array<DataFlow::Frame, MAX_NUMBER_OF_FRAMES_CURRENTLY_NEEDED_FOR_TEST>;
+    }
+
+    class SpiritFramesFileManager : public FileManager<DataFlow::Frame> {
 
     public:
         SpiritFramesFileManager() = default;
 
         ~SpiritFramesFileManager() override = default;
 
-    private:
-        SpiritProtocol::Frame readMessageFromFileBlock(std::string const& fileBlock) override;
+        void writeFileWithFrames(Structures::Frames frames, std::string const& filename);
 
-        void writeFileBlockWithMessage(SpiritProtocol::Frame message, std::FILE* file) override;
+    private:
+        DataFlow::Frame readMessageFromFileBlock(std::string const& fileBlock) override;
+
+        void writeFileBlockWithMessage(DataFlow::Frame message, std::FILE* file) override;
 
         void writeFileLineWithContentLabel(std::FILE* file, unsigned int numberOfTabulator, char const* contentLabel);
 
         void writeFileLineWithContentLabelAndValue(std::FILE* file, unsigned int numberOfTabulator,
                                                    char const* contentLabel, unsigned int contentValue);
 
-        const std::string FRAME_ID_LABEL = "Frame ID";
+        std::string const  FRAME_ID_LABEL = "Frame ID";
 
-        const std::string SYSTEM_ID_LABEL = "System ID";
+        std::string const  SYSTEM_ID_LABEL = "System ID";
 
-        const std::string PIXELS_LABEL = "Pixels";
+        std::string const  PIXELS_LABEL = "Pixels";
 
-        const std::string PIXEL_ID_LABEL = "Pixel ID";
+        std::string const  PIXEL_ID_LABEL = "Pixel ID";
 
-        const std::string TRACKS_LABEL = "Tracks";
+        std::string const  TRACKS_LABEL = "Tracks";
 
-        const std::string TRACK_ID_LABEL = "Track ID";
+        std::string const  TRACK_ID_LABEL = "Track ID";
 
-        const std::string INTENSITY_LABEL = "Ìntensity";
+        std::string const  INTENSITY_LABEL = "Ìntensity";
 
-        const std::string CONFIDENCE_LEVEL_LABEL = "Confidence Level";
+        std::string const  CONFIDENCE_LEVEL_LABEL = "Confidence Level";
 
-        const std::string DISTANCE_LABEL = "Distance";
+        std::string const  DISTANCE_LABEL = "Distance";
 
-        const std::string ACCELERATION_LABEL = "Acceleration";
+        std::string const  ACCELERATION_LABEL = "Acceleration";
 
-        const std::string SPEED_LABEL = "Speed";
+        std::string const  SPEED_LABEL = "Speed";
     };
 }
 

@@ -16,11 +16,52 @@
 
 #include "spirit-sensor-gateway/common/ConstantValuesDefinition.h"
 
-struct AWLMessage {
-    int64_t id;
-    uint64_t timestamp;
-    uint32_t length;
-    unsigned char data[MAX_NUMBER_OF_DATA_IN_AWL_MESSAGE];
-};
+using Sensor::AWL::MAXIMUM_NUMBER_OF_DATA_IN_MESSAGE;
 
+
+namespace AWL {
+    using DataArray = std::array<unsigned char, MAXIMUM_NUMBER_OF_DATA_IN_MESSAGE>;
+}
+
+
+namespace DataFlow {
+    class AWLMessage {
+    public:
+        explicit AWLMessage(int64_t id, uint64_t timestamp, uint32_t length, AWL::DataArray data);
+
+        ~AWLMessage() noexcept = default;
+
+        AWLMessage(AWLMessage const& other);
+
+        AWLMessage(AWLMessage&& other) noexcept;
+
+        AWLMessage& operator = (AWLMessage const& other)& ;
+
+        AWLMessage& operator = (AWLMessage&& other)& noexcept;
+
+        void swap(AWLMessage& current, AWLMessage& other) noexcept;
+
+        bool operator ==(AWLMessage const&) const;
+
+        bool operator != (AWLMessage const&) const;
+
+        static AWLMessage const& returnDefaultData() noexcept;
+
+        int64_t id;
+        uint64_t timestamp;
+        uint32_t length;
+        AWL::DataArray data;
+
+    };
+
+namespace Defaults {
+    using DataFlow::AWLMessage;
+    int64_t const DEFAULT_ID = 0;
+    uint64_t const DEFAULT_TIMESTAMP = 0;
+    uint32_t const DEFAULT_LENGTH = 0;
+    AWL::DataArray const DEFAULT_AWL_DATA = AWL::DataArray();
+    AWLMessage const DEFAULT_AWL_MESSAGE = AWLMessage(DEFAULT_ID, DEFAULT_TIMESTAMP, DEFAULT_LENGTH, DEFAULT_AWL_DATA);
+}
+
+}
 #endif //SPIRITSENSORGATEWAY_MESSAGE_H

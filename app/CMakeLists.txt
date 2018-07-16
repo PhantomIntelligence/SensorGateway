@@ -1,5 +1,5 @@
 
-# Add SpiritSensorGateway files
+# Add all the SpiritSensorGateway files
 # Select all the test and source files
 file(GLOB LIVE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/*")
 
