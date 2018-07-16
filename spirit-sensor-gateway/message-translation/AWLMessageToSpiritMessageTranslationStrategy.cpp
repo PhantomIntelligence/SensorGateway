@@ -101,5 +101,3 @@ Track* AWLMessageToSpiritMessageTranslationStrategy::fetchTrack(TrackID const& t
 Frame AWLMessageToSpiritMessageTranslationStrategy::returnDefaultData() {
     return Frame();
 }
-
-
