@@ -5,10 +5,9 @@ configure_file(config.h.in "${CMAKE_CURRENT_BINARY_DIR}/config.h" @ONLY)
 # Select all the source and header files
 file(GLOB COMMON_FILES "${CMAKE_CURRENT_SOURCE_DIR}/common/*")
 file(GLOB DOMAIN_FILES "${CMAKE_CURRENT_SOURCE_DIR}/domain/*")
-file(GLOB COMMUNICATION_PROTOCOL_FILES "${CMAKE_CURRENT_SOURCE_DIR}/communication-protocol-strategy/*")
 file(GLOB SERVER_COMMUNICATION_PROTOCOL_FILES "${CMAKE_CURRENT_SOURCE_DIR}/server-communication/*")
-file(GLOB SPIRIT_PROTOCOL_FILES "${CMAKE_CURRENT_SOURCE_DIR}/spirit-protocol-translation/*")
-
+file(GLOB SPIRIT_PROTOCOL_FILES "${CMAKE_CURRENT_SOURCE_DIR}/message-translation/*")
+file(GLOB COMMUNICATION_PROTOCOL_FILES "${CMAKE_CURRENT_SOURCE_DIR}/sensor-communication/*")
 
 add_library(${PROJECT_NAME} SHARED ${COMMON_FILES} ${DOMAIN_FILES} ${SRC_FILES} ${COMMUNICATION_PROTOCOL_FILES} ${SPIRIT_PROTOCOL_FILES} ${SERVER_COMMUNICATION_PROTOCOL_FILES} config.h.in)
 
@@ -23,6 +22,7 @@ else ()
     message(WARNING "The file conanbuildinfo.cmake doesn't exist, you have to run conan install first")
 endif ()
 #######################################################
+
 
 ########## uws ########################################
 find_package(uws CONFIG REQUIRED)

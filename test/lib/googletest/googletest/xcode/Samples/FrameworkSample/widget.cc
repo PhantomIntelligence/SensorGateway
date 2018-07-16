@@ -56,7 +56,7 @@ std::string Widget::GetStringValue() const {
 }
 
 void Widget::GetCharPtrValue(char* buffer, size_t max_size) const {
-  // Copy the char* representation of name_ into buffer, up to max_size.
+  // Copy the char* representation of name_ into data-flow, up to max_size.
   strncpy(buffer, name_.c_str(), max_size-1);
   buffer[max_size-1] = '\0';
   return;

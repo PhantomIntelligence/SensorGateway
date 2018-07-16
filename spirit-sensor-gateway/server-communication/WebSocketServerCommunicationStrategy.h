@@ -22,10 +22,10 @@ namespace ServerCommunication {
 
     std::string const SERVER_ADDRRESS = "ws://localhost:8080/connect-gateway";
 
-    class WebSocketServerCommunicationStrategy : public ServerCommunicationProtocolStrategy<SpiritProtocol::Frame> {
+    class WebSocketServerCommunicationStrategy : public ServerCommunicationProtocolStrategy<DataFlow::Frame> {
 
     protected:
-        using super = ServerCommunicationProtocolStrategy<SpiritProtocol::Frame>;
+        using super = ServerCommunicationProtocolStrategy<DataFlow::Frame>;
 
         using super::MESSAGE;
 

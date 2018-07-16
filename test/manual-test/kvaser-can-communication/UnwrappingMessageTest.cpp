@@ -2,7 +2,7 @@
 #include <iostream>
 #include <cstdio>
 #include <inttypes.h>
-#include "spirit-sensor-gateway/communication-protocol-strategy/KvaserCanProtocolStrategy.cpp"
+#include "spirit-sensor-gateway/sensor-communication/KvaserCanCommunicationStrategy.cpp"
 
 
 int main(){
@@ -10,14 +10,15 @@ int main(){
     const int NUMBER_DETECTION = 1000;
     auto file = std::fopen("AWLMessagesCustom.txt", "w+");
 
-    KvaserCanProtocolStrategy kvaserCanProtocolStrategy;
+
+    KvaserCanCommunicationStrategy kvaserCanProtocolStrategy;
     kvaserCanProtocolStrategy.openConnection();
 
     //FOR GENERATING TXT FILE
     for (auto i = 0; i < NUMBER_DETECTION; i++) {
         AWLMessage message = kvaserCanProtocolStrategy.readMessage();
         std::fprintf(file, "=================================================================================== \n");
-        std::fprintf(file, "ID : %" PRIu64 "\n", message.id);
+        std::fprintf(file, "SENSOR_ID : %" PRIu64 "\n", message.id);
         std::fprintf(file, "length : %d \n", message.length);
         std::fprintf(file, "timestamp : %" PRIu64 "\n", message.timestamp);
         for (int j = 0; j < message.length; j++) {

@@ -19,7 +19,7 @@
 #define SPIRITSENSORGATEWAY_CONSTANTSIZEDPOINTERQUEUETEST_CPP
 
 #include <gtest/gtest.h>
-#include "spirit-sensor-gateway/common/ConstantSizedPointerQueue.hpp"
+#include "spirit-sensor-gateway/common/container/ConstantSizedPointerQueue.hpp"
 #include "data-model/DataModelFixture.h"
 
 using ExampleDataModel::NativeData;

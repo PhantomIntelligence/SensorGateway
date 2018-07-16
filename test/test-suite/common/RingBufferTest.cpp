@@ -3,10 +3,13 @@
 
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
+#include <spirit-sensor-gateway/domain/AWLMessage.h>
+#include <spirit-sensor-gateway/sensor-communication/SensorCommunicator.hpp>
+#include <spirit-sensor-gateway/sensor-communication/KvaserCanCommunicationStrategy.h>
 
-#include "spirit-sensor-gateway/common/RingBuffer.hpp"
+#include "spirit-sensor-gateway/common/data-flow/RingBuffer.hpp"
 #include "data-model/DataModelFixture.h"
-#include "MockConsumerLink.h"
+#include "ConsumerLinkMock.h"
 
 using ExampleDataModel::NativeData;
 using ExampleDataModel::ProcessedData;
@@ -14,7 +17,7 @@ using ExampleDataModel::Data;
 using TestFunctions::DataTestUtil;
 
 using NativeBuffer = DataFlow::RingBuffer<NativeData>;
-using MockConsumerLink = Mock::MockConsumerLink<NativeData>;
+using MockConsumerLink = Mock::ConsumerLinkMock<NativeData>;
 
 class RingBufferTest : public ::testing::Test {
 

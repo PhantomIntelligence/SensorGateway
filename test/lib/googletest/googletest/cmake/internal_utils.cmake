@@ -108,7 +108,7 @@ macro(config_compiler_and_linker)
     set(cxx_no_rtti_flags "-features=no%rtti -DGTEST_HAS_RTTI=0")
   elseif (CMAKE_CXX_COMPILER_ID STREQUAL "VisualAge" OR
       CMAKE_CXX_COMPILER_ID STREQUAL "XL")
-    # CMake 2.8 changes Visual Age's compiler ID to "XL".
+    # CMake 2.8 changes Visual Age's compiler SENSOR_ID to "XL".
     set(cxx_exception_flags "-qeh")
     set(cxx_no_exception_flags "-qnoeh")
     # Until version 9.0, Visual Age doesn't define a macro to indicate

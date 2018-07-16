@@ -1,5 +1,5 @@
 # Add SpiritSensorGateway acceptance test files
-file(GLOB TEST_FILES "${CMAKE_CURRENT_SOURCE_DIR}/spirit-protocol-translation/*")
+file(GLOB TEST_FILES "${CMAKE_CURRENT_SOURCE_DIR}/message-translation/*")
 
 add_executable(acceptance-tests ${TEST_FILES} ${UTILITIES_FILES})
 

@@ -21,22 +21,15 @@
 #include <thread>
 #include <cstdint>
 
-/**
- * @brief High Integrity C++ default compliant code is contained in this namespace. It has been directly obtained from the HIC++ version 4
- */
 namespace HighIntegrity {
 
-    /**
-     * @brief Enum used in this template to determine if the thread should run by itself and will be expected to rejoin a thread later (JOIN) or if it simply will be executed and no be expected back (DETACH)
-     */
     enum ThreadExecutionType : int32_t {
         DETACH,
         JOIN,
     };
 
     /**
-     * @brief Delete safe implementation of std::threads. Only this implementation shall be used in the project
-     * @template ThreadExec the enum type (see enum ThreadExec)
+     * @warning Delete safe implementation of std::threads. Only this implementation shall be used in the project
      */
     template<ThreadExecutionType TYPE>
     class HighIntegrityThread {
@@ -60,7 +53,7 @@ namespace HighIntegrity {
             }
         }
 
-        HighIntegrityThread& operator=(const HighIntegrityThread&) = delete;
+        HighIntegrityThread& operator=(HighIntegrityThread const&) = delete;
 
         HighIntegrityThread& operator=(HighIntegrityThread&& other) {
             if (this != &other) {

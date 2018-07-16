@@ -42,7 +42,7 @@ void WebSocketServerCommunicationStrategy::initializeClientCallbacks() {
 
 //}
 
-void WebSocketServerCommunicationStrategy::processMessage(SpiritProtocol::Frame&& message) {
+void WebSocketServerCommunicationStrategy::processMessage(DataFlow::Frame&& message) {
 
 }
 
