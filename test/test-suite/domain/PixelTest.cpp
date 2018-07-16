@@ -5,7 +5,6 @@
 #include <gmock/gmock.h>
 #include "spirit-sensor-gateway/domain/Pixel.h"
 
-
 using DataFlow::Pixel;
 using DataFlow::PixelID;
 using DataFlow::TracksArray;
