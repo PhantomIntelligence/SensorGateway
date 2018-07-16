@@ -51,10 +51,10 @@ namespace  DataFlow {
     typedef int16_t Speed;
     typedef uint16_t SystemID;
     typedef uint16_t TrackID;
-    typedef double AngleStart;
-    typedef double AngleEnd;
-    typedef int PositionOnLayer;
-    typedef int Layer;
+    typedef int32_t AngleStart;
+    typedef int32_t AngleEnd;
+    typedef int8_t PositionOnLayer;
+    typedef int8_t Layer;
 };
 
 #endif //SPIRITSENSORGATEWAY_TYPEDEFINITION_H
