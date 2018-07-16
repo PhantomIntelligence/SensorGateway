@@ -68,7 +68,7 @@ namespace Sensor {
             SensorID const SENSOR_ID = 0x0010;
         }
         namespace _16 {
-            int const MULTIPLICATIVE_CONSTANT = 1000;
+            int const MULTIPLICATIVE_CONSTANT = 10;  // Because all values are multiple with 1 decimal, 10 is sufficient to work with non-floating point representation
             int const HORIZONTAL_FIELD_OF_VIEW = static_cast<int>(30.4*MULTIPLICATIVE_CONSTANT);
             int const NUMBER_OF_LAYER = 2;
             int const NUMBER_OF_PIXELS_IN_LAYER = 8;

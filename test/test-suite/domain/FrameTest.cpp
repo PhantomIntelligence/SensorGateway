@@ -89,6 +89,4 @@ TEST_F(FrameTest,
     ASSERT_TRUE(framesAreNotEqual);
 }
 
-
-
 #endif //SPIRITSENSORGATEWAY_FRAMETEST_H
