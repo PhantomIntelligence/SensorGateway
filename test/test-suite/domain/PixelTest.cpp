@@ -126,10 +126,8 @@ TEST_F(PixelTest,
     auto expectedLayer = 0;
     auto expectedPositionOnLayer = 1;
 
-
     ASSERT_EQ(expectedLayer, pixel.layer);
     ASSERT_EQ(expectedPositionOnLayer, pixel.positionOnLayer);
-
 }
 
 TEST_F(PixelTest,
@@ -143,8 +141,6 @@ TEST_F(PixelTest,
 
     ASSERT_EQ(expectedAngleStart,pixel.angleStart);
     ASSERT_EQ(expectedAngleEnd,pixel.angleEnd);
-
-
 }
 
 #endif //SPIRITSENSORGATEWAY_PIXELTEST_CPP
