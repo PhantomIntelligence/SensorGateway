@@ -18,7 +18,7 @@
 #define SPIRITSENSORGATEWAY_SENSORCOMMUNICATOR_HPP
 
 #include "spirit-sensor-gateway/common/data-flow/DataProcessingScheduler.hpp"
-#include "CommunicationProtocolStrategy.hpp"
+#include "SensorCommunicationStrategy.hpp"
 
 namespace SensorAccessLinkElement {
 
@@ -27,30 +27,37 @@ namespace SensorAccessLinkElement {
 
     protected:
         typedef T DATA;
-        typedef SensorCommunication::CommunicationProtocolStrategy<DATA> CommunicationProtocolStrategy;
+        typedef SensorCommunication::SensorCommunicationStrategy<DATA> SensorCommunicationStrategy;
 
         using super = DataFlow::DataSource<DATA>;
         using super::produce;
 
     public:
-        explicit SensorCommunicator(CommunicationProtocolStrategy* communicationProtocolStrategy) :
+        explicit SensorCommunicator(SensorCommunicationStrategy* sensorCommunicationStrategy) :
                 terminateOrderReceived(false),
-                communicationProtocolStrategy(communicationProtocolStrategy),
+                sensorCommunicationStrategy(sensorCommunicationStrategy),
                 communicatorThread(JoinableThread(doNothing)) {
             communicatorThread.exitSafely();
         }
 
         ~SensorCommunicator() {
+        };
 
-        }
+        SensorCommunicator(SensorCommunicator const& other) = delete;
+
+        SensorCommunicator(SensorCommunicator&& other) noexcept = delete;
+
+        SensorCommunicator& operator=(SensorCommunicator const& other)& = delete;
+
+        SensorCommunicator& operator=(SensorCommunicator&& other)& noexcept = delete;
 
         void start() {
-            communicationProtocolStrategy->openConnection();
+            sensorCommunicationStrategy->openConnection();
             communicatorThread = JoinableThread(&SensorCommunicator::run, this);
         };
 
         void terminateAndJoin() {
-            communicationProtocolStrategy->closeConnection();
+            sensorCommunicationStrategy->closeConnection();
 
             if (!terminateOrderHasBeenReceived()) {
                 terminateOrderReceived.store(true);
@@ -64,7 +71,7 @@ namespace SensorAccessLinkElement {
 
         void run() {
             while (!terminateOrderHasBeenReceived()) {
-                auto message = communicationProtocolStrategy->readMessage();
+                auto message = sensorCommunicationStrategy->readMessage();
                 produce(std::move(message));
             }
         }
@@ -77,7 +84,7 @@ namespace SensorAccessLinkElement {
 
         AtomicFlag terminateOrderReceived;
 
-        CommunicationProtocolStrategy* communicationProtocolStrategy;
+        SensorCommunicationStrategy* sensorCommunicationStrategy;
     };
 }
 
