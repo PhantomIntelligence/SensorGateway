@@ -17,51 +17,34 @@
 #include "spirit-sensor-gateway/domain/Frame.h"
 
 
-namespace ServerCommunication{
+namespace ServerCommunication {
     using Json = nlohmann::json;
     using DataFlow::Frame;
 
-    static Json parseTrackToJson(Track track){
-        Json jsonTrack;
-        jsonTrack["trackID"] =  track.ID;
-        jsonTrack["intensity"] =  track.intensity;
-        jsonTrack["distance"] =  track.distance;
-        jsonTrack["confidenceLevel"] =  track.confidenceLevel;
-        jsonTrack["speed"] =  track.speed;
-        jsonTrack["acceleration"] =  track.acceleration;
+    class JsonParser final{
+    public:
+        JsonParser() = delete;
 
-        return jsonTrack;
-    }
+        ~JsonParser() = delete;
 
-    static Json parsePixelToJson(Pixel pixel){
-            Json jsonPixel;
-            jsonPixel["pixelID"] = pixel.ID;
-            jsonPixel["numberOfTracksInPixel"] = pixel.getCurrentNumberOfTracksInPixel();
+        JsonParser(JsonParser const& other) = delete;
 
-            Json pixelTracks;
-            for(Track track:*pixel.getTracks()){
-                    pixelTracks.push_back(parseTrackToJson(track));
-            }
-            jsonPixel["tracks"] = pixelTracks;
+        JsonParser(JsonParser&& other) noexcept = delete;
 
-        return jsonPixel;
+        JsonParser& operator=(JsonParser const& other)& = delete;
 
-    }
-    static std::string parseFrameToJsonString (Frame frame){
-        Json jsonFrame;
-        jsonFrame["frameID"] = frame.frameID;
-        jsonFrame["systemID"] = frame.systemID;
+        JsonParser& operator=(JsonParser&& other) noexcept = delete;
 
-        Json framePixels;
-        for(Pixel pixel: *frame.getPixels()){
-            framePixels.push_back(parsePixelToJson(pixel));
-        }
 
-        jsonFrame["pixels"] = framePixels;
+        static std::string parseFrameToJsonString(Frame frame);
 
-        return jsonFrame.dump(4);
-    }
+    private:
+        static Json parsePixelToJson(Pixel pixel);
 
+        static Json parseTrackToJson(Track track);
+
+    };
+    
 }
 
 #endif //SPIRITSENSORGATEWAY_JSONPARSER_H
