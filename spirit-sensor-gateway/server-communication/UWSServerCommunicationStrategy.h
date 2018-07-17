@@ -10,8 +10,8 @@
 	See the License for the specific language governing permissions and
 	limitations under the License.
 */
-#ifndef SPIRITSENSORGATEWAY_WEBSOCKETSERVERCOMMUNICATIONSTRATEGY_H
-#define SPIRITSENSORGATEWAY_WEBSOCKETSERVERCOMMUNICATIONSTRATEGY_H
+#ifndef SPIRITSENSORGATEWAY_UWSSERVERCOMMUNICATIONSTRATEGY_H
+#define SPIRITSENSORGATEWAY_UWSSERVERCOMMUNICATIONSTRATEGY_H
 
 #include <uWS.h>
 #include "ServerCommunicationProtocolStrategy.hpp"
@@ -20,9 +20,9 @@
 
 namespace ServerCommunication {
 
-    std::string const SERVER_ADDRRESS = "ws://localhost:8080/connect-gateway";
+    std::string const SERVER_CONNECTION_ADDRESS = "ws://localhost:8080/connect-gateway";
 
-    class WebSocketServerCommunicationStrategy : public ServerCommunicationProtocolStrategy<DataFlow::Frame> {
+    class UWSServerCommunicationStrategy : public ServerCommunicationProtocolStrategy<DataFlow::Frame> {
 
     protected:
         using super = ServerCommunicationProtocolStrategy<DataFlow::Frame>;
@@ -31,9 +31,17 @@ namespace ServerCommunication {
 
     public:
 
-        WebSocketServerCommunicationStrategy();
+        UWSServerCommunicationStrategy();
 
-        ~WebSocketServerCommunicationStrategy();
+        ~UWSServerCommunicationStrategy() noexcept;
+
+        UWSServerCommunicationStrategy(UWSServerCommunicationStrategy const& other) = delete;
+
+        UWSServerCommunicationStrategy(UWSServerCommunicationStrategy&& other) noexcept = delete;
+
+        UWSServerCommunicationStrategy& operator=(UWSServerCommunicationStrategy const& other)& = delete;
+
+        UWSServerCommunicationStrategy& operator=(UWSServerCommunicationStrategy&& other) noexcept= delete;
 
         void openConnection() override;
 
@@ -47,10 +55,10 @@ namespace ServerCommunication {
 
     private:
 
-
         void initializeClientCallbacks();
 
         void sendMessage(MESSAGE&& message) override;
+
 
         struct ConnectionMetadata {
             int id;
@@ -66,9 +74,9 @@ namespace ServerCommunication {
 //
 //        Client client;
 
-        std::string serverAddrress = SERVER_ADDRRESS;
+        std::string serverAddrress = SERVER_CONNECTION_ADDRESS;
     };
 }
 
 
-#endif //SPIRITSENSORGATEWAY_WEBSOCKETSERVERCOMMUNICATIONSTRATEGY_H
+#endif //SPIRITSENSORGATEWAY_UWSSERVERCOMMUNICATIONSTRATEGY_H
