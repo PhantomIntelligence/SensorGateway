@@ -14,7 +14,7 @@
 #define SPIRITSENSORGATEWAY_UWSSERVERCOMMUNICATIONSTRATEGY_H
 
 #include <uWS.h>
-#include "ServerCommunicationProtocolStrategy.hpp"
+#include "ServerCommunicationStrategy.hpp"
 #include "spirit-sensor-gateway/domain/Frame.h"
 
 
@@ -22,10 +22,10 @@ namespace ServerCommunication {
 
     std::string const SERVER_CONNECTION_ADDRESS = "ws://localhost:8080/connect-gateway";
 
-    class UWSServerCommunicationStrategy : public ServerCommunicationProtocolStrategy<DataFlow::Frame> {
+    class UWSServerCommunicationStrategy : public ServerCommunicationStrategy<DataFlow::Frame> {
 
     protected:
-        using super = ServerCommunicationProtocolStrategy<DataFlow::Frame>;
+        using super = ServerCommunicationStrategy<DataFlow::Frame>;
 
         using super::MESSAGE;
 
@@ -62,17 +62,13 @@ namespace ServerCommunication {
 
         struct ConnectionMetadata {
             int id;
-//        ConnectionHandle connectionHandler;
             std::string status;
             std::string URI;
             std::string server;
             std::string errorReason;
         };
-        ConnectionMetadata connectionMetadata;
 
-//        void onOpen(ConnectionHandle connectionHandle);
-//
-//        Client client;
+        ConnectionMetadata connectionMetadata;
 
         std::string serverAddrress = SERVER_CONNECTION_ADDRESS;
     };

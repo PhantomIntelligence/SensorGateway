@@ -85,7 +85,7 @@ void UWSServerCommunicationStrategy::openConnection() {
     hub.connect(SERVER_CONNECTION_ADDRESS, user, extraHeaders, timeoutInMilliseconds);
 
     hub.run();
-    
+
 }
 
 void UWSServerCommunicationStrategy::closeConnection() {

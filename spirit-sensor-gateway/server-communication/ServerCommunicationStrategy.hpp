@@ -16,11 +16,11 @@
 namespace ServerCommunication {
 
     template<class T>
-    class ServerCommunicationProtocolStrategy {
+    class ServerCommunicationStrategy {
     protected:
         typedef T MESSAGE;
     public:
-        virtual ~ServerCommunicationProtocolStrategy() noexcept = default;
+        virtual ~ServerCommunicationStrategy() noexcept = default;
 
         virtual void sendMessage(MESSAGE&& message) = 0;
 

@@ -18,16 +18,18 @@
 #include "test/utilities/files/SpiritFramesFileManager.h"
 #include "test/acceptance-test/stubs/AWLMessagesStub.h"
 #include "test/acceptance-test/stubs/SpiritFramesStub.h"
+#include "spirit-sensor-gateway/message-translation/MessageTranslator.hpp"
 #include "spirit-sensor-gateway/message-translation/AWLMessageToSpiritMessageTranslationStrategy.h"
 #include "test/mock/FrameSinkMock.h"
 
-using MessageTranslation::AWLMessageToSpiritMessageTranslationStrategy;
 using Mock::FrameProcessingScheduler;
 using Mock::FrameSinkMock;
 using TestUtilities::AWLMessagesFileManager;
 using TestUtilities::SpiritFramesFileManager;
+using SensorAccessLinkElement::MessageTranslator;
+using MessageTranslation::AWLMessageToSpiritMessageTranslationStrategy;
 
-class AWLMessageToSpiritMessageTranslationStrategyTest : public ::testing::Test {
+class MessageTranslatorTest : public ::testing::Test {
 protected:
     char const* AWLMESSAGES_INPUT_FILE_NAME = "AWLMessagesInputFile.txt";
     char const* EXPECTED_SPIRIT_FRAMES_OUTPUT_FILE_NAME = "ExpectedSpiritFramesOutputFile.txt";
@@ -41,19 +43,18 @@ protected:
     SpiritFramesFileManager spiritFramesFileManager;
 };
 
-TEST_F(AWLMessageToSpiritMessageTranslationStrategyTest,
+TEST_F(MessageTranslatorTest,
        given_someInputFileContainingValidAWLMessages_when_translatingAWLMessagesIntoSpiritFrames_then_returnCorrespondingSpriritFramesOutputFile) {
     auto ACTUAL_SPIRIT_FRAMES_OUTPUT_FILE_NAME = "ActualSpiritFramesOutputFile.txt";
-    AWLMessageToSpiritMessageTranslationStrategy awlMessageTranslator;
+
+    AWLMessageToSpiritMessageTranslationStrategy messageTranslationStrategy;
+    MessageTranslator<AWLMessage,Frame> messageTranslator(&messageTranslationStrategy);
     FrameSinkMock frameSinkMock(1);
     FrameProcessingScheduler scheduler(&frameSinkMock);
-    awlMessageTranslator.linkConsumer(&scheduler);
-    int counter = 0;
 
     auto messages = awlMessagesFileManager.readMessagesFromFile(AWLMESSAGES_INPUT_FILE_NAME);
     for (auto message : messages) {
-        awlMessageTranslator.translateBasicMessage(std::move(message));
-        ++counter;
+        messageTranslator.consume(std::move(message));
     }
 
     scheduler.terminateAndJoin();
