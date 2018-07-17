@@ -15,16 +15,15 @@ int main(){
 
     KvaserCanCommunicationStrategy sensorCommunicationStrategy;
     AWLMessageToSpiritMessageTranslationStrategy messageTranslationStrategy;
-    FrameSinkMock serverCommunicationStrategy(1);
+    FrameSinkMock serverCommunicationStrategy(100);
 
-    SensorAccessLink sensorAccessLink(&sensorCommunicationStrategy, &messageTranslationStrategy,
-                                      &serverCommunicationStrategy);
-    SpiritFramesFileManager fileManager;
-    const int NUMBER_OF_MILLISECONDS = 5000;
-
-    sensorAccessLink.start();
-    std::this_thread::sleep_for(std::chrono::milliseconds(NUMBER_OF_MILLISECONDS));
-    sensorAccessLink.terminateAndJoin();
+    SensorAccessLink<AWLMessage, Frame> sensorAccessLink(&sensorCommunicationStrategy, &messageTranslationStrategy, &serverCommunicationStrategy);
+//    SpiritFramesFileManager fileManager;
+//    const int NUMBER_OF_MILLISECONDS = 5000;
+//
+//    sensorAccessLink.start();
+//    std::this_thread::sleep_for(std::chrono::milliseconds(NUMBER_OF_MILLISECONDS));
+//    sensorAccessLink.terminateAndJoin();
 
 
 };

@@ -17,6 +17,7 @@
 #ifndef SPIRITSENSORGATEWAY_SENSORACCESSLINK_H
 #define SPIRITSENSORGATEWAY_SENSORACCESSLINK_H
 
+#include <test/mock/FrameSinkMock.h>
 #include "spirit-sensor-gateway/sensor-communication/SensorCommunicator.hpp"
 #include "spirit-sensor-gateway/sensor-communication/SensorCommunicationStrategy.hpp"
 #include "spirit-sensor-gateway/message-translation/MessageTranslator.hpp"
@@ -36,17 +37,12 @@ public:
     //TODO change constructor to receive serverCommunicationStrategy instead
     explicit SensorAccessLink(SensorCommunicationStrategy<I>* sensorCommunicationStrategy,
                               MessageTranslationStrategy<I, O>* messageTranslationStrategy,
-                              DataSink<O>* serverCommunicator) : sensorCommunicator(),
-                                                                        messageTranslator(),
-                                                                        messageTranslationScheduler(),
-                                                                        serverCommunicationScheduler() {
-        sensorCommunicator = SensorCommunicator(sensorCommunicationStrategy);
-        messageTranslator = MessageTranslator(messageTranslationStrategy);
+                              DataSink<O>* serverCommunicator): sensorCommunicator(sensorCommunicationStrategy),
+                                                                messageTranslator(messageTranslationStrategy),
+                                                                messageTranslationScheduler(&messageTranslator),
+                                                                serverCommunicationScheduler(serverCommunicator) {
 
-        serverCommunicationScheduler = ServerCommunicationScheduler(serverCommunicator);
-        messageTranslator.linkConsumer(&serverCommunicationScheduler);
-
-        messageTranslationScheduler = MessageTranslationScheduler(messageTranslator);
+        messageTranslationStrategy->linkConsumer(&serverCommunicationScheduler);
         sensorCommunicator.linkConsumer(&messageTranslationScheduler);
     };
 
