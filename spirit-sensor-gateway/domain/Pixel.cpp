@@ -11,7 +11,6 @@
 	limitations under the License.
 */
 
-#include <iostream>
 #include "Pixel.h"
 
 using DataFlow::Pixel;

@@ -15,11 +15,12 @@
 #define SPIRITSENSORGATEWAY_TYPEDEFINITION_H
 
 
-#include <array>
 #include <atomic>
 #include <future>
 #include <mutex>
+#include <functional>
 
+#include <array>
 #include <iostream>
 #include <unordered_map>
 #include <exception>
