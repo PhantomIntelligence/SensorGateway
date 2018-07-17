@@ -14,9 +14,12 @@
 #ifndef SPIRITSENSORGATEWAY_CONSTANTFUNCTIONSDEFINITION_H
 #define SPIRITSENSORGATEWAY_CONSTANTFUNCTIONSDEFINITION_H
 
+
 #include "ConstantValuesDefinition.h"
 
+
 namespace {
+
     uint16_t convertTwoBytesToUnsignedBigEndian(uint8_t firstByte, uint8_t secondByte) noexcept {
         auto shift = static_cast<uint16_t>(256U);
         uint16_t unsignedBigEndianNumber = shift * secondByte + firstByte;

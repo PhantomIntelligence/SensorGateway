@@ -105,6 +105,10 @@ void Pixel::validateNotFull() const {
     }
 }
 
+int Pixel::getCurrentNumberOfTracksInPixel() {
+    return currentNumberOfTracksInPixel;
+}
+
 
 
 

@@ -64,9 +64,12 @@ namespace DataFlow {
 
         PixelID ID;
 
+        int getCurrentNumberOfTracksInPixel();
+
     private:
 
         TracksArray tracks;
+
         int currentNumberOfTracksInPixel;
 
         void validateNotFull() const;

@@ -17,6 +17,7 @@ file(GLOB UTILITIES_FILES "${CMAKE_CURRENT_SOURCE_DIR}/utilities/files/*")
 file(GLOB TEST_FILES "${CMAKE_CURRENT_SOURCE_DIR}/mock/*")
 file(GLOB RING_BUFFER_TEST_FILES "${CMAKE_CURRENT_SOURCE_DIR}/test-suite/common/*")
 file(GLOB SENSOR_COMM_TEST_FILES "${CMAKE_CURRENT_SOURCE_DIR}/test-suite/sensor-communication/*")
+file(GLOB SERVER_COMM_TEST_FILES "${CMAKE_CURRENT_SOURCE_DIR}/test-suite/server-communication/*")
 file(GLOB DATA_MODEL_FILES "${CMAKE_CURRENT_SOURCE_DIR}/test-suite/data-model/*")
 
 # Include Mocks
@@ -30,7 +31,7 @@ include_directories("${CMAKE_CURRENT_SOURCE_DIR}/test/manual-test")
 
 # Add all the test and mock files to the executable
 
-add_executable(runtests ${TEST_FILES} ${COMMON_TEST_FILES} ${TRANSLATOR_TEST_FILES} ${DOMAIN_TEST_FILES} ${UTILITIES_FILES} ${MOCK_FILES} ${RING_BUFFER_TEST_FILES} ${DATA_MODEL_FILES} ${SENSOR_COMM_TEST_FILES})
+add_executable(runtests ${TEST_FILES} ${COMMON_TEST_FILES} ${TRANSLATOR_TEST_FILES} ${DOMAIN_TEST_FILES} ${UTILITIES_FILES} ${MOCK_FILES} ${RING_BUFFER_TEST_FILES} ${DATA_MODEL_FILES} ${SENSOR_COMM_TEST_FILES} ${SERVER_COMM_TEST_FILES})
 
 
 find_package(SpiritSensorGateway)
