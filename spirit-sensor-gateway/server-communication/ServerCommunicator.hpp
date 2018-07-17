@@ -30,7 +30,7 @@ namespace SensorAccessLinkElement {
 
     public:
 
-        explicit ServerCommunicator(ServerCommunicationStrategy* serverCommunicationProtocolStrategy) :
+        explicit ServerCommunicator(ServerCommunicationStrategy<T>* serverCommunicationProtocolStrategy) :
                 serverCommunicationStrategy(serverCommunicationProtocolStrategy),
                 communicatorThread(JoinableThread(doNothing)) {
         };
@@ -46,22 +46,12 @@ namespace SensorAccessLinkElement {
         ServerCommunicator& operator=(ServerCommunicator&& other)& noexcept = delete;
 
         void consume(MESSAGE&& message) override {
-            serverCommunicationStrategy->sendMessage(message);
+
         }
 
-        void start() {
-            serverCommunicationStrategy->openConnection();
-            communicatorThread = JoinableThread(&ServerCommunicator::run, this);
-        };
 
 
     private:
-
-        void run() {
-            while (!terminateOrderHasBeenReceived()) {
-                auto message = serverCommunicationStrategy->readMessage();
-            }
-        }
 
         bool terminateOrderHasBeenReceived() const {
             return terminateOrderReceived.load();
@@ -69,10 +59,10 @@ namespace SensorAccessLinkElement {
 
         AtomicFlag terminateOrderReceived;
 
-        ServerCommunicationStrategy* serverCommunicationStrategy;
+        ServerCommunicationStrategy<T>* serverCommunicationStrategy;
 
         JoinableThread communicatorThread;
-    }
+    };
 }
 
 #endif //SPIRITSENSORGATEWAY_SERVERCOMMUNICATOR_H
