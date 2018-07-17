@@ -68,8 +68,13 @@ namespace Sensor {
             SensorID const SENSOR_ID = 0x0010;
         }
         namespace _16 {
+            int const MULTIPLICATIVE_CONSTANT = 10;  // Because all values are multiple with 1 decimal, 10 is sufficient to work with non-floating point representation
+            int const HORIZONTAL_FIELD_OF_VIEW = static_cast<int>(30.4*MULTIPLICATIVE_CONSTANT);
+            int const NUMBER_OF_LAYER = 2;
+            int const NUMBER_OF_PIXELS_IN_LAYER = 8;
             int const NUMBER_OF_PIXELS_IN_FRAME = 16;
             int const NUMBER_OF_TRACKS_IN_PIXEL = 16;
+            int const ANGLE_RANGE = HORIZONTAL_FIELD_OF_VIEW / NUMBER_OF_PIXELS_IN_LAYER;
             SensorID const SENSOR_ID = 0x0010;
         }
     }

@@ -25,7 +25,7 @@ using DataFlow::Frame;
 using DataFlow::PixelID;
 
 namespace MessageTranslation {
-
+    
     class AWLMessageToSpiritMessageTranslationStrategy final : public MessageTranslationStrategy<AWLMessage, Frame> {
     protected:
         using super = MessageTranslationStrategy<AWLMessage, Frame>;
@@ -46,7 +46,7 @@ namespace MessageTranslation {
         using super::currentOutputMessage;
 
         void addTrackInPixel(AWLMessage&& awlMessage, PixelID pixelID);
-
+        
         Track* fetchTrack(DataFlow::TrackID const& trackID);
 
         void translateDetectionTrackMessage(AWLMessage&& awlMessage);
