@@ -18,48 +18,55 @@
 #define SPIRITSENSORGATEWAY_SENSORACCESSLINK_H
 
 #include "spirit-sensor-gateway/sensor-communication/SensorCommunicator.hpp"
+#include "spirit-sensor-gateway/sensor-communication/SensorCommunicationStrategy.hpp"
 #include "spirit-sensor-gateway/message-translation/MessageTranslator.hpp"
+#include "spirit-sensor-gateway/common/data-flow/DataSink.hpp"
 
-using DataFlow::DataProcessingScheduler;
 using SensorAccessLinkElement::SensorCommunicator;
 using SensorAccessLinkElement::MessageTranslator;
+using SensorCommunication::SensorCommunicationStrategy;
+using MessageTranslation::MessageTranslationStrategy;
+using DataFlow::DataProcessingScheduler;
+using DataFlow::DataSink;
 
 template<class I, class O>
 class SensorAccessLink {
 
-protected:
-
-    typedef MessageTranslator<I, O> MessageTranslator;
-    typedef SensorCommunicator<I> SensorCommunicator;
-    typedef DataProcessingScheduler<I, MessageTranslator, 1> TranslationScheduler;
-
 public:
-    explicit SensorAccessLink(SensorCommunicator* sensorCommunicator, MessageTranslator* messageTranslator) :
-            sensorCommunicator(sensorCommunicator), messageTranslator(messageTranslator), translationScheduler() {
-        translationScheduler = TranslationScheduler(messageTranslator);
-        sensorCommunicator->linkConsumer(&translationScheduler);
+    //TODO change constructor to receive serverCommunicationStrategy instead
+    explicit SensorAccessLink(SensorCommunicationStrategy<I>* sensorCommunicationStrategy,
+                              MessageTranslationStrategy<I, O>* messageTranslationStrategy,
+                              DataSink<O>* serverCommunicator) : sensorCommunicator(),
+                                                                        messageTranslator(),
+                                                                        messageTranslationScheduler(),
+                                                                        serverCommunicationScheduler() {
+        sensorCommunicator = SensorCommunicator(sensorCommunicationStrategy);
+        messageTranslator = MessageTranslator(messageTranslationStrategy);
+
+        serverCommunicationScheduler = ServerCommunicationScheduler(serverCommunicator);
+        messageTranslator.linkConsumer(&serverCommunicationScheduler);
+
+        messageTranslationScheduler = MessageTranslationScheduler(messageTranslator);
+        sensorCommunicator.linkConsumer(&messageTranslationScheduler);
     };
 
     ~ SensorAccessLink() = default;
 
     void start() {
-        sensorCommunicator->start();
+        sensorCommunicator.start();
     };
 
     void terminateAndJoin(){
-        sensorCommunicator->terminateAndJoin();
-        translationScheduler.terminateAndJoin();
+        sensorCommunicator.terminateAndJoin();
+        messageTranslationScheduler.terminateAndJoin();
+        serverCommunicationScheduler.terminateAndJoin();
     }
-
-    void getOutputMessages(){
-    }
-
 
 private:
-    SensorCommunicator* sensorCommunicator;
-    MessageTranslator* messageTranslator;
-    TranslationScheduler translationScheduler;
-
+    SensorCommunicator<I> sensorCommunicator;
+    MessageTranslator<I, O> messageTranslator;
+    DataProcessingScheduler<I, MessageTranslator<I, O>, 1>  messageTranslationScheduler;
+    DataProcessingScheduler<O, DataSink<O> , 1>  serverCommunicationScheduler;
 };
 
 

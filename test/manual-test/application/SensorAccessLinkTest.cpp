@@ -4,18 +4,21 @@
 #include "test/utilities/files/SpiritFramesFileManager.h"
 #include <chrono>
 #include <thread>
+#include <test/mock/FrameSinkMock.h>
 
 using SensorCommunication::KvaserCanCommunicationStrategy;
 using MessageTranslation::AWLMessageToSpiritMessageTranslationStrategy;
 using TestUtilities::SpiritFramesFileManager;
+using Mock::FrameSinkMock;
 
 int main(){
 
-    KvaserCanCommunicationStrategy communicationStrategy;
-    AWLMessageToSpiritMessageTranslationStrategy translationStrategy;
-    SensorCommunicator<AWLMessage> sensorCommunicator(&communicationStrategy);
-    MessageTranslator<AWLMessage, Frame> messageTranslator(&translationStrategy);
-    SensorAccessLink sensorAccessLink(&sensorCommunicator, &messageTranslator);
+    KvaserCanCommunicationStrategy sensorCommunicationStrategy;
+    AWLMessageToSpiritMessageTranslationStrategy messageTranslationStrategy;
+    FrameSinkMock serverCommunicationStrategy(1);
+
+    SensorAccessLink sensorAccessLink(&sensorCommunicationStrategy, &messageTranslationStrategy,
+                                      &serverCommunicationStrategy);
     SpiritFramesFileManager fileManager;
     const int NUMBER_OF_MILLISECONDS = 5000;
 
