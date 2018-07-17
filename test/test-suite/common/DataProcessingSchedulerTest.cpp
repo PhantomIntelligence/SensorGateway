@@ -20,17 +20,15 @@
 
 #include <gtest/gtest.h>
 #include "data-model/DataModelFixture.h"
-#include "spirit-sensor-gateway/common/DataProcessingScheduler.hpp"
+#include "spirit-sensor-gateway/common/data-flow/DataProcessingScheduler.hpp"
 
+using DataFlow::NUMBER_OF_CONCURRENT_INPUT_FOR_SENSOR_ACCESS_LINK_ELEMENTS;
 using ExampleDataModel::NativeData;
 using ExampleDataModel::ProcessedData;
-
 using TestFunctions::DataTestUtil;
-
 using NativeBuffer = DataFlow::RingBuffer<NativeData>;
 using OutputProducer = DataFlow::DataSource<ProcessedData>;
 using ProcessingStrategy = DataFlow::DataSink<NativeData>;
-
 using NativeSink = DataFlow::DataSink<NativeData>;
 
 class DataProcessingSchedulerTest : public ::testing::Test {
@@ -105,6 +103,12 @@ public:
     bool hasBeenCalledExpectedNumberOfTimes() const {
         return actualNumberOfWrites.load() == numberOfWritesGoal.load();
     };
+
+    void waitUntillReadMessageIsCalled() const {
+        if (!hasBeenCalledExpectedNumberOfTimes()) {
+            numberOfWritesAchieved.get_future().wait();
+        }
+    }
 
 private:
     AtomicCounter actualNumberOfWrites;
@@ -274,6 +278,8 @@ TEST_F(DataProcessingSchedulerTest,
         auto nativeData = DataTestUtil::generateRandomNativeData();
         inputBuffer.write(std::move(nativeData));
     }
+
+    mockSink.waitUntillReadMessageIsCalled();
 
     scheduler.terminateAndJoin();
 

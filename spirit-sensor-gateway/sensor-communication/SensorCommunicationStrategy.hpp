@@ -1,12 +1,9 @@
 /**
 	Copyright 2014-2018 Phantom Intelligence Inc.
-
 	Licensed under the Apache License, Version 2.0 (the "License");
 	you may not use this file except in compliance with the License.
 	You may obtain a copy of the License at
-
 		http://www.apache.org/licenses/LICENSE-2.0
-
 	Unless required by applicable law or agreed to in writing, software
 	distributed under the License is distributed on an "AS IS" BASIS,
 	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -14,34 +11,31 @@
 	limitations under the License.
 */
 
+#ifndef SPIRITSENSORGATEWAY_SENSORCOMMUNICATIONSTRATEGY_H
+#define SPIRITSENSORGATEWAY_SENSORCOMMUNICATIONSTRATEGY_H
 
-#ifndef SPIRITSENSORGATEWAY_CONSUMERLINK_HPP
-#define SPIRITSENSORGATEWAY_CONSUMERLINK_HPP
+#include "spirit-sensor-gateway/domain/AWLMessage.h"
 
-#include "ConstantSizedPointerList.hpp"
 
-namespace DataFlow {
-
-    template<class T>
-    class RingBuffer;
+namespace SensorCommunication {
 
     template<class T>
-    class ConsumerLink {
+    class SensorCommunicationStrategy {
 
     protected:
-
-        ConsumerLink() = default;
-
-        virtual ~ConsumerLink() {}
+        typedef T DATA;
 
     public:
 
-        virtual void linkWith(RingBuffer<T>* buffer) = 0;
+        virtual ~SensorCommunicationStrategy() noexcept = default;
 
-        virtual void activateFor(RingBuffer<T>* buffer) = 0;
+        virtual DATA readMessage() = 0;
 
-        virtual void deactivateFor(RingBuffer<T>* buffer) = 0;
+        virtual void openConnection()=0;
+
+        virtual void closeConnection()=0;
+
     };
 }
 
-#endif //SPIRITSENSORGATEWAY_CONSUMERLINK_HPP
+#endif //SPIRITSENSORGATEWAY_SENSORCOMMUNICATIONSTRATEGY_H

@@ -22,6 +22,7 @@
 #include "ConsumerLink.hpp"
 #include "RingBufferPad.hpp"
 
+using DataFlow::RING_BUFFER_SIZE;
 
 namespace DataFlow {
 

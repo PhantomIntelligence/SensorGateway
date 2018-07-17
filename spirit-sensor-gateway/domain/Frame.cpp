@@ -13,38 +13,80 @@
 
 #include "Frame.h"
 
-using namespace SpiritProtocol;
+using DataFlow::Frame;
+using DataFlow::FrameID;
+using Defaults::Frame::DEFAULT_FRAME;
+using Defaults::Frame::DEFAULT_FRAME_ID;
+using Defaults::Frame::DEFAULT_PIXELS_ARRAY;
+using Defaults::Frame::DEFAULT_SYSTEM_ID;
+using DataFlow::PixelsArray;
+using DataFlow::SystemID;
 
-Frame::Frame() {
+Frame::Frame(FrameID frameID, SystemID systemID, PixelsArray pixels) :
+        frameID(frameID), systemID(systemID), pixels(pixels) {};
+
+Frame::Frame() : Frame(Frame::returnDefaultData()) {};
+
+Frame::Frame(Frame const& other) :
+        Frame(other.frameID, other.systemID, other.pixels) {};
+
+Frame::Frame(Frame&& other) noexcept:
+        frameID(std::move(other.frameID)),
+        systemID(std::move(systemID)),
+        pixels(std::move(other.pixels)) {};
+
+Frame& Frame::operator=(Frame const& other)& {
+    Frame temporary(std::move(other));
+    swap(*this, temporary);
+    return *this;
 };
 
-Frame::~Frame() {
+Frame& Frame::operator=(Frame&& other)& noexcept {
+    swap(*this, other);
+    return *this;
 };
 
-void Frame::addPixel(Pixel pixel) {
-    pixels[pixel.getID()] = pixel;
+void Frame::swap(Frame& current, Frame& other) noexcept {
+    std::swap(current.frameID, other.frameID);
+    std::swap(current.systemID, other.systemID);
+    std::swap(current.pixels, other.pixels);
+};
+
+bool Frame::operator==(Frame const& other) const {
+    auto sameFrameID = (frameID == other.frameID);
+    auto sameSystemID = (systemID == other.systemID);
+    auto samePixels = (pixels == other.pixels);
+    auto framesAreEqual = (sameFrameID && sameSystemID && samePixels);
+    return framesAreEqual;
 }
 
-Pixel* Frame::fetchPixelByID(PixelID pixelID) {
-    return &pixels[pixelID];
+bool Frame::operator!=(Frame const& other) const {
+    return !(operator==(other));
 }
 
-FrameID Frame::getFrameID() const {
-    return frameID;
-};
+void Frame::addTrackToPixelWithID(PixelID const& pixelID, Track&& trackToAdd) {
+    updatePixelID(pixelID);
+    updatePixelPositionOnLayer(pixelID);
+    updatePixelAngles(pixelID);
+    pixels[pixelID].addTrack(std::forward<Track>(trackToAdd));
+}
 
-std::array<Pixel, NUMBER_OF_PIXELS_IN_AWL16_FRAME>* Frame::getPixels() {
+PixelsArray* Frame::getPixels() {
     return &pixels;
 };
 
-SystemID Frame::getSystemID() const {
-    return systemID;
-};
-
-void Frame::setFrameID(FrameID const& frameID) {
-    this->frameID = frameID;
+Frame const& Frame::returnDefaultData() noexcept {
+    return DEFAULT_FRAME;
 }
 
-void Frame::setSystemID(SystemID const& systemID) {
-    this->systemID = systemID;
+void Frame::updatePixelID(PixelID const& pixelID) {
+    pixels[pixelID].ID = pixelID;
+}
+
+void Frame::updatePixelAngles(PixelID const& pixelID) {
+    pixels[pixelID].calculateAngles();
+}
+
+void Frame::updatePixelPositionOnLayer(PixelID const& pixelID) {
+    pixels[pixelID].calculatePositionOnLayer();
 }

@@ -24,6 +24,7 @@
 #include <unordered_map>
 #include <exception>
 #include <cstring>
+#include <limits>
 
 #include "hicpp/HighIntegrityThread.h"
 #include "ExceptionMessages.h"
@@ -40,7 +41,7 @@ namespace {
     typedef HighIntegrity::HighIntegrityThread<HighIntegrity::ThreadExecutionType::JOIN> JoinableThread;
 };
 
-namespace  SpiritProtocol {
+namespace  DataFlow {
     typedef int16_t Acceleration;
     typedef uint8_t ConfidenceLevel;
     typedef uint16_t Distance;
@@ -50,6 +51,10 @@ namespace  SpiritProtocol {
     typedef int16_t Speed;
     typedef uint16_t SystemID;
     typedef uint16_t TrackID;
+    typedef int32_t AngleStart;
+    typedef int32_t AngleEnd;
+    typedef uint8_t PositionOnLayer;
+    typedef uint8_t Layer;
 };
 
 #endif //SPIRITSENSORGATEWAY_TYPEDEFINITION_H
