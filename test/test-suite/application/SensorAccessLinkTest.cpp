@@ -20,189 +20,139 @@
 
 #include <gtest/gtest.h>
 #include <list>
+#include <chrono>
 
 #include "spirit-sensor-gateway/application/SensorAccessLink.hpp"
 #include "test/utilities/data-model/DataModelFixture.h"
 
 using DataModel::SimpleData;
-using DataModel::SimpleDataContent;
 using SimpleDataList = std::list<SimpleData>;
-using TestFunctions::DataTestUtil;
-using SensorAccessLink = SpiritSensorGateway::SensorAccessLink<SimpleData, SimpleData>;
+using SensorCommunication::SensorCommunicationStrategy;
+using MessageTranslation::MessageTranslationStrategy;
+using ServerCommunication::ServerCommunicationStrategy;
+using SpiritSensorGateway::SensorAccessLink;
+using namespace std::chrono;
 
 class SensorAccessLinkTest : public ::testing::Test {
-
-protected:
-    SensorAccessLinkTest() = default;
-
-    virtual ~SensorAccessLinkTest() = default;
-};
-
-using SimpleSensorCommunicationStrategy = SensorCommunication::SensorCommunicationStrategy<SimpleData>;
-
-class MockSensorCommunicationStrategy final : public SimpleSensorCommunicationStrategy {
-
 protected:
 
-    using SimpleSensorCommunicationStrategy::DATA;
-    using DataList = std::list<DATA>;
+    typedef std::chrono::time_point<std::chrono::system_clock> Timestamp;
 
-public:
+    class SensorCommunicationStrategyMock final: public SensorCommunicationStrategy<SimpleData> {
 
-    explicit MockSensorCommunicationStrategy(uint8_t minimumNumberOfMessageToCreate) :
-            promiseFulfilled(false),
-            numberOfMessageCreated(0),
-            minimumNumberOfMessageToCreate(minimumNumberOfMessageToCreate) {
-    }
+    public:
 
-    void openConnection() override {}
-
-    void closeConnection() override {}
-
-    DATA readMessage() override {
-        DATA createdData = DataTestUtil::createRandomSimpleData();
-        auto copy = DATA(createdData);
-        createdDataCopies.push_back(copy);
-
-        ++numberOfMessageCreated;
-        if (hasCreatedMinimumNumberOfData() && !promiseFulfilled.load()) {
-            promiseFulfilled.store(true);
-            minimumNumberOfMessageCreated.set_value(true);
+        explicit SensorCommunicationStrategyMock() : numberOfTimesOpenConnectionIsCalled(0),
+        timestamp(Timestamp()){
         }
 
-        // WARNING! This mock implementation of readMessage needs to be slowed down because the way gtest works. DO NOT REMOVE.
-        std::this_thread::sleep_for(std::chrono::milliseconds(5));
-        std::this_thread::yield();
-
-        return createdData;
-    }
-
-    void waitUntilReadMessageHasBeenCalledEnough() {
-        if (!hasCreatedMinimumNumberOfData()) {
-            minimumNumberOfMessageCreated.get_future().wait();
+        void openConnection() override {
+            numberOfTimesOpenConnectionIsCalled++;
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+            timestamp = std::chrono::system_clock::now();
         }
+
+        void closeConnection() override {}
+
+        SimpleData readMessage() override {
+            SimpleData sommeMessage = TestFunctions::DataTestUtil::createRandomSimpleData();
+
+            // WARNING! This mock implementation of readMessage needs to be slowed down because the way gtest works. DO NOT REMOVE.
+            std::this_thread::sleep_for(std::chrono::milliseconds(5));
+            std::this_thread::yield();
+            return sommeMessage;
+        }
+
+        bool openConnectionHasBeenCalledOnce(){
+            return numberOfTimesOpenConnectionIsCalled.load() == 1;
+        }
+
+        Timestamp getTimestamp(){
+            return timestamp;
+        }
+
+    private:
+        AtomicCounter numberOfTimesOpenConnectionIsCalled;
+        Timestamp timestamp;
+
+    };
+
+
+    class MessageTranslationStrategyMock final : public MessageTranslationStrategy<SimpleData, SimpleData> {
+
+    public:
+
+        void translateMessage(SimpleData&& inputMessage) override {
+            produce(std::move(inputMessage));
+        }
+    };
+
+
+    class ServerCommunicationStrategyMock final : public ServerCommunicationStrategy<SimpleData> {
+
+    public:
+        explicit ServerCommunicationStrategyMock() : numberOfTimesOpenConnectionIsCalled(0),
+        timestamp(Timestamp()){
+
+        }
+
+        ~ServerCommunicationStrategyMock() = default;
+
+        void openConnection() override {
+            numberOfTimesOpenConnectionIsCalled++;
+            timestamp = std::chrono::system_clock::now();
+        }
+
+        void closeConnection() override {}
+
+        void sendMessage(SimpleData&& message) override {
+        }
+
+        bool openConnectionHasBeenCalledOnce(){
+            return numberOfTimesOpenConnectionIsCalled.load() == 1;
+        }
+
+        Timestamp getTimestamp(){
+            return timestamp;
+        }
+
+    private:
+        AtomicCounter numberOfTimesOpenConnectionIsCalled;
+        Timestamp timestamp;
+    };
+
+    bool connectionIsValid(SensorCommunicationStrategyMock* sensorCommunicationStrategyMock,
+                           ServerCommunicationStrategyMock* serverCommunicationStrategyMock){
+        bool openConnectionHasBeenCalledOnceInServerCommunicationStrategy =
+                serverCommunicationStrategyMock->openConnectionHasBeenCalledOnce();
+        bool openConnectionHasBeenCalledOnceInSensorCommunicationStrategy =
+                sensorCommunicationStrategyMock->openConnectionHasBeenCalledOnce();
+        bool openConnectionInServerCommunicationStrategyIsCalledFirst =
+                (serverCommunicationStrategyMock->getTimestamp() < sensorCommunicationStrategyMock->getTimestamp());
+
+        return openConnectionHasBeenCalledOnceInServerCommunicationStrategy &&
+               openConnectionHasBeenCalledOnceInSensorCommunicationStrategy &&
+               openConnectionInServerCommunicationStrategyIsCalledFirst;
     }
 
-    DataList const& getCreatedMessageCopies() const {
-        return createdDataCopies;
-    }
-
-private:
-
-    bool hasCreatedMinimumNumberOfData() {
-        LockGuard guard(numberOfMessageCreatedVerificationMutex);
-        return numberOfMessageCreated.load() == minimumNumberOfMessageToCreate.load();
-    }
-
-    AtomicCounter numberOfMessageCreated;
-    AtomicCounter minimumNumberOfMessageToCreate;
-
-    AtomicFlag promiseFulfilled;
-    Mutex numberOfMessageCreatedVerificationMutex;
-    mutable BooleanPromise minimumNumberOfMessageCreated;
-
-    DataList createdDataCopies;
 };
 
-using SimpleTranslationStrategy = MessageTranslation::MessageTranslationStrategy<SimpleData, SimpleData>;
 
-class MockTranslationStrategy final : public SimpleTranslationStrategy {
-protected:
-    using SimpleTranslationStrategy::INPUT;
-    using SimpleTranslationStrategy::OUTPUT;
+TEST_F(SensorAccessLinkTest, given_noEstablishedConnection_when_starting_then_aValidConnectionIsMade){
+    SensorCommunicationStrategyMock sensorCommunicationStrategyMock;
+    MessageTranslationStrategyMock messageTranslationStrategyMock;
+    ServerCommunicationStrategyMock serverCommunicationStrategyMock;
 
-public:
-    MockTranslationStrategy() = default;
-
-    void translateMessage(INPUT&& inputMessage) override {
-        produce(std::move(inputMessage));
-    }
-};
-
-using SimpleServerCommunicationStrategy = ServerCommunication::ServerCommunicationStrategy<SimpleData>;
-
-class MockServerCommunicationStrategy final : public SimpleServerCommunicationStrategy {
-protected:
-    using SimpleServerCommunicationStrategy::MESSAGE;
-
-public:
-    MockServerCommunicationStrategy() = default;
-
-    ~MockServerCommunicationStrategy() noexcept override = default;
-
-    void openConnection() override {}
-
-    void closeConnection() override {}
-
-    void sendMessage(MESSAGE&& message) override {
-        receivedData.push_back(message);
-    }
-
-    SimpleDataList const& getReceivedData() const {
-        return receivedData;
-    }
-
-private:
-    SimpleDataList receivedData;
-};
-
-
-TEST_F(SensorAccessLinkTest,
-       given_aNumberOfDataCreatedByTheSensorCommunicationStrategy_when_executing_then_aSimilarNumberOfDataEndsUpInTheServerCommunicationStrategy) {
-    uint8_t numberOfDataToProcess = 42;
-    MockSensorCommunicationStrategy mockSensorCommunicationStrategy(numberOfDataToProcess);
-    MockTranslationStrategy mockTranslationStrategy;
-    MockServerCommunicationStrategy mockServerCommunicationStrategy;
-    SensorAccessLink sensorAccessLink(&mockSensorCommunicationStrategy,
-                                      &mockTranslationStrategy,
-                                      &mockServerCommunicationStrategy);
+    SensorAccessLink<SimpleData, SimpleData>  sensorAccessLink(&sensorCommunicationStrategyMock,
+                                                               &messageTranslationStrategyMock,
+                                                               &serverCommunicationStrategyMock);
 
     sensorAccessLink.start();
-
-    mockSensorCommunicationStrategy.waitUntilReadMessageHasBeenCalledEnough();
-
     sensorAccessLink.terminateAndJoin();
 
-    auto createdDataList = mockSensorCommunicationStrategy.getCreatedMessageCopies();
-    auto receivedDataList = mockServerCommunicationStrategy.getReceivedData();
-
-    ASSERT_EQ(createdDataList.size(), receivedDataList.size());
+    ASSERT_TRUE(connectionIsValid(&sensorCommunicationStrategyMock, &serverCommunicationStrategyMock));
 }
 
-
-/*TEST_F(SensorAccessLinkTest,
-       given_dataCreatedByTheSensorCommunicationStrategy_when_executing_then_dataGoesThroughTranslationStrategyBeforeEndingInTheServerCommunicationStrategy) {
-    uint8_t numberOfDataToProcess = 42;
-    MockSensorCommunicationStrategy mockSensorCommunicationStrategy(numberOfDataToProcess);
-    MockTranslationStrategy mockTranslationStrategy;
-    MockServerCommunicationStrategy mockServerCommunicationStrategy;
-    SensorAccessLink sensorAccessLink(&mockSensorCommunicationStrategy,
-                                      &mockTranslationStrategy,
-                                      &mockServerCommunicationStrategy);
-
-    sensorAccessLink.start();
-
-    mockSensorCommunicationStrategy.waitUntilReadMessageHasBeenCalledEnough();
-
-    sensorAccessLink.terminateAndJoin();
-
-    auto createdDataList = mockSensorCommunicationStrategy.getCreatedMessageCopies();
-    auto receivedDataList = mockServerCommunicationStrategy.getReceivedData();
-    std::cout << "createdData.size() : " << createdDataList.size() << std::endl;
-    std::cout << "receivedData.size() : " << receivedDataList.size() << std::endl;
-
-    auto numberOfProcessedData = receivedDataList.size();
-    bool dataHasPassedThroughCorrectly = true;
-    for (int i = 0; i < numberOfProcessedData && dataHasPassedThroughCorrectly; ++i) {
-        auto createdData = createdDataList.front();
-        createdDataList.pop_front();
-        auto receivedData = receivedDataList.front();
-        receivedDataList.pop_front();
-    }
-
-    ASSERT_TRUE(dataHasPassedThroughCorrectly);
-}
- */
 
 #endif //SPIRITSENSORGATEWAY_SENSORCOMMUNICATORTEST_CPP
 

@@ -44,11 +44,11 @@ protected:
     AWLMessages fetchMessageProducedBySensorCommunicatorExecution(AWLMessages&& messages);
 };
 
-class MockSensorCommunicationStrategy final : public SensorCommunication::SensorCommunicationStrategy<AWLMessage> {
+class SensorCommunicationStrategy final : public SensorCommunication::SensorCommunicationStrategy<AWLMessage> {
 
 public:
 
-    MockSensorCommunicationStrategy() :
+    SensorCommunicationStrategy() :
             openConnectionCalled(false),
             closeConnectionCalled(false),
             readMessageCalled(false),
@@ -124,7 +124,7 @@ private:
 };
 
 TEST_F(SensorCommunicatorTest, given__when_start_then_callsOpenConnectionInStrategy) {
-    MockSensorCommunicationStrategy mockStrategy;
+    SensorCommunicationStrategy mockStrategy;
     AWLCommunicator sensorCommunicator(&mockStrategy);
 
     sensorCommunicator.start();
@@ -135,7 +135,7 @@ TEST_F(SensorCommunicatorTest, given__when_start_then_callsOpenConnectionInStrat
 }
 
 TEST_F(SensorCommunicatorTest, given__when_terminateAndJoin_then_callsCloseConnectionInStrategy) {
-    MockSensorCommunicationStrategy mockStrategy;
+    SensorCommunicationStrategy mockStrategy;
     AWLCommunicator sensorCommunicator(&mockStrategy);
 
     sensorCommunicator.terminateAndJoin();
@@ -145,7 +145,7 @@ TEST_F(SensorCommunicatorTest, given__when_terminateAndJoin_then_callsCloseConne
 }
 
 TEST_F(SensorCommunicatorTest, given__when_start_then_callsReadMessageInStrategy) {
-    MockSensorCommunicationStrategy mockStrategy;
+    SensorCommunicationStrategy mockStrategy;
     AWLCommunicator sensorCommunicator(&mockStrategy);
 
     sensorCommunicator.start();
@@ -222,7 +222,7 @@ AWLMessages SensorCommunicatorTest::fetchMessageProducedBySensorCommunicatorExec
     AWLSinkMock sink(numberOfMessagesToProcess);
     AWLProcessingScheduler scheduler(&sink);
 
-    MockSensorCommunicationStrategy mockStrategy;
+    SensorCommunicationStrategy mockStrategy;
     mockStrategy.returnThisMessageSequenceWhenReadMessageIsCalled(std::forward<AWLMessages>(messages));
     AWLCommunicator sensorCommunicator(&mockStrategy);
     sensorCommunicator.linkConsumer(&scheduler);

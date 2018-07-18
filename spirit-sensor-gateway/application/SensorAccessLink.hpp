@@ -52,9 +52,7 @@ namespace SpiritSensorGateway {
             sensorCommunicator.linkConsumer(&translatorScheduler);
         }
 
-        ~SensorAccessLink() noexcept {
-            terminateAndJoin();
-        };
+        ~SensorAccessLink() noexcept {};
 
         SensorAccessLink(SensorAccessLink const& other) = delete;
 
@@ -65,6 +63,7 @@ namespace SpiritSensorGateway {
         SensorAccessLink& operator=(SensorAccessLink&& other)& noexcept = delete;
 
         void start() {
+            serverCommunicator.connect();
             sensorCommunicator.start();
         };
 
@@ -72,6 +71,7 @@ namespace SpiritSensorGateway {
             sensorCommunicator.terminateAndJoin();
             translatorScheduler.terminateAndJoin();
             serverCommunicatorScheduler.terminateAndJoin();
+
         }
 
     private:
