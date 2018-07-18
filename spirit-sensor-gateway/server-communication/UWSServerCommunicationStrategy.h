@@ -55,18 +55,6 @@ namespace ServerCommunication {
 
     private:
 
-        void initializeClientCallbacks();
-
-        struct ConnectionMetadata {
-            int id;
-            std::string status;
-            std::string URI;
-            std::string server;
-            std::string errorReason;
-        };
-
-        ConnectionMetadata connectionMetadata;
-
         std::string serverAddrress = SERVER_CONNECTION_ADDRESS;
     };
 }

@@ -4,7 +4,6 @@ using ServerCommunication::UWSServerCommunicationStrategy;
 
 
 UWSServerCommunicationStrategy::UWSServerCommunicationStrategy() {
-    initializeClientCallbacks();
 }
 
 UWSServerCommunicationStrategy::~UWSServerCommunicationStrategy() {
@@ -24,9 +23,6 @@ void UWSServerCommunicationStrategy::sendMessage(MESSAGE&& message) {
 
 void UWSServerCommunicationStrategy::start() {
 
-}
-
-void UWSServerCommunicationStrategy::initializeClientCallbacks() {
 }
 
 //void UWSServerCommunicationStrategy::onOpen(ConnectionHandle connectionHandle){
