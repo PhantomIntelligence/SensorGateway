@@ -33,10 +33,6 @@ void UWSServerCommunicationStrategy::initializeClientCallbacks() {
 
 //}
 
-void UWSServerCommunicationStrategy::processMessage(DataFlow::Frame&& message) {
-
-}
-
 int UWSServerCommunicationStrategy::connect(std::string const& serverAddress) {
     return 0;
 }

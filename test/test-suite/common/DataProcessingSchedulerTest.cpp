@@ -19,7 +19,7 @@
 #define SPIRITSENSORGATEWAY_WORKSCHEDULERTEST_CPP
 
 #include <gtest/gtest.h>
-#include "data-model/DataModelFixture.h"
+#include "test/utilities/data-model/DataModelFixture.h"
 #include "spirit-sensor-gateway/common/data-flow/DataProcessingScheduler.hpp"
 
 using DataFlow::NUMBER_OF_CONCURRENT_INPUT_FOR_SENSOR_ACCESS_LINK_ELEMENTS;
@@ -51,7 +51,7 @@ public:
             numberOfCallsToConsumeNextData(0) {
     }
 
-    auto consumeNextDataFor(Consumer *consumer) -> NativeData const & override {
+    auto consumeNextDataFor(Consumer* consumer) -> NativeData const& override {
         numberOfCallsToConsumeNextData++;
         if (hasBeenCalledExpectedNumberOfTimes()) {
             consumptionGoalReached.set_value(true);
@@ -59,7 +59,7 @@ public:
         return NativeBuffer::consumeNextDataFor(consumer);
     }
 
-    void linkWith(Consumer *consumer) noexcept override {
+    void linkWith(Consumer* consumer) noexcept override {
         linkedConsumer = consumer;
         NativeBuffer::linkWith(consumer);
     }
@@ -74,7 +74,7 @@ public:
         }
     }
 
-    Consumer *getLinkedConsumer() const noexcept {
+    Consumer* getLinkedConsumer() const noexcept {
         return linkedConsumer;
     }
 
@@ -82,7 +82,7 @@ private:
     uint16_t const numberOfTimesToBeConsumedBeforeStop;
     AtomicCounter numberOfCallsToConsumeNextData;
     NativeData data;
-    Consumer *linkedConsumer = nullptr;
+    Consumer* linkedConsumer = nullptr;
     mutable BooleanPromise consumptionGoalReached;
 };
 
@@ -93,7 +93,7 @@ public:
             actualNumberOfWrites(0) {
     }
 
-    void consume(NativeData &&data) override {
+    void consume(NativeData&& data) override {
         ++actualNumberOfWrites;
         if (hasBeenCalledExpectedNumberOfTimes()) {
             numberOfWritesAchieved.set_value(true);
@@ -199,7 +199,7 @@ TEST_F(DataProcessingSchedulerTest,
     MockSink mockSink(ARBITRARY_NUMBER_OF_CALL_GOAL);
     SingleInputScheduler scheduler(&mockSink);
     NativeBuffer inputBuffers[NUMBER_OF_CONCURRENT_INPUT_FOR_SENSOR_ACCESS_LINK_ELEMENTS];
-    for (auto &inputBuffer : inputBuffers) {
+    for (auto& inputBuffer : inputBuffers) {
         scheduler.linkWith(&inputBuffer);
     }
 
@@ -207,7 +207,7 @@ TEST_F(DataProcessingSchedulerTest,
     try {
         MockInputBuffer inputBufferMock(0);
         scheduler.linkWith(&inputBufferMock);
-    } catch (std::runtime_error const &) {
+    } catch (std::runtime_error const&) {
         hasThrownException = true;
     }
 
@@ -224,7 +224,7 @@ TEST_F(DataProcessingSchedulerTest, given_anInputBuffer_when_linkingItMoreThanOn
     scheduler.linkWith(&inputBuffer);
     try {
         scheduler.linkWith(&inputBuffer);
-    } catch (std::runtime_error const &) {
+    } catch (std::runtime_error const&) {
         hasThrownException = true;
     }
     scheduler.terminateAndJoin();

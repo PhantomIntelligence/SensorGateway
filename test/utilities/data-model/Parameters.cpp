@@ -17,7 +17,7 @@
 
 
 #include <iostream>
-#include "data-model/Parameters.h"
+#include "Parameters.h"
 #include <cassert>
 
 

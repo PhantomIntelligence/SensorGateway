@@ -47,7 +47,7 @@ namespace ServerCommunication {
 
         void closeConnection() override;
 
-        void processMessage(MESSAGE&& message);
+        void sendMessage(MESSAGE&& message) override;
 
         void start();
 
@@ -56,9 +56,6 @@ namespace ServerCommunication {
     private:
 
         void initializeClientCallbacks();
-
-        void sendMessage(MESSAGE&& message) override;
-
 
         struct ConnectionMetadata {
             int id;

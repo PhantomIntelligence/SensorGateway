@@ -20,7 +20,7 @@
 #include <gtest/gtest.h>
 
 #include "spirit-sensor-gateway/common/data-flow/RingBufferPad.hpp"
-#include "data-model/DataModelFixture.h"
+#include "test/utilities/data-model/DataModelFixture.h"
 
 using DataFlow::RingBufferPad;
 using TestFunctions::DataTestUtil;

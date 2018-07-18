@@ -48,16 +48,16 @@ Track::Track(Track const& other) : Track(other.ID, other.confidenceLevel, other.
                                          other.acceleration, other.distance, other.speed) {
 };
 
-Track::Track(Track&& other) noexcept: ID(std::move(other.ID)),
-                                      confidenceLevel(std::move(other.confidenceLevel)),
-                                      intensity(std::move(other.intensity)),
-                                      acceleration(std::move(other.acceleration)),
-                                      distance(std::move(other.distance)),
-                                      speed(std::move(other.speed)) {
+Track::Track(Track&& other) noexcept: ID(other.ID),
+                                      confidenceLevel(other.confidenceLevel),
+                                      intensity(other.intensity),
+                                      acceleration(other.acceleration),
+                                      distance(other.distance),
+                                      speed(other.speed) {
 };
 
 Track& Track::operator=(Track const& other)& {
-    Track temporary(std::move(other));
+    Track temporary(other);
     swap(*this, temporary);
     return *this;
 };

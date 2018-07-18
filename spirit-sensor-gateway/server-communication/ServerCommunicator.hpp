@@ -10,16 +10,15 @@
 	See the License for the specific language governing permissions and
 	limitations under the License.
 */
+
 #ifndef SPIRITSENSORGATEWAY_SERVERCOMMUNICATOR_H
 #define SPIRITSENSORGATEWAY_SERVERCOMMUNICATOR_H
 
-#include "spirit-sensor-gateway/common/data-flow/DataProcessingScheduler.hpp"
-#include "spirit-sensor-gateway/common/data-flow/DataSink.hpp"
+#include "spirit-sensor-gateway/message-translation/MessageTranslator.hpp"
 #include "ServerCommunicationStrategy.hpp"
 
-using ServerCommunication::ServerCommunicationStrategy;
-
 namespace SensorAccessLinkElement {
+
 
     template<class T>
     class ServerCommunicator : public DataFlow::DataSink<T> {
@@ -27,12 +26,12 @@ namespace SensorAccessLinkElement {
     protected:
 
         typedef T MESSAGE;
+        using ServerCommunicationStrategy = ServerCommunication::ServerCommunicationStrategy<MESSAGE>;
 
     public:
 
-        explicit ServerCommunicator(ServerCommunicationStrategy<T>* serverCommunicationProtocolStrategy) :
-                serverCommunicationStrategy(serverCommunicationProtocolStrategy),
-                communicatorThread(JoinableThread(doNothing)) {
+        explicit ServerCommunicator(ServerCommunicationStrategy* serverCommunicationStrategy) :
+                serverCommunicationStrategy(serverCommunicationStrategy) {
         };
 
         ~ServerCommunicator() noexcept {};
@@ -45,23 +44,22 @@ namespace SensorAccessLinkElement {
 
         ServerCommunicator& operator=(ServerCommunicator&& other)& noexcept = delete;
 
-        void consume(MESSAGE&& message) override {
+        void connect() {
+            serverCommunicationStrategy->openConnection();
+        };
 
+        void disconnect() {
+            serverCommunicationStrategy->closeConnection();
         }
 
+        void consume(MESSAGE&& message) override {
+            serverCommunicationStrategy->sendMessage(std::forward<MESSAGE>(message));
+        }
 
 
     private:
 
-        bool terminateOrderHasBeenReceived() const {
-            return terminateOrderReceived.load();
-        }
-
-        AtomicFlag terminateOrderReceived;
-
-        ServerCommunicationStrategy<T>* serverCommunicationStrategy;
-
-        JoinableThread communicatorThread;
+        ServerCommunicationStrategy* serverCommunicationStrategy;
     };
 }
 

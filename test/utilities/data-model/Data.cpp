@@ -14,7 +14,7 @@
 	limitations under the License.
 */
 
-#include "data-model/Data.h"
+#include "Data.h"
 
 using ExampleDataModel::Data;
 using ExampleDataModel::Complement;

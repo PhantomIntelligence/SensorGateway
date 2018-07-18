@@ -20,7 +20,7 @@
 #include <random>
 #include <cassert>
 
-#include "Data.h"
+#include "SimpleData.h"
 
 using ExampleDataModel::NativeComplement;
 using ExampleDataModel::NativeData;
@@ -36,7 +36,7 @@ namespace TestFunctions {
          * @brief This function initializes a NativeData with arbitrary values which are used in several tests.
          * @return A NativeData with specific values for several tests
          */
-        static inline const NativeData initNativeData() {
+        static const NativeData initNativeData() {
 
             NativeSample distance;
             distance[0] = static_cast<uint16_t>(30);
@@ -108,10 +108,47 @@ namespace TestFunctions {
             return complement;
         }
 
+        static const DataModel::SimpleData createRandomSimpleData() {
+            auto const lengthOfDataToCreate = 42;
+            typedef std::array<char, 62> CharArray;
+            auto charSet = CharArray({'0', '1', '2', '3', '4',
+                                      '5', '6', '7', '8', '9',
+                                      'A', 'B', 'C', 'D', 'E', 'F',
+                                      'G', 'H', 'I', 'J', 'K',
+                                      'L', 'M', 'N', 'O', 'P',
+                                      'Q', 'R', 'S', 'T', 'U',
+                                      'V', 'W', 'X', 'Y', 'Z',
+                                      'a', 'b', 'c', 'd', 'e', 'f',
+                                      'g', 'h', 'i', 'j', 'k',
+                                      'l', 'm', 'n', 'o', 'p',
+                                      'q', 'r', 's', 't', 'u',
+                                      'v', 'w', 'x', 'y', 'z'});
+
+            std::default_random_engine randomEngine(std::random_device{}());
+            std::uniform_int_distribution<> distribution(0, charSet.size() - 1);
+            auto randomCharFunction = [charSet, &distribution, &randomEngine]() {
+                return charSet[distribution(randomEngine)];
+            };
+
+            DataModel::SimpleDataContent content;
+            auto numberOfStringToCreate = content.size();
+            for (unsigned long i = 0; i < numberOfStringToCreate; ++i) {
+                content.at(i) = createRandomStringOfLength(lengthOfDataToCreate, randomCharFunction);
+            }
+            DataModel::SimpleData randomSimpleData(content);
+
+            return randomSimpleData;
+        }
+
     private:
 
+        static std::string createRandomStringOfLength(size_t length, std::function<char(void)> const& pickRandomChar) {
+            std::string randomString(length, 0);
+            std::generate_n(randomString.begin(), length, pickRandomChar);
+            return randomString;
+        }
 
-        static inline uint16_t drawNativeDetection() {
+        static uint16_t drawNativeDetection() {
             std::default_random_engine randomEngine(std::random_device{}());
             std::uniform_int_distribution<uint16_t> detectionDistribution(0, EXAMPLE_DATA_NATIVE_SAMPLE_SIZE);
             uint16_t numberOfDetections = detectionDistribution(randomEngine);

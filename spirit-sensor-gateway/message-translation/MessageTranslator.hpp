@@ -13,7 +13,7 @@
 #ifndef SPIRITSENSORGATEWAY_MESSAGETRANSLATOR_H
 #define SPIRITSENSORGATEWAY_MESSAGETRANSLATOR_H
 
-#include "spirit-sensor-gateway/common/data-flow/DataSink.hpp"
+#include "spirit-sensor-gateway/sensor-communication/SensorCommunicator.hpp"
 #include "MessageTranslationStrategy.hpp"
 
 namespace SensorAccessLinkElement {
@@ -40,7 +40,7 @@ namespace SensorAccessLinkElement {
         MessageTranslator& operator=(MessageTranslator&& other)& noexcept = delete;
 
         void consume(I&& inputMessage) override {
-            messageTranslationStrategy->translateBasicMessage(std::move(inputMessage));
+            messageTranslationStrategy->translateMessage(std::move(inputMessage));
         };
 
     private:
