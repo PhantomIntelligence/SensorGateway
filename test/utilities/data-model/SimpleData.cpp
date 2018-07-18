@@ -74,12 +74,12 @@ bool SimpleData::isTheInverseOf(SimpleData const& other) const {
     return operator==(inversedOther);
 }
 
-std::string SimpleData::toString() const {
-    std::string stringifiedData;
+std::string SimpleData::toString() const noexcept {
+    std::string stringifiedContent;
     for (unsigned long i = 0; i < content.size(); ++i) {
-        stringifiedData += " " + content.at(i);
+        stringifiedContent += " " + content.at(i);
     }
-    return stringifiedData;
+    return stringifiedContent;
 }
 
 const SimpleData SimpleData::returnDefaultData() noexcept {
