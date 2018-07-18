@@ -23,7 +23,7 @@ namespace {
         return unsignedBigEndianNumber;
     }
 
-    void convertFourBytesToUnsignedBigEndian(uint8_t (&littleEndianBytes)[4], uint32_t *bigEndianResult) noexcept {
+    void convertFourBytesToUnsignedBigEndian(uint8_t (& littleEndianBytes)[4], uint32_t* bigEndianResult) noexcept {
         memcpy(bigEndianResult, littleEndianBytes, sizeof *bigEndianResult);
     }
 
@@ -38,7 +38,7 @@ namespace {
       */
     void doNothing() {}
 
-    [[noreturn]] void throwIllegalActionException(char const *message) {
+    [[noreturn]] void throwIllegalActionException(char const* message) {
         throw std::runtime_error(message);
     }
 

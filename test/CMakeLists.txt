@@ -17,13 +17,19 @@ file(GLOB DATA_MODEL_FILES "${CMAKE_CURRENT_SOURCE_DIR}/utilities/data-model/*")
 file(GLOB COMMON_TEST_FILES "${CMAKE_CURRENT_SOURCE_DIR}/test-suite/common/*")
 file(GLOB DOMAIN_TEST_FILES "${CMAKE_CURRENT_SOURCE_DIR}/test-suite/domain/*")
 file(GLOB SENSOR_COMM_TEST_FILES "${CMAKE_CURRENT_SOURCE_DIR}/test-suite/sensor-communication/*")
+file(GLOB SERVER_COMM_TEST_FILES "${CMAKE_CURRENT_SOURCE_DIR}/test-suite/server-communication/*")
+
+# Include Mocks
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/mock")
+
+# Include unfiled of higher hierarchy files
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/test-suite")
 file(GLOB TRANSLATOR_TEST_FILES "${CMAKE_CURRENT_SOURCE_DIR}/test-suite/message-translation/*")
 file(GLOB SERVER_COMM_TEST_FILES "${CMAKE_CURRENT_SOURCE_DIR}/test-suite/server-communication/*")
 file(GLOB APPLICATION_TEST_FILES "${CMAKE_CURRENT_SOURCE_DIR}/test-suite/application/*")
 
 
 # Add all the test and mock files to the executable
-
 add_executable(runtests ${TEST_FILES} ${UTILITIES_FILES} ${MOCK_FILES} ${STUB_FILES} ${DATA_MODEL_FILES} ${COMMON_TEST_FILES} ${DOMAIN_TEST_FILES} ${SENSOR_COMM_TEST_FILES} ${TRANSLATOR_TEST_FILES} ${SERVER_COMM_TEST_FILES} ${APPLICATION_TEST_FILES})
 
 find_package(SpiritSensorGateway)

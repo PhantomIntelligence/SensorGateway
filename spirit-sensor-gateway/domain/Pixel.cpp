@@ -110,6 +110,10 @@ void Pixel::validateNotFull() const {
     }
 }
 
+int Pixel::getCurrentNumberOfTracksInPixel() const {
+    return currentNumberOfTracksInPixel;
+}
+
 void Pixel::calculateAngles() {
     if (positionOnLayer < (NUMBER_OF_PIXELS_IN_LAYER)) {
         angleStart = (HORIZONTAL_FIELD_OF_VIEW / -NUMBER_OF_LAYER) + (positionOnLayer * ANGLE_RANGE);
@@ -120,7 +124,6 @@ void Pixel::calculateAngles() {
 }
 
 void Pixel::calculatePositionOnLayer() {
-
     if (ID < (NUMBER_OF_PIXELS_IN_LAYER)) {
         layer = 0;
     } else {

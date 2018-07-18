@@ -16,8 +16,8 @@
 
 using TestUtilities::SpiritFramesFileManager;
 
-void
-SpiritFramesFileManager::writeFileWithFrames(TestUtilities::Structures::Frames frames, std::string const& filename) {
+
+void SpiritFramesFileManager::writeFileWithFrames(TestUtilities::Structures::Frames frames, std::string const& filename) {
     auto file = std::fopen(filename.c_str(), "w+");
     for (auto frame : frames) {
         writeFileBlockWithMessage(frame, file);
