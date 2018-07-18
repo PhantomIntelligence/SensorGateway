@@ -43,7 +43,6 @@ namespace ServerCommunication {
         static Json parseTrackToJson(Track track);
 
     };
-    
 }
 
 #endif //SPIRITSENSORGATEWAY_JSONPARSER_H
