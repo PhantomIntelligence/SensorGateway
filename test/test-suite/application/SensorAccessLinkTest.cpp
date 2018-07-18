@@ -56,10 +56,6 @@ protected:
 
         SimpleData readMessage() override {
             SimpleData sommeMessage = TestFunctions::DataTestUtil::createRandomSimpleData();
-
-            // WARNING! This mock implementation of readMessage needs to be slowed down because the way gtest works. DO NOT REMOVE.
-            std::this_thread::sleep_for(std::chrono::milliseconds(5));
-            std::this_thread::yield();
             return sommeMessage;
         }
 
