@@ -3,7 +3,7 @@
 
 #include <gtest/gtest.h>
 #include "spirit-sensor-gateway/server-communication/JsonConverter.h"
-#include "test/utilities/stubs/FrameStub.h"
+#include "test/utilities/stub/FrameStub.h"
 
 using DataFlow::Frame;
 using ServerCommunication::JsonConverter;
