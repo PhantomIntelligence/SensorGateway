@@ -14,7 +14,7 @@
 #define SPIRITSENSORGATEWAY_FRAMESTUB_H
 
 namespace DataStub {
-    std::string frameStub = "{\n"
+    auto frameStub = "{\n"
                                 "    \"frameID\": 48,\n"
                                 "    \"pixels\": [\n"
                                 "        {\n"

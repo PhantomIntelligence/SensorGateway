@@ -12,7 +12,6 @@
 using DataFlow::Frame;
 using DataFlow::AWLMessage;
 using ServerCommunication::JsonParser;
-using TestUtilities::AWLMessagesFileManager;
 using DataFlow::PixelsArray;
 using DataFlow::TracksArray;
 using Defaults::Pixel::DEFAULT_TRACKS_ARRAY;
@@ -25,7 +24,7 @@ class ParseFrameToJsonStringTest : public ::testing::Test {
 };
 
 TEST_F(ParseFrameToJsonStringTest,
-       given_twoDifferentsFrames_when_parsingThenToJson_then_returnsTwoDifferentParsedJsonString) {
+       given_twoDifferentsFrames_when_parsingThemToJson_then_returnsTwoDifferentsParsedJsonStrings) {
     Frame firstFrame = DEFAULT_FRAME;
     Frame secondFrame = DEFAULT_FRAME;
 
@@ -36,7 +35,7 @@ TEST_F(ParseFrameToJsonStringTest,
     ASSERT_NE(firstParsedFrame, secondParsedFrame);
 }
 
-TEST_F(ParseFrameToJsonStringTest, given_aFrame_when_parsongItToAJsonString_then_returnTheCorrectlyParsedJSonString) {
+TEST_F(ParseFrameToJsonStringTest, given_aFrame_when_parsingItToAJsonString_then_returnTheCorrectlyParsedJSonString) {
     TracksArray tracksArray = DEFAULT_TRACKS_ARRAY;
     tracksArray[2].ID = 44;
     tracksArray[2].intensity = 44;
@@ -49,9 +48,10 @@ TEST_F(ParseFrameToJsonStringTest, given_aFrame_when_parsongItToAJsonString_then
     pixelsArray[1] = pixel;
     Frame testFrame = Frame(48, 47, pixelsArray);
 
-    std::string actualFrame = JsonParser::parseFrameToJsonString(testFrame);
+    std::string expectedParsedFrame = frameStub;
+    auto actualParsedFrame = JsonParser::parseFrameToJsonString(testFrame);
 
-    ASSERT_EQ(frameStub,actualFrame);
+    ASSERT_EQ(expectedParsedFrame,actualParsedFrame);
 
 }
 

@@ -105,7 +105,7 @@ void Pixel::validateNotFull() const {
     }
 }
 
-int Pixel::getCurrentNumberOfTracksInPixel() {
+int Pixel::getCurrentNumberOfTracksInPixel() const {
     return currentNumberOfTracksInPixel;
 }
 

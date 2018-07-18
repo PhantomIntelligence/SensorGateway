@@ -28,7 +28,6 @@ Json JsonParser::parseTrackToJson(Track track) {
     jsonTrack["confidenceLevel"] = track.confidenceLevel;
     jsonTrack["speed"] = track.speed;
     jsonTrack["acceleration"] = track.acceleration;
-
     return jsonTrack;
 }
 
@@ -36,29 +35,23 @@ Json JsonParser::parsePixelToJson(Pixel pixel) {
     Json jsonPixel;
     jsonPixel["pixelID"] = pixel.ID;
     jsonPixel["numberOfTracksInPixel"] = pixel.getCurrentNumberOfTracksInPixel();
-
     Json pixelTracks;
     for (Track track:*pixel.getTracks()) {
         pixelTracks.push_back(parseTrackToJson(track));
     }
     jsonPixel["tracks"] = pixelTracks;
-
     return jsonPixel;
-
 }
 
 std::string JsonParser::parseFrameToJsonString(Frame frame) {
     Json jsonFrame;
     jsonFrame["frameID"] = frame.frameID;
     jsonFrame["systemID"] = frame.systemID;
-
     Json framePixels;
     for (Pixel pixel: *frame.getPixels()) {
         framePixels.push_back(parsePixelToJson(pixel));
     }
-
     jsonFrame["pixels"] = framePixels;
-
     return jsonFrame.dump(4);
 }
 

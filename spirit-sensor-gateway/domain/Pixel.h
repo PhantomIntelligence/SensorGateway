@@ -64,7 +64,7 @@ namespace DataFlow {
 
         PixelID ID;
 
-        int getCurrentNumberOfTracksInPixel();
+        int getCurrentNumberOfTracksInPixel() const;
 
     private:
 

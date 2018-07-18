@@ -35,7 +35,6 @@ namespace ServerCommunication {
 
         JsonParser& operator=(JsonParser&& other) noexcept = delete;
 
-
         static std::string parseFrameToJsonString(Frame frame);
 
     private:
