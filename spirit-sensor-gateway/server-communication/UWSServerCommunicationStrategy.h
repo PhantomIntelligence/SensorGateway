@@ -16,11 +16,14 @@
 #include <uWS.h>
 #include "ServerCommunicator.hpp"
 #include "spirit-sensor-gateway/domain/Frame.h"
+#include "JsonConverter.h"
 
 
 namespace ServerCommunication {
-
-    std::string const SERVER_CONNECTION_ADDRESS = "ws://localhost:8080/connect-gateway";
+    using Hub = uWS::Hub;
+    using WebSocket = uWS::WebSocket<uWS::CLIENT>;
+    using WebSocketPointerPromise = std::promise<WebSocket*>;
+    std::string const SERVER_CONNECTION_ADDRESS = "ws://localhost:8080/setWebSocketCallbacksAndConnection-gateway";
 
     class UWSServerCommunicationStrategy : public ServerCommunicationStrategy<DataFlow::Frame> {
 
@@ -51,11 +54,26 @@ namespace ServerCommunication {
 
         void start();
 
-        int connect(std::string const& serverAddress);
 
     private:
+        void setConnectionCallback(Hub* pHub, WebSocketPointerPromise* webSocketPointerPromise);
 
-        std::string serverAddrress = SERVER_CONNECTION_ADDRESS;
+        void setErrorCallback(Hub* pHub);
+
+        void setDisconnectionCallback(Hub* pHub);
+
+        void setOnMessageCallBack();
+
+        static void startWebSocket(Hub* hub);
+
+        void
+        setWebSocketCallbacksAndConnection(std::string serverAddress, WebSocketPointerPromise* webSocketPointerPromise);
+
+        Hub hub;
+
+        WebSocket* webSocket;
+
+        std::string serverAddress = SERVER_CONNECTION_ADDRESS;
     };
 }
 
