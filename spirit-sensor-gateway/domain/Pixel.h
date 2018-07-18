@@ -66,15 +66,17 @@ namespace DataFlow {
 
         void calculatePositionOnLayer();
 
-        AngleEnd angleEnd ;
+        AngleEnd angleEnd;
 
-        AngleStart angleStart ;
+        AngleStart angleStart;
 
         Layer layer;
 
         PositionOnLayer positionOnLayer;
 
         PixelID ID;
+
+        int getCurrentNumberOfTracksInPixel() const;
 
     private:
 
