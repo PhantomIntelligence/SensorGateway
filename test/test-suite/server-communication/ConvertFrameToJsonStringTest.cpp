@@ -3,7 +3,7 @@
 
 #include <gtest/gtest.h>
 #include "spirit-sensor-gateway/server-communication/JsonConverter.h"
-#include "test/utilities/stub/FrameStub.h"
+#include "test/utilities/stub/StringFrameStub.h"
 
 using DataFlow::Frame;
 using ServerCommunication::JsonConverter;
@@ -19,7 +19,7 @@ class ConvertFrameToJsonStringTest : public ::testing::Test {
 };
 
 TEST_F(ConvertFrameToJsonStringTest,
-       given_twoDifferentsFrames_when_convertingThemToJson_then_returnsTwoDifferentsConvertedJsonStrings) {
+       given_twoDifferentFrames_when_convertingThemToJson_then_returnsTwoDifferentConvertedJsonStrings) {
     Frame firstFrame = DEFAULT_FRAME;
     Frame secondFrame = DEFAULT_FRAME;
 
@@ -30,7 +30,7 @@ TEST_F(ConvertFrameToJsonStringTest,
     ASSERT_NE(firstConvertedFrame, secondConvertedFrame);
 }
 
-TEST_F(ConvertFrameToJsonStringTest, given_aFrame_when_convertingItToAJsonString_then_returnTheCorrectlConvertedJSonString) {
+TEST_F(ConvertFrameToJsonStringTest, given_aFrame_when_convertingItToAJsonString_then_returnTheCorrectConvertedJSonString) {
     TracksArray tracksArray = DEFAULT_TRACKS_ARRAY;
     tracksArray[2].ID = 44;
     tracksArray[2].intensity = 44;
