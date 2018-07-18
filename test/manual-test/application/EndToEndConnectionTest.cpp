@@ -1,10 +1,13 @@
+#ifndef SPIRITSENSORGATEWAY_ENDTOENDCONNECTIONTEST_CPP
+#define SPIRITSENSORGATEWAY_ENDTOENDCONNECTIONTEST_CPP
+
 #include "spirit-sensor-gateway/application/SensorAccessLink.hpp"
 #include "spirit-sensor-gateway/sensor-communication/KvaserCanCommunicationStrategy.h"
 #include "spirit-sensor-gateway/message-translation/AWLMessageToSpiritMessageTranslationStrategy.h"
 #include "test/utilities/files/SpiritFramesFileManager.h"
 #include <chrono>
 #include <thread>
-#include <test/mock/FrameSinkMock.h>
+#include <test/utilities/mock/FrameSinkMock.h>
 
 using SensorCommunication::KvaserCanCommunicationStrategy;
 using MessageTranslation::AWLMessageToSpiritMessageTranslationStrategy;
@@ -17,7 +20,7 @@ int main(){
     AWLMessageToSpiritMessageTranslationStrategy messageTranslationStrategy;
     FrameSinkMock serverCommunicationStrategy(100);
 
-    SensorAccessLink<AWLMessage, Frame> sensorAccessLink(&sensorCommunicationStrategy, &messageTranslationStrategy, &serverCommunicationStrategy);
+//    SpiritSensorGateway::SensorAccessLink<AWLMessage, Frame> sensorAccessLink(&sensorCommunicationStrategy, &messageTranslationStrategy, &serverCommunicationStrategy);
 //    SpiritFramesFileManager fileManager;
 //    const int NUMBER_OF_MILLISECONDS = 5000;
 //
@@ -27,3 +30,4 @@ int main(){
 
 
 };
+#endif // SPIRITSENSORGATEWAY_ENDTOENDCONNECTIONTEST_CPP

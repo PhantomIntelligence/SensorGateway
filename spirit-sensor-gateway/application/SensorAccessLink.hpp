@@ -17,53 +17,80 @@
 #ifndef SPIRITSENSORGATEWAY_SENSORACCESSLINK_H
 #define SPIRITSENSORGATEWAY_SENSORACCESSLINK_H
 
-#include <test/mock/FrameSinkMock.h>
-#include "spirit-sensor-gateway/sensor-communication/SensorCommunicator.hpp"
-#include "spirit-sensor-gateway/sensor-communication/SensorCommunicationStrategy.hpp"
-#include "spirit-sensor-gateway/message-translation/MessageTranslator.hpp"
-#include "spirit-sensor-gateway/common/data-flow/DataSink.hpp"
+#include "spirit-sensor-gateway/server-communication/ServerCommunicator.hpp"
 
-using SensorAccessLinkElement::SensorCommunicator;
-using SensorAccessLinkElement::MessageTranslator;
-using SensorCommunication::SensorCommunicationStrategy;
-using MessageTranslation::MessageTranslationStrategy;
-using DataFlow::DataProcessingScheduler;
-using DataFlow::DataSink;
+namespace SpiritSensorGateway {
 
-template<class I, class O>
-class SensorAccessLink {
+    template<class I, class O>
+    class SensorAccessLink {
+    protected:
+        typedef I INPUT;
+        typedef O OUTPUT;
 
-public:
-    //TODO change constructor to receive serverCommunicationStrategy instead
-    explicit SensorAccessLink(SensorCommunicationStrategy<I>* sensorCommunicationStrategy,
-                              MessageTranslationStrategy<I, O>* messageTranslationStrategy,
-                              DataSink<O>* serverCommunicator): sensorCommunicator(sensorCommunicationStrategy),
-                                                                messageTranslator(messageTranslationStrategy),
-                                                                messageTranslationScheduler(&messageTranslator),
-                                                                serverCommunicationScheduler(serverCommunicator) {
+        using SensorCommunicator = SensorAccessLinkElement::SensorCommunicator<INPUT>;
+        using SensorCommunicationStrategy = SensorCommunication::SensorCommunicationStrategy<INPUT>;
 
-        messageTranslationStrategy->linkConsumer(&serverCommunicationScheduler);
-        sensorCommunicator.linkConsumer(&messageTranslationScheduler);
+        using MessageTranslator = SensorAccessLinkElement::MessageTranslator<INPUT, OUTPUT>;
+        using MessageTranslationStrategy = MessageTranslation::MessageTranslationStrategy<INPUT, OUTPUT>;
+        using TranslatorScheduler = DataFlow::DataProcessingScheduler<INPUT, MessageTranslator, 1>;
+
+        using ServerCommunicator = SensorAccessLinkElement::ServerCommunicator<OUTPUT>;
+        using ServerCommunicationStrategy = ServerCommunication::ServerCommunicationStrategy<OUTPUT>;
+        using ServerCommunicatorScheduler = DataFlow::DataProcessingScheduler<OUTPUT, ServerCommunicator, 1>;
+
+    public:
+        //TODO change constructor to receive serverCommunicationStrategy instead
+        explicit SensorAccessLink(SensorCommunicationStrategy* sensorCommunicationStrategy,
+        MessageTranslationStrategy* messageTranslationStrategy,
+        ServerCommunicationStrategy* serverCommunicationStrategy):
+        sensorCommunicator(sensorCommunicationStrategy),
+        messageTranslator(messageTranslationStrategy),
+        translatorScheduler(&messageTranslator),
+        serverCommunicator(serverCommunicationStrategy),
+        serverCommunicatorScheduler(&serverCommunicator) {
+        }
+//    explicit SensorAccessLink(SensorCommunicationStrategy<I>* sensorCommunicationStrategy,
+//                              MessageTranslationStrategy<I, O>* messageTranslationStrategy,
+//                              DataSink<O>* serverCommunicator): sensorCommunicator(sensorCommunicationStrategy),
+//                                                                messageTranslator(messageTranslationStrategy),
+//                                                                messageTranslationScheduler(&messageTranslator),
+//                                                                serverCommunicationScheduler(serverCommunicator) {
+//
+//        messageTranslationStrategy->linkConsumer(&serverCommunicationScheduler);
+//        sensorCommunicator.linkConsumer(&messageTranslationScheduler);
+//    };
+
+        ~SensorAccessLink() noexcept;
+
+        SensorAccessLink(SensorAccessLink const& other) = delete;
+
+        SensorAccessLink(SensorAccessLink&& other) noexcept = delete;
+
+        SensorAccessLink& operator=(SensorAccessLink const& other)& = delete;
+
+        SensorAccessLink& operator=(SensorAccessLink&& other)& noexcept = delete;
+
+        void start() {
+            sensorCommunicator.start();
+        };
+
+        void terminateAndJoin() {
+            sensorCommunicator.terminateAndJoin();
+            translatorScheduler.terminateAndJoin();
+            serverCommunicatorScheduler.terminateAndJoin();
+        }
+
+    private:
+
+        SensorCommunicator sensorCommunicator;
+
+        MessageTranslator messageTranslator;
+        TranslatorScheduler translatorScheduler;
+
+        ServerCommunicator serverCommunicator;
+        ServerCommunicatorScheduler serverCommunicatorScheduler;
     };
 
-    ~ SensorAccessLink() = default;
-
-    void start() {
-        sensorCommunicator.start();
-    };
-
-    void terminateAndJoin(){
-        sensorCommunicator.terminateAndJoin();
-        messageTranslationScheduler.terminateAndJoin();
-        serverCommunicationScheduler.terminateAndJoin();
-    }
-
-private:
-    SensorCommunicator<I> sensorCommunicator;
-    MessageTranslator<I, O> messageTranslator;
-    DataProcessingScheduler<I, MessageTranslator<I, O>, 1>  messageTranslationScheduler;
-    DataProcessingScheduler<O, DataSink<O> , 1>  serverCommunicationScheduler;
-};
-
+}
 
 #endif //SPIRITSENSORGATEWAY_SENSORACCESSLINK_H

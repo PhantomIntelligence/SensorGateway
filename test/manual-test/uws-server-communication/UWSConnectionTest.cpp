@@ -14,6 +14,9 @@
 	limitations under the License.
 */
 
+#ifndef SPIRITSENSORGATEWAY_UWSCONNECTIONTEST_CPP
+#define SPIRITSENSORGATEWAY_UWSCONNECTIONTEST_CPP
+
 #include "spirit-sensor-gateway/server-communication/UWSServerCommunicationStrategy.h"
 
 namespace ManualTest {
@@ -218,3 +221,5 @@ int main() {
     }
     return 0;
 }
+
+#endif // SPIRITSENSORGATEWAY_UWSCONNECTIONTEST_CPP

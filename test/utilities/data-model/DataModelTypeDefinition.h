@@ -19,6 +19,7 @@
 #define SPIRITSENSORGATEWAY_DATAMODELTYPEDEFINITION_H
 
 #include <array>
+#include <functional>
 
 namespace { // Values
 

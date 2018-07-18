@@ -17,7 +17,7 @@
 
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
-#include "test/mock/FrameSinkMock.h"
+#include "test/utilities/mock/FrameSinkMock.h"
 #include "spirit-sensor-gateway/message-translation/AWLMessageToSpiritMessageTranslationStrategy.h"
 
 using Defaults::Track::DEFAULT_ACCELERATION;

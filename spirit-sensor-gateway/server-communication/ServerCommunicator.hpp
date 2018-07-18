@@ -17,7 +17,7 @@
 #ifndef SPIRITSENSORGATEWAY_SERVERCOMMUNICATOR_H
 #define SPIRITSENSORGATEWAY_SERVERCOMMUNICATOR_H
 
-#include "spirit-sensor-gateway/common/data-flow/DataProcessingScheduler.hpp"
+#include "spirit-sensor-gateway/message-translation/MessageTranslator.hpp"
 #include "ServerCommunicationStrategy.hpp"
 
 namespace SensorAccessLinkElement {

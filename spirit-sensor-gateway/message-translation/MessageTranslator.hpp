@@ -13,7 +13,7 @@
 #ifndef SPIRITSENSORGATEWAY_MESSAGETRANSLATOR_H
 #define SPIRITSENSORGATEWAY_MESSAGETRANSLATOR_H
 
-#include "spirit-sensor-gateway/common/data-flow/DataSink.hpp"
+#include "spirit-sensor-gateway/sensor-communication/SensorCommunicator.hpp"
 #include "MessageTranslationStrategy.hpp"
 
 namespace SensorAccessLinkElement {

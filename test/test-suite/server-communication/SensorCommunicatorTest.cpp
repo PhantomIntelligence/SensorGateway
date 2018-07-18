@@ -15,15 +15,15 @@
 
 */
 
-#ifndef SPIRITSERVERGATEWAY_SERVERCOMMUNICATORTEST_CPP
-#define SPIRITSERVERGATEWAY_SERVERCOMMUNICATORTEST_CPP
+#ifndef SPIRITSERVERGATEWAY_SENSORACCESSLINKTEST_CPP
+#define SPIRITSERVERGATEWAY_SENSORACCESSLINKTEST_CPP
 
 #include <gtest/gtest.h>
 #include <list>
 
 #include "spirit-sensor-gateway/server-communication/ServerCommunicator.hpp"
-#include "data-model/DataModelFixture.h"
-#include "test/stub/SpiritFramesStub.h"
+#include "test/utilities/data-model/DataModelFixture.h"
+#include "test/utilities/stub/SpiritFramesStub.h"
 
 using DataFlow::Frame;
 using Frames = std::list<Frame>;
@@ -126,12 +126,12 @@ TEST_F(ServerCommunicatorTest, given_aMessageToSend_when_consume_then_callsSendM
 TEST_F(ServerCommunicatorTest, given__when_disconnect_then_callsCloseConnectionInStrategy) {
     MockServerCommunicatorStrategy mockStrategy;
     ServerCommunicator serverCommunicator(&mockStrategy);
-    
+
     serverCommunicator.disconnect();
 
     auto strategyHasBeenCalled = mockStrategy.hasCloseConnectionBeenCalled();
     ASSERT_TRUE(strategyHasBeenCalled);
 }
 
-#endif //SPIRITSERVERGATEWAY_SERVERCOMMUNICATORTEST_CPP
+#endif //SPIRITSERVERGATEWAY_SENSORACCESSLINKTEST_CPP
 

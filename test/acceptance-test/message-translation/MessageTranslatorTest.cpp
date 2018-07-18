@@ -16,10 +16,10 @@
 #include <fstream>
 #include "test/utilities/files/AWLMessagesFileManager.h"
 #include "test/utilities/files/SpiritFramesFileManager.h"
-#include "test/stub/AWLMessagesStub.h"
-#include "test/stub/SpiritFramesStub.h"
+#include "test/utilities/stub/AWLMessagesStub.h"
+#include "test/utilities/stub/SpiritFramesStub.h"
 #include "spirit-sensor-gateway/message-translation/AWLMessageToSpiritMessageTranslationStrategy.h"
-#include "test/mock/FrameSinkMock.h"
+#include "test/utilities/mock/FrameSinkMock.h"
 
 using Mock::FrameProcessingScheduler;
 using Mock::FrameSinkMock;
