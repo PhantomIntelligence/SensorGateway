@@ -2,15 +2,10 @@
 #define SPIRITSENSORGATEWAY_PARSEFRAMETOJSONSTRINGTEST_CPP
 
 #include <gtest/gtest.h>
-#include <fstream>
-#include <spirit-sensor-gateway/domain/AWLMessage.h>
-#include <test/utilities/files/AWLMessagesFileManager.h>
 #include "spirit-sensor-gateway/server-communication/JsonParser.h"
-#include "test/utilities/files/FileManager.hpp"
 #include "test/utilities/stubs/FrameStub.h"
 
 using DataFlow::Frame;
-using DataFlow::AWLMessage;
 using ServerCommunication::JsonParser;
 using DataFlow::PixelsArray;
 using DataFlow::TracksArray;
