@@ -47,8 +47,5 @@ TEST_F(ParseFrameToJsonStringTest, given_aFrame_when_parsingItToAJsonString_then
     auto actualParsedFrame = JsonParser::parseFrameToJsonString(testFrame);
 
     ASSERT_EQ(expectedParsedFrame,actualParsedFrame);
-
 }
-
-
 #endif //SPIRITSENSORGATEWAY_PARSEFRAMETOJSONSTRINGTEST_CPP
