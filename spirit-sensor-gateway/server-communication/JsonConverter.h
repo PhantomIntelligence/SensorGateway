@@ -21,26 +21,26 @@ namespace ServerCommunication {
     using Json = nlohmann::json;
     using DataFlow::Frame;
 
-    class JsonParser final{
+    class JsonConverter final{
     public:
-        JsonParser() = delete;
+        JsonConverter() = delete;
 
-        ~JsonParser() = delete;
+        ~JsonConverter() = delete;
 
-        JsonParser(JsonParser const& other) = delete;
+        JsonConverter(JsonConverter const& other) = delete;
 
-        JsonParser(JsonParser&& other) noexcept = delete;
+        JsonConverter(JsonConverter&& other) noexcept = delete;
 
-        JsonParser& operator=(JsonParser const& other)& = delete;
+        JsonConverter& operator=(JsonConverter const& other)& = delete;
 
-        JsonParser& operator=(JsonParser&& other) noexcept = delete;
+        JsonConverter& operator=(JsonConverter&& other) noexcept = delete;
 
-        static std::string parseFrameToJsonString(Frame frame);
+        static std::string convertFrameToJsonString(Frame frame);
 
     private:
-        static Json parsePixelToJson(Pixel pixel);
+        static Json convertPixelToJson(Pixel pixel);
 
-        static Json parseTrackToJson(Track track);
+        static Json convertTrackToJson(Track track);
 
     };
 }

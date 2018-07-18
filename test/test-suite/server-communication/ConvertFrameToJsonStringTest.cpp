@@ -2,11 +2,11 @@
 #define SPIRITSENSORGATEWAY_PARSEFRAMETOJSONSTRINGTEST_CPP
 
 #include <gtest/gtest.h>
-#include "spirit-sensor-gateway/server-communication/JsonParser.h"
+#include "spirit-sensor-gateway/server-communication/JsonConverter.h"
 #include "test/utilities/stubs/FrameStub.h"
 
 using DataFlow::Frame;
-using ServerCommunication::JsonParser;
+using ServerCommunication::JsonConverter;
 using DataFlow::PixelsArray;
 using DataFlow::TracksArray;
 using Defaults::Pixel::DEFAULT_TRACKS_ARRAY;
@@ -15,22 +15,22 @@ using Defaults::Frame::DEFAULT_PIXELS_ARRAY;
 using DataStub::frameStub;
 
 
-class ParseFrameToJsonStringTest : public ::testing::Test {
+class ConvertFrameToJsonStringTest : public ::testing::Test {
 };
 
-TEST_F(ParseFrameToJsonStringTest,
-       given_twoDifferentsFrames_when_parsingThemToJson_then_returnsTwoDifferentsParsedJsonStrings) {
+TEST_F(ConvertFrameToJsonStringTest,
+       given_twoDifferentsFrames_when_convertingThemToJson_then_returnsTwoDifferentsConvertedJsonStrings) {
     Frame firstFrame = DEFAULT_FRAME;
     Frame secondFrame = DEFAULT_FRAME;
 
     secondFrame.frameID = 33;
 
-    auto firstParsedFrame = JsonParser::parseFrameToJsonString(firstFrame);
-    auto secondParsedFrame = JsonParser::parseFrameToJsonString(secondFrame);
-    ASSERT_NE(firstParsedFrame, secondParsedFrame);
+    auto firstConvertedFrame = JsonConverter::convertFrameToJsonString(firstFrame);
+    auto secondConvertedFrame = JsonConverter::convertFrameToJsonString(secondFrame);
+    ASSERT_NE(firstConvertedFrame, secondConvertedFrame);
 }
 
-TEST_F(ParseFrameToJsonStringTest, given_aFrame_when_parsingItToAJsonString_then_returnTheCorrectlyParsedJSonString) {
+TEST_F(ConvertFrameToJsonStringTest, given_aFrame_when_convertingItToAJsonString_then_returnTheCorrectlConvertedJSonString) {
     TracksArray tracksArray = DEFAULT_TRACKS_ARRAY;
     tracksArray[2].ID = 44;
     tracksArray[2].intensity = 44;
@@ -43,9 +43,9 @@ TEST_F(ParseFrameToJsonStringTest, given_aFrame_when_parsingItToAJsonString_then
     pixelsArray[1] = pixel;
     Frame testFrame = Frame(48, 47, pixelsArray);
 
-    std::string expectedParsedFrame = frameStub;
-    auto actualParsedFrame = JsonParser::parseFrameToJsonString(testFrame);
+    std::string expectedConvertedFrame = frameStub;
+    auto actualConvertedFrame = JsonConverter::convertFrameToJsonString(testFrame);
 
-    ASSERT_EQ(expectedParsedFrame,actualParsedFrame);
+    ASSERT_EQ(expectedConvertedFrame,actualConvertedFrame);
 }
 #endif //SPIRITSENSORGATEWAY_PARSEFRAMETOJSONSTRINGTEST_CPP
