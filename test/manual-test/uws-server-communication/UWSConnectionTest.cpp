@@ -159,39 +159,28 @@ namespace ManualTest {
     }
 
     using TestFunctions::DataTestUtil;
-    using ClientWebSocket = uWS::WebSocket<uWS::CLIENT>;
+    using WebSocket = uWS::WebSocket<uWS::CLIENT>;
+    using WebSocketPointerPromise = std::promise<WebSocket*>;
 
-    int testMessageSending() {
-        auto numberOfSentMessages = 100;
-        ClientWebSocket* webSocket;
-        uWS::Hub hub;
-
+    void connectAndStartWebSocket(uWS::Hub* hub, WebSocketPointerPromise* webSocketPointerPromise) {
         int length = 0;
-        hub.onConnection([&webSocket, &length](ClientWebSocket* ws, uWS::HttpRequest req) {
-            webSocket = ws;
+        hub->onConnection([&webSocketPointerPromise, &length](WebSocket* ws, uWS::HttpRequest req) {
             std::cout << "Connected!" << std::endl;
-//            while (length < 2048) {
-//                char* message = new char[length];
-//                memset(message, 0, length);
-//                ws->send(message, length, uWS::OpCode::BINARY);
-//                delete[] message;
-//                length++;
-//            }
-//            hub.getDefaultGroup<uWS::SERVER>().close();
+            webSocketPointerPromise->set_value(ws);
         });
 
-        hub.onMessage([](ClientWebSocket* ws, char* message, size_t length, uWS::OpCode opCode) {
+        hub->onMessage([](WebSocket* ws, char* message, size_t length, uWS::OpCode opCode) {
             std::cout << std::string(message, length) << std::endl;
             ws->send(message, length, opCode);
         });
 
 
-        hub.onDisconnection([](ClientWebSocket* ws, int code, char* message, size_t length) {
+        hub->onDisconnection([](WebSocket* ws, int code, char* message, size_t length) {
             std::cout << "Client got disconnected with data: " << ws->getUserData() << ", code: " << code
                       << ", message: <" << std::string(message, length) << ">" << std::endl;
         });
 
-        hub.onError([](void* user) {
+        hub->onError([](void* user) {
             long receivedCode = (long) user;
             std::vector<long> handledCodes = {};
             handleOtherErrors(handledCodes, receivedCode, coutMessageAndCrash, "An error has occured!");
@@ -199,12 +188,22 @@ namespace ManualTest {
 
 
         auto const VALID_ADDRESS_WS = "ws://localhost:8080/connect-gateway";
-        auto user = (void*) 5;
-        hub.connect(VALID_ADDRESS_WS, user);
+        hub->connect(VALID_ADDRESS_WS);
 
-        hub.run();
-        std::cout << "aouecshsaouhntes : " << std::endl;
+        hub->run();
 
+    }
+
+    int testMessageSending() {
+        uWS::Hub hub;
+        WebSocketPointerPromise webSocketPointerPromise;
+
+        auto webSocketConnectionThread = JoinableThread(&connectAndStartWebSocket, &hub, &webSocketPointerPromise);
+        auto futureWebSocket = webSocketPointerPromise.get_future();
+        futureWebSocket.wait();
+        auto webSocket = futureWebSocket.get();
+
+        auto numberOfSentMessages = 100;
         DataModel::SimpleData simpleData = DataTestUtil::createRandomSimpleData();
         std::string textToSend;
         for (int i = 0; i < numberOfSentMessages; ++i) {
@@ -213,6 +212,9 @@ namespace ManualTest {
             std::cout << "sending : " << textToSend << std::endl;
             webSocket->send(textToSend.c_str(), textToSend.size(), uWS::OpCode::TEXT);
         }
+
+        webSocket->close();
+        webSocketConnectionThread.join();
 
         return 0;
     }
