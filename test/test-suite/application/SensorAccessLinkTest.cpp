@@ -196,8 +196,6 @@ TEST_F(SensorAccessLinkTest,
 
     auto createdDataList = mockSensorCommunicationStrategy.getCreatedMessageCopies();
     auto receivedDataList = mockServerCommunicationStrategy.getReceivedData();
-    std::cout << "createdData.size() : " << createdDataList.size() << std::endl;
-    std::cout << "receivedData.size() : " << receivedDataList.size() << std::endl;
 
     auto numberOfProcessedData = receivedDataList.size();
     bool dataHasPassedThroughCorrectly = true;
