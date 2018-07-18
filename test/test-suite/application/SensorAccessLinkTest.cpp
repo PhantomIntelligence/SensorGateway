@@ -36,7 +36,6 @@ protected:
     SensorAccessLinkTest() = default;
 
     virtual ~SensorAccessLinkTest() = default;
-
 };
 
 using SimpleSensorCommunicationStrategy = SensorCommunication::SensorCommunicationStrategy<SimpleData>;
@@ -148,9 +147,7 @@ private:
     SimpleDataList receivedData;
 };
 
-/**
- * Medium test
- */
+
 TEST_F(SensorAccessLinkTest,
        given_aNumberOfDataCreatedByTheSensorCommunicationStrategy_when_executing_then_aSimilarNumberOfDataEndsUpInTheServerCommunicationStrategy) {
     uint8_t numberOfDataToProcess = 42;
@@ -173,9 +170,7 @@ TEST_F(SensorAccessLinkTest,
     ASSERT_EQ(createdDataList.size(), receivedDataList.size());
 }
 
-/**
- * Medium Test
- */
+
 TEST_F(SensorAccessLinkTest,
        given_dataCreatedByTheSensorCommunicationStrategy_when_executing_then_dataGoesThroughTranslationStrategyBeforeEndingInTheServerCommunicationStrategy) {
     uint8_t numberOfDataToProcess = 42;

@@ -19,6 +19,7 @@
 
 #include "spirit-sensor-gateway/server-communication/ServerCommunicator.hpp"
 
+
 namespace SpiritSensorGateway {
 
     template<class I, class O>
@@ -76,12 +77,11 @@ namespace SpiritSensorGateway {
     private:
 
         SensorCommunicator sensorCommunicator;
-
         MessageTranslator messageTranslator;
-        TranslatorScheduler translatorScheduler;
-
         ServerCommunicator serverCommunicator;
+
         ServerCommunicatorScheduler serverCommunicatorScheduler;
+        TranslatorScheduler translatorScheduler;
     };
 
 }
