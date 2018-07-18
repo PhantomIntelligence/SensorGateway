@@ -15,8 +15,8 @@
 
 */
 
-#ifndef SPIRITSERVERGATEWAY_SENSORACCESSLINKTEST_CPP
-#define SPIRITSERVERGATEWAY_SENSORACCESSLINKTEST_CPP
+#ifndef SPIRITSENSORGATEWAY_SERVERCOMMUNICATORTEST_CPP
+#define SPIRITSENSORGATEWAY_SERVERCOMMUNICATORTEST_CPP
 
 #include <gtest/gtest.h>
 #include <list>
@@ -41,57 +41,60 @@ protected:
 
 };
 
-class MockServerCommunicatorStrategy final : public ServerCommunicationStrategy<Frame> {
-public:
-    MockServerCommunicatorStrategy() :
-            openConnectionCalled(false),
-            sendMessageCalled(false),
-            closeConnectionCalled(false),
-            sentMessage(Frame::returnDefaultData()) {
+namespace ServerCommunicatorTestMock {
 
-    }
+    class MockServerCommunicatorStrategy final : public ServerCommunicationStrategy<Frame> {
+    public:
+        MockServerCommunicatorStrategy() :
+                openConnectionCalled(false),
+                sendMessageCalled(false),
+                closeConnectionCalled(false),
+                sentMessage(Frame::returnDefaultData()) {
 
-    ~MockServerCommunicatorStrategy() noexcept = default;
+        }
 
-    void sendMessage(MESSAGE&& message) {
-        sendMessageCalled.store(true);
-        sentMessage = message;
-    }
+        ~MockServerCommunicatorStrategy() noexcept = default;
 
-    void openConnection() override {
-        openConnectionCalled.store(true);
-    }
+        void sendMessage(MESSAGE&& message) {
+            sendMessageCalled.store(true);
+            sentMessage = message;
+        }
 
-    void closeConnection() override {
-        closeConnectionCalled.store(true);
-    }
+        void openConnection() override {
+            openConnectionCalled.store(true);
+        }
 
-    bool hasOpenConnectionBeenCalled() const {
-        return openConnectionCalled.load();
-    }
+        void closeConnection() override {
+            closeConnectionCalled.store(true);
+        }
 
-    bool hasCloseConnectionBeenCalled() const {
-        return closeConnectionCalled.load();
-    }
+        bool hasOpenConnectionBeenCalled() const {
+            return openConnectionCalled.load();
+        }
 
-    bool hasReadMessageBeenCalled() const {
-        return sendMessageCalled.load();
-    }
+        bool hasCloseConnectionBeenCalled() const {
+            return closeConnectionCalled.load();
+        }
 
-    Frame getSentMessage() const {
-        return sentMessage;
-    }
+        bool hasReadMessageBeenCalled() const {
+            return sendMessageCalled.load();
+        }
 
-private:
-    AtomicFlag openConnectionCalled;
-    AtomicFlag sendMessageCalled;
-    AtomicFlag closeConnectionCalled;
+        Frame getSentMessage() const {
+            return sentMessage;
+        }
 
-    Frame sentMessage;
-};
+    private:
+        AtomicFlag openConnectionCalled;
+        AtomicFlag sendMessageCalled;
+        AtomicFlag closeConnectionCalled;
+
+        Frame sentMessage;
+    };
+}
 
 TEST_F(ServerCommunicatorTest, given__when_connect_then_callsOpenConnectionInStrategy) {
-    MockServerCommunicatorStrategy mockStrategy;
+    ServerCommunicatorTestMock::MockServerCommunicatorStrategy mockStrategy;
     ServerCommunicator serverCommunicator(&mockStrategy);
 
     serverCommunicator.connect();
@@ -101,7 +104,7 @@ TEST_F(ServerCommunicatorTest, given__when_connect_then_callsOpenConnectionInStr
 }
 
 TEST_F(ServerCommunicatorTest, given_aMessageToSend_when_consume_then_callsSendMessageInStrategy) {
-    MockServerCommunicatorStrategy mockStrategy;
+    ServerCommunicatorTestMock::MockServerCommunicatorStrategy mockStrategy;
     ServerCommunicator serverCommunicator(&mockStrategy);
     auto frame = createArbitrarySpiritFrame();
 
@@ -112,7 +115,7 @@ TEST_F(ServerCommunicatorTest, given_aMessageToSend_when_consume_then_callsSendM
 }
 
 TEST_F(ServerCommunicatorTest, given_aMessageToSend_when_consume_then_callsSendMessageInStrategyWithTheMessage) {
-    MockServerCommunicatorStrategy mockStrategy;
+    ServerCommunicatorTestMock::MockServerCommunicatorStrategy mockStrategy;
     ServerCommunicator serverCommunicator(&mockStrategy);
     auto frame = createArbitrarySpiritFrame();
     auto frameCopy = Frame(frame);
@@ -124,7 +127,7 @@ TEST_F(ServerCommunicatorTest, given_aMessageToSend_when_consume_then_callsSendM
 }
 
 TEST_F(ServerCommunicatorTest, given__when_disconnect_then_callsCloseConnectionInStrategy) {
-    MockServerCommunicatorStrategy mockStrategy;
+    ServerCommunicatorTestMock::MockServerCommunicatorStrategy mockStrategy;
     ServerCommunicator serverCommunicator(&mockStrategy);
 
     serverCommunicator.disconnect();
@@ -133,5 +136,5 @@ TEST_F(ServerCommunicatorTest, given__when_disconnect_then_callsCloseConnectionI
     ASSERT_TRUE(strategyHasBeenCalled);
 }
 
-#endif //SPIRITSERVERGATEWAY_SENSORACCESSLINKTEST_CPP
+#endif //SPIRITSENSORGATEWAY_SERVERCOMMUNICATORTEST_CPP
 
