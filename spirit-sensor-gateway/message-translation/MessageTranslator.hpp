@@ -40,7 +40,7 @@ namespace SensorAccessLinkElement {
         MessageTranslator& operator=(MessageTranslator&& other)& noexcept = delete;
 
         void consume(I&& inputMessage) override {
-            messageTranslationStrategy->translateBasicMessage(std::move(inputMessage));
+            messageTranslationStrategy->translateMessage(std::move(inputMessage));
         };
 
     private:

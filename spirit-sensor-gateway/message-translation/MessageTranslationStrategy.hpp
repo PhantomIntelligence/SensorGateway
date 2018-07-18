@@ -28,7 +28,7 @@ namespace MessageTranslation {
 
         virtual ~MessageTranslationStrategy() noexcept = default;
 
-        virtual void translateBasicMessage(INPUT&& inputMessage) = 0;
+        virtual void translateMessage(INPUT&& inputMessage) = 0;
 
     protected:
 

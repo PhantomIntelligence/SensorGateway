@@ -39,7 +39,7 @@ namespace MessageTranslation {
 
         Frame returnDefaultData();
 
-        void translateBasicMessage(INPUT&& inputMessage) override;
+        void translateMessage(INPUT&& inputMessage) override;
 
     private:
 

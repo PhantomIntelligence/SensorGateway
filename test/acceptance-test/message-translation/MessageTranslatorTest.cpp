@@ -56,7 +56,7 @@ TEST_F(AWLMessageToSpiritMessageTranslationStrategyTest,
 
     auto messages = awlMessagesFileManager.readMessagesFromFile(AWLMESSAGES_INPUT_FILE_NAME);
     for (auto message : messages) {
-        awlMessageTranslator.translateBasicMessage(std::move(message));
+        awlMessageTranslator.translateMessage(std::move(message));
         ++counter;
     }
 

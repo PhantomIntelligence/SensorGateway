@@ -28,6 +28,7 @@ using DataModel::SimpleData;
 using DataModel::SimpleDataContent;
 using SimpleDataList = std::list<SimpleData>;
 using TestFunctions::DataTestUtil;
+using SensorAccessLink = SpiritSensorGateway::SensorAccessLink<SimpleData, SimpleData>;
 
 class SensorAccessLinkTest : public ::testing::Test {
 
@@ -49,12 +50,15 @@ protected:
 
 public:
 
-    MockSensorCommunicationStrategy(int minimumNumberOfMessageToCreate) :
+    explicit MockSensorCommunicationStrategy(uint8_t minimumNumberOfMessageToCreate) :
             promiseFulfilled(false),
             numberOfMessageCreated(0),
             minimumNumberOfMessageToCreate(minimumNumberOfMessageToCreate) {
     }
 
+    void openConnection() override {}
+
+    void closeConnection() override {}
 
     DATA readMessage() override {
         DATA createdData = DataTestUtil::createRandomSimpleData();
@@ -101,6 +105,110 @@ private:
     DataList createdDataCopies;
 };
 
+using SimpleTranslationStrategy = MessageTranslation::MessageTranslationStrategy<SimpleData, SimpleData>;
+
+class MockTranslationStrategy final : public SimpleTranslationStrategy {
+protected:
+    using SimpleTranslationStrategy::INPUT;
+    using SimpleTranslationStrategy::OUTPUT;
+
+public:
+    MockTranslationStrategy() = default;
+
+    void translateMessage(INPUT&& inputMessage) override {
+        inputMessage.inverseContent();
+        produce(std::move(inputMessage));
+    }
+};
+
+using SimpleServerCommunicationStrategy = ServerCommunication::ServerCommunicationStrategy<SimpleData>;
+
+class MockServerCommunicationStrategy final : public SimpleServerCommunicationStrategy {
+protected:
+    using SimpleServerCommunicationStrategy::MESSAGE;
+
+public:
+    MockServerCommunicationStrategy() = default;
+
+    ~MockServerCommunicationStrategy() noexcept override = default;
+
+    void openConnection() override {}
+
+    void closeConnection() override {}
+
+    void sendMessage(MESSAGE&& message) override {
+        receivedData.push_back(message);
+    }
+
+    SimpleDataList const& getReceivedData() const {
+        return receivedData;
+    }
+
+private:
+    SimpleDataList receivedData;
+};
+
+/**
+ * Medium test
+ */
+TEST_F(SensorAccessLinkTest,
+       given_aNumberOfDataCreatedByTheSensorCommunicationStrategy_when_executing_then_aSimilarNumberOfDataEndsUpInTheServerCommunicationStrategy) {
+    uint8_t numberOfDataToProcess = 42;
+    MockSensorCommunicationStrategy mockSensorCommunicationStrategy(numberOfDataToProcess);
+    MockTranslationStrategy mockTranslationStrategy;
+    MockServerCommunicationStrategy mockServerCommunicationStrategy;
+    SensorAccessLink sensorAccessLink(&mockSensorCommunicationStrategy,
+                                      &mockTranslationStrategy,
+                                      &mockServerCommunicationStrategy);
+
+    sensorAccessLink.start();
+
+    mockSensorCommunicationStrategy.waitUntilReadMessageHasBeenCalledEnough();
+
+    sensorAccessLink.terminateAndJoin();
+
+    auto createdDataList = mockSensorCommunicationStrategy.getCreatedMessageCopies();
+    auto receivedDataList = mockServerCommunicationStrategy.getReceivedData();
+
+    ASSERT_EQ(createdDataList.size(), receivedDataList.size());
+}
+
+/**
+ * Medium Test
+ */
+TEST_F(SensorAccessLinkTest,
+       given_dataCreatedByTheSensorCommunicationStrategy_when_executing_then_dataGoesThroughTranslationStrategyBeforeEndingInTheServerCommunicationStrategy) {
+    uint8_t numberOfDataToProcess = 42;
+    MockSensorCommunicationStrategy mockSensorCommunicationStrategy(numberOfDataToProcess);
+    MockTranslationStrategy mockTranslationStrategy;
+    MockServerCommunicationStrategy mockServerCommunicationStrategy;
+    SensorAccessLink sensorAccessLink(&mockSensorCommunicationStrategy,
+                                      &mockTranslationStrategy,
+                                      &mockServerCommunicationStrategy);
+
+    sensorAccessLink.start();
+
+    mockSensorCommunicationStrategy.waitUntilReadMessageHasBeenCalledEnough();
+
+    sensorAccessLink.terminateAndJoin();
+
+    auto createdDataList = mockSensorCommunicationStrategy.getCreatedMessageCopies();
+    auto receivedDataList = mockServerCommunicationStrategy.getReceivedData();
+    std::cout << "createdData.size() : " << createdDataList.size() << std::endl;
+    std::cout << "receivedData.size() : " << receivedDataList.size() << std::endl;
+
+    auto numberOfProcessedData = receivedDataList.size();
+    bool dataHasPassedThroughCorrectly = true;
+    for (int i = 0; i < numberOfProcessedData && dataHasPassedThroughCorrectly; ++i) {
+        auto createdData = createdDataList.front();
+        createdDataList.pop_front();
+        auto receivedData = receivedDataList.front();
+        receivedDataList.pop_front();
+        dataHasPassedThroughCorrectly = createdData.isTheInverseOf(receivedData);
+    }
+
+    ASSERT_TRUE(dataHasPassedThroughCorrectly);
+}
 
 #endif //SPIRITSENSORGATEWAY_SENSORCOMMUNICATORTEST_CPP
 

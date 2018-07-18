@@ -57,7 +57,33 @@ bool SimpleData::operator!=(SimpleData const& other) const {
     return false;
 }
 
+void SimpleData::inverseContent() {
+    auto oldContent = SimpleDataContent(content);
+    auto size = content.size();
+    if (size < 2) {
+        throw std::runtime_error("Warning! Some tests may misbehave. Content size needs to be more than 2.");
+    }
+    for (unsigned long i = 0; i < content.size(); ++i) {
+        content.at(i) = std::move(oldContent.at(size - 1 - i));
+    }
+}
+
+bool SimpleData::isTheInverseOf(SimpleData const& other) const {
+    auto inversedOther = SimpleData(other);
+    inversedOther.inverseContent();
+    return operator==(inversedOther);
+}
+
+std::string SimpleData::toString() const {
+    std::string stringifiedData;
+    for (unsigned long i = 0; i < content.size(); ++i) {
+        stringifiedData += " " + content.at(i);
+    }
+    return stringifiedData;
+}
+
 const SimpleData SimpleData::returnDefaultData() noexcept {
     return Defaults::DEFAULT_SIMPLE_DATA;
 }
+
 

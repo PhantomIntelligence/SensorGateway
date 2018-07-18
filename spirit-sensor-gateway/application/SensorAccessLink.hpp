@@ -41,26 +41,20 @@ namespace SpiritSensorGateway {
     public:
         //TODO change constructor to receive serverCommunicationStrategy instead
         explicit SensorAccessLink(SensorCommunicationStrategy* sensorCommunicationStrategy,
-        MessageTranslationStrategy* messageTranslationStrategy,
-        ServerCommunicationStrategy* serverCommunicationStrategy):
-        sensorCommunicator(sensorCommunicationStrategy),
-        messageTranslator(messageTranslationStrategy),
-        translatorScheduler(&messageTranslator),
-        serverCommunicator(serverCommunicationStrategy),
-        serverCommunicatorScheduler(&serverCommunicator) {
+                                  MessageTranslationStrategy* messageTranslationStrategy,
+                                  ServerCommunicationStrategy* serverCommunicationStrategy) :
+                sensorCommunicator(sensorCommunicationStrategy),
+                messageTranslator(messageTranslationStrategy),
+                translatorScheduler(&messageTranslator),
+                serverCommunicator(serverCommunicationStrategy),
+                serverCommunicatorScheduler(&serverCommunicator) {
+            messageTranslationStrategy->linkConsumer(&serverCommunicatorScheduler);
+            sensorCommunicator.linkConsumer(&translatorScheduler);
         }
-//    explicit SensorAccessLink(SensorCommunicationStrategy<I>* sensorCommunicationStrategy,
-//                              MessageTranslationStrategy<I, O>* messageTranslationStrategy,
-//                              DataSink<O>* serverCommunicator): sensorCommunicator(sensorCommunicationStrategy),
-//                                                                messageTranslator(messageTranslationStrategy),
-//                                                                messageTranslationScheduler(&messageTranslator),
-//                                                                serverCommunicationScheduler(serverCommunicator) {
-//
-//        messageTranslationStrategy->linkConsumer(&serverCommunicationScheduler);
-//        sensorCommunicator.linkConsumer(&messageTranslationScheduler);
-//    };
 
-        ~SensorAccessLink() noexcept;
+        ~SensorAccessLink() noexcept {
+            terminateAndJoin();
+        };
 
         SensorAccessLink(SensorAccessLink const& other) = delete;
 

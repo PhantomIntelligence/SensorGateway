@@ -47,6 +47,12 @@ namespace DataModel {
 
         bool operator!=(SimpleData const& other) const;
 
+        void inverseContent();
+
+        bool isTheInverseOf(SimpleData const& other) const;
+
+        std::string toString() const;
+
         SimpleData static const returnDefaultData() noexcept;
 
     private:
