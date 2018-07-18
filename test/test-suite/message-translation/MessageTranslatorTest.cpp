@@ -34,37 +34,37 @@ class MockMessageTranslationStrategy final : public MessageTranslationStrategy<A
 
 public:
 
-    MockMessageTranslationStrategy() : translateBasicMessageCalled(false),
+    MockMessageTranslationStrategy() : translateMessageCalled(false),
                                        receivedInputMessage(AWLMessage::returnDefaultData()) {};
 
-    void translateBasicMessage(AWLMessage&& inputMessage) override {
+    void translateMessage(AWLMessage&& inputMessage) override {
         receivedInputMessage = inputMessage;
-        translateBasicMessageCalled.store(true);
+        translateMessageCalled.store(true);
 
     };
 
-    bool hasTranslateBasicMessageBeenCalledWithRightInputMessage(AWLMessage expectedInputMessage) const {
+    bool hasTranslateMessageBeenCalledWithRightInputMessage(AWLMessage expectedInputMessage) const {
 
-        return (translateBasicMessageCalled.load() && (expectedInputMessage == receivedInputMessage));
+        return (translateMessageCalled.load() && (expectedInputMessage == receivedInputMessage));
 
     };
 
 
 private:
 
-    AtomicFlag translateBasicMessageCalled;
+    AtomicFlag translateMessageCalled;
     AWLMessage receivedInputMessage;
 
 };
 
 TEST_F(MessageTranslatorTest,
-       given_aMessageTranslationStrategy_when_consumingABasicAWLMessage_then_callsTranslateBasicMessageInStrategy) {
+       given_aMessageTranslationStrategy_when_consumingAAWLMessage_then_callsTranslateMessageInStrategy) {
     AWLMessage awlMessage = AWLMessage::returnDefaultData();
 
     MockMessageTranslationStrategy mockStrategy;
     MessageTranslator<AWLMessage,Frame> messageTranslator(&mockStrategy);
 
     messageTranslator.consume(std::move(awlMessage));
-    auto strategyHasBeenCalledWithRightParameter = mockStrategy.hasTranslateBasicMessageBeenCalledWithRightInputMessage(awlMessage);
+    auto strategyHasBeenCalledWithRightParameter = mockStrategy.hasTranslateMessageBeenCalledWithRightInputMessage(awlMessage);
     ASSERT_TRUE(strategyHasBeenCalledWithRightParameter);
 }

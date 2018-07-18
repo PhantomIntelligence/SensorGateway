@@ -62,6 +62,18 @@ namespace DataFlow {
 
         static Pixel const& returnDefaultData() noexcept;
 
+        void calculateAngles();
+
+        void calculatePositionOnLayer();
+
+        AngleEnd angleEnd ;
+
+        AngleStart angleStart ;
+
+        Layer layer;
+
+        PositionOnLayer positionOnLayer;
+
         PixelID ID;
 
         int getCurrentNumberOfTracksInPixel() const;

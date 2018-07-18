@@ -17,7 +17,7 @@
 
 #include <iostream>
 #include <cassert>
-#include "data-model/NativeData.h"
+#include "NativeData.h"
 
 using ExampleDataModel::NativeData;
 using ExampleDataModel::NativeComplement;

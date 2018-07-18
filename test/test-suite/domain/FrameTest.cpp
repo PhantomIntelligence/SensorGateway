@@ -29,7 +29,8 @@ protected:
     PixelsArray const SOME_OTHER_PIXELS_ARRAY = PixelsArray({SOME_PIXEL, SOME_OTHER_PIXEL});
 };
 
-TEST_F(FrameTest, given_aTrackAndAPixelID_when_addingTheTrackToThePixelWithCorrespondingID_then_trackIsAddedCorrectlyAtRightPositionInPixel) {
+TEST_F(FrameTest,
+       given_aTrackAndAPixelID_when_addingTheTrackToThePixelWithCorrespondingID_then_trackIsAddedCorrectlyAtRightPositionInPixel) {
     Frame frame;
     Track track;
     auto expectedAddedTrack = track;
@@ -87,6 +88,5 @@ TEST_F(FrameTest,
     ASSERT_FALSE(framesAreEqual);
     ASSERT_TRUE(framesAreNotEqual);
 }
-
 
 #endif //SPIRITSENSORGATEWAY_FRAMETEST_H

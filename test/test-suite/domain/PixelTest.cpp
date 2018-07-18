@@ -116,4 +116,30 @@ TEST_F(PixelTest,
     ASSERT_TRUE(tracksAreNotEqual);
 }
 
+TEST_F(PixelTest,
+       given_aPixelWithAGivenID_when_calculatingThePositionOnLayerOfThePixel_then_calculateTheRightPositionOnTheLayer) {
+    auto pixel = Pixel(SOME_ID, SOME_TRACKS_ARRAY, SOME_CURRENT_NUMBER_OF_TRACKS);
+
+    pixel.calculatePositionOnLayer();
+
+    auto expectedLayer = 0;
+    auto expectedPositionOnLayer = 1;
+
+    ASSERT_EQ(expectedLayer, pixel.layer);
+    ASSERT_EQ(expectedPositionOnLayer, pixel.positionOnLayer);
+}
+
+TEST_F(PixelTest,
+       given_aPixelWithAgivenIdAndGivenPositionOntheLayer_when_calculatingTheAngles_then_calculateTheRightAngles) {
+    auto pixel = Pixel(SOME_ID, SOME_TRACKS_ARRAY, SOME_CURRENT_NUMBER_OF_TRACKS);
+    pixel.calculatePositionOnLayer();
+    pixel.calculateAngles();
+
+    auto expectedAngleStart = -114;
+    auto expectedAngleEnd = -76;
+
+    ASSERT_EQ(expectedAngleStart,pixel.angleStart);
+    ASSERT_EQ(expectedAngleEnd,pixel.angleEnd);
+}
+
 #endif //SPIRITSENSORGATEWAY_PIXELTEST_CPP

@@ -22,7 +22,7 @@
 #include <list>
 
 #include "spirit-sensor-gateway/sensor-communication/SensorCommunicator.hpp"
-#include "data-model/DataModelFixture.h"
+#include "test/utilities/data-model/DataModelFixture.h"
 
 using DataFlow::AWLMessage;
 using AWLMessages = std::list<AWLMessage>;

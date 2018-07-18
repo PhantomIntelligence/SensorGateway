@@ -16,16 +16,18 @@
 #include <fstream>
 #include "test/utilities/files/AWLMessagesFileManager.h"
 #include "test/utilities/files/SpiritFramesFileManager.h"
-#include "test/acceptance-test/stubs/AWLMessagesStub.h"
-#include "test/acceptance-test/stubs/SpiritFramesStub.h"
+#include "test/utilities/stub/AWLMessagesStub.h"
+#include "test/utilities/stub/SpiritFramesStub.h"
 #include "spirit-sensor-gateway/message-translation/AWLMessageToSpiritMessageTranslationStrategy.h"
-#include "test/mock/FrameSinkMock.h"
+#include "test/utilities/mock/FrameSinkMock.h"
 
-using MessageTranslation::AWLMessageToSpiritMessageTranslationStrategy;
 using Mock::FrameProcessingScheduler;
 using Mock::FrameSinkMock;
 using TestUtilities::AWLMessagesFileManager;
 using TestUtilities::SpiritFramesFileManager;
+using Stub::createAWLMessageStub;
+using Stub::createSpiritFramesStub;
+using MessageTranslation::AWLMessageToSpiritMessageTranslationStrategy;
 
 class AWLMessageToSpiritMessageTranslationStrategyTest : public ::testing::Test {
 protected:
@@ -33,8 +35,10 @@ protected:
     char const* EXPECTED_SPIRIT_FRAMES_OUTPUT_FILE_NAME = "ExpectedSpiritFramesOutputFile.txt";
 
     virtual void SetUp() {
-        awlMessagesFileManager.writeFileWithMessages(awlMessagesStub, AWLMESSAGES_INPUT_FILE_NAME);
-        spiritFramesFileManager.writeFileWithMessages(spiritFramesStub, EXPECTED_SPIRIT_FRAMES_OUTPUT_FILE_NAME);
+        auto awlMessages = createAWLMessageStub();
+        auto spiritFrames = createSpiritFramesStub();
+        awlMessagesFileManager.writeFileWithMessages(awlMessages, AWLMESSAGES_INPUT_FILE_NAME);
+        spiritFramesFileManager.writeFileWithMessages(spiritFrames, EXPECTED_SPIRIT_FRAMES_OUTPUT_FILE_NAME);
     }
 
     AWLMessagesFileManager awlMessagesFileManager;
@@ -52,7 +56,7 @@ TEST_F(AWLMessageToSpiritMessageTranslationStrategyTest,
 
     auto messages = awlMessagesFileManager.readMessagesFromFile(AWLMESSAGES_INPUT_FILE_NAME);
     for (auto message : messages) {
-        awlMessageTranslator.translateBasicMessage(std::move(message));
+        awlMessageTranslator.translateMessage(std::move(message));
         ++counter;
     }
 

@@ -17,7 +17,7 @@
 
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
-#include "test/mock/FrameSinkMock.h"
+#include "test/utilities/mock/FrameSinkMock.h"
 #include "spirit-sensor-gateway/message-translation/AWLMessageToSpiritMessageTranslationStrategy.h"
 
 using Defaults::Track::DEFAULT_ACCELERATION;
@@ -65,7 +65,7 @@ TEST_F(AWLMessageToSpiritMessageTranslationStrategyTest,
     FrameProcessingScheduler scheduler(&frameSinkMock);
     translationStrategy.linkConsumer(&scheduler);
 
-    translationStrategy.translateBasicMessage(std::move(endOfFrameAWLMessage));
+    translationStrategy.translateMessage(std::move(endOfFrameAWLMessage));
 
     scheduler.terminateAndJoin();
     auto actualFrame = frameSinkMock.getConsumedData().at(FRAME_INDEX);
@@ -83,8 +83,8 @@ TEST_F(AWLMessageToSpiritMessageTranslationStrategyTest,
     FrameProcessingScheduler scheduler(&frameSinkMock);
     translationStrategy.linkConsumer(&scheduler);
 
-    translationStrategy.translateBasicMessage(std::move(detectionTrackAWLMessage));
-    translationStrategy.translateBasicMessage(std::move(endOfFrameAWLMessage));
+    translationStrategy.translateMessage(std::move(detectionTrackAWLMessage));
+    translationStrategy.translateMessage(std::move(endOfFrameAWLMessage));
 
     scheduler.terminateAndJoin();
     auto actualFrame = frameSinkMock.getConsumedData().at(FRAME_INDEX);
@@ -103,9 +103,9 @@ TEST_F(AWLMessageToSpiritMessageTranslationStrategyTest,
     FrameProcessingScheduler scheduler(&frameSinkMock);
     translationStrategy.linkConsumer(&scheduler);
 
-    translationStrategy.translateBasicMessage(std::move(detectionTrackAWLMessage));
-    translationStrategy.translateBasicMessage(std::move(detectionVelocityAWLMessage));
-    translationStrategy.translateBasicMessage(std::move(endOfFrameAWLMessage));
+    translationStrategy.translateMessage(std::move(detectionTrackAWLMessage));
+    translationStrategy.translateMessage(std::move(detectionVelocityAWLMessage));
+    translationStrategy.translateMessage(std::move(endOfFrameAWLMessage));
 
     scheduler.terminateAndJoin();
     auto actualFrame = frameSinkMock.getConsumedData().at(FRAME_INDEX);
@@ -121,7 +121,7 @@ TEST_F(AWLMessageToSpiritMessageTranslationStrategyTest,
     FrameProcessingScheduler scheduler(&frameSinkMock);
     translationStrategy.linkConsumer(&scheduler);
 
-    translationStrategy.translateBasicMessage(std::move(endOfFrameAWLMessage));
+    translationStrategy.translateMessage(std::move(endOfFrameAWLMessage));
 
     scheduler.terminateAndJoin();
     ASSERT_EQ(frameSinkMock.hasBeenCalledExpectedNumberOfTimes(), 1);

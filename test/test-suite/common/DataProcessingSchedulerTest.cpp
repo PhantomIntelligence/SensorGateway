@@ -19,7 +19,7 @@
 #define SPIRITSENSORGATEWAY_WORKSCHEDULERTEST_CPP
 
 #include <gtest/gtest.h>
-#include "data-model/DataModelFixture.h"
+#include "test/utilities/data-model/DataModelFixture.h"
 #include "spirit-sensor-gateway/common/data-flow/DataProcessingScheduler.hpp"
 
 using DataFlow::NUMBER_OF_CONCURRENT_INPUT_FOR_SENSOR_ACCESS_LINK_ELEMENTS;
@@ -162,7 +162,8 @@ TEST_F(DataProcessingSchedulerTest, given_anUnlinkedInputBuffer_when_deactivates
     ASSERT_TRUE(hasThrownException);
 }
 
-TEST_F(DataProcessingSchedulerTest, given_anUnlinkedInputBuffer_when_linksIt_then_callsTheRingBuffersLinkFunctionWithAPointerToTheScheduler) {
+TEST_F(DataProcessingSchedulerTest,
+       given_anUnlinkedInputBuffer_when_linksIt_then_callsTheRingBuffersLinkFunctionWithAPointerToTheScheduler) {
     MockInputBuffer inputBufferMock(ARBITRARY_NUMBER_OF_CONSUMPTION_BEFORE_STOP);
     MockSink mockSink(ARBITRARY_NUMBER_OF_CALL_GOAL);
     SingleInputScheduler scheduler(&mockSink);
