@@ -191,7 +191,6 @@ namespace ManualTest {
         hub->connect(VALID_ADDRESS_WS);
 
         hub->run();
-
     }
 
     int testMessageSending() {

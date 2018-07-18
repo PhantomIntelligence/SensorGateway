@@ -41,112 +41,114 @@ protected:
 
 using SimpleSensorCommunicationStrategy = SensorCommunication::SensorCommunicationStrategy<SimpleData>;
 
-class MockSensorCommunicationStrategy final : public SimpleSensorCommunicationStrategy {
+namespace SensorAccessLinkTestMock {
+    class MockSensorCommunicationStrategy final : public SimpleSensorCommunicationStrategy {
 
-protected:
+    protected:
 
-    using SimpleSensorCommunicationStrategy::DATA;
-    using DataList = std::list<DATA>;
+        using SimpleSensorCommunicationStrategy::DATA;
+        using DataList = std::list<DATA>;
 
-public:
+    public:
 
-    explicit MockSensorCommunicationStrategy(uint8_t minimumNumberOfMessageToCreate) :
-            promiseFulfilled(false),
-            numberOfMessageCreated(0),
-            minimumNumberOfMessageToCreate(minimumNumberOfMessageToCreate) {
-    }
-
-    void openConnection() override {}
-
-    void closeConnection() override {}
-
-    DATA readMessage() override {
-        DATA createdData = DataTestUtil::createRandomSimpleData();
-        auto copy = DATA(createdData);
-        createdDataCopies.push_back(copy);
-
-        ++numberOfMessageCreated;
-        if (hasCreatedMinimumNumberOfData() && !promiseFulfilled.load()) {
-            promiseFulfilled.store(true);
-            minimumNumberOfMessageCreated.set_value(true);
+        explicit MockSensorCommunicationStrategy(uint8_t minimumNumberOfMessageToCreate) :
+                promiseFulfilled(false),
+                numberOfMessageCreated(0),
+                minimumNumberOfMessageToCreate(minimumNumberOfMessageToCreate) {
         }
 
-        // WARNING! This mock implementation of readMessage needs to be slowed down because the way gtest works. DO NOT REMOVE.
-        std::this_thread::sleep_for(std::chrono::milliseconds(5));
-        std::this_thread::yield();
+        void openConnection() override {}
 
-        return createdData;
-    }
+        void closeConnection() override {}
 
-    void waitUntilReadMessageHasBeenCalledEnough() {
-        if (!hasCreatedMinimumNumberOfData()) {
-            minimumNumberOfMessageCreated.get_future().wait();
+        DATA readMessage() override {
+            DATA createdData = DataTestUtil::createRandomSimpleData();
+            auto copy = DATA(createdData);
+            createdDataCopies.push_back(copy);
+
+            ++numberOfMessageCreated;
+            if (hasCreatedMinimumNumberOfData() && !promiseFulfilled.load()) {
+                promiseFulfilled.store(true);
+                minimumNumberOfMessageCreated.set_value(true);
+            }
+
+            // WARNING! This mock implementation of readMessage needs to be slowed down because the way gtest works. DO NOT REMOVE.
+            std::this_thread::sleep_for(std::chrono::milliseconds(5));
+            std::this_thread::yield();
+
+            return createdData;
         }
-    }
 
-    DataList const& getCreatedMessageCopies() const {
-        return createdDataCopies;
-    }
+        void waitUntilReadMessageHasBeenCalledEnough() {
+            if (!hasCreatedMinimumNumberOfData()) {
+                minimumNumberOfMessageCreated.get_future().wait();
+            }
+        }
 
-private:
+        DataList const& getCreatedMessageCopies() const {
+            return createdDataCopies;
+        }
 
-    bool hasCreatedMinimumNumberOfData() {
-        LockGuard guard(numberOfMessageCreatedVerificationMutex);
-        return numberOfMessageCreated.load() == minimumNumberOfMessageToCreate.load();
-    }
+    private:
 
-    AtomicCounter numberOfMessageCreated;
-    AtomicCounter minimumNumberOfMessageToCreate;
+        bool hasCreatedMinimumNumberOfData() {
+            LockGuard guard(numberOfMessageCreatedVerificationMutex);
+            return numberOfMessageCreated.load() == minimumNumberOfMessageToCreate.load();
+        }
 
-    AtomicFlag promiseFulfilled;
-    Mutex numberOfMessageCreatedVerificationMutex;
-    mutable BooleanPromise minimumNumberOfMessageCreated;
+        AtomicCounter numberOfMessageCreated;
+        AtomicCounter minimumNumberOfMessageToCreate;
 
-    DataList createdDataCopies;
-};
+        AtomicFlag promiseFulfilled;
+        Mutex numberOfMessageCreatedVerificationMutex;
+        mutable BooleanPromise minimumNumberOfMessageCreated;
 
-using SimpleTranslationStrategy = MessageTranslation::MessageTranslationStrategy<SimpleData, SimpleData>;
+        DataList createdDataCopies;
+    };
 
-class MockTranslationStrategy final : public SimpleTranslationStrategy {
-protected:
-    using SimpleTranslationStrategy::INPUT;
-    using SimpleTranslationStrategy::OUTPUT;
+    using SimpleTranslationStrategy = MessageTranslation::MessageTranslationStrategy<SimpleData, SimpleData>;
 
-public:
-    MockTranslationStrategy() = default;
+    class MockTranslationStrategy final : public SimpleTranslationStrategy {
+    protected:
+        using SimpleTranslationStrategy::INPUT;
+        using SimpleTranslationStrategy::OUTPUT;
 
-    void translateMessage(INPUT&& inputMessage) override {
-        inputMessage.inverseContent();
-        produce(std::move(inputMessage));
-    }
-};
+    public:
+        MockTranslationStrategy() = default;
 
-using SimpleServerCommunicationStrategy = ServerCommunication::ServerCommunicationStrategy<SimpleData>;
+        void translateMessage(INPUT&& inputMessage) override {
+            inputMessage.inverseContent();
+            produce(std::move(inputMessage));
+        }
+    };
 
-class MockServerCommunicationStrategy final : public SimpleServerCommunicationStrategy {
-protected:
-    using SimpleServerCommunicationStrategy::MESSAGE;
+    using SimpleServerCommunicationStrategy = ServerCommunication::ServerCommunicationStrategy<SimpleData>;
 
-public:
-    MockServerCommunicationStrategy() = default;
+    class MockServerCommunicationStrategy final : public SimpleServerCommunicationStrategy {
+    protected:
+        using SimpleServerCommunicationStrategy::MESSAGE;
 
-    ~MockServerCommunicationStrategy() noexcept override = default;
+    public:
+        MockServerCommunicationStrategy() = default;
 
-    void openConnection() override {}
+        ~MockServerCommunicationStrategy() noexcept override = default;
 
-    void closeConnection() override {}
+        void openConnection() override {}
 
-    void sendMessage(MESSAGE&& message) override {
-        receivedData.push_back(message);
-    }
+        void closeConnection() override {}
 
-    SimpleDataList const& getReceivedData() const {
-        return receivedData;
-    }
+        void sendMessage(MESSAGE&& message) override {
+            receivedData.push_back(message);
+        }
 
-private:
-    SimpleDataList receivedData;
-};
+        SimpleDataList const& getReceivedData() const {
+            return receivedData;
+        }
+
+    private:
+        SimpleDataList receivedData;
+    };
+}
 
 /**
  * Medium test
@@ -154,9 +156,9 @@ private:
 TEST_F(SensorAccessLinkTest,
        given_aNumberOfDataCreatedByTheSensorCommunicationStrategy_when_executing_then_aSimilarNumberOfDataEndsUpInTheServerCommunicationStrategy) {
     uint8_t numberOfDataToProcess = 42;
-    MockSensorCommunicationStrategy mockSensorCommunicationStrategy(numberOfDataToProcess);
-    MockTranslationStrategy mockTranslationStrategy;
-    MockServerCommunicationStrategy mockServerCommunicationStrategy;
+    SensorAccessLinkTestMock::MockSensorCommunicationStrategy mockSensorCommunicationStrategy(numberOfDataToProcess);
+    SensorAccessLinkTestMock::MockTranslationStrategy mockTranslationStrategy;
+    SensorAccessLinkTestMock::MockServerCommunicationStrategy mockServerCommunicationStrategy;
     SensorAccessLink sensorAccessLink(&mockSensorCommunicationStrategy,
                                       &mockTranslationStrategy,
                                       &mockServerCommunicationStrategy);
@@ -179,9 +181,9 @@ TEST_F(SensorAccessLinkTest,
 TEST_F(SensorAccessLinkTest,
        given_dataCreatedByTheSensorCommunicationStrategy_when_executing_then_dataGoesThroughTranslationStrategyBeforeEndingInTheServerCommunicationStrategy) {
     uint8_t numberOfDataToProcess = 42;
-    MockSensorCommunicationStrategy mockSensorCommunicationStrategy(numberOfDataToProcess);
-    MockTranslationStrategy mockTranslationStrategy;
-    MockServerCommunicationStrategy mockServerCommunicationStrategy;
+    SensorAccessLinkTestMock::MockSensorCommunicationStrategy mockSensorCommunicationStrategy(numberOfDataToProcess);
+    SensorAccessLinkTestMock::MockTranslationStrategy mockTranslationStrategy;
+    SensorAccessLinkTestMock::MockServerCommunicationStrategy mockServerCommunicationStrategy;
     SensorAccessLink sensorAccessLink(&mockSensorCommunicationStrategy,
                                       &mockTranslationStrategy,
                                       &mockServerCommunicationStrategy);
