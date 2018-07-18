@@ -18,6 +18,7 @@
 #define SPIRITSENSORGATEWAY_UWSCONNECTIONTEST_CPP
 
 #include "spirit-sensor-gateway/server-communication/UWSServerCommunicationStrategy.h"
+#include "test/utilities/data-model/DataModelFixture.h"
 
 namespace ManualTest {
 
@@ -78,11 +79,13 @@ namespace ManualTest {
             long receivedCode = (long) user;
             std::vector<long> handledCodes = {1, 2, 3, 4, 5, 6, 7};
             handleError(1, receivedCode, coutMessage, "Client emitted error on invalid URI");
-            handleError(2, receivedCode, handleMultipleConnectionErrorForOneConnection, "Client emitted error on invalid protocol");
+            handleError(2, receivedCode, handleMultipleConnectionErrorForOneConnection,
+                        "Client emitted error on invalid protocol");
             handleError(3, receivedCode, coutMessage, "Client emitted error on resolve failure");
             handleError(4, receivedCode, coutMessage, "Client emitted error on connection timeout (non-SSL)");
             handleError(5, receivedCode, coutMessage, "Client emitted error on connection timeout (SSL)");
-            handleError(6, receivedCode, coutMessage, "Client emitted error on HTTP response without upgrade (non-SSL)");
+            handleError(6, receivedCode, coutMessage,
+                        "Client emitted error on HTTP response without upgrade (non-SSL)");
             handleError(7, receivedCode, coutMessage, "Client emitted error on HTTP response without upgrade (SSL)");
             handleOtherErrors(handledCodes, receivedCode, coutMessageAndCrash, "FAILURE: should not emit error!");
         });
@@ -155,67 +158,71 @@ namespace ManualTest {
         return 0;
     }
 
-//int testMessageSending() {
-//    auto numberOfSentMessages = 100;
-//    uWS::WebSocket<uWS::CLIENT>* webSocket;
-//
-//    int length = 0;
-//    h.onConnection([&h, &length](uWS::WebSocket<uWS::SERVER> *ws, uWS::HttpRequest req) {
-//        std::cout << "Connected, will send small messages now" << std::endl;
-//        while (length < 2048) {
-//            char *message = new char[length];
-//            memset(message, 0, length);
-//            ws->send(message, length, uWS::OpCode::TEXT);
-//            delete [] message;
-//            length++;
-//        }
-//        h.getDefaultGroup<uWS::SERVER>().close();
-//    });
-//
-//
-//    uWS::Hub hub;
-//
-//
-//    hub.onConnection([](uWS::WebSocket<uWS::CLIENT>* ws, uWS::HttpRequest req) {
-//        switch ((long) ws->getUserData()) {
-//            case 8:
-//                std::cout << "Client established a remote connection over non-SSL" << std::endl;
-//                ws->close(1000);
-//                break;
-//            case 9:
-//                std::cout << "Client established a remote connection over SSL" << std::endl;
-//                ws->close(1000);
-//                break;
-//            default:
-//                std::cout << "FAILURE: " << ws->getUserData() << " should not connect!" << std::endl;
-//                exit(-1);
-//        }
-//    });
-//
-//    hub.onDisconnection([](uWS::WebSocket<uWS::CLIENT>* ws, int code, char* message, size_t length) {
-//        std::cout << "Client got disconnected with data: " << ws->getUserData() << ", code: " << code << ", message: <"
-//                  << std::string(message, length) << ">" << std::endl;
-//    });
-//
-//    hub.onDisconnection([](uWS::WebSocket<uWS::CLIENT>* ws, int code, char* message, size_t length) {
-//        std::cout << "Client got disconnected with data: " << ws->getUserData() << ", code: " << code << ", message: <"
-//                  << std::string(message, length) << ">" << std::endl;
-//    });
-//
-//
-//    user = (void*) 8; // should connect with ws
-//    auto const VALID_ADDRESS_WS = "ws://localhost:8080/connect-gateway";
-//    hub.connect(VALID_ADDRESS_WS, user);
-//
-//    hub.run();
-//}
+    using TestFunctions::DataTestUtil;
+    using ClientWebSocket = uWS::WebSocket<uWS::CLIENT>;
+
+    int testMessageSending() {
+        auto numberOfSentMessages = 100;
+        ClientWebSocket* webSocket;
+        uWS::Hub hub;
+
+        int length = 0;
+        hub.onConnection([&webSocket, &length](ClientWebSocket* ws, uWS::HttpRequest req) {
+            webSocket = ws;
+            std::cout << "Connected!" << std::endl;
+//            while (length < 2048) {
+//                char* message = new char[length];
+//                memset(message, 0, length);
+//                ws->send(message, length, uWS::OpCode::BINARY);
+//                delete[] message;
+//                length++;
+//            }
+//            hub.getDefaultGroup<uWS::SERVER>().close();
+        });
+
+        hub.onMessage([](ClientWebSocket* ws, char* message, size_t length, uWS::OpCode opCode) {
+            std::cout << std::string(message, length) << std::endl;
+            ws->send(message, length, opCode);
+        });
+
+
+        hub.onDisconnection([](ClientWebSocket* ws, int code, char* message, size_t length) {
+            std::cout << "Client got disconnected with data: " << ws->getUserData() << ", code: " << code
+                      << ", message: <" << std::string(message, length) << ">" << std::endl;
+        });
+
+        hub.onError([](void* user) {
+            long receivedCode = (long) user;
+            std::vector<long> handledCodes = {};
+            handleOtherErrors(handledCodes, receivedCode, coutMessageAndCrash, "An error has occured!");
+        });
+
+
+        auto const VALID_ADDRESS_WS = "ws://localhost:8080/connect-gateway";
+        auto user = (void*) 5;
+        hub.connect(VALID_ADDRESS_WS, user);
+
+        hub.run();
+        std::cout << "aouecshsaouhntes : " << std::endl;
+
+        DataModel::SimpleData simpleData = DataTestUtil::createRandomSimpleData();
+        std::string textToSend;
+        for (int i = 0; i < numberOfSentMessages; ++i) {
+            simpleData = DataTestUtil::createRandomSimpleData();
+            textToSend = simpleData.toString();
+            std::cout << "sending : " << textToSend << std::endl;
+            webSocket->send(textToSend.c_str(), textToSend.size(), uWS::OpCode::TEXT);
+        }
+
+        return 0;
+    }
 
 
 }
 
 int main() {
-    auto testOutput = ManualTest::testBasicUWSConnectionCalls();
-
+//    auto testOutput = ManualTest::testBasicUWSConnectionCalls();
+    auto testOutput = ManualTest::testMessageSending();
     if (testOutput == 0) {
 
     }

@@ -54,7 +54,7 @@ bool SimpleData::operator==(SimpleData const& other) const {
 }
 
 bool SimpleData::operator!=(SimpleData const& other) const {
-    return false;
+    return !operator==(other);
 }
 
 void SimpleData::inverseContent() {

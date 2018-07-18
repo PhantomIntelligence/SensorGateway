@@ -14,7 +14,7 @@
 #define SPIRITSENSORGATEWAY_UWSSERVERCOMMUNICATIONSTRATEGY_H
 
 #include <uWS.h>
-#include "ServerCommunicationStrategy.hpp"
+#include "ServerCommunicator.hpp"
 #include "spirit-sensor-gateway/domain/Frame.h"
 
 
