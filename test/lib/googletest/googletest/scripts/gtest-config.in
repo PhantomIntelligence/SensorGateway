@@ -15,7 +15,7 @@ show_help()
   cat <<\EOF
 
 The `gtest-config' script provides access to the necessary compile and linking
-flags to connect with Google C++ Testing Framework, both in a build prior to
+flags to setWebSocketCallbacksAndConnection with Google C++ Testing Framework, both in a build prior to
 installation, and on the system proper after installation. The installation
 overrides may be issued in combination with any other queries, but will only
 affect installation queries if called on a built but not installed gtest. The

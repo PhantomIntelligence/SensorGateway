@@ -103,7 +103,7 @@ namespace ManualTest {
                     ws->close(1000);
                     break;
                 default:
-                    std::cout << "FAILURE: " << ws->getUserData() << " should not connect!" << std::endl;
+                    std::cout << "FAILURE: " << ws->getUserData() << " should not setWebSocketCallbacksAndConnection!" << std::endl;
                     exit(-1);
             }
         });
@@ -131,11 +131,11 @@ namespace ManualTest {
         std::map<std::string, std::string> extraHeaders = {};
 
         user = (void*) 4; // should emit an error on timeout of non-ssl ws
-        auto const VALID_ADDRESS_WS = "ws://localhost:8080/connect-gateway";
+        auto const VALID_ADDRESS_WS = "ws://localhost:8080/setWebSocketCallbacksAndConnection-gateway";
         hub.connect(VALID_ADDRESS_WS, user, extraHeaders, timeoutInMilliseconds);
 
         user = (void*) 5; // should emit an error on timeout of ssl ws
-        auto const VALID_ADDRESS_WSS = "wss://localhost:8080/connect-gateway";
+        auto const VALID_ADDRESS_WSS = "wss://localhost:8080/setWebSocketCallbacksAndConnection-gateway";
         hub.connect(VALID_ADDRESS_WSS, user, extraHeaders, timeoutInMilliseconds);
 
         user = (void*) 6; // should emit an error on HTTP with no upgrade on non-ssl ws
@@ -148,13 +148,13 @@ namespace ManualTest {
 
 
         // THIS TEST SHOULD WORK NOW BUT STOP WORKING WHEN SSL IS CONFIGURED
-        user = (void*) 8; // should connect with ws
+        user = (void*) 8; // should setWebSocketCallbacksAndConnection with ws
         hub.connect(VALID_ADDRESS_WS, user);
 
 
         // THIS TEST IS NOT WORKING NOW, IT SHOULD BE THE ONLY ONE TO WORK WHEN SSL IS CONFIGURED
-//    user = (void*) 9; // should connect with wss
-//    hub.connect(VALID_ADDRESS_WSS, user);
+//    user = (void*) 9; // should setWebSocketCallbacksAndConnection with wss
+//    hub.setWebSocketCallbacksAndConnection(VALID_ADDRESS_WSS, user);
 
         hub.run();
         return 0;
