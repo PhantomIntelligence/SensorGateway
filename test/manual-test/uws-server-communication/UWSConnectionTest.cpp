@@ -175,9 +175,10 @@ namespace ManualTest {
         });
 
 
-        hub->onDisconnection([](WebSocket* ws, int code, char* message, size_t length) {
+        hub->onDisconnection([&hub](WebSocket* ws, int code, char* message, size_t length) {
             std::cout << "Client got disconnected with data: " << ws->getUserData() << ", code: " << code
                       << ", message: <" << std::string(message, length) << ">" << std::endl;
+            hub->getDefaultGroup<uWS::CLIENT>().close();
         });
 
         hub->onError([](void* user) {
