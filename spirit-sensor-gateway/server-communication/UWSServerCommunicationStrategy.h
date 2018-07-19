@@ -23,7 +23,7 @@ namespace ServerCommunication {
     using Hub = uWS::Hub;
     using WebSocket = uWS::WebSocket<uWS::CLIENT>;
     using WebSocketPointerPromise = std::promise<WebSocket*>;
-    std::string const SERVER_CONNECTION_ADDRESS = "ws://localhost:8080/setWebSocketCallbacksAndConnection-gateway";
+    std::string const SERVER_CONNECTION_ADDRESS = "ws://localhost:8080/connect-gateway";
 
     class UWSServerCommunicationStrategy : public ServerCommunicationStrategy<DataFlow::Frame> {
 
@@ -56,24 +56,25 @@ namespace ServerCommunication {
 
 
     private:
-        void setConnectionCallback(Hub* pHub, WebSocketPointerPromise* webSocketPointerPromise);
+        void setConnectionCallback(Hub* hub, WebSocketPointerPromise* webSocketPointerPromise);
 
-        void setErrorCallback(Hub* pHub);
+        void setErrorCallback(Hub* hub);
 
-        void setDisconnectionCallback(Hub* pHub);
+        void setDisconnectionCallback(Hub* hub);
 
-        void setOnMessageCallBack();
+        void setOnMessageCallBack(Hub* hub);
 
-        static void startWebSocket(Hub* hub);
+        static void startWebSocket(UWSServerCommunicationStrategy* context);
 
         void
-        setWebSocketCallbacksAndConnection(std::string serverAddress, WebSocketPointerPromise* webSocketPointerPromise);
+        setWebSocketCallbacksAndConnection(std::string serverAddress, Hub* hub,
+                                                   WebSocketPointerPromise* webSocketPointerPromise);
 
         Hub hub;
 
         WebSocket* webSocket;
 
-        std::string serverAddress = SERVER_CONNECTION_ADDRESS;
+//        WebSocketPointerPromise webSocketPointerPromise;
     };
 }
 

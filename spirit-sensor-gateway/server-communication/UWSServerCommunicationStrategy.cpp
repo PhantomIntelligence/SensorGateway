@@ -12,8 +12,8 @@ UWSServerCommunicationStrategy::~UWSServerCommunicationStrategy() {
 
 void UWSServerCommunicationStrategy::openConnection() {
     WebSocketPointerPromise webSocketPointerPromise;
-    setWebSocketCallbacksAndConnection(serverAddress, &webSocketPointerPromise);
-    auto webSocketConnectionThread = JoinableThread(&startWebSocket, &hub);
+    setWebSocketCallbacksAndConnection(SERVER_CONNECTION_ADDRESS, &hub, &webSocketPointerPromise);
+    auto webSocketConnectionThread = JoinableThread(&startWebSocket, this);
     auto futureWebSocket = webSocketPointerPromise.get_future();
     futureWebSocket.wait();
     webSocket = futureWebSocket.get();
@@ -24,8 +24,12 @@ void UWSServerCommunicationStrategy::closeConnection() {
 }
 
 void UWSServerCommunicationStrategy::sendMessage(MESSAGE&& message) {
+    std::cout << "MessageWillSend" << std::endl;
     auto convertedMessage = JsonConverter::convertFrameToJsonString(std::forward<MESSAGE>(message));
+    std::cout << "MessageStagedToBeSent" << std::endl;
     webSocket->send(convertedMessage.c_str(), convertedMessage.size(), uWS::OpCode::BINARY);
+    std::cout << "MessageSent" << std::endl;
+
 }
 
 void UWSServerCommunicationStrategy::start() {
@@ -36,23 +40,46 @@ void
 UWSServerCommunicationStrategy::setConnectionCallback(Hub* hub, WebSocketPointerPromise* webSocketPointerPromise) {
     hub->onConnection([&webSocketPointerPromise](WebSocket* ws, uWS::HttpRequest req) {
         std::cout << "Connected!" << std::endl;
+        std::cout << webSocketPointerPromise << std::endl;
         webSocketPointerPromise->set_value(ws);
     });
 
 }
 
 
-void UWSServerCommunicationStrategy::startWebSocket(Hub* hub) {
-    hub->run();
+void UWSServerCommunicationStrategy::startWebSocket(UWSServerCommunicationStrategy* context) {
+    context->hub.run();
 }
 
 
-void UWSServerCommunicationStrategy::setWebSocketCallbacksAndConnection(std::string serverAddress,
+void UWSServerCommunicationStrategy::setWebSocketCallbacksAndConnection(std::string serverAddress, Hub* hub,
                                                                         WebSocketPointerPromise* webSocketPointerPromise) {
-    setErrorCallback(&hub);
-    setConnectionCallback(&hub, webSocketPointerPromise);
-    setDisconnectionCallback(&hub);
-    hub.connect(serverAddress);
+//    setErrorCallback(&hub);
+//    setConnectionCallback(&hub, webSocketPointerPromise);
+//    setDisconnectionCallback(&hub);
+//    setOnMessageCallBack(&hub);
+    hub->onConnection([&webSocketPointerPromise](WebSocket* ws, uWS::HttpRequest req) {
+        std::cout << "Connected!" << std::endl;
+        webSocketPointerPromise->set_value(ws);
+    });
+
+    hub->onMessage([](WebSocket* ws, char* message, size_t length, uWS::OpCode opCode) {
+        std::cout << std::string(message, length) << std::endl;
+        ws->send(message, length, opCode);
+    });
+
+
+    hub->onDisconnection([&hub](WebSocket* ws, int code, char* message, size_t length) {
+        std::cout << "Client got disconnected with data: " << ws->getUserData() << ", code: " << code
+                  << ", message: <" << std::string(message, length) << ">" << std::endl;
+        hub->getDefaultGroup<uWS::CLIENT>().close();
+    });
+
+    hub->onError([](void* user) {
+        std::cout << "WebSocket Connection Error" << std::endl;
+    });
+    hub->connect(serverAddress);
+
 }
 
 void ServerCommunication::UWSServerCommunicationStrategy::setErrorCallback(Hub* hub) {
@@ -70,8 +97,8 @@ void ServerCommunication::UWSServerCommunicationStrategy::setDisconnectionCallba
     });
 }
 
-void ServerCommunication::UWSServerCommunicationStrategy::setOnMessageCallBack() {
-    hub.onMessage([](WebSocket* ws, char* message, size_t length, uWS::OpCode opCode) {
+void ServerCommunication::UWSServerCommunicationStrategy::setOnMessageCallBack(Hub* hub) {
+    hub->onMessage([](WebSocket* ws, char* message, size_t length, uWS::OpCode opCode) {
         std::cout << std::string(message, length) << std::endl;
         ws->send(message, length, opCode);
     });

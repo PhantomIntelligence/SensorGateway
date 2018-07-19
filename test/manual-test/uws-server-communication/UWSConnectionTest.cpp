@@ -23,6 +23,8 @@
 #include "test/utilities/stub/SpiritFramesStub.h"
 
 namespace ManualTest {
+    using Stub::createArbitrarySpiritFrame;
+    using ServerCommunication::UWSServerCommunicationStrategy;
 
     void coutMessage(std::string const& message) {
         std::cout << message << std::endl;
@@ -103,7 +105,8 @@ namespace ManualTest {
                     ws->close(1000);
                     break;
                 default:
-                    std::cout << "FAILURE: " << ws->getUserData() << " should not setWebSocketCallbacksAndConnection!" << std::endl;
+                    std::cout << "FAILURE: " << ws->getUserData() << " should not setWebSocketCallbacksAndConnection!"
+                              << std::endl;
                     exit(-1);
             }
         });
@@ -222,14 +225,24 @@ namespace ManualTest {
 
         return 0;
     }
+
+    void testConnectionWithConcreteStrategy() {
+        UWSServerCommunicationStrategy uwsServerCommunicationStrategy;
+        uwsServerCommunicationStrategy.openConnection();
+        auto frame = createArbitrarySpiritFrame();
+        uwsServerCommunicationStrategy.sendMessage(std::move(frame));
+
+    }
+
 }
 
 int main() {
 //    auto testOutput = ManualTest::testBasicUWSConnectionCalls();
-    auto testOutput = ManualTest::testMessageSending();
-    if (testOutput == 0) {
-
-    }
+//    auto testOutput = ManualTest::testMessageSending();
+//    if (testOutput == 0) {
+//
+//    }
+    ManualTest::testConnectionWithConcreteStrategy();
     return 0;
 }
 
