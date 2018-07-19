@@ -15,7 +15,6 @@
 
 #include <uWS.h>
 #include "ServerCommunicationStrategy.hpp"
-#include "spirit-sensor-gateway/domain/Frame.h"
 
 
 namespace ServerCommunication {

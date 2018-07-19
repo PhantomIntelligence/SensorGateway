@@ -97,7 +97,3 @@ Track* AWLMessageToSpiritMessageTranslationStrategy::fetchTrack(TrackID const& t
     }
     return nullptr;
 }
-
-Frame AWLMessageToSpiritMessageTranslationStrategy::returnDefaultData() {
-    return Frame();
-}

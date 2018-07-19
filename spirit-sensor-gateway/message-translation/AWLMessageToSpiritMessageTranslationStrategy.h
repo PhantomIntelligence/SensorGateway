@@ -20,12 +20,12 @@
 #include "spirit-sensor-gateway/domain/AWLMessage.h"
 #include "MessageTranslationStrategy.hpp"
 
+namespace MessageTranslation {
+
 using DataFlow::AWLMessage;
 using DataFlow::Frame;
 using DataFlow::PixelID;
 
-namespace MessageTranslation {
-    
     class AWLMessageToSpiritMessageTranslationStrategy final : public MessageTranslationStrategy<AWLMessage, Frame> {
     protected:
         using super = MessageTranslationStrategy<AWLMessage, Frame>;
@@ -36,8 +36,6 @@ namespace MessageTranslation {
         AWLMessageToSpiritMessageTranslationStrategy();
 
         ~ AWLMessageToSpiritMessageTranslationStrategy() = default;
-
-        Frame returnDefaultData();
 
         void translateMessage(INPUT&& inputMessage) override;
 

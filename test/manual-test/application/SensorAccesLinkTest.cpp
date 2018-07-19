@@ -28,7 +28,7 @@ using SensorCommunication::KvaserCanCommunicationStrategy;
 using MessageTranslation::AWLMessageToSpiritMessageTranslationStrategy;
 using ServerCommunication::ServerCommunicationStrategy;
 
-class ServerCommunicationStrategyMock final : public ServerCommunicationStrategy<Frame> {
+class ServerCommunicationStrategyMock final : public ServerCommunicationStrategy<DataFlow::Frame> {
 
 public:
     explicit ServerCommunicationStrategyMock() : numberOfReceivedFrames(0), receivedFrames({}){}
@@ -65,13 +65,13 @@ int main(){
     ServerCommunicationStrategyMock serverCommunicationStrategy;
     TestUtilities::SpiritFramesFileManager fileManager;
 
-    SpiritSensorGateway::SensorAccessLink<AWLMessage, Frame> sensorAccessLink(&sensorCommunicationStrategy,&messageTranslationStrategy, &serverCommunicationStrategy);
+    SpiritSensorGateway::SensorAccessLink<DataFlow::AWLMessage, DataFlow::Frame> sensorAccessLink(&sensorCommunicationStrategy,&messageTranslationStrategy, &serverCommunicationStrategy);
 
     //sensorAccessLink.connect();
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+//    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     //sensorAccessLink.disconnect();
 
-    fileManager.writeFileWithMessages(serverCommunicationStrategy.getReceivedFrames(), "SensorAccessLinkOutputFrames.txt");
+//    fileManager.writeFileWithMessages(serverCommunicationStrategy.getReceivedFrames(), "SensorAccessLinkOutputFrames.txt");
 
     return 0;
 };

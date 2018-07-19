@@ -17,11 +17,12 @@
 #include "spirit-sensor-gateway/common/data-flow/DataSink.hpp"
 #include "test/utilities/files/SpiritFramesFileManager.h"
 
-using DataFlow::DataSink;
-using DataFlow::Frame;
-using TestUtilities::Structures::Frames;
 
 namespace Mock {
+
+    using DataFlow::DataSink;
+    using DataFlow::Frame;
+    using TestUtilities::Structures::Frames;
 
     class FrameSinkMock : public DataSink<Frame> {
     protected:

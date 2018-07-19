@@ -19,7 +19,6 @@
 
 #include "spirit-sensor-gateway/server-communication/ServerCommunicator.hpp"
 
-
 namespace SpiritSensorGateway {
 
     template<class I, class O>
