@@ -23,7 +23,7 @@ namespace ServerCommunication {
     using Hub = uWS::Hub;
     using WebSocket = uWS::WebSocket<uWS::CLIENT>;
     using WebSocketPointerPromise = std::promise<WebSocket*>;
-    std::string const SERVER_CONNECTION_ADDRESS = "ws://localhost:8080/connect-gateway";
+
 
     class UWSServerCommunicationStrategy : public ServerCommunicationStrategy<DataFlow::Frame> {
 
@@ -46,7 +46,7 @@ namespace ServerCommunication {
 
         UWSServerCommunicationStrategy& operator=(UWSServerCommunicationStrategy&& other) noexcept= delete;
 
-        void openConnection() override;
+        void openConnection(std::string const& serverAddress) override;
 
         void closeConnection() override;
 
@@ -57,7 +57,8 @@ namespace ServerCommunication {
 
 
         static void startWebSocket(UWSServerCommunicationStrategy* context,
-                                   WebSocketPointerPromise* webSocketPointerPromise);
+                                           WebSocketPointerPromise* webSocketPointerPromise,
+                                           std::string const& serverAddress);
 
         Hub hub;
 

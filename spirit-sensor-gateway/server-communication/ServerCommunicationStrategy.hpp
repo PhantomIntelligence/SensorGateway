@@ -30,7 +30,7 @@ namespace ServerCommunication {
 
         virtual void sendMessage(MESSAGE&& message) = 0;
 
-        virtual void openConnection() = 0;
+        virtual void openConnection(std::string const& serverAddress) = 0;
 
         virtual void closeConnection() = 0;
     };

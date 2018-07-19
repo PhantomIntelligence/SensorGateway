@@ -35,6 +35,7 @@ using Stub::createArbitrarySpiritFrame;
 class ServerCommunicatorTest : public ::testing::Test {
 
 protected:
+    std::string const SERVER_ADRESS = "I like pears";
     ServerCommunicatorTest() = default;
 
     virtual ~ServerCommunicatorTest() = default;
@@ -60,7 +61,7 @@ namespace ServerCommunicatorTestMock {
             sentMessage = message;
         }
 
-        void openConnection() override {
+        void openConnection(std::string const& serverAddress) override {
             openConnectionCalled.store(true);
         }
 
@@ -97,7 +98,7 @@ TEST_F(ServerCommunicatorTest, given__when_connect_then_callsOpenConnectionInStr
     ServerCommunicatorTestMock::MockServerCommunicatorStrategy mockStrategy;
     ServerCommunicator serverCommunicator(&mockStrategy);
 
-    serverCommunicator.connect();
+    serverCommunicator.connect(SERVER_ADRESS);
 
     auto strategyHasBeenCalled = mockStrategy.hasOpenConnectionBeenCalled();
     ASSERT_TRUE(strategyHasBeenCalled);

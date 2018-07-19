@@ -47,8 +47,8 @@ namespace SensorAccessLinkElement {
 
         ServerCommunicator& operator=(ServerCommunicator&& other)& noexcept = delete;
 
-        void connect() {
-            serverCommunicationStrategy->openConnection();
+        void connect(std::string const& serverAddress) {
+            serverCommunicationStrategy->openConnection(serverAddress);
         };
 
         void disconnect() {

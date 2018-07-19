@@ -61,6 +61,28 @@ namespace Stub {
                                         TracksInPixel(15, {Track(14321, 0, 109, 0, 113, 0)})
                 });
     }
+    Frame createRandomIDFrame() {
+        std::default_random_engine randomEngine(std::random_device{}());
+        std::uniform_int_distribution<uint16_t> distribution(0, 1000);
+        auto randomID = distribution(randomEngine);
+        return createFrame(randomID, 16, {TracksInPixel(0, {Track(14275, 0, 139, 0, 109, 0)}),
+                                    TracksInPixel(1, {Track(42, 0, 135, 0, 110, 0)}),
+                                    TracksInPixel(2, {Track(14286, 0, 125, 0, 105, 0)}),
+                                    TracksInPixel(3, {Track(14270, 0, 127, 0, 106, 1)}),
+                                    TracksInPixel(4, {Track(14301, 0, 122, 0, 104, 0)}),
+                                    TracksInPixel(5, {Track(14272, 0, 120, 0, 108, 0)}),
+                                    TracksInPixel(6, {Track(14316, 0, 114, 0, 114, 0)}),
+                                    TracksInPixel(7, {Track(14321, 0, 112, 0, 117, 1)}),
+                                    TracksInPixel(8, {Track(14284, 0, 126, 0, 111, 0)}),
+                                    TracksInPixel(9, {Track(14289, 0, 124, 0, 113, 0)}),
+                                    TracksInPixel(10, {Track(14290, 0, 125, 0, 107, 0)}),
+                                    TracksInPixel(11, {Track(14291, 0, 123, 0, 106, 0)}),
+                                    TracksInPixel(12, {Track(14324, 0, 91, 0, 109, 1)}),
+                                    TracksInPixel(13, {Track(14302, 0, 114, 0, 109, 0)}),
+                                    TracksInPixel(14, {Track(14322, 0, 109, 0, 116, -2)}),
+                                    TracksInPixel(15, {Track(14321, 0, 109, 0, 113, 0)})
+        });
+    }
 
     std::vector<Frame> createSpiritFramesStub() {
         std::vector<Frame> spiritFrames = {

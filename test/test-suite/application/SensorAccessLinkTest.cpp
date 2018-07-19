@@ -134,7 +134,7 @@ namespace SensorAccessLinkTestMock {
 
         ~MockServerCommunicationStrategy() noexcept override = default;
 
-        void openConnection() override {}
+        void openConnection(std::string const& serverAddress) override {}
 
         void closeConnection() override {}
 

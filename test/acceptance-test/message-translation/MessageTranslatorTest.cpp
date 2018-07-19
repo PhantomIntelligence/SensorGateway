@@ -11,6 +11,9 @@
 	limitations under the License.
 */
 
+#ifndef SPIRITSENSORGATEWAY_MESSAGETRANSLATORTEST_CPP
+#define SPIRITSENSORGATEWAY_MESSAGETRANSLATORTEST_CPP
+
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 #include <fstream>
@@ -68,3 +71,5 @@ TEST_F(AWLMessageToSpiritMessageTranslationStrategyTest,
     ASSERT_TRUE(spiritFramesFileManager.areFilesEqual(EXPECTED_SPIRIT_FRAMES_OUTPUT_FILE_NAME,
                                                       ACTUAL_SPIRIT_FRAMES_OUTPUT_FILE_NAME));
 }
+
+#endif //SPIRITSENSORGATEWAY_MESSAGETRANSLATORTEST_CPP

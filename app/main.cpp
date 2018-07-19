@@ -24,6 +24,7 @@
 #include "spirit-sensor-gateway/server-communication/UWSServerCommunicationStrategy.h"
 
 int main() {
+
     using SensorCommunicationStrategy = SensorCommunication::KvaserCanCommunicationStrategy;
     using MessageTranslationStrategy = MessageTranslation::AWLMessageToSpiritMessageTranslationStrategy;
     using ServerCommunicationStrategy = ServerCommunication::UWSServerCommunicationStrategy;

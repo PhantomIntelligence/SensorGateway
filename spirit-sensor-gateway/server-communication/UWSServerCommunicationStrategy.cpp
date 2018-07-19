@@ -12,9 +12,9 @@ UWSServerCommunicationStrategy::~UWSServerCommunicationStrategy() {
     webSocketConnectionThread.exitSafely();
 }
 
-void UWSServerCommunicationStrategy::openConnection() {
+void UWSServerCommunicationStrategy::openConnection(std::string const& serverAddress) {
     WebSocketPointerPromise webSocketPointerPromise;
-    webSocketConnectionThread = JoinableThread(&startWebSocket, this, &webSocketPointerPromise);
+    webSocketConnectionThread = JoinableThread(&startWebSocket, this, &webSocketPointerPromise,serverAddress);
     auto futureWebSocket = webSocketPointerPromise.get_future();
     futureWebSocket.wait();
     webSocket = futureWebSocket.get();
@@ -34,7 +34,8 @@ void UWSServerCommunicationStrategy::sendMessage(MESSAGE&& message) {
 }
 
 void UWSServerCommunicationStrategy::startWebSocket(UWSServerCommunicationStrategy* context,
-                                                    WebSocketPointerPromise* webSocketPointerPromise) {
+                                                   WebSocketPointerPromise* webSocketPointerPromise,
+                                                   std::string const& serverAddress) {
     Hub* hub = &(context->hub);
     hub->onConnection([&webSocketPointerPromise](WebSocket* ws, uWS::HttpRequest req) {
         std::cout << "Connected!" << std::endl;
@@ -56,6 +57,6 @@ void UWSServerCommunicationStrategy::startWebSocket(UWSServerCommunicationStrate
     hub->onError([](void* user) {
         std::cout << "WebSocket Connection Error" << std::endl;
     });
-    hub->connect(SERVER_CONNECTION_ADDRESS);
+    hub->connect(serverAddress);
     context->hub.run();
 }

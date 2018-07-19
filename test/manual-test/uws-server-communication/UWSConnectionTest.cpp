@@ -23,6 +23,7 @@
 #include "test/utilities/stub/SpiritFramesStub.h"
 
 namespace ManualTest {
+
     using Stub::createArbitrarySpiritFrame;
     using ServerCommunication::UWSServerCommunicationStrategy;
 
@@ -227,8 +228,9 @@ namespace ManualTest {
     }
 
     void testConnectionWithConcreteStrategy() {
+        std::string const SERVER_CONNECTION_ADDRESS = "ws://localhost:8080/connect-gateway";
         UWSServerCommunicationStrategy uwsServerCommunicationStrategy;
-        uwsServerCommunicationStrategy.openConnection();
+        uwsServerCommunicationStrategy.openConnection(SERVER_CONNECTION_ADDRESS);
         for(auto i = 1; i < 100; ++i){
             auto frame = createArbitrarySpiritFrame();
             uwsServerCommunicationStrategy.sendMessage(std::move(frame));
