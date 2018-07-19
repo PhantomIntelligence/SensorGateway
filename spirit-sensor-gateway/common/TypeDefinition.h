@@ -16,6 +16,7 @@
 
 
 #include <atomic>
+#include <algorithm>
 #include <future>
 #include <mutex>
 #include <functional>

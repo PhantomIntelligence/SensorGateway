@@ -66,6 +66,7 @@ namespace SpiritSensorGateway {
 
         void start() {
             sensorCommunicator.start();
+            serverCommunicator.connect();
         };
 
         void terminateAndJoin() {
