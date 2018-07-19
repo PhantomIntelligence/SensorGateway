@@ -17,6 +17,7 @@
 #ifndef SPIRITSENSORGATEWAY_DATASOURCE_HPP
 #define SPIRITSENSORGATEWAY_DATASOURCE_HPP
 
+#include "spirit-sensor-gateway/domain/AWLMessage.h"
 #include "ThreadSafeRingBuffer.hpp"
 
 namespace DataFlow {
@@ -29,6 +30,12 @@ namespace DataFlow {
         virtual ~DataSource() noexcept = default;
 
         void linkConsumer(ConsumerLink<T>* consumer) {
+            if (std::is_same<T, AWLMessage>::value){
+                std::cout << 7 << std::endl;
+            }
+            else{
+                std::cout << 6 << std::endl;
+            }
             consumer->linkWith(&outputBuffer);
         }
 

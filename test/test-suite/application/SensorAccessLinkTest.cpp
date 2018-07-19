@@ -252,9 +252,9 @@ TEST_F(SensorAccessLinkTest, given__when_connecting_then_aValidConnectionIsEstab
     MessageTranslationStrategyMock messageTranslationStrategyMock;
     ServerCommunicationStrategyMock serverCommunicationStrategyMock;
 
-    SensorAccessLink<SimpleData, SimpleData>  sensorAccessLink(&sensorCommunicationStrategyMock,
+    SensorAccessLink<SimpleData, SimpleData>  sensorAccessLink(&serverCommunicationStrategyMock,
                                                                &messageTranslationStrategyMock,
-                                                               &serverCommunicationStrategyMock);
+                                                               &sensorCommunicationStrategyMock);
 
     sensorAccessLink.connect();
     sensorAccessLink.disconnect();
@@ -267,9 +267,9 @@ TEST_F(SensorAccessLinkTest, given__when_connecting_then_aValidDataFlowIsInstant
     MessageTranslationStrategyMock messageTranslationStrategyMock;
     ServerCommunicationStrategyMock serverCommunicationStrategyMock;
 
-    SensorAccessLink<SimpleData, SimpleData>  sensorAccessLink(&sensorCommunicationStrategyMock,
+    SensorAccessLink<SimpleData, SimpleData>  sensorAccessLink(&serverCommunicationStrategyMock,
                                                                &messageTranslationStrategyMock,
-                                                               &serverCommunicationStrategyMock);
+                                                               &sensorCommunicationStrategyMock);
 
     sensorAccessLink.connect();
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
@@ -284,9 +284,9 @@ TEST_F(SensorAccessLinkTest, given_aPreviouslyEstablisedConnection_when_disconne
     MessageTranslationStrategyMock messageTranslationStrategyMock;
     ServerCommunicationStrategyMock serverCommunicationStrategyMock;
 
-    SensorAccessLink<SimpleData, SimpleData>  sensorAccessLink(&sensorCommunicationStrategyMock,
+    SensorAccessLink<SimpleData, SimpleData>  sensorAccessLink(&serverCommunicationStrategyMock,
                                                                &messageTranslationStrategyMock,
-                                                               &serverCommunicationStrategyMock);
+                                                               &sensorCommunicationStrategyMock);
 
     sensorAccessLink.connect();
     sensorAccessLink.disconnect();

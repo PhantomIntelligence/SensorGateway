@@ -17,7 +17,10 @@
 #ifndef SPIRITSENSORGATEWAY_SENSORACCESSLINK_H
 #define SPIRITSENSORGATEWAY_SENSORACCESSLINK_H
 
+#include "spirit-sensor-gateway/sensor-communication/SensorCommunicator.hpp"
+#include "spirit-sensor-gateway/message-translation/MessageTranslator.hpp"
 #include "spirit-sensor-gateway/server-communication/ServerCommunicator.hpp"
+
 
 namespace SpiritSensorGateway {
 
@@ -39,13 +42,13 @@ namespace SpiritSensorGateway {
         using ServerCommunicatorScheduler = DataFlow::DataProcessingScheduler<OUTPUT, ServerCommunicator, 1>;
 
     public:
-        explicit SensorAccessLink(SensorCommunicationStrategy* sensorCommunicationStrategy,
+        explicit SensorAccessLink(ServerCommunicationStrategy* serverCommunicationStrategy,
                                   MessageTranslationStrategy* messageTranslationStrategy,
-                                  ServerCommunicationStrategy* serverCommunicationStrategy) :
-                sensorCommunicator(sensorCommunicationStrategy),
-                messageTranslator(messageTranslationStrategy),
-                translatorScheduler(&messageTranslator),
+                                  SensorCommunicationStrategy* sensorCommunicationStrategy) :
                 serverCommunicator(serverCommunicationStrategy),
+                messageTranslator(messageTranslationStrategy),
+                sensorCommunicator(sensorCommunicationStrategy),
+                translatorScheduler(&messageTranslator),
                 serverCommunicatorScheduler(&serverCommunicator) {
             messageTranslationStrategy->linkConsumer(&serverCommunicatorScheduler);
             sensorCommunicator.linkConsumer(&translatorScheduler);
@@ -75,9 +78,9 @@ namespace SpiritSensorGateway {
 
     private:
 
-        SensorCommunicator sensorCommunicator;
-        MessageTranslator messageTranslator;
         ServerCommunicator serverCommunicator;
+        MessageTranslator messageTranslator;
+        SensorCommunicator sensorCommunicator;
 
         ServerCommunicatorScheduler serverCommunicatorScheduler;
         TranslatorScheduler translatorScheduler;

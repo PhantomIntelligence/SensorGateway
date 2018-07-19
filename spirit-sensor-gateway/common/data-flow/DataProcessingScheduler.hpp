@@ -18,6 +18,8 @@
 #define SPIRITSENSORGATEWAY_DATAPROCESSINGSCHEDULER_HPP
 
 #include "DataSink.hpp"
+#include "spirit-sensor-gateway/domain/AWLMessage.h"
+
 
 namespace DataFlow {
 
@@ -34,6 +36,12 @@ namespace DataFlow {
                 numberOfLinkedBuffers(0),
                 dataSink(dataSink),
                 schedulerThread(JoinableThread(doNothing)) {
+            if (std::is_same<T, AWLMessage>::value){
+                std::cout << 5 << std::endl;
+            }
+            else{
+                std::cout << 4 << std::endl;
+            }
             schedulerThread.exitSafely();
             schedulerThread = JoinableThread(&DataProcessingScheduler::start, this);
         }
@@ -89,6 +97,12 @@ namespace DataFlow {
         }
 
         void terminateAndJoin() {
+            if (std::is_same<T, AWLMessage>::value){
+                std::cout << 11 << std::endl;
+            }
+            else{
+                std::cout << 12 << std::endl;
+            }
             if (!terminateOrderHasBeenReceived()) {
                 terminateOrderReceived.store(true);
             }
@@ -102,6 +116,12 @@ namespace DataFlow {
                 if (!readyToConsumeInputBuffers.isEmpty()) {
                     auto inputBufferToConsumeFrom = readyToConsumeInputBuffers.readNextPointerToConsume();
                     auto data = inputBufferToConsumeFrom->consumeNextDataFor(this);
+                    if (std::is_same<T, AWLMessage>::value){
+                        std::cout << "Consuming AWL" << std::endl;
+                    }
+                    else{
+                        std::cout << "Consuming Frame" << std::endl;
+                    }
                     dataSink->consume(std::move(data));
                 }
             }

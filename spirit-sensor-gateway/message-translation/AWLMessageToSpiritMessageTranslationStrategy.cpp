@@ -35,6 +35,7 @@ AWLMessageToSpiritMessageTranslationStrategy::AWLMessageToSpiritMessageTranslati
         super() {}
 
 void AWLMessageToSpiritMessageTranslationStrategy::translateMessage(AWLMessage&& inputMessage) {
+    std::cout << "Translating AWL of ID:" << inputMessage.id <<std::endl;
     switch (inputMessage.id) {
         case END_OF_FRAME:
             translateEndOfFrameMessage(std::forward<INPUT>(inputMessage));
@@ -46,7 +47,8 @@ void AWLMessageToSpiritMessageTranslationStrategy::translateMessage(AWLMessage&&
             translateDetectionVelocityMessage(std::forward<INPUT>(inputMessage));
             break;
         default:
-            throw UnknownMessageException(std::forward<INPUT>(inputMessage));
+            break;
+            //throw UnknownMessageException(std::forward<INPUT>(inputMessage));
     }
 }
 
@@ -55,6 +57,7 @@ void AWLMessageToSpiritMessageTranslationStrategy::translateEndOfFrameMessage(AW
     SystemID systemID = convertTwoBytesToUnsignedBigEndian(awlMessage.data[2], awlMessage.data[3]);
     currentOutputMessage.systemID = systemID;
     currentOutputMessage.frameID = frameID;
+    std::cout<<"Producing Frame"<<std::endl;
     produce(std::move(currentOutputMessage));
     currentOutputMessage = Frame::returnDefaultData();
 }

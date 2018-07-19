@@ -31,7 +31,8 @@ using ServerCommunication::ServerCommunicationStrategy;
 class ServerCommunicationStrategyMock final : public ServerCommunicationStrategy<DataFlow::Frame> {
 
 public:
-    explicit ServerCommunicationStrategyMock() : numberOfReceivedFrames(0), receivedFrames({}){}
+    explicit ServerCommunicationStrategyMock() : numberOfReceivedFrames(0), receivedFrames({}){
+    }
 
     ~ServerCommunicationStrategyMock() = default;
 
@@ -40,10 +41,11 @@ public:
     void closeConnection() override {}
 
     void sendMessage(DataFlow::Frame&& message) override {
-        if(numberOfReceivedFrames.load() != MAXIMUM_NUMBER_OF_FRAMES_NEEDED_FOR_TEST){
-            receivedFrames.at(numberOfReceivedFrames) = message;
-            numberOfReceivedFrames++;
+        if(numberOfReceivedFrames.load() < MAXIMUM_NUMBER_OF_FRAMES_NEEDED_FOR_TEST){
+            std::cout << "Frame received" << std::endl;
+            receivedFrames.push_back(message);
         }
+        numberOfReceivedFrames++;
     }
 
     std::vector<DataFlow::Frame> getReceivedFrames(){
@@ -60,18 +62,21 @@ private:
 
 
 int main(){
-    KvaserCanCommunicationStrategy sensorCommunicationStrategy;
-    AWLMessageToSpiritMessageTranslationStrategy messageTranslationStrategy;
     ServerCommunicationStrategyMock serverCommunicationStrategy;
+    AWLMessageToSpiritMessageTranslationStrategy messageTranslationStrategy;
+    KvaserCanCommunicationStrategy sensorCommunicationStrategy;
     TestUtilities::SpiritFramesFileManager fileManager;
 
-    SpiritSensorGateway::SensorAccessLink<DataFlow::AWLMessage, DataFlow::Frame> sensorAccessLink(&sensorCommunicationStrategy,&messageTranslationStrategy, &serverCommunicationStrategy);
+    SpiritSensorGateway::SensorAccessLink<DataFlow::AWLMessage, DataFlow::Frame> sensorAccessLink(&serverCommunicationStrategy,&messageTranslationStrategy, &sensorCommunicationStrategy);
 
-    //sensorAccessLink.connect();
-//    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-    //sensorAccessLink.disconnect();
+    sensorAccessLink.connect();
+    std::this_thread::sleep_for(std::chrono::milliseconds(10000));
+    std::cout<< "About to disconnect"<<std::endl;
+    sensorAccessLink.disconnect();
 
-//    fileManager.writeFileWithMessages(serverCommunicationStrategy.getReceivedFrames(), "SensorAccessLinkOutputFrames.txt");
+    std::cout << "After Disconnection"<< std::endl;
+    std::cout << "Number of frames received : "<< serverCommunicationStrategy.getReceivedFrames().size() << std::endl;
+    fileManager.writeFileWithMessages(serverCommunicationStrategy.getReceivedFrames(), "SensorAccessLinkOutputFrames.txt");
 
     return 0;
 };

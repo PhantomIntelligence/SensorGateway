@@ -49,6 +49,8 @@ namespace DataModel {
 
         SimpleData static const returnDefaultData() noexcept;
 
+        int id = 1;
+
     private:
 
         SimpleDataContent content;

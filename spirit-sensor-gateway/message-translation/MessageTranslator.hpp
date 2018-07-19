@@ -27,7 +27,7 @@ namespace SensorAccessLinkElement {
 
     public:
         explicit MessageTranslator(MessageTranslation::MessageTranslationStrategy<INPUT, OUTPUT>* messageTranslationStrategy) :
-                messageTranslationStrategy(messageTranslationStrategy) {};
+                messageTranslationStrategy(messageTranslationStrategy) {   std::cout<<2<<std::endl;};
 
         ~MessageTranslator() noexcept {};
 
@@ -40,7 +40,7 @@ namespace SensorAccessLinkElement {
         MessageTranslator& operator=(MessageTranslator&& other)& noexcept = delete;
 
         void consume(I&& inputMessage) override {
-            messageTranslationStrategy->translateMessage(std::move(inputMessage));
+            messageTranslationStrategy->translateMessage(std::forward<I>(inputMessage));
         };
 
     private:

@@ -37,6 +37,7 @@ namespace SensorAccessLinkElement {
                 terminateOrderReceived(false),
                 sensorCommunicationStrategy(sensorCommunicationStrategy),
                 communicatorThread(JoinableThread(doNothing)) {
+            std::cout<<3<<std::endl;
             communicatorThread.exitSafely();
         }
 
@@ -52,11 +53,13 @@ namespace SensorAccessLinkElement {
         SensorCommunicator& operator=(SensorCommunicator&& other)& noexcept = delete;
 
         void connect() {
+            std::cout <<9<<std::endl;
             sensorCommunicationStrategy->openConnection();
             communicatorThread = JoinableThread(&SensorCommunicator::run, this);
         };
 
         void disconnect() {
+            std::cout<<10<<std::endl;
             sensorCommunicationStrategy->closeConnection();
 
             if (!terminateOrderHasBeenReceived()) {
@@ -72,6 +75,7 @@ namespace SensorAccessLinkElement {
         void run() {
             while (!terminateOrderHasBeenReceived()) {
                 auto message = sensorCommunicationStrategy->readMessage();
+                //std::cout<<"AWL ID sent into buffer: "<<message.id << std::endl;
                 produce(std::move(message));
             }
         }
