@@ -127,9 +127,9 @@ TEST_F(SensorCommunicatorTest, given__when_start_then_callsOpenConnectionInStrat
     SensorCommunicationStrategy mockStrategy;
     AWLCommunicator sensorCommunicator(&mockStrategy);
 
-    sensorCommunicator.start();
+    sensorCommunicator.connect();
 
-    sensorCommunicator.terminateAndJoin();
+    sensorCommunicator.disconnect();
     auto strategyHasBeenCalled = mockStrategy.hasOpenConnectionBeenCalled();
     ASSERT_TRUE(strategyHasBeenCalled);
 }
@@ -138,7 +138,7 @@ TEST_F(SensorCommunicatorTest, given__when_terminateAndJoin_then_callsCloseConne
     SensorCommunicationStrategy mockStrategy;
     AWLCommunicator sensorCommunicator(&mockStrategy);
 
-    sensorCommunicator.terminateAndJoin();
+    sensorCommunicator.disconnect();
 
     auto strategyHasBeenCalled = mockStrategy.hasCloseConnectionBeenCalled();
     ASSERT_TRUE(strategyHasBeenCalled);
@@ -148,11 +148,11 @@ TEST_F(SensorCommunicatorTest, given__when_start_then_callsReadMessageInStrategy
     SensorCommunicationStrategy mockStrategy;
     AWLCommunicator sensorCommunicator(&mockStrategy);
 
-    sensorCommunicator.start();
+    sensorCommunicator.connect();
 
     mockStrategy.waitUntilReadMessageIsCalled();
     auto strategyHasBeenCalled = mockStrategy.hasReadMessageBeenCalled();
-    sensorCommunicator.terminateAndJoin();
+    sensorCommunicator.disconnect();
     ASSERT_TRUE(strategyHasBeenCalled);
 }
 
@@ -227,11 +227,11 @@ AWLMessages SensorCommunicatorTest::fetchMessageProducedBySensorCommunicatorExec
     AWLCommunicator sensorCommunicator(&mockStrategy);
     sensorCommunicator.linkConsumer(&scheduler);
 
-    sensorCommunicator.start();
+    sensorCommunicator.connect();
 
     sink.waitConsumptionToBeReached();
 
-    sensorCommunicator.terminateAndJoin();
+    sensorCommunicator.disconnect();
     scheduler.terminateAndJoin();
 
     AWLMessages producedMessages = sink.getConsumedData();

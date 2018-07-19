@@ -247,7 +247,7 @@ protected:
 };
 
 
-TEST_F(SensorAccessLinkTest, given_noEstablishedConnection_when_starting_then_aValidConnectionIsMade){
+TEST_F(SensorAccessLinkTest, given__when_connecting_then_aValidConnectionIsEstablished){
     SensorCommunicationStrategyMock sensorCommunicationStrategyMock;
     MessageTranslationStrategyMock messageTranslationStrategyMock;
     ServerCommunicationStrategyMock serverCommunicationStrategyMock;
@@ -256,13 +256,13 @@ TEST_F(SensorAccessLinkTest, given_noEstablishedConnection_when_starting_then_aV
                                                                &messageTranslationStrategyMock,
                                                                &serverCommunicationStrategyMock);
 
-    sensorAccessLink.start();
-    sensorAccessLink.terminateAndJoin();
+    sensorAccessLink.connect();
+    sensorAccessLink.disconnect();
 
     ASSERT_TRUE(connectionOpeningIsValid(&sensorCommunicationStrategyMock, &serverCommunicationStrategyMock));
 }
 
-TEST_F(SensorAccessLinkTest, given_someConnectionEstablished_when_starting_then_aValidDataFlowIsMadeAcrossTheDifferentStrategies){
+TEST_F(SensorAccessLinkTest, given__when_connecting_then_aValidDataFlowIsInstantiatedThroughTheGateway){
     SensorCommunicationStrategyMock sensorCommunicationStrategyMock;
     MessageTranslationStrategyMock messageTranslationStrategyMock;
     ServerCommunicationStrategyMock serverCommunicationStrategyMock;
@@ -271,15 +271,15 @@ TEST_F(SensorAccessLinkTest, given_someConnectionEstablished_when_starting_then_
                                                                &messageTranslationStrategyMock,
                                                                &serverCommunicationStrategyMock);
 
-    sensorAccessLink.start();
+    sensorAccessLink.connect();
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
-    sensorAccessLink.terminateAndJoin();
+    sensorAccessLink.disconnect();
 
     ASSERT_TRUE(dataFlowIsValid(&sensorCommunicationStrategyMock, &messageTranslationStrategyMock,
                                 &serverCommunicationStrategyMock));
 }
 
-TEST_F(SensorAccessLinkTest, given_someConnectionEstablished_when_terminatingTheConnection_then_theConnectionIsClosedInAValidWay){
+TEST_F(SensorAccessLinkTest, given_aPreviouslyEstablisedConnection_when_disconnecting_then_theConnectionIsCorrectlyClosed){
     SensorCommunicationStrategyMock sensorCommunicationStrategyMock;
     MessageTranslationStrategyMock messageTranslationStrategyMock;
     ServerCommunicationStrategyMock serverCommunicationStrategyMock;
@@ -288,45 +288,11 @@ TEST_F(SensorAccessLinkTest, given_someConnectionEstablished_when_terminatingThe
                                                                &messageTranslationStrategyMock,
                                                                &serverCommunicationStrategyMock);
 
-    sensorAccessLink.start();
-    sensorAccessLink.terminateAndJoin();
+    sensorAccessLink.connect();
+    sensorAccessLink.disconnect();
 
     ASSERT_TRUE(connectionClosingIsValid(&sensorCommunicationStrategyMock, &serverCommunicationStrategyMock));
 }
-
-
-//TODO Determine with the rest of team what is the behaviour wanted for a connection that is terminated before even being started
-TEST_F(SensorAccessLinkTest, given_noEstablishedConnection_when_terminating_then_throwsInvalidConnectionTermination){
-    SensorCommunicationStrategyMock sensorCommunicationStrategyMock;
-    MessageTranslationStrategyMock messageTranslationStrategyMock;
-    ServerCommunicationStrategyMock serverCommunicationStrategyMock;
-
-    //SensorAccessLink<SimpleData, SimpleData>  sensorAccessLink(&sensorCommunicationStrategyMock,
-                                                               //&messageTranslationStrategyMock,
-                                                               //&serverCommunicationStrategyMock);
-
-    //sensorAccessLink.terminateAndJoin();
-
-    ASSERT_TRUE(true);
-}
-
-
-//TODO Determine with the rest of team what is the behaviour wanted for a connection that is started more than once
-TEST_F(SensorAccessLinkTest, given_someConnectionAlreadyEstablished_when_startingAgain_then_throwsInvalidConnectionOpening){
-    SensorCommunicationStrategyMock sensorCommunicationStrategyMock;
-    MessageTranslationStrategyMock messageTranslationStrategyMock;
-    ServerCommunicationStrategyMock serverCommunicationStrategyMock;
-
-    //SensorAccessLink<SimpleData, SimpleData>  sensorAccessLink(&sensorCommunicationStrategyMock,
-                                                               //&messageTranslationStrategyMock,
-                                                               //&serverCommunicationStrategyMock);
-    //sensorAccessLink.start();
-    //sensorAccessLink.start();
-    //sensorAccessLink.terminateAndJoin();
-
-    ASSERT_TRUE(true);
-}
-
 
 #endif //SPIRITSENSORGATEWAY_SENSORCOMMUNICATORTEST_CPP
 

@@ -51,12 +51,12 @@ namespace SensorAccessLinkElement {
 
         SensorCommunicator& operator=(SensorCommunicator&& other)& noexcept = delete;
 
-        void start() {
+        void connect() {
             sensorCommunicationStrategy->openConnection();
             communicatorThread = JoinableThread(&SensorCommunicator::run, this);
         };
 
-        void terminateAndJoin() {
+        void disconnect() {
             sensorCommunicationStrategy->closeConnection();
 
             if (!terminateOrderHasBeenReceived()) {

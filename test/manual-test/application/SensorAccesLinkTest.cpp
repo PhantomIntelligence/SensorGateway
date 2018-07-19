@@ -18,30 +18,62 @@
 #include <chrono>
 #include <thread>
 #include "spirit-sensor-gateway/sensor-communication/KvaserCanCommunicationStrategy.h"
+#include "spirit-sensor-gateway/server-communication/ServerCommunicationStrategy.hpp"
 #include "spirit-sensor-gateway/message-translation/AWLMessageToSpiritMessageTranslationStrategy.h"
 #include "spirit-sensor-gateway/server-communication/UWSServerCommunicationStrategy.h"
 #include "test/utilities/files/SpiritFramesFileManager.h"
+#include "spirit-sensor-gateway/application/SensorAccessLink.hpp"
 
 using SensorCommunication::KvaserCanCommunicationStrategy;
 using MessageTranslation::AWLMessageToSpiritMessageTranslationStrategy;
-using ServerCommunication::UWSServerCommunicationStrategy;
+using ServerCommunication::ServerCommunicationStrategy;
 using TestUtilities::SpiritFramesFileManager;
+
+class ServerCommunicationStrategyMock final : public ServerCommunicationStrategy<Frame> {
+
+public:
+    explicit ServerCommunicationStrategyMock() : numberOfReceivedFrames(0), receivedFrames({}){}
+
+    ~ServerCommunicationStrategyMock() = default;
+
+    void openConnection() override {}
+
+    void closeConnection() override {}
+
+    void sendMessage(Frame&& message) override {
+        if(numberOfReceivedFrames.load() != MAXIMUM_NUMBER_OF_FRAMES_NEEDED_FOR_TEST){
+            receivedFrames.at(numberOfReceivedFrames) = message;
+            numberOfReceivedFrames++;
+        }
+    }
+
+    std::vector<Frame> getReceivedFrames(){
+        return receivedFrames;
+    }
+
+private:
+    int const MAXIMUM_NUMBER_OF_FRAMES_NEEDED_FOR_TEST = 10;
+    AtomicCounter numberOfReceivedFrames;
+    std::vector<Frame> receivedFrames;
+};
+
+
+
 
 int main(){
     KvaserCanCommunicationStrategy sensorCommunicationStrategy;
     AWLMessageToSpiritMessageTranslationStrategy messageTranslationStrategy;
-    UWSServerCommunicationStrategy serverCommunicationStrategy;
+    ServerCommunicationStrategyMock serverCommunicationStrategy;
+    SpiritFramesFileManager fileManager;
 
+    //SpiritSensorGateway::SensorAccessLink<AWLMessage, Frame> sensorAccessLink(&sensorCommunicationStrategy, &messageTranslationStrategy, &serverCommunicationStrategy);
 
-//    SpiritSensorGateway::SensorAccessLink<AWLMessage, Frame> sensorAccessLink(&sensorCommunicationStrategy, &messageTranslationStrategy, &serverCommunicationStrategy);
+    //sensorAccessLink.connect();
+    //std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    //sensorAccessLink.disconnect();
 
-//    SpiritFramesFileManager fileManager;
-//    const int NUMBER_OF_MILLISECONDS = 5000;
-//
-//    sensorAccessLink.start();
-//    std::this_thread::sleep_for(std::chrono::milliseconds(NUMBER_OF_MILLISECONDS));
-//    sensorAccessLink.terminateAndJoin();
+    //fileManager.writeFileWithMessages(serverCommunicationStrategy.getReceivedFrames(), "SensorAccessLinkOutputFrames.txt");
 
-
+    return 0;
 };
 #endif // SPIRITSENSORGATEWAY_ENDTOENDCONNECTIONTEST_CPP

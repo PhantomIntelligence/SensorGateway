@@ -62,13 +62,13 @@ namespace SpiritSensorGateway {
 
         SensorAccessLink& operator=(SensorAccessLink&& other)& noexcept = delete;
 
-        void start() {
+        void connect() {
             serverCommunicator.connect();
-            sensorCommunicator.start();
+            sensorCommunicator.connect();
         };
 
-        void terminateAndJoin() {
-            sensorCommunicator.terminateAndJoin();
+        void disconnect() {
+            sensorCommunicator.disconnect();
             translatorScheduler.terminateAndJoin();
             serverCommunicatorScheduler.terminateAndJoin();
             serverCommunicator.disconnect();
