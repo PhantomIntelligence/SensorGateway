@@ -36,7 +36,8 @@ int main() {
     MessageTranslationStrategy messageTranslationStrategy;
     ServerCommunicationStrategy serverCommunicationStrategy;
     SensorAccessLink sensorAccessLink(&sensorCommunicationStrategy, &messageTranslationStrategy, &serverCommunicationStrategy);
-
+    sensorAccessLink.start();
+    
     return 0;
 }
 
