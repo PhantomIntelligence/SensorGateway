@@ -65,9 +65,7 @@ namespace ServerCommunication {
 
         JoinableThread webSocketConnectionThread;
 
-//        WebSocketPointerPromise webSocketPointerPromise;
     };
 }
-
 
 #endif //SPIRITSENSORGATEWAY_UWSSERVERCOMMUNICATIONSTRATEGY_H
