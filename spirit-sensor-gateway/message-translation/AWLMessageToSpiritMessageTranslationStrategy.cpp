@@ -47,7 +47,6 @@ void AWLMessageToSpiritMessageTranslationStrategy::translateMessage(AWLMessage&&
             break;
         default:
             break;
-            //throw UnknownMessageException(std::forward<INPUT>(inputMessage));
     }
 }
 
