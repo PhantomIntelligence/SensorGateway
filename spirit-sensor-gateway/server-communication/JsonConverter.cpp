@@ -52,7 +52,7 @@ std::string JsonConverter::convertFrameToJsonString(Frame frame) {
         framePixels.push_back(convertPixelToJson(pixel));
     }
     jsonFrame["pixels"] = framePixels;
-    return jsonFrame.dump(4);
+    return jsonFrame.dump();
 }
 
 #endif //SPIRITSENSORGATEWAY_JSONPARSER_CPP
