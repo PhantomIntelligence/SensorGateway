@@ -229,8 +229,10 @@ namespace ManualTest {
     void testConnectionWithConcreteStrategy() {
         UWSServerCommunicationStrategy uwsServerCommunicationStrategy;
         uwsServerCommunicationStrategy.openConnection();
-        auto frame = createArbitrarySpiritFrame();
-        uwsServerCommunicationStrategy.sendMessage(std::move(frame));
+        for(auto i = 1; i < 100; ++i){
+            auto frame = createArbitrarySpiritFrame();
+            uwsServerCommunicationStrategy.sendMessage(std::move(frame));
+        }
 
     }
 

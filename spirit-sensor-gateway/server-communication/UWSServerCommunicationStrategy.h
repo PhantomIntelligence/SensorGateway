@@ -52,27 +52,18 @@ namespace ServerCommunication {
 
         void sendMessage(MESSAGE&& message) override;
 
-        void start();
-
 
     private:
-        void setConnectionCallback(Hub* hub, WebSocketPointerPromise* webSocketPointerPromise);
 
-        void setErrorCallback(Hub* hub);
 
-        void setDisconnectionCallback(Hub* hub);
-
-        void setOnMessageCallBack(Hub* hub);
-
-        static void startWebSocket(UWSServerCommunicationStrategy* context);
-
-        void
-        setWebSocketCallbacksAndConnection(std::string serverAddress, Hub* hub,
-                                                   WebSocketPointerPromise* webSocketPointerPromise);
+        static void startWebSocket(UWSServerCommunicationStrategy* context,
+                                   WebSocketPointerPromise* webSocketPointerPromise);
 
         Hub hub;
 
         WebSocket* webSocket;
+
+        JoinableThread webSocketConnectionThread;
 
 //        WebSocketPointerPromise webSocketPointerPromise;
     };
