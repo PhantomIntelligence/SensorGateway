@@ -27,7 +27,7 @@ namespace SensorCommunication {
 
     class KvaserCanCommunicationStrategy final : public SensorCommunicationStrategy<AWLMessage> {
 
-        unsigned long const CANLIB_READ_WAIT_INFINITE_DELAY = std::numeric_limits<int>::infinity();
+        unsigned long const CANLIB_READ_WAIT_INFINITE_DELAY = -1;
         using super = SensorCommunicationStrategy<AWLMessage>;
         using super::DATA;
 

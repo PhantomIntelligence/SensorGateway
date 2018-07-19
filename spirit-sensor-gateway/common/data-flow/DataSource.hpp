@@ -31,10 +31,10 @@ namespace DataFlow {
 
         void linkConsumer(ConsumerLink<T>* consumer) {
             if (std::is_same<T, AWLMessage>::value){
-                std::cout << 7 << std::endl;
+                std::cout << "Instantiating SensorLinkConsumer" << std::endl;
             }
             else{
-                std::cout << 6 << std::endl;
+                std::cout << "Instantiating TranslatorLinkConsumer" << std::endl;
             }
             consumer->linkWith(&outputBuffer);
         }

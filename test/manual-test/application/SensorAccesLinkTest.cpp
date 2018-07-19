@@ -42,7 +42,6 @@ public:
 
     void sendMessage(DataFlow::Frame&& message) override {
         if(numberOfReceivedFrames.load() < MAXIMUM_NUMBER_OF_FRAMES_NEEDED_FOR_TEST){
-            std::cout << "Frame received" << std::endl;
             receivedFrames.push_back(message);
         }
         numberOfReceivedFrames++;
@@ -71,11 +70,8 @@ int main(){
 
     sensorAccessLink.connect();
     std::this_thread::sleep_for(std::chrono::milliseconds(10000));
-    std::cout<< "About to disconnect"<<std::endl;
+    std::cout<< "Ready to disconnect"<<std::endl;
     sensorAccessLink.disconnect();
-
-    std::cout << "After Disconnection"<< std::endl;
-    std::cout << "Number of frames received : "<< serverCommunicationStrategy.getReceivedFrames().size() << std::endl;
     fileManager.writeFileWithMessages(serverCommunicationStrategy.getReceivedFrames(), "SensorAccessLinkOutputFrames.txt");
 
     return 0;

@@ -37,7 +37,7 @@ namespace SensorAccessLinkElement {
                 terminateOrderReceived(false),
                 sensorCommunicationStrategy(sensorCommunicationStrategy),
                 communicatorThread(JoinableThread(doNothing)) {
-            std::cout<<3<<std::endl;
+            std::cout<<"Instantiating SensorCommunicator"<<std::endl;
             communicatorThread.exitSafely();
         }
 
@@ -53,13 +53,13 @@ namespace SensorAccessLinkElement {
         SensorCommunicator& operator=(SensorCommunicator&& other)& noexcept = delete;
 
         void connect() {
-            std::cout <<9<<std::endl;
+            std::cout << "Connecting SensorCommunicator" << std::endl;
             sensorCommunicationStrategy->openConnection();
             communicatorThread = JoinableThread(&SensorCommunicator::run, this);
         };
 
         void disconnect() {
-            std::cout<<10<<std::endl;
+            std::cout << "Disconnecting SensorCommunicator" << std::endl;
             sensorCommunicationStrategy->closeConnection();
 
             if (!terminateOrderHasBeenReceived()) {
