@@ -15,8 +15,8 @@
 
 */
 
-#ifndef SPIRITSENSORGATEWAY_SENSORCOMMUNICATORTEST_CPP
-#define SPIRITSENSORGATEWAY_SENSORCOMMUNICATORTEST_CPP
+#ifndef SPIRITSERVERGATEWAY_SENSORACCESSLINKTEST_CPP
+#define SPIRITSERVERGATEWAY_SENSORACCESSLINKTEST_CPP
 
 #include <gtest/gtest.h>
 #include <list>
@@ -42,6 +42,7 @@ protected:
 using SimpleSensorCommunicationStrategy = SensorCommunication::SensorCommunicationStrategy<SimpleData>;
 
 namespace SensorAccessLinkTestMock {
+
     class MockSensorCommunicationStrategy final : public SimpleSensorCommunicationStrategy {
 
     protected:
@@ -52,7 +53,7 @@ namespace SensorAccessLinkTestMock {
     public:
 
         explicit MockSensorCommunicationStrategy(uint8_t minimumNumberOfMessageToCreate) :
-                promiseFulfilled(false),
+                promiseAlreadyFulfilled(false),
                 numberOfMessageCreated(0),
                 minimumNumberOfMessageToCreate(minimumNumberOfMessageToCreate) {
         }
@@ -62,26 +63,26 @@ namespace SensorAccessLinkTestMock {
         void closeConnection() override {}
 
         DATA readMessage() override {
-            DATA createdData = DataTestUtil::createRandomSimpleData();
-            auto copy = DATA(createdData);
+            DATA data = DataTestUtil::createRandomSimpleData();
+            auto copy = DATA(data);
             createdDataCopies.push_back(copy);
 
             ++numberOfMessageCreated;
-            if (hasCreatedMinimumNumberOfData() && !promiseFulfilled.load()) {
-                promiseFulfilled.store(true);
-                minimumNumberOfMessageCreated.set_value(true);
+            if (hasCreatedMinimumNumberOfData() && !promiseAlreadyFulfilled.load()) {
+                promiseAlreadyFulfilled.store(true);
+                requiredNumberOfMessageCreated.set_value(true);
             }
 
             // WARNING! This mock implementation of readMessage needs to be slowed down because the way gtest works. DO NOT REMOVE.
-            std::this_thread::sleep_for(std::chrono::milliseconds(5));
+            std::this_thread::sleep_for(std::chrono::milliseconds(2));
             std::this_thread::yield();
 
-            return createdData;
+            return data;
         }
 
-        void waitUntilReadMessageHasBeenCalledEnough() {
+        void waitUntilReadMessageHasBeenCalledMinimumNumberOfTimes() {
             if (!hasCreatedMinimumNumberOfData()) {
-                minimumNumberOfMessageCreated.get_future().wait();
+                requiredNumberOfMessageCreated.get_future().wait();
             }
         }
 
@@ -99,9 +100,9 @@ namespace SensorAccessLinkTestMock {
         AtomicCounter numberOfMessageCreated;
         AtomicCounter minimumNumberOfMessageToCreate;
 
-        AtomicFlag promiseFulfilled;
+        AtomicFlag promiseAlreadyFulfilled;
         Mutex numberOfMessageCreatedVerificationMutex;
-        mutable BooleanPromise minimumNumberOfMessageCreated;
+        mutable BooleanPromise requiredNumberOfMessageCreated;
 
         DataList createdDataCopies;
     };
@@ -165,7 +166,7 @@ TEST_F(SensorAccessLinkTest,
 
     sensorAccessLink.start();
 
-    mockSensorCommunicationStrategy.waitUntilReadMessageHasBeenCalledEnough();
+    mockSensorCommunicationStrategy.waitUntilReadMessageHasBeenCalledMinimumNumberOfTimes();
 
     sensorAccessLink.terminateAndJoin();
 
@@ -190,7 +191,7 @@ TEST_F(SensorAccessLinkTest,
 
     sensorAccessLink.start();
 
-    mockSensorCommunicationStrategy.waitUntilReadMessageHasBeenCalledEnough();
+    mockSensorCommunicationStrategy.waitUntilReadMessageHasBeenCalledMinimumNumberOfTimes();
 
     sensorAccessLink.terminateAndJoin();
 
@@ -210,5 +211,4 @@ TEST_F(SensorAccessLinkTest,
     ASSERT_TRUE(dataHasPassedThroughCorrectly);
 }
 
-#endif //SPIRITSENSORGATEWAY_SENSORCOMMUNICATORTEST_CPP
-
+#endif //SPIRITSERVERGATEWAY_SENSORACCESSLINKTEST_CPP

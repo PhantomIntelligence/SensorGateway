@@ -17,6 +17,7 @@
 #ifndef SPIRITSENSORGATEWAY_UWSCONNECTIONTEST_CPP
 #define SPIRITSENSORGATEWAY_UWSCONNECTIONTEST_CPP
 
+#include "spirit-sensor-gateway/server-communication/JsonConverter.h"
 #include "spirit-sensor-gateway/server-communication/UWSServerCommunicationStrategy.h"
 #include "test/utilities/data-model/DataModelFixture.h"
 #include "test/utilities/stub/SpiritFramesStub.h"
@@ -166,45 +167,42 @@ namespace ManualTest {
     using WebSocket = uWS::WebSocket<uWS::CLIENT>;
     using WebSocketPointerPromise = std::promise<WebSocket*>;
 
-    void connectAndStartWebSocket(uWS::Hub* hub, WebSocketPointerPromise* webSocketPointerPromise) {
+    void connectAndStartWebSocket(uWS::Hub* hub) {
+        hub->run();
+    }
+
+    int testMessageSending() {
+        uWS::Hub hub;
+        WebSocketPointerPromise webSocketPointerPromise;
+
         int length = 0;
-        hub->onConnection([&webSocketPointerPromise, &length](WebSocket* ws, uWS::HttpRequest req) {
+        hub.onConnection([&webSocketPointerPromise](WebSocket* ws, uWS::HttpRequest req) {
             std::cout << "Connected!" << std::endl;
-            webSocketPointerPromise->set_value(ws);
+            webSocketPointerPromise.set_value(ws);
         });
 
-        hub->onMessage([](WebSocket* ws, char* message, size_t length, uWS::OpCode opCode) {
+        hub.onMessage([](WebSocket* ws, char* message, size_t length, uWS::OpCode opCode) {
             std::cout << std::string(message, length) << std::endl;
             ws->send(message, length, opCode);
         });
 
-
-        hub->onDisconnection([&hub](WebSocket* ws, int code, char* message, size_t length) {
+        hub.onDisconnection([&hub](WebSocket* ws, int code, char* message, size_t length) {
             std::cout << "Client got disconnected with data: " << ws->getUserData() << ", code: " << code
                       << ", message: <" << std::string(message, length) << ">" << std::endl;
-            hub->getDefaultGroup<uWS::CLIENT>().close();
+            hub.getDefaultGroup<uWS::CLIENT>().close();
         });
 
-        hub->onError([](void* user) {
+        hub.onError([](void* user) {
             long receivedCode = (long) user;
             std::vector<long> handledCodes = {};
             handleOtherErrors(handledCodes, receivedCode, coutMessageAndCrash, "An error has occured!");
         });
 
 
-        auto const VALID_ADDRESS_WS = "ws://localhost:8080/setWebSocketCallbacksAndConnection-gateway";
-        hub->connect(VALID_ADDRESS_WS);
+        auto const VALID_ADDRESS_WS = "ws://localhost:8080/connect-gateway";
+        hub.connect(VALID_ADDRESS_WS);
 
-        hub->run();
-    }
-
-    int testMessageSending() {
-        uWS::Hub hub;
-
-
-        WebSocketPointerPromise webSocketPointerPromise;
-
-        auto webSocketConnectionThread = JoinableThread(&connectAndStartWebSocket, &hub, &webSocketPointerPromise);
+        auto webSocketConnectionThread = JoinableThread(&connectAndStartWebSocket, &hub);
         auto futureWebSocket = webSocketPointerPromise.get_future();
         futureWebSocket.wait();
         auto webSocket = futureWebSocket.get();
@@ -216,8 +214,10 @@ namespace ManualTest {
         for (int i = 0; i < numberOfSentMessages; ++i) {
             simpleData = DataTestUtil::createRandomSimpleData();
             textToSend = simpleData.toString();
-            std::cout << "sending : " << textToSend << std::endl;
-            webSocket->send(textToSend.c_str(), textToSend.size(), uWS::OpCode::TEXT);
+            auto frame = Stub::createArbitrarySpiritFrame();
+            textToSend = ServerCommunication::JsonConverter::convertFrameToJsonString(frame);
+//            std::cout << "sending : " << textToSend << std::endl;
+            webSocket->send(textToSend.c_str(), textToSend.size(), uWS::OpCode::BINARY);
         }
 
         webSocket->close();
@@ -229,11 +229,12 @@ namespace ManualTest {
     void testConnectionWithConcreteStrategy() {
         UWSServerCommunicationStrategy uwsServerCommunicationStrategy;
         uwsServerCommunicationStrategy.openConnection();
-        auto frame = createArbitrarySpiritFrame();
-        uwsServerCommunicationStrategy.sendMessage(std::move(frame));
+        for(auto i = 1; i < 100; ++i){
+            auto frame = createArbitrarySpiritFrame();
+            uwsServerCommunicationStrategy.sendMessage(std::move(frame));
+        }
 
     }
-
 
 }
 

@@ -51,7 +51,7 @@ namespace DataModel {
 
         bool isTheInverseOf(SimpleData const& other) const;
 
-        std::string toString() const;
+        std::string toString() const noexcept;
 
         SimpleData static const returnDefaultData() noexcept;
 
@@ -69,7 +69,7 @@ namespace Defaults {
     const std::string DEFAULT_SIMPLE_DATA_CONTENT_TEXT_ONE = "Help me someone please!!! I'm stuck inside this computer!";
     const std::string DEFAULT_SIMPLE_DATA_CONTENT_TEXT_TWO = "Please! It's dark and I'm scared...";
     const SimpleDataContent DEFAULT_SIMPLE_DATA_CONTENT = SimpleDataContent({DEFAULT_SIMPLE_DATA_CONTENT_TEXT_ONE,
-                                                                            DEFAULT_SIMPLE_DATA_CONTENT_TEXT_TWO});
+                                                                             DEFAULT_SIMPLE_DATA_CONTENT_TEXT_TWO});
     const SimpleData DEFAULT_SIMPLE_DATA = SimpleData(DEFAULT_SIMPLE_DATA_CONTENT);
 }
 
