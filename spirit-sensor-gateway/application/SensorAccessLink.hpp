@@ -71,7 +71,7 @@ namespace SpiritSensorGateway {
             sensorCommunicator.terminateAndJoin();
             translatorScheduler.terminateAndJoin();
             serverCommunicatorScheduler.terminateAndJoin();
-
+            serverCommunicator.disconnect();
         }
 
     private:
