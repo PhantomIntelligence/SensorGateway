@@ -18,7 +18,6 @@
 #ifndef SPIRITSENSORGATEWAY_ABSTRACTPOINTERARRAY_HPP
 #define SPIRITSENSORGATEWAY_ABSTRACTPOINTERARRAY_HPP
 
-#include <algorithm>
 #include "spirit-sensor-gateway/common/ConstantFunctionsDefinition.h"
 
 namespace Container {
