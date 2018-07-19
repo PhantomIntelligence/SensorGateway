@@ -25,12 +25,8 @@ void UWSServerCommunicationStrategy::closeConnection() {
 }
 
 void UWSServerCommunicationStrategy::sendMessage(MESSAGE&& message) {
-    std::cout << "MessageWillSend" << std::endl;
     auto convertedMessage = JsonConverter::convertFrameToJsonString(std::forward<MESSAGE>(message));
-    std::cout << "MessageStagedToBeSent" << std::endl;
     webSocket->send(convertedMessage.c_str(), convertedMessage.size(), uWS::OpCode::BINARY);
-    std::cout << "MessageSent" << std::endl;
-
 }
 
 void UWSServerCommunicationStrategy::startWebSocket(UWSServerCommunicationStrategy* context,

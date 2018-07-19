@@ -15,29 +15,45 @@
 #define SPIRITSENSORGATEWAY_UWSSERVERCOMMUNICATORTEST_CPP
 
 #include <gtest/gtest.h>
-#include "test/utilities/stub/WebSocketServerStub.h"
-#include "test/utilities/stub/SpiritFramesStub.h"
 #include "spirit-sensor-gateway/server-communication/UWSServerCommunicationStrategy.h"
+#include "test/utilities/stub/SpiritFramesStub.h"
+#include "test/utilities/stub/WebSocketServerStub.h"
 
 using ServerCommunication::UWSServerCommunicationStrategy;
+using ServerCommunication::JsonConverter;
 using Stub::WebSocketServerStub;
+using Stub::createRandomIDFrame;
+using DataFlow::Frame;
 
 
-class UWSServerCommunicatorTest: public ::testing::Test {
+class UWSServerCommunicatorTest : public ::testing::Test {
 protected:
-    char const* AWLMESSAGES_INPUT_FILE_NAME = "AWLMessagesInputFile.txt";
-    char const* EXPECTED_SPIRIT_FRAMES_OUTPUT_FILE_NAME = "ExpectedSpiritFramesOutputFile.txt";
+    std::string const SERVER_ACTUAL_MESSAGE_LOGFILE = "ActualWebSocketServerMessageFile.txt";
+    std::string const SERVER_EXPECTED_MESSAGE_LOGFILE = "ExpectedWebSocketServerMessageFile.txt";
+    std::FILE* expectedLogFile;
 };
 
 TEST_F(UWSServerCommunicatorTest,
        given_someIncomingFrames_when_sendingMessages_then_messagesAreCorrectlyReceivedByTheWebSocketServer) {
 
-    WebSocketServerStub webSocketServerStub;
+    expectedLogFile = std::fopen(SERVER_EXPECTED_MESSAGE_LOGFILE.c_str(), "w");
+    WebSocketServerStub webSocketServerStub(SERVER_ACTUAL_MESSAGE_LOGFILE);
     UWSServerCommunicationStrategy uwsServerCommunicationStrategy;
+    webSocketServerStub.run();
     uwsServerCommunicationStrategy.openConnection(webSocketServerStub.getAddress());
 
+    for (auto i = 0; i < 10; i++) {
+        auto frame = createRandomIDFrame();
+        auto frameCopy = Frame(frame);
+        auto expectedFormattedFrame = JsonConverter::convertFrameToJsonString(frameCopy);
+        std::fprintf(expectedLogFile, "%s", expectedFormattedFrame.c_str());
+        uwsServerCommunicationStrategy.sendMessage(std::move(frame));
+    }
 
+    std::cout<<"Done"<<std::endl;
 
+    fflush(expectedLogFile);
+    fclose(expectedLogFile);
 
 }
 

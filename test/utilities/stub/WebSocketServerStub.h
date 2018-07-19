@@ -13,6 +13,7 @@
 #ifndef SPIRITSENSORGATEWAY_WEBSOCKETSERVERSTUB_H
 #define SPIRITSENSORGATEWAY_WEBSOCKETSERVERSTUB_H
 
+#include "spirit-sensor-gateway/common/ConstantFunctionsDefinition.h"
 
 namespace Stub {
 
@@ -20,17 +21,21 @@ namespace Stub {
 
     public:
 
-        WebSocketServerStub();
+        WebSocketServerStub(std::string const& logFileName);
 
         ~WebSocketServerStub() noexcept;
 
         std::string const& getAddress();
 
+        void run();
+
     private:
 
-        static void startServerStub();
+        static void startServerStub(std::FILE* logFile);
 
+        JoinableThread webSocketServerStubThread;
 
+        std::FILE* logFile;
     };
 }
 
