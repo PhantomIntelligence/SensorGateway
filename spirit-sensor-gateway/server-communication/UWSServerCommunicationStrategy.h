@@ -24,6 +24,24 @@ namespace ServerCommunication {
     using WebSocket = uWS::WebSocket<uWS::CLIENT>;
     using WebSocketPointerPromise = std::promise<WebSocket*>;
 
+    namespace CLOSE_CODE {
+        int const NORMAL_CLOSURE = 1000;
+        int const GOING_AWAY = 1001;
+        int const PROTOCOL_ERROR = 1002;
+        int const UNSUPPORTED_DATA = 1003;
+        int const NO_STATUS_RECEIVED = 1005;
+        int const ABNORMAL_CLOSURE = 1006;
+        int const INVALID_FRAME_PAYLOAD_DATA = 1007;
+        int const POLICY_VIOLATION = 1008;
+        int const MESSAGE_TOO_BIG = 1009;
+        int const MISSING_EXTENSION = 1010;
+        int const INTERNAL_ERROR = 1011;
+        int const SERVICE_RESTART = 1012;
+        int const TRY_AGAIN_LATER = 1013;
+        int const BAD_GATEWAY = 1014;
+        int const TLS_HANDSHAKE = 1015;
+    }
+
 
     class UWSServerCommunicationStrategy : public ServerCommunicationStrategy<DataFlow::Frame> {
 
@@ -31,6 +49,8 @@ namespace ServerCommunication {
         using super = ServerCommunicationStrategy<DataFlow::Frame>;
 
         using super::MESSAGE;
+
+        std::string const CLOSE_MESSAGE = "Closing connection for client";
 
     public:
 
@@ -51,7 +71,6 @@ namespace ServerCommunication {
         void closeConnection() override;
 
         void sendMessage(MESSAGE&& message) override;
-
 
     private:
 

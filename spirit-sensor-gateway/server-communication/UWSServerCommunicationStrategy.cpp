@@ -21,7 +21,9 @@ void UWSServerCommunicationStrategy::openConnection(std::string const& serverAdd
 }
 
 void UWSServerCommunicationStrategy::closeConnection() {
-
+    webSocket->close(CLOSE_CODE, CLOSE_MESSAGE.c_str(), CLOSE_MESSAGE.size());
+//    hub.getDefaultGroup<uWS::CLIENT>().close();
+    webSocketConnectionThread.join();
 }
 
 void UWSServerCommunicationStrategy::sendMessage(MESSAGE&& message) {

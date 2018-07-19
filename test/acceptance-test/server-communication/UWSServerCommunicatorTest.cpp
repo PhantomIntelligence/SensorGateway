@@ -50,7 +50,7 @@ TEST_F(UWSServerCommunicatorTest,
         uwsServerCommunicationStrategy.sendMessage(std::move(frame));
     }
 
-    std::cout<<"Done"<<std::endl;
+    uwsServerCommunicationStrategy.closeConnection();
 
     fflush(expectedLogFile);
     fclose(expectedLogFile);
