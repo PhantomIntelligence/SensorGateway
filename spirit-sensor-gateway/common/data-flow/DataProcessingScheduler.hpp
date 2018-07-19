@@ -25,7 +25,7 @@ namespace DataFlow {
     class DataProcessingScheduler : public ConsumerLink<T> {
 
         typedef RingBuffer<T> InputBuffer;
-        typedef Container::ConstantSizedPointerList<InputBuffer , NUMBER_OF_CONCURRENT_INPUTS> InputBuffers;
+        typedef Container::ConstantSizedPointerList<InputBuffer, NUMBER_OF_CONCURRENT_INPUTS> InputBuffers;
 
     public:
 
@@ -72,7 +72,8 @@ namespace DataFlow {
 
         void activateFor(InputBuffer* inputBuffer) override {
             LockGuard guard(inputBufferStatusMutex);
-            throwExceptionIfInputBufferIsNotLinked(inputBuffer, ExceptionMessage::DATA_PROCESSING_SCHEDULER_ILLEGAL_ACTIVATION_MESSAGE);
+            throwExceptionIfInputBufferIsNotLinked(inputBuffer,
+                                                   ExceptionMessage::DATA_PROCESSING_SCHEDULER_ILLEGAL_ACTIVATION_MESSAGE);
             if (notReadyToConsumeInputBuffers.contains(inputBuffer)) {
                 notReadyToConsumeInputBuffers.remove(inputBuffer);
                 readyToConsumeInputBuffers.store(inputBuffer);
@@ -81,7 +82,8 @@ namespace DataFlow {
 
         void deactivateFor(InputBuffer* inputBuffer) override {
             LockGuard guard(inputBufferStatusMutex);
-            throwExceptionIfInputBufferIsNotLinked(inputBuffer, ExceptionMessage::DATA_PROCESSING_SCHEDULER_ILLEGAL_DEACTIVATION_MESSAGE);
+            throwExceptionIfInputBufferIsNotLinked(inputBuffer,
+                                                   ExceptionMessage::DATA_PROCESSING_SCHEDULER_ILLEGAL_DEACTIVATION_MESSAGE);
             if (readyToConsumeInputBuffers.contains(inputBuffer)) {
                 readyToConsumeInputBuffers.remove(inputBuffer);
                 notReadyToConsumeInputBuffers.store(inputBuffer);
@@ -123,7 +125,8 @@ namespace DataFlow {
         }
 
         bool isInputBufferLinked(InputBuffer* inputBuffer) const noexcept {
-            return notReadyToConsumeInputBuffers.contains(inputBuffer) || readyToConsumeInputBuffers.contains(inputBuffer);
+            return notReadyToConsumeInputBuffers.contains(inputBuffer) ||
+                   readyToConsumeInputBuffers.contains(inputBuffer);
         }
 
 
@@ -136,7 +139,8 @@ namespace DataFlow {
 
         void throwExceptionIfMaximumOfLinkedBufferReached() const {
             if (numberOfLinkedBuffers.load() == NUMBER_OF_CONCURRENT_INPUTS) {
-                throwIllegalActionException(ExceptionMessage::DATA_PROCESSING_SCHEDULER_ILLEGAL_NUMBER_OF_INPUT_BUFFER_MESSAGE);
+                throwIllegalActionException(
+                        ExceptionMessage::DATA_PROCESSING_SCHEDULER_ILLEGAL_NUMBER_OF_INPUT_BUFFER_MESSAGE);
             }
         }
 

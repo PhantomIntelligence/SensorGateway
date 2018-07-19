@@ -15,6 +15,29 @@
 
 */
 
+#ifndef SPIRITSENSORGATEWAY_APPLICATION_CPP
+#define SPIRITSENSORGATEWAY_APPLICATION_CPP
+
+#include "spirit-sensor-gateway/application/SensorAccessLink.hpp"
+#include "spirit-sensor-gateway/sensor-communication/KvaserCanCommunicationStrategy.h"
+#include "spirit-sensor-gateway/message-translation/AWLMessageToSpiritMessageTranslationStrategy.h"
+#include "spirit-sensor-gateway/server-communication/UWSServerCommunicationStrategy.h"
+
 int main() {
+    using SensorCommunicationStrategy = SensorCommunication::KvaserCanCommunicationStrategy;
+    using MessageTranslationStrategy = MessageTranslation::AWLMessageToSpiritMessageTranslationStrategy;
+    using ServerCommunicationStrategy = ServerCommunication::UWSServerCommunicationStrategy;
+
+    using SensorMessageType = DataFlow::AWLMessage;
+    using SpiritMessageType = DataFlow::Frame;
+    using SensorAccessLink = SpiritSensorGateway::SensorAccessLink<SensorMessageType, SpiritMessageType>;
+
+    SensorCommunicationStrategy sensorCommunicationStrategy;
+    MessageTranslationStrategy messageTranslationStrategy;
+    ServerCommunicationStrategy serverCommunicationStrategy;
+    SensorAccessLink sensorAccessLink(&sensorCommunicationStrategy, &messageTranslationStrategy, &serverCommunicationStrategy);
+
     return 0;
 }
+
+#endif // SPIRITSENSORGATEWAY_APPLICATION_CPP
