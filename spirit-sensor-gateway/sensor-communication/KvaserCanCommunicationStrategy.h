@@ -27,7 +27,7 @@ namespace SensorCommunication {
 
     class KvaserCanCommunicationStrategy final : public SensorCommunicationStrategy<AWLMessage> {
 
-        unsigned long const CANLIB_READ_WAIT_INFINITE_DELAY = -1;
+        unsigned long const CANLIB_READ_WAIT_INFINITE_DELAY = -1; // WARNING !!! --> NEVER change -1 with infinity because the code CRASH
         using super = SensorCommunicationStrategy<AWLMessage>;
         using super::DATA;
 
