@@ -53,7 +53,7 @@ bool SimpleData::operator==(SimpleData const& other) const {
 }
 
 bool SimpleData::operator!=(SimpleData const& other) const {
-    return !(operator==(other));
+    return !operator==(other);
 }
 
 const SimpleData SimpleData::returnDefaultData() noexcept {

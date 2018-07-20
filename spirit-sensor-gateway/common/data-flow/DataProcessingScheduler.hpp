@@ -18,7 +18,6 @@
 #define SPIRITSENSORGATEWAY_DATAPROCESSINGSCHEDULER_HPP
 
 #include "DataSink.hpp"
-#include "spirit-sensor-gateway/domain/AWLMessage.h"
 
 
 namespace DataFlow {
@@ -36,12 +35,6 @@ namespace DataFlow {
                 numberOfLinkedBuffers(0),
                 dataSink(dataSink),
                 schedulerThread(JoinableThread(doNothing)) {
-            if (std::is_same<T, AWLMessage>::value){
-                std::cout << "Instantiating SensorScheduler" << std::endl;
-            }
-            else{
-                std::cout << "Instantiating TranslatorScheduler" << std::endl;
-            }
             schedulerThread.exitSafely();
             schedulerThread = JoinableThread(&DataProcessingScheduler::start, this);
         }
@@ -97,12 +90,6 @@ namespace DataFlow {
         }
 
         void terminateAndJoin() {
-            if (std::is_same<T, AWLMessage>::value){
-                std::cout << "Terminating SensorScheduler" << std::endl;
-            }
-            else{
-                std::cout << "Terminating TranslatorScheduler" << std::endl;
-            }
             if (!terminateOrderHasBeenReceived()) {
                 terminateOrderReceived.store(true);
             }

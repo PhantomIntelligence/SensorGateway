@@ -27,8 +27,7 @@ namespace SensorAccessLinkElement {
 
     public:
         explicit MessageTranslator(MessageTranslation::MessageTranslationStrategy<INPUT, OUTPUT>* messageTranslationStrategy) :
-                messageTranslationStrategy(messageTranslationStrategy) {
-            std::cout<<"Instantiating MessageTranslator"<<std::endl;};
+                messageTranslationStrategy(messageTranslationStrategy) {};
 
         ~MessageTranslator() noexcept {};
 

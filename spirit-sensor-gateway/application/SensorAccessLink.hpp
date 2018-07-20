@@ -17,10 +17,7 @@
 #ifndef SPIRITSENSORGATEWAY_SENSORACCESSLINK_H
 #define SPIRITSENSORGATEWAY_SENSORACCESSLINK_H
 
-#include "spirit-sensor-gateway/sensor-communication/SensorCommunicator.hpp"
-#include "spirit-sensor-gateway/message-translation/MessageTranslator.hpp"
 #include "spirit-sensor-gateway/server-communication/ServerCommunicator.hpp"
-
 
 namespace SpiritSensorGateway {
 
@@ -54,7 +51,9 @@ namespace SpiritSensorGateway {
             sensorCommunicator.linkConsumer(&translatorScheduler);
         }
 
-        ~SensorAccessLink() noexcept {};
+        ~SensorAccessLink() noexcept {
+            disconnect();
+        };
 
         SensorAccessLink(SensorAccessLink const& other) = delete;
 

@@ -46,8 +46,7 @@ void AWLMessageToSpiritMessageTranslationStrategy::translateMessage(AWLMessage&&
             translateDetectionVelocityMessage(std::forward<INPUT>(inputMessage));
             break;
         default:
-            break;
-            //throw UnknownMessageException(std::forward<INPUT>(inputMessage));
+            throw UnknownMessageException(std::forward<INPUT>(inputMessage));
     }
 }
 

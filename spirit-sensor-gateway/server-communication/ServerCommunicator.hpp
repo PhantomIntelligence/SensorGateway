@@ -32,10 +32,9 @@ namespace SensorAccessLinkElement {
 
         explicit ServerCommunicator(ServerCommunicationStrategy* serverCommunicationStrategy) :
                 serverCommunicationStrategy(serverCommunicationStrategy) {
-            std::cout<<"Instantiating ServerCommunicator"<<std::endl;
         };
 
-        ~ServerCommunicator() noexcept {};
+        ~ServerCommunicator() noexcept = default;
 
         ServerCommunicator(ServerCommunicator const& other) = delete;
 
@@ -46,12 +45,10 @@ namespace SensorAccessLinkElement {
         ServerCommunicator& operator=(ServerCommunicator&& other)& noexcept = delete;
 
         void connect() {
-            std::cout << "Connecting ServerCommunicator" << std::endl;
             serverCommunicationStrategy->openConnection();
         };
 
         void disconnect() {
-            std::cout << "Disconnecting ServerCommunicator" << std::endl;
             serverCommunicationStrategy->closeConnection();
         }
 
