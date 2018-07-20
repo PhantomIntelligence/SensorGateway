@@ -21,11 +21,11 @@
 
 namespace DataModel {
 
-    // Allows to populate SimpleData with a "complex", non-primitive, element
-    typedef std::array<std::string, 2> SimpleDataContent;
+    int const NUMBER_OF_SIMPLE_DATA_CONTENT = 2;
+
+    typedef std::array<std::string, NUMBER_OF_SIMPLE_DATA_CONTENT> SimpleDataContent;
 
     class SimpleData {
-    protected:
 
     public:
 
@@ -47,13 +47,10 @@ namespace DataModel {
 
         bool operator!=(SimpleData const& other) const;
 
-        void inverseContent();
-
-        bool isTheInverseOf(SimpleData const& other) const;
-
         std::string toString() const noexcept;
 
         SimpleData static const returnDefaultData() noexcept;
+
 
     private:
 
@@ -66,11 +63,11 @@ namespace Defaults {
     using DataModel::SimpleData;
     using DataModel::SimpleDataContent;
 
-    const std::string DEFAULT_SIMPLE_DATA_CONTENT_TEXT_ONE = "Help me someone please!!! I'm stuck inside this computer!";
-    const std::string DEFAULT_SIMPLE_DATA_CONTENT_TEXT_TWO = "Please! It's dark and I'm scared...";
-    const SimpleDataContent DEFAULT_SIMPLE_DATA_CONTENT = SimpleDataContent({DEFAULT_SIMPLE_DATA_CONTENT_TEXT_ONE,
-                                                                             DEFAULT_SIMPLE_DATA_CONTENT_TEXT_TWO});
-    const SimpleData DEFAULT_SIMPLE_DATA = SimpleData(DEFAULT_SIMPLE_DATA_CONTENT);
+    std::string const DEFAULT_FIRST_SIMPLE_DATA_CONTENT = "Some first simple data content";
+    std::string const DEFAULT_SECOND_SIMPLE_DATA_CONTENT = "Some second simple data content.";
+    SimpleDataContent const DEFAULT_SIMPLE_DATA_CONTENT = SimpleDataContent({DEFAULT_FIRST_SIMPLE_DATA_CONTENT,
+                                                                             DEFAULT_SECOND_SIMPLE_DATA_CONTENT});
+    SimpleData const DEFAULT_SIMPLE_DATA = SimpleData(DEFAULT_SIMPLE_DATA_CONTENT);
 }
 
 #endif //SPIRITSENSORGATEWAY_SIMPLEDATA_H

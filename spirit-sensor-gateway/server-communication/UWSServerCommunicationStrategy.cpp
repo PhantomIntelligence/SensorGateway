@@ -21,7 +21,7 @@ void UWSServerCommunicationStrategy::openConnection(std::string const& serverAdd
 }
 
 void UWSServerCommunicationStrategy::closeConnection() {
-    webSocket->close(CLOSE_CODE, CLOSE_MESSAGE.c_str(), CLOSE_MESSAGE.size());
+    webSocket->close(CLOSE_CODE::NORMAL_CLOSURE, CLOSE_MESSAGE.c_str(), CLOSE_MESSAGE.size());
 //    hub.getDefaultGroup<uWS::CLIENT>().close();
     webSocketConnectionThread.join();
 }
@@ -49,7 +49,6 @@ void UWSServerCommunicationStrategy::startWebSocket(UWSServerCommunicationStrate
     hub->onDisconnection([&hub](WebSocket* ws, int code, char* message, size_t length) {
         std::cout << "Client got disconnected with data: " << ws->getUserData() << ", code: " << code
                   << ", message: <" << std::string(message, length) << ">" << std::endl;
-        hub->getDefaultGroup<uWS::CLIENT>().close();
     });
 
     hub->onError([](void* user) {

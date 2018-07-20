@@ -42,7 +42,6 @@ namespace ServerCommunication {
         int const TLS_HANDSHAKE = 1015;
     }
 
-
     class UWSServerCommunicationStrategy : public ServerCommunicationStrategy<DataFlow::Frame> {
 
     protected:
@@ -76,8 +75,8 @@ namespace ServerCommunication {
 
 
         static void startWebSocket(UWSServerCommunicationStrategy* context,
-                                           WebSocketPointerPromise* webSocketPointerPromise,
-                                           std::string const& serverAddress);
+                                   WebSocketPointerPromise* webSocketPointerPromise,
+                                   std::string const& serverAddress);
 
         Hub hub;
 

@@ -16,18 +16,18 @@
 
 
 #include <atomic>
-#include <algorithm>
 #include <future>
 #include <mutex>
 #include <random>
 #include <functional>
-
+#include <algorithm>
+#include <list>
 #include <array>
-#include <iostream>
 #include <unordered_map>
 #include <exception>
 #include <cstring>
 #include <limits>
+#include <iostream>
 
 #include "hicpp/HighIntegrityThread.h"
 #include "ExceptionMessages.h"
@@ -44,7 +44,7 @@ namespace {
     typedef HighIntegrity::HighIntegrityThread<HighIntegrity::ThreadExecutionType::JOIN> JoinableThread;
 };
 
-namespace  DataFlow {
+namespace DataFlow {
     typedef int16_t Acceleration;
     typedef uint8_t ConfidenceLevel;
     typedef uint16_t Distance;

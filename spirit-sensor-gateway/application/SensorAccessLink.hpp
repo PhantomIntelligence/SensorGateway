@@ -1,12 +1,12 @@
 /**
 	Copyright 2014-2018 Phantom Intelligence Inc.
-	
+
 	Licensed under the Apache License, Version 2.0 (the "License");
 	you may not use this file except in compliance with the License.
 	You may obtain a copy of the License at
-	
+
 		http://www.apache.org/licenses/LICENSE-2.0
-	
+
 	Unless required by applicable law or agreed to in writing, software
 	distributed under the License is distributed on an "AS IS" BASIS,
 	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -39,21 +39,20 @@ namespace SpiritSensorGateway {
         using ServerCommunicatorScheduler = DataFlow::DataProcessingScheduler<OUTPUT, ServerCommunicator, 1>;
 
     public:
-        //TODO change constructor to receive serverCommunicationStrategy instead
-        explicit SensorAccessLink(SensorCommunicationStrategy* sensorCommunicationStrategy,
+        explicit SensorAccessLink(ServerCommunicationStrategy* serverCommunicationStrategy,
                                   MessageTranslationStrategy* messageTranslationStrategy,
-                                  ServerCommunicationStrategy* serverCommunicationStrategy) :
-                sensorCommunicator(sensorCommunicationStrategy),
-                messageTranslator(messageTranslationStrategy),
-                translatorScheduler(&messageTranslator),
+                                  SensorCommunicationStrategy* sensorCommunicationStrategy) :
                 serverCommunicator(serverCommunicationStrategy),
+                messageTranslator(messageTranslationStrategy),
+                sensorCommunicator(sensorCommunicationStrategy),
+                translatorScheduler(&messageTranslator),
                 serverCommunicatorScheduler(&serverCommunicator) {
             messageTranslationStrategy->linkConsumer(&serverCommunicatorScheduler);
             sensorCommunicator.linkConsumer(&translatorScheduler);
         }
 
         ~SensorAccessLink() noexcept {
-            terminateAndJoin();
+            disconnect();
         };
 
         SensorAccessLink(SensorAccessLink const& other) = delete;
@@ -64,25 +63,26 @@ namespace SpiritSensorGateway {
 
         SensorAccessLink& operator=(SensorAccessLink&& other)& noexcept = delete;
 
-        void start() {
-            sensorCommunicator.start();
+        void connect(std::string const& serverAddress) {
+            serverCommunicator.connect(serverAddress);
+            sensorCommunicator.connect();
         };
 
-        void terminateAndJoin() {
-            sensorCommunicator.terminateAndJoin();
+        void disconnect() {
+            sensorCommunicator.disconnect();
             translatorScheduler.terminateAndJoin();
             serverCommunicatorScheduler.terminateAndJoin();
+            serverCommunicator.disconnect();
         }
 
     private:
 
+        ServerCommunicator serverCommunicator;
+        MessageTranslator messageTranslator;
         SensorCommunicator sensorCommunicator;
 
-        MessageTranslator messageTranslator;
-        TranslatorScheduler translatorScheduler;
-
-        ServerCommunicator serverCommunicator;
         ServerCommunicatorScheduler serverCommunicatorScheduler;
+        TranslatorScheduler translatorScheduler;
     };
 
 }

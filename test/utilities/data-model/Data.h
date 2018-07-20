@@ -86,7 +86,7 @@ namespace ExampleDataModel {
          * @return A handle to this instance.
          */
         Data& operator=(Data const& other)& {
-            Data temporary(std::move(other));
+            Data temporary(other);
             swap(*this, temporary);
             return *this;
         }

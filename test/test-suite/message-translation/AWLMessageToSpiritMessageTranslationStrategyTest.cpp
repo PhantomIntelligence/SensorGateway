@@ -27,6 +27,9 @@ using MessageTranslation::AWLMessageToSpiritMessageTranslationStrategy;
 using Mock::FrameProcessingScheduler;
 using Mock::FrameSinkMock;
 using DataFlow::PixelsArray;
+using DataFlow::PixelID;
+using DataFlow::Frame;
+using DataFlow::AWLMessage;
 
 
 
