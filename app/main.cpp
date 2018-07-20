@@ -41,6 +41,8 @@ int main() {
     sensorAccessLink.connect(SERVER_ADDRESS);
 
     std::this_thread::sleep_for(std::chrono::seconds(5));
+
+    sensorAccessLink.disconnect();
     
     return 0;
 }

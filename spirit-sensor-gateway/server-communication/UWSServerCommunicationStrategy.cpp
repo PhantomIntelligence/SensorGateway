@@ -22,13 +22,12 @@ void UWSServerCommunicationStrategy::openConnection(std::string const& serverAdd
 
 void UWSServerCommunicationStrategy::closeConnection() {
     webSocket->close(CLOSE_CODE::NORMAL_CLOSURE, CLOSE_MESSAGE.c_str(), CLOSE_MESSAGE.size());
-//    hub.getDefaultGroup<uWS::CLIENT>().close();
     webSocketConnectionThread.join();
 }
 
 void UWSServerCommunicationStrategy::sendMessage(MESSAGE&& message) {
     auto convertedMessage = JsonConverter::convertFrameToJsonString(std::forward<MESSAGE>(message));
-    webSocket->send(convertedMessage.c_str(), convertedMessage.size(), uWS::OpCode::BINARY);
+    webSocket->send(convertedMessage.c_str(), convertedMessage.size(), uWS::OpCode::TEXT);
 }
 
 void UWSServerCommunicationStrategy::startWebSocket(UWSServerCommunicationStrategy* context,
