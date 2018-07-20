@@ -37,13 +37,20 @@ int main() {
     SensorCommunicationStrategy sensorCommunicationStrategy;
     MessageTranslationStrategy messageTranslationStrategy;
     ServerCommunicationStrategy serverCommunicationStrategy;
-    SensorAccessLink sensorAccessLink(&serverCommunicationStrategy, &messageTranslationStrategy, &sensorCommunicationStrategy);
-    sensorAccessLink.connect(SERVER_ADDRESS);
 
-    std::this_thread::sleep_for(std::chrono::seconds(5));
+    try {
+        SensorAccessLink sensorAccessLink(&serverCommunicationStrategy, &messageTranslationStrategy,
+                                          &sensorCommunicationStrategy);
 
-    sensorAccessLink.disconnect();
-    
+        sensorAccessLink.connect(SERVER_ADDRESS);
+
+        std::this_thread::sleep_for(std::chrono::seconds(60));
+
+        sensorAccessLink.disconnect();
+    } catch (std::exception& e) {
+        std::cout << "e.what() : " << e.what() << std::endl;
+    }
+
     return 0;
 }
 

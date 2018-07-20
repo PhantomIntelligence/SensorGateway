@@ -36,7 +36,7 @@ public:
 
     ~ServerCommunicationStrategyMock() = default;
 
-    void openConnection() override {}
+    void openConnection(std::string const& serverAddress) override {}
 
     void closeConnection() override {}
 
@@ -61,6 +61,7 @@ private:
 
 
 int main(){
+    std::string const SERVER_ADDRESS = "ws://localhost:8080/connect-gateway";
     ServerCommunicationStrategyMock serverCommunicationStrategy;
     AWLMessageToSpiritMessageTranslationStrategy messageTranslationStrategy;
     KvaserCanCommunicationStrategy sensorCommunicationStrategy;
@@ -68,9 +69,8 @@ int main(){
 
     SpiritSensorGateway::SensorAccessLink<DataFlow::AWLMessage, DataFlow::Frame> sensorAccessLink(&serverCommunicationStrategy,&messageTranslationStrategy, &sensorCommunicationStrategy);
 
-    sensorAccessLink.connect();
+    sensorAccessLink.connect(SERVER_ADDRESS);
     std::this_thread::sleep_for(std::chrono::milliseconds(10000));
-    std::cout<< "Ready to disconnect"<<std::endl;
     sensorAccessLink.disconnect();
     fileManager.writeFileWithMessages(serverCommunicationStrategy.getReceivedFrames(), "SensorAccessLinkOutputFrames.txt");
 
