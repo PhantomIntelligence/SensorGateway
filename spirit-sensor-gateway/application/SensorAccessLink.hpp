@@ -27,16 +27,17 @@ namespace SpiritSensorGateway {
         typedef I INPUT;
         typedef O OUTPUT;
 
-        using SensorCommunicator = SensorAccessLinkElement::SensorCommunicator<INPUT>;
-        using SensorCommunicationStrategy = SensorCommunication::SensorCommunicationStrategy<INPUT>;
+        using ServerCommunicator = SensorAccessLinkElement::ServerCommunicator<OUTPUT>;
+        using ServerCommunicationStrategy = ServerCommunication::ServerCommunicationStrategy<OUTPUT>;
+        using ServerCommunicatorScheduler = DataFlow::DataProcessingScheduler<OUTPUT, ServerCommunicator, 1>;
 
         using MessageTranslator = SensorAccessLinkElement::MessageTranslator<INPUT, OUTPUT>;
         using MessageTranslationStrategy = MessageTranslation::MessageTranslationStrategy<INPUT, OUTPUT>;
         using TranslatorScheduler = DataFlow::DataProcessingScheduler<INPUT, MessageTranslator, 1>;
 
-        using ServerCommunicator = SensorAccessLinkElement::ServerCommunicator<OUTPUT>;
-        using ServerCommunicationStrategy = ServerCommunication::ServerCommunicationStrategy<OUTPUT>;
-        using ServerCommunicatorScheduler = DataFlow::DataProcessingScheduler<OUTPUT, ServerCommunicator, 1>;
+        using SensorCommunicator = SensorAccessLinkElement::SensorCommunicator<INPUT>;
+        using SensorCommunicationStrategy = SensorCommunication::SensorCommunicationStrategy<INPUT>;
+
 
     public:
         explicit SensorAccessLink(ServerCommunicationStrategy* serverCommunicationStrategy,

@@ -22,7 +22,7 @@
 
 namespace DataFlow {
 
-    template<class T, class SINK, uint8_t const NUMBER_OF_CONCURRENT_INPUTS>
+    template<class T, class SINK, size_t const NUMBER_OF_CONCURRENT_INPUTS>
     class DataProcessingScheduler : public ConsumerLink<T> {
 
         typedef RingBuffer<T> InputBuffer;

@@ -16,6 +16,7 @@
 
 #include <gtest/gtest.h>
 #include "spirit-sensor-gateway/server-communication/UWSServerCommunicationStrategy.h"
+#include "test/utilities/files/FileManager.hpp"
 #include "test/utilities/stub/SpiritFramesStub.h"
 #include "test/utilities/stub/WebSocketServerStub.h"
 
@@ -28,16 +29,17 @@ using DataFlow::Frame;
 
 class UWSServerCommunicatorTest : public ::testing::Test {
 protected:
-    std::string const SERVER_ACTUAL_MESSAGE_LOGFILE = "ActualWebSocketServerMessageFile.txt";
-    std::string const SERVER_EXPECTED_MESSAGE_LOGFILE = "ExpectedWebSocketServerMessageFile.txt";
+    std::string const UWS_ACTUAL_MESSAGE_LOGFILE = "ActualWebSocketServerMessageFile.txt";
+    std::string const UWS_EXPECTED_MESSAGE_LOGFILE = "ExpectedWebSocketServerMessageFile.txt";
     std::FILE* expectedLogFile;
+    typedef Frame IRRELEVANT_TYPE;
 };
 
 TEST_F(UWSServerCommunicatorTest,
        given_someIncomingFrames_when_sendingMessages_then_messagesAreCorrectlyReceivedByTheWebSocketServer) {
 
-    expectedLogFile = std::fopen(SERVER_EXPECTED_MESSAGE_LOGFILE.c_str(), "w");
-    WebSocketServerStub webSocketServerStub(SERVER_ACTUAL_MESSAGE_LOGFILE);
+    expectedLogFile = std::fopen(UWS_EXPECTED_MESSAGE_LOGFILE.c_str(), "w");
+    WebSocketServerStub webSocketServerStub(UWS_ACTUAL_MESSAGE_LOGFILE);
     UWSServerCommunicationStrategy uwsServerCommunicationStrategy;
     webSocketServerStub.run();
     uwsServerCommunicationStrategy.openConnection(webSocketServerStub.getAddress());
@@ -46,7 +48,7 @@ TEST_F(UWSServerCommunicatorTest,
         auto frame = createRandomIDFrame();
         auto frameCopy = Frame(frame);
         auto expectedFormattedFrame = JsonConverter::convertFrameToJsonString(frameCopy);
-        std::fprintf(expectedLogFile, "%s", expectedFormattedFrame.c_str());
+        std::fprintf(expectedLogFile, "%s\n", expectedFormattedFrame.c_str());
         uwsServerCommunicationStrategy.sendMessage(std::move(frame));
     }
 
@@ -55,6 +57,8 @@ TEST_F(UWSServerCommunicatorTest,
     fflush(expectedLogFile);
     fclose(expectedLogFile);
 
+    auto filesAreEqual = TestUtilities::FileManager<IRRELEVANT_TYPE>::areFilesEqual(UWS_ACTUAL_MESSAGE_LOGFILE, UWS_EXPECTED_MESSAGE_LOGFILE);
+    ASSERT_TRUE(filesAreEqual);
 }
 
 #endif //SPIRITSENSORGATEWAY_UWSSERVERCOMMUNICATORTEST_CPP

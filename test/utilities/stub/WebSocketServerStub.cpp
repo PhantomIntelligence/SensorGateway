@@ -29,22 +29,17 @@ void WebSocketServerStub::startServerStub(std::FILE* logFile) {
 
     hub.onMessage([&logFile](uWS::WebSocket<uWS::SERVER>* ws, char* message, size_t length, uWS::OpCode opCode) {
         auto messageContent = std::string(message, length);
-        std::fprintf(logFile, "%s", message);
+        std::fprintf(logFile, "%s\n", messageContent.c_str());
     });
 
-    hub.onConnection([&hub](WebSocket* ws, uWS::HttpRequest req) {
-        std::cout << "Connected to the server stub" << std::endl;
-    });
-
-
-    hub.onDisconnection([&hub](uWS::WebSocket<uWS::SERVER>* ws, int code, char* message, size_t length) {
+    hub.onDisconnection([&hub, &logFile](uWS::WebSocket<uWS::SERVER>* ws, int code, char* message, size_t length) {
         hub.getDefaultGroup<uWS::SERVER>().close();
+        fflush(logFile);
+        fclose(logFile);
     });
 
     hub.listen(WEBSOCKET_SERVER_STUB_PORT);
     hub.run();
-
-
 }
 
 std::string const& Stub::WebSocketServerStub::getAddress() {

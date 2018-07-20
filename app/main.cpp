@@ -24,6 +24,7 @@
 #include "spirit-sensor-gateway/server-communication/UWSServerCommunicationStrategy.h"
 
 int main() {
+    std::string const SERVER_ADDRESS = "ws://localhost:8080/connect-gateway";
 
     using SensorCommunicationStrategy = SensorCommunication::KvaserCanCommunicationStrategy;
     using MessageTranslationStrategy = MessageTranslation::AWLMessageToSpiritMessageTranslationStrategy;
@@ -36,8 +37,10 @@ int main() {
     SensorCommunicationStrategy sensorCommunicationStrategy;
     MessageTranslationStrategy messageTranslationStrategy;
     ServerCommunicationStrategy serverCommunicationStrategy;
-    SensorAccessLink sensorAccessLink(&sensorCommunicationStrategy, &messageTranslationStrategy, &serverCommunicationStrategy);
-    sensorAccessLink.start();
+    SensorAccessLink sensorAccessLink(&serverCommunicationStrategy, &messageTranslationStrategy, &sensorCommunicationStrategy);
+    sensorAccessLink.connect(SERVER_ADDRESS);
+
+    std::this_thread::sleep_for(std::chrono::seconds(5));
     
     return 0;
 }
