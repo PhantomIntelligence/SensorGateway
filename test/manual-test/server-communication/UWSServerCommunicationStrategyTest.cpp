@@ -231,7 +231,7 @@ namespace ManualTest {
         std::string const SERVER_CONNECTION_ADDRESS = "ws://localhost:8080/connect-gateway";
         UWSServerCommunicationStrategy uwsServerCommunicationStrategy;
         uwsServerCommunicationStrategy.openConnection(SERVER_CONNECTION_ADDRESS);
-        for(auto i = 1; i < 100; ++i){
+        for (auto i = 1; i < 100; ++i) {
             auto frame = createArbitrarySpiritFrame();
             uwsServerCommunicationStrategy.sendMessage(std::move(frame));
         }
@@ -241,12 +241,13 @@ namespace ManualTest {
 }
 
 int main() {
-//    auto testOutput = ManualTest::testBasicUWSConnectionCalls();
-//    auto testOutput = ManualTest::testMessageSending();
-//    if (testOutput == 0) {
-//
-//    }
-    ManualTest::testConnectionWithConcreteStrategy();
+    auto testOutput = ManualTest::testBasicUWSConnectionCalls();
+    if (testOutput == 0) {
+        testOutput = ManualTest::testMessageSending();
+    }
+    if (testOutput == 0) {
+        ManualTest::testConnectionWithConcreteStrategy();
+    }
     return 0;
 }
 
