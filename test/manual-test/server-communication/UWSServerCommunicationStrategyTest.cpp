@@ -221,7 +221,8 @@ namespace ManualTest {
             webSocket->send(textToSend.c_str(), textToSend.size(), uWS::OpCode::BINARY);
         }
 
-        webSocket->close();
+        std::string closingMessage = "Closing with code 1000: normal closure";
+        webSocket->close(1000, closingMessage.c_str(), closingMessage.size());
         webSocketConnectionThread.join();
 
         return 0;
