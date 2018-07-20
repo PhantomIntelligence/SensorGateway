@@ -30,7 +30,8 @@ TEST_F(ConvertFrameToJsonStringTest,
     ASSERT_NE(firstConvertedFrame, secondConvertedFrame);
 }
 
-TEST_F(ConvertFrameToJsonStringTest, given_aFrame_when_convertingItToAJsonString_then_returnTheCorrectConvertedJSonString) {
+TEST_F(ConvertFrameToJsonStringTest,
+       given_aFrame_when_convertingItToAJsonString_then_returnTheCorrectConvertedJSonString) {
     TracksArray tracksArray = DEFAULT_TRACKS_ARRAY;
     tracksArray[2].ID = 44;
     tracksArray[2].intensity = 44;
@@ -46,6 +47,7 @@ TEST_F(ConvertFrameToJsonStringTest, given_aFrame_when_convertingItToAJsonString
     std::string expectedConvertedFrame = frameStub;
     auto actualConvertedFrame = JsonConverter::convertFrameToJsonString(testFrame);
 
-    ASSERT_EQ(expectedConvertedFrame,actualConvertedFrame);
+    ASSERT_EQ(expectedConvertedFrame, actualConvertedFrame);
 }
+
 #endif //SPIRITSENSORGATEWAY_PARSEFRAMETOJSONSTRINGTEST_CPP

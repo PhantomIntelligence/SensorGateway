@@ -34,6 +34,8 @@ Json JsonConverter::convertTrackToJson(Track track) {
 Json JsonConverter::convertPixelToJson(Pixel pixel) {
     Json jsonPixel;
     jsonPixel["pixelID"] = pixel.ID;
+    jsonPixel["angleStart"] = pixel.angleStart;
+    jsonPixel["angleEnd"] = pixel.angleEnd;
     jsonPixel["numberOfTracksInPixel"] = pixel.getCurrentNumberOfTracksInPixel();
     Json pixelTracks;
     for (Track track:*pixel.getTracks()) {
