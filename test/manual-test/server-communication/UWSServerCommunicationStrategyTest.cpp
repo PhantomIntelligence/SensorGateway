@@ -217,7 +217,6 @@ namespace ManualTest {
             textToSend = simpleData.toString();
             auto frame = Stub::createArbitrarySpiritFrame();
             textToSend = ServerCommunication::JsonConverter::convertFrameToJsonString(frame);
-//            std::cout << "sending : " << textToSend << std::endl;
             webSocket->send(textToSend.c_str(), textToSend.size(), uWS::OpCode::BINARY);
         }
 
