@@ -39,7 +39,7 @@ namespace DataFlow {
 
         Frame(Frame&& other) noexcept;
 
-        Frame& operator=(Frame const& other)& ;
+        Frame& operator=(Frame const& other)&;
 
         Frame& operator=(Frame&& other)& noexcept;
 
@@ -50,7 +50,7 @@ namespace DataFlow {
         bool operator!=(Frame const& other) const;
 
         void addTrackToPixelWithID(PixelID const& pixelID, Track&& trackToAdd);
-        
+
         PixelsArray* getPixels();
 
         static Frame const& returnDefaultData() noexcept;
@@ -62,11 +62,7 @@ namespace DataFlow {
     private:
         PixelsArray pixels;
 
-        void updatePixelAngles(PixelID const& pixelID);
-
         void updatePixelID(PixelID const& pixelID);
-        
-        void updatePixelPositionOnLayer(PixelID const& pixelID);
     };
 }
 

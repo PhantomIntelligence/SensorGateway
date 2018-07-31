@@ -114,23 +114,6 @@ int Pixel::getCurrentNumberOfTracksInPixel() const {
     return currentNumberOfTracksInPixel;
 }
 
-void Pixel::calculateAngles() {
-    if (positionOnLayer < (NUMBER_OF_PIXELS_IN_LAYER)) {
-        angleStart = (HORIZONTAL_FIELD_OF_VIEW / -NUMBER_OF_LAYER) + (positionOnLayer * ANGLE_RANGE);
-    } else {
-        angleStart = ANGLE_RANGE * (positionOnLayer - NUMBER_OF_PIXELS_IN_LAYER);
-    }
-    angleEnd = angleStart + ANGLE_RANGE;
-}
-
-void Pixel::calculatePositionOnLayer() {
-    if (ID < (NUMBER_OF_PIXELS_IN_LAYER)) {
-        layer = 0;
-    } else {
-        layer = 1;
-    }
-    positionOnLayer = (ID % NUMBER_OF_PIXELS_IN_LAYER);
-}
 
 
 
