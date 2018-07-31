@@ -23,7 +23,7 @@ using DataFlow::PixelsArray;
 using DataFlow::SystemID;
 
 Frame::Frame(FrameID frameID, SystemID systemID, PixelsArray pixels) :
-        frameID(frameID), systemID(systemID), pixels(pixels) {};
+        frameID(frameID), systemID(systemID), pixels(std::move(pixels)) {};
 
 Frame::Frame() : Frame(Frame::returnDefaultData()) {};
 
@@ -31,12 +31,16 @@ Frame::Frame(Frame const& other) :
         Frame(other.frameID, other.systemID, other.pixels) {};
 
 Frame::Frame(Frame&& other) noexcept:
-        frameID(std::move(other.frameID)),
-        systemID(std::move(systemID)),
-        pixels(std::move(other.pixels)) {};
+        frameID(other.frameID),
+        systemID(other.systemID),
+        pixels(other.pixels) {
+    other.frameID = DEFAULT_FRAME_ID;
+    other.systemID = DEFAULT_SYSTEM_ID;
+    other.pixels = DEFAULT_PIXELS_ARRAY;
+};
 
 Frame& Frame::operator=(Frame const& other)& {
-    Frame temporary(std::move(other));
+    Frame temporary(other);
     swap(*this, temporary);
     return *this;
 };

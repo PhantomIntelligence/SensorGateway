@@ -14,18 +14,16 @@
 #ifndef SPIRITSENSORGATEWAY_MESSAGEIMPLEMENTATIONSTRATEGY_H
 #define SPIRITSENSORGATEWAY_MESSAGEIMPLEMENTATIONSTRATEGY_H
 
-#include <vector>
-
 #include "spirit-sensor-gateway/domain/Frame.h"
 #include "spirit-sensor-gateway/domain/AWLMessage.h"
 #include "MessageTranslationStrategy.hpp"
 
-using DataFlow::AWLMessage;
-using DataFlow::Frame;
-using DataFlow::PixelID;
-
 namespace MessageTranslation {
-    
+
+    using DataFlow::AWLMessage;
+    using DataFlow::Frame;
+    using DataFlow::PixelID;
+
     class AWLMessageToSpiritMessageTranslationStrategy final : public MessageTranslationStrategy<AWLMessage, Frame> {
     protected:
         using super = MessageTranslationStrategy<AWLMessage, Frame>;
@@ -37,16 +35,14 @@ namespace MessageTranslation {
 
         ~ AWLMessageToSpiritMessageTranslationStrategy() = default;
 
-        Frame returnDefaultData();
-
-        void translateBasicMessage(INPUT&& inputMessage) override;
+        void translateMessage(INPUT&& inputMessage) override;
 
     private:
 
         using super::currentOutputMessage;
 
         void addTrackInPixel(AWLMessage&& awlMessage, PixelID pixelID);
-        
+
         Track* fetchTrack(DataFlow::TrackID const& trackID);
 
         void translateDetectionTrackMessage(AWLMessage&& awlMessage);

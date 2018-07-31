@@ -15,16 +15,19 @@
 #define SPIRITSENSORGATEWAY_TYPEDEFINITION_H
 
 
-#include <array>
 #include <atomic>
 #include <future>
 #include <mutex>
-
-#include <iostream>
+#include <random>
+#include <functional>
+#include <algorithm>
+#include <list>
+#include <array>
 #include <unordered_map>
 #include <exception>
 #include <cstring>
 #include <limits>
+#include <iostream>
 
 #include "hicpp/HighIntegrityThread.h"
 #include "ExceptionMessages.h"
@@ -41,7 +44,7 @@ namespace {
     typedef HighIntegrity::HighIntegrityThread<HighIntegrity::ThreadExecutionType::JOIN> JoinableThread;
 };
 
-namespace  DataFlow {
+namespace DataFlow {
     typedef int16_t Acceleration;
     typedef uint8_t ConfidenceLevel;
     typedef uint16_t Distance;

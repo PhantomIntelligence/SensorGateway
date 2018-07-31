@@ -1,0 +1,18 @@
+#!/bin/sh
+
+BUILD_FOLDER=cmake-build-debug
+
+echo "---- Creating build folder: ./${BUILD_FOLDER}..."
+mkdir -p $BUILD_FOLDER
+
+
+# TODO: Find a way to initialize CMake cache and indexes
+
+echo "---- Have CMake build initial folders..."
+cmake --build $BUILD_FOLDER --target all
+
+echo "---- Makes conan install external dependencies..."
+./dev-script/conanUpdateDependencies
+
+echo "---- Finalize CMake build after conan update"
+cmake --build $BUILD_FOLDER --target all

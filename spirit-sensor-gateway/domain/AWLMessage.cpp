@@ -35,7 +35,7 @@ AWLMessage::AWLMessage(AWLMessage&& other) noexcept :
 }
 
 AWLMessage& AWLMessage::operator = (AWLMessage const& other)& {
-    AWLMessage temporary(std::move(other));
+    AWLMessage temporary(other);
     swap(*this, temporary);
     return *this;
 }

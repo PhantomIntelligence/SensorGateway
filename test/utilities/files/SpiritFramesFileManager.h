@@ -27,7 +27,7 @@ namespace TestUtilities {
     class SpiritFramesFileManager : public FileManager<DataFlow::Frame> {
 
     public:
-        SpiritFramesFileManager() = default;
+        SpiritFramesFileManager()  = default;
 
         ~SpiritFramesFileManager() override = default;
 

@@ -34,7 +34,7 @@ using Sensor::AWL::_16::ANGLE_RANGE;
 AWLMessageToSpiritMessageTranslationStrategy::AWLMessageToSpiritMessageTranslationStrategy() :
         super() {}
 
-void AWLMessageToSpiritMessageTranslationStrategy::translateBasicMessage(AWLMessage&& inputMessage) {
+void AWLMessageToSpiritMessageTranslationStrategy::translateMessage(AWLMessage&& inputMessage) {
     switch (inputMessage.id) {
         case END_OF_FRAME:
             translateEndOfFrameMessage(std::forward<INPUT>(inputMessage));
@@ -96,8 +96,4 @@ Track* AWLMessageToSpiritMessageTranslationStrategy::fetchTrack(TrackID const& t
         }
     }
     return nullptr;
-}
-
-Frame AWLMessageToSpiritMessageTranslationStrategy::returnDefaultData() {
-    return Frame();
 }
