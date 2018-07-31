@@ -15,7 +15,7 @@
 */
 
 
-#include "data-model/ProcessedData.h"
+#include "ProcessedData.h"
 #include <utility>
 #include <iostream>
 

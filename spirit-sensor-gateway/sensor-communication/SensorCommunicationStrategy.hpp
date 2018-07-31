@@ -16,7 +16,6 @@
 
 #include "spirit-sensor-gateway/domain/AWLMessage.h"
 
-
 namespace SensorCommunication {
 
     template<class T>

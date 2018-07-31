@@ -10,28 +10,27 @@ include_directories(SYSTEM ${GOOGLE_TEST_DIR}/googlemock/include)
 # Add SpiritSensorGateway files
 # Select all the test and source files
 file(GLOB TEST_FILES "${CMAKE_CURRENT_SOURCE_DIR}/test-suite/*")
-file(GLOB COMMON_TEST_FILES "${CMAKE_CURRENT_SOURCE_DIR}/test-suite/common/*")
-file(GLOB TRANSLATOR_TEST_FILES "${CMAKE_CURRENT_SOURCE_DIR}/test-suite/message-translation/*")
-file(GLOB DOMAIN_TEST_FILES "${CMAKE_CURRENT_SOURCE_DIR}/test-suite/domain/*")
 file(GLOB UTILITIES_FILES "${CMAKE_CURRENT_SOURCE_DIR}/utilities/files/*")
-file(GLOB TEST_FILES "${CMAKE_CURRENT_SOURCE_DIR}/mock/*")
-file(GLOB RING_BUFFER_TEST_FILES "${CMAKE_CURRENT_SOURCE_DIR}/test-suite/common/*")
+file(GLOB MOCK_FILES "${CMAKE_CURRENT_SOURCE_DIR}/utilities/mock/*")
+file(GLOB STUB_FILES "${CMAKE_CURRENT_SOURCE_DIR}/utilities/stub/*")
+file(GLOB DATA_MODEL_FILES "${CMAKE_CURRENT_SOURCE_DIR}/utilities/data-model/*")
+file(GLOB COMMON_TEST_FILES "${CMAKE_CURRENT_SOURCE_DIR}/test-suite/common/*")
+file(GLOB DOMAIN_TEST_FILES "${CMAKE_CURRENT_SOURCE_DIR}/test-suite/domain/*")
 file(GLOB SENSOR_COMM_TEST_FILES "${CMAKE_CURRENT_SOURCE_DIR}/test-suite/sensor-communication/*")
-file(GLOB DATA_MODEL_FILES "${CMAKE_CURRENT_SOURCE_DIR}/test-suite/data-model/*")
+file(GLOB SERVER_COMM_TEST_FILES "${CMAKE_CURRENT_SOURCE_DIR}/test-suite/server-communication/*")
 
 # Include Mocks
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/mock")
 
 # Include unfiled of higher hierarchy files
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/test-suite")
+file(GLOB TRANSLATOR_TEST_FILES "${CMAKE_CURRENT_SOURCE_DIR}/test-suite/message-translation/*")
+file(GLOB SERVER_COMM_TEST_FILES "${CMAKE_CURRENT_SOURCE_DIR}/test-suite/server-communication/*")
+file(GLOB APPLICATION_TEST_FILES "${CMAKE_CURRENT_SOURCE_DIR}/test-suite/application/*")
 
-# Include manual-test
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}/test/manual-test")
 
 # Add all the test and mock files to the executable
-
-add_executable(runtests ${TEST_FILES} ${COMMON_TEST_FILES} ${TRANSLATOR_TEST_FILES} ${DOMAIN_TEST_FILES} ${UTILITIES_FILES} ${MOCK_FILES} ${RING_BUFFER_TEST_FILES} ${DATA_MODEL_FILES} ${SENSOR_COMM_TEST_FILES})
-
+add_executable(runtests ${TEST_FILES} ${UTILITIES_FILES} ${MOCK_FILES} ${STUB_FILES} ${DATA_MODEL_FILES} ${COMMON_TEST_FILES} ${DOMAIN_TEST_FILES} ${SENSOR_COMM_TEST_FILES} ${TRANSLATOR_TEST_FILES} ${SERVER_COMM_TEST_FILES} ${APPLICATION_TEST_FILES})
 
 find_package(SpiritSensorGateway)
 target_link_libraries(runtests gtest gmock_main ${SpiritSensorGateway_LIBRARIES} ${CONAN_LIBS})
@@ -42,7 +41,7 @@ install(TARGETS runtests
         RUNTIME DESTINATION "${INSTALL_BIN_DIR}" COMPONENT bin)
 
 # Include acceptance-test
-add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/acceptance-test")
+add_subdirectory(acceptance-test)
 
 # Includes the manual test
 add_subdirectory(manual-test)

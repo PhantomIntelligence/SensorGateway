@@ -85,8 +85,9 @@ namespace ExampleDataModel {
          * @param other the Data DR instance copy-assigned to this instance.
          * @return A handle to this instance.
          */
-        Data& operator=(Data other)& {
-            swap(*this, other);
+        Data& operator=(Data const& other)& {
+            Data temporary(other);
+            swap(*this, temporary);
             return *this;
         }
 
@@ -98,8 +99,7 @@ namespace ExampleDataModel {
          * @attention the *other* param should be used in any way after having been used in a move assignation.
          */
         Data& operator=(Data&& other)& noexcept {
-            Data temporary(std::move(other));
-            swap(*this, temporary);
+            swap(*this, other);
             return *this;
         }
 

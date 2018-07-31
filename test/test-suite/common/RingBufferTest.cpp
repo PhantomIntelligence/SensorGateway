@@ -8,8 +8,8 @@
 #include <spirit-sensor-gateway/sensor-communication/KvaserCanCommunicationStrategy.h>
 
 #include "spirit-sensor-gateway/common/data-flow/RingBuffer.hpp"
-#include "data-model/DataModelFixture.h"
-#include "ConsumerLinkMock.h"
+#include "test/utilities/data-model/DataModelFixture.h"
+#include "test/utilities/mock/ConsumerLinkMock.h"
 
 using ExampleDataModel::NativeData;
 using ExampleDataModel::ProcessedData;

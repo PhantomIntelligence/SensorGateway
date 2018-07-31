@@ -13,8 +13,6 @@
 #ifndef SPIRITSENSORGATEWAY_MESSAGETRANSLATIONSTRATEGY_H
 #define SPIRITSENSORGATEWAY_MESSAGETRANSLATIONSTRATEGY_H
 
-#include "spirit-sensor-gateway/common/data-flow/DataSource.hpp"
-
 namespace MessageTranslation {
 
     template<class I, class O>
@@ -30,7 +28,7 @@ namespace MessageTranslation {
 
         virtual ~MessageTranslationStrategy() noexcept = default;
 
-        virtual void translateBasicMessage(INPUT&& inputMessage) = 0;
+        virtual void translateMessage(INPUT&& inputMessage) = 0;
 
     protected:
 

@@ -11,7 +11,6 @@
 	limitations under the License.
 */
 
-#include <iostream>
 #include "Pixel.h"
 
 using DataFlow::Pixel;
@@ -27,7 +26,7 @@ using Sensor::AWL::_16::NUMBER_OF_LAYER;
 using Sensor::AWL::_16::MULTIPLICATIVE_CONSTANT;
 
 Pixel::Pixel(PixelID pixelID, TracksArray tracks, int currentNumberOfTracks) :
-        ID(pixelID), tracks(tracks), currentNumberOfTracksInPixel(currentNumberOfTracks) {
+        ID(pixelID), tracks(std::move(tracks)), currentNumberOfTracksInPixel(currentNumberOfTracks) {
 };
 
 Pixel::Pixel() : Pixel(Pixel::returnDefaultData()) {};
@@ -37,14 +36,14 @@ Pixel::Pixel(Pixel const& other) :
 
 };
 
-Pixel::Pixel(Pixel&& other) noexcept: ID(std::move(other.ID)),
+Pixel::Pixel(Pixel&& other) noexcept: ID(other.ID),
                                       tracks(std::move(other.tracks)),
-                                      currentNumberOfTracksInPixel(std::move(other.currentNumberOfTracksInPixel)) {
+                                      currentNumberOfTracksInPixel(other.currentNumberOfTracksInPixel) {
 
 };
 
 Pixel& Pixel::operator=(Pixel const& other)& {
-    Pixel temporary(std::move(other));
+    Pixel temporary(other);
     swap(*this, temporary);
     return *this;
 };
@@ -111,6 +110,10 @@ void Pixel::validateNotFull() const {
     }
 }
 
+int Pixel::getCurrentNumberOfTracksInPixel() const {
+    return currentNumberOfTracksInPixel;
+}
+
 void Pixel::calculateAngles() {
     if (positionOnLayer < (NUMBER_OF_PIXELS_IN_LAYER)) {
         angleStart = (HORIZONTAL_FIELD_OF_VIEW / -NUMBER_OF_LAYER) + (positionOnLayer * ANGLE_RANGE);
@@ -121,7 +124,6 @@ void Pixel::calculateAngles() {
 }
 
 void Pixel::calculatePositionOnLayer() {
-    
     if (ID < (NUMBER_OF_PIXELS_IN_LAYER)) {
         layer = 0;
     } else {

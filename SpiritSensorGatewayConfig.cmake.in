@@ -6,6 +6,10 @@
 
 # Compute paths
 get_filename_component(SpiritSensorGateway_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
+
+include(CMakeFindDependencyMacro)
+find_package(uws REQUIRED)
+
 set(SpiritSensorGateway_INCLUDE_DIRS "@CONF_INCLUDE_DIRS@")
 
 # This library dependencies (contains definitions for IMPORTED targets)
@@ -14,5 +18,6 @@ if(NOT TARGET SpiritSensorGateway AND NOT SpiritSensorGateway_BINARY_DIR)
 endif()
 
 # These are IMPORTED targets created by SpiritSensorGatewayTargets.cmake
+set(uws_LIBRARIES uws::uws)
 set(SpiritSensorGateway_LIBRARIES SpiritSensorGateway)
 set(SpiritSensorGateway_EXECUTABLE runtests)
