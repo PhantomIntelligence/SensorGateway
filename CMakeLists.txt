@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.8)
+cmake_minimum_required(VERSION 3.8 FATAL_ERROR)
 
 set(PROJECT_NAME SpiritSensorGateway)
 set(LIVE_APP_SOURCE_DIR "app")
@@ -7,6 +7,7 @@ set(LIVE_APP_NAME "production-gateway")
 project(${PROJECT_NAME} CXX)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake-module/")
+include(cmake-module/googletest.cmake)
 
 # For more information on how the CMake-related files were created:
 # https://gitlab.kitware.com/cmake/community/wikis/doc/tutorials/How-to-create-a-ProjectConfig.cmake-file
