@@ -57,8 +57,7 @@ namespace DataFlow {
 
         FrameID frameID;
         SystemID systemID;
-
-
+        
     private:
         PixelsArray pixels;
 
