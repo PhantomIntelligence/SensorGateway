@@ -70,8 +70,6 @@ bool Frame::operator!=(Frame const& other) const {
 
 void Frame::addTrackToPixelWithID(PixelID const& pixelID, Track&& trackToAdd) {
     updatePixelID(pixelID);
-    updatePixelPositionOnLayer(pixelID);
-    updatePixelAngles(pixelID);
     pixels[pixelID].addTrack(std::forward<Track>(trackToAdd));
 }
 
@@ -85,12 +83,4 @@ Frame const& Frame::returnDefaultData() noexcept {
 
 void Frame::updatePixelID(PixelID const& pixelID) {
     pixels[pixelID].ID = pixelID;
-}
-
-void Frame::updatePixelAngles(PixelID const& pixelID) {
-    pixels[pixelID].calculateAngles();
-}
-
-void Frame::updatePixelPositionOnLayer(PixelID const& pixelID) {
-    pixels[pixelID].calculatePositionOnLayer();
 }
