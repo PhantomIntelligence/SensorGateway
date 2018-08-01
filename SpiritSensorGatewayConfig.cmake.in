@@ -21,4 +21,4 @@ endif()
 # These are IMPORTED targets created by SpiritSensorGatewayTargets.cmake
 set(uws_LIBRARIES uws::uws)
 set(SpiritSensorGateway_LIBRARIES SpiritSensorGateway)
-set(SpiritSensorGateway_EXECUTABLE "${LIVE_APP_NAME}")
+set(SpiritSensorGateway_EXECUTABLE production-gateway)

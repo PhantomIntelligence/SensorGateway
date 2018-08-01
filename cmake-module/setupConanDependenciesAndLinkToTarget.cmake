@@ -1,12 +1,6 @@
 macro(setup_conan_dependencies_and_link_to_target _project_name)
     message(STATUS)
     message(STATUS "Downloading conan dependencies")
-    execute_process(
-            COMMAND ls -lAh
-            WORKING_DIRECTORY ${CMAKE_MACRO_SOURCE_DIR})
-    execute_process(
-            COMMAND ls -lAh
-            WORKING_DIRECTORY ${CMAKE_MACRO_BINARY_DIR})
 
     execute_process(
             COMMAND "./dev-script/conanUpdateDependencies" spirit-sensor-gateway ${CMAKE_MACRO_BINARY_DIR}
