@@ -14,10 +14,11 @@ set(SpiritSensorGateway_INCLUDE_DIRS "@CONF_INCLUDE_DIRS@")
 
 # This library dependencies (contains definitions for IMPORTED targets)
 if(NOT TARGET SpiritSensorGateway AND NOT SpiritSensorGateway_BINARY_DIR)
+    include_directories("${SpiritSensorGateway_CMAKE_DIR}/spirit-sensor-gateway")
     include("${SpiritSensorGateway_CMAKE_DIR}/SpiritSensorGatewayTargets.cmake")
 endif()
 
 # These are IMPORTED targets created by SpiritSensorGatewayTargets.cmake
 set(uws_LIBRARIES uws::uws)
 set(SpiritSensorGateway_LIBRARIES SpiritSensorGateway)
-set(SpiritSensorGateway_EXECUTABLE ${LIVE_APP_NAME})
+set(SpiritSensorGateway_EXECUTABLE "${LIVE_APP_NAME}")
