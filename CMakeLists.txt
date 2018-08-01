@@ -8,11 +8,6 @@ project(${PROJECT_NAME} CXX)
 
 include(cmake-module/setupCMakeMacros.cmake)
 setup_cmake_macros(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
-#set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake-module/")
-#set(ABSOLUTE_GATEWAY_SOURCE_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
-#set(ABSOLUTE_GATEWAY_BINARY_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
-#include(cmake-module/setupConanDependenciesAndLinkToTarget.cmake)
-#include(cmake-module/googletest.cmake)
 
 # For more information on how the CMake-related files were created:
 # https://gitlab.kitware.com/cmake/community/wikis/doc/tutorials/How-to-create-a-ProjectConfig.cmake-file
