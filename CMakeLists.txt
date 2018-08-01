@@ -50,11 +50,9 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -lpthread -O3")
 add_subdirectory(spirit-sensor-gateway)
 add_subdirectory(${LIVE_APP_SOURCE_DIR})
 
-# Options:  Add flag -BUILD_TESTS to build the tests
-option(BUILD_TESTS  "Build tests." ON)
 option(ENABLE_CPP11 "Build ${PROJECT_NAME} with C++11 features enabled" TRUE)
 
-# Add tests directory if flag is on
+# To build the test, run cmake with -DBUILD_TESTS=ON
 if(BUILD_TESTS)
     enable_testing()
     add_subdirectory(test)
