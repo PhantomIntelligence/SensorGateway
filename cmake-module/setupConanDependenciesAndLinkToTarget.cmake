@@ -8,9 +8,9 @@ macro(setup_conan_dependencies_and_link_to_target _project_name)
             COMMAND "./dev-script/conanUpdateDependencies"
             WORKING_DIRECTORY ${ABSOLUTE_GATEWAY_SOURCE_DIRECTORY})
 
-    if (EXISTS ${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
+    if (EXISTS ${ABSOLUTE_GATEWAY_BINARY_DIRECTORY}/conanbuildinfo.cmake)
         # Include generated cmake files
-        include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
+        include(${ABSOLUTE_GATEWAY_BINARY_DIRECTORY}/conanbuildinfo.cmake)
 
         conan_basic_setup(TARGETS)
 
