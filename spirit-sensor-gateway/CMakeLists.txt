@@ -12,18 +12,7 @@ file(GLOB COMMUNICATION_PROTOCOL_FILES "${CMAKE_CURRENT_SOURCE_DIR}/sensor-commu
 
 add_library(${PROJECT_NAME} SHARED ${APPLICATION_FILES} ${COMMON_FILES} ${DOMAIN_FILES} ${SRC_FILES} ${COMMUNICATION_PROTOCOL_FILES} ${SPIRIT_PROTOCOL_FILES} ${SERVER_COMMUNICATION_PROTOCOL_FILES} config.h.in)
 
-########## CONAN ######################################
-if (EXISTS ${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
-    include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
-    conan_basic_setup(TARGETS)
-
-    message(STATUS "Linking the following libs from conan: ${CONAN_LIBS}")
-    conan_target_link_libraries(${PROJECT_NAME})
-else ()
-    message(WARNING "The file conanbuildinfo.cmake doesn't exist, you have to run conan install first")
-endif ()
-#######################################################
-
+setup_conan_dependencies_and_link_to_target(${PROJECT_NAME})
 
 ########## uws ########################################
 find_package(uws CONFIG REQUIRED)
@@ -47,3 +36,4 @@ install(TARGETS ${PROJECT_NAME}
         RUNTIME DESTINATION "${INSTALL_BIN_DIR}" COMPONENT bin
         LIBRARY DESTINATION "${INSTALL_LIB_DIR}" COMPONENT shlib
         PUBLIC_HEADER DESTINATION "${INSTALL_INCLUDE_DIR}/${PROJECT_NAME}" COMPONENT dev)
+

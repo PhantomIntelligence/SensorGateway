@@ -19,9 +19,7 @@ find_package(SpiritSensorGateway)
 add_executable(runtests ${TEST_FILES} ${UTILITIES_FILES} ${MOCK_FILES} ${STUB_FILES} ${DATA_MODEL_FILES} ${APPLICATION_TEST_FILES} ${COMMON_TEST_FILES} ${DOMAIN_TEST_FILES} ${SENSOR_COMM_TEST_FILES} ${TRANSLATOR_TEST_FILES} ${SERVER_COMM_TEST_FILES})
 
 target_link_libraries(runtests gtest gmock_main ${SpiritSensorGateway_LIBRARIES} ${CONAN_LIBS})
-#set_property(TARGET gtest APPEND_STRING PROPERTY COMPILE_FLAGS " -w")
 
-include(../cmake-module/googletest.cmake)
 fetch_googletest(
         ${PROJECT_SOURCE_DIR}/cmake-module
         ${PROJECT_BINARY_DIR}/lib/googletest

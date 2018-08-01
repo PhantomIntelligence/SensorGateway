@@ -7,6 +7,7 @@ set(LIVE_APP_NAME "production-gateway")
 project(${PROJECT_NAME} CXX)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake-module/")
+include(cmake-module/setupConanDependenciesAndLinkToTarget.cmake)
 include(cmake-module/googletest.cmake)
 
 # For more information on how the CMake-related files were created:
