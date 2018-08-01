@@ -2,6 +2,9 @@ macro(setup_conan_dependencies_and_link_to_target _project_name)
     message(STATUS)
     message(STATUS "Downloading conan dependencies")
     execute_process(
+            COMMAND ls -lAh
+            WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
+    execute_process(
             COMMAND "./dev-script/conanUpdateDependencies"
             WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
 
