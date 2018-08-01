@@ -3,14 +3,14 @@ macro(setup_conan_dependencies_and_link_to_target _project_name)
     message(STATUS "Downloading conan dependencies")
     execute_process(
             COMMAND ls -lAh
-            WORKING_DIRECTORY ${ABSOLUTE_GATEWAY_SOURCE_DIRECTORY})
+            WORKING_DIR ${CMAKE_MACRO_SOURCE_DIR})
     execute_process(
             COMMAND "./dev-script/conanUpdateDependencies"
-            WORKING_DIRECTORY ${ABSOLUTE_GATEWAY_SOURCE_DIRECTORY})
+            WORKING_DIR ${CMAKE_MACRO_SOURCE_DIR})
 
-    if (EXISTS ${ABSOLUTE_GATEWAY_BINARY_DIRECTORY}/conanbuildinfo.cmake)
+    if (EXISTS ${CMAKE_MACRO_BINARY_DIR}/conanbuildinfo.cmake)
         # Include generated cmake files
-        include(${ABSOLUTE_GATEWAY_BINARY_DIRECTORY}/conanbuildinfo.cmake)
+        include(${CMAKE_MACRO_BINARY_DIR}/conanbuildinfo.cmake)
 
         conan_basic_setup(TARGETS)
 
