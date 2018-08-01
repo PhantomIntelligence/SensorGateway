@@ -2,22 +2,19 @@ macro(setup_conan_dependencies_and_link_to_target _project_name)
     message(STATUS)
     message(STATUS "Downloading conan dependencies")
     execute_process(
-            COMMAND pwd
-            WORKING_DIR ${CMAKE_MACRO_SOURCE_DIR})
+            COMMAND ls -lAh
+            WORKING_DIRECTORY ${CMAKE_MACRO_SOURCE_DIR})
     execute_process(
             COMMAND ls -lAh
-            WORKING_DIR ${CMAKE_MACRO_SOURCE_DIR})
-    execute_process(
-            COMMAND pwd
-            WORKING_DIR ${CMAKE_MACRO_BINARY_DIR})
-    execute_process(
-            COMMAND ls -lAh
-            WORKING_DIR ${CMAKE_MACRO_BINARY_DIR})
+            WORKING_DIRECTORY ${CMAKE_MACRO_BINARY_DIR})
 
     execute_process(
-            COMMAND "./dev-script/conanUpdateDependencies"
-            WORKING_DIR ${CMAKE_MACRO_SOURCE_DIR})
-
+            COMMAND "./dev-script/conanUpdateDependencies" spirit-sensor-gateway ${CMAKE_MACRO_BINARY_DIR}
+            OUTPUT_VARIABLE CONAN_SCRIPT_OUTPUT
+            ERROR_VARIABLE CONAN_SCRIPT_OUTPUT
+            WORKING_DIRECTORY ${CMAKE_MACRO_SOURCE_DIR}
+    )
+    message(${CONAN_SCRIPT_OUTPUT})
     if (EXISTS ${CMAKE_MACRO_BINARY_DIR}/conanbuildinfo.cmake)
         # Include generated cmake files
         include(${CMAKE_MACRO_BINARY_DIR}/conanbuildinfo.cmake)
@@ -29,6 +26,6 @@ macro(setup_conan_dependencies_and_link_to_target _project_name)
         message(STATUS "Done with conan")
         message(STATUS)
     else ()
-        message(FATAL_ERROR "Could not run Conan. \n Make sure 'conan' is installed")
-    endif()
+        message(FATAL_ERROR "Could not run conan. \n Make sure 'conan' is installed")
+    endif ()
 endmacro()
