@@ -15,14 +15,10 @@ add_library(${PROJECT_NAME} SHARED ${APPLICATION_FILES} ${COMMON_FILES} ${DOMAIN
 setup_conan_dependencies_and_link_to_target(${PROJECT_NAME})
 
 ########## uws ########################################
-find_package(uws CONFIG REQUIRED)
-if (uws_FOUND)
-    message(STATUS "Found uWS")
-    message(STATUS "INCLUDE_DIRS ${uws_INCLUDE_DIRS}")
-    include_directories(${uws_INCLUDE_DIRS})
-else ()
-    message(FATAL "uWS is required")
-endif ()
+fetch_uws(
+        ${PROJECT_SOURCE_DIR}/cmake-module
+        ${PROJECT_BINARY_DIR}/lib/uws
+)
 #######################################################
 
 target_link_libraries(${PROJECT_NAME} canlib uws)
