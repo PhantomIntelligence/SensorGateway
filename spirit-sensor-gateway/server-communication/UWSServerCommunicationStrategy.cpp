@@ -8,7 +8,7 @@ UWSServerCommunicationStrategy::UWSServerCommunicationStrategy() :
     webSocketConnectionThread.exitSafely();
 }
 
-UWSServerCommunicationStrategy::~UWSServerCommunicationStrategy() {
+UWSServerCommunicationStrategy::~UWSServerCommunicationStrategy() noexcept {
     webSocketConnectionThread.exitSafely();
 }
 
