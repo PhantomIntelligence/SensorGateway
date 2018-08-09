@@ -1,6 +1,7 @@
 macro(setup_conan_dependencies_and_link_to_target _project_name)
     message(STATUS)
     message(STATUS "Downloading conan dependencies")
+    message(STATUS)
 
     execute_process(
             COMMAND "./dev-script/conanUpdateDependencies" sensor-gateway ${CMAKE_MACRO_BINARY_DIR}
@@ -17,8 +18,8 @@ macro(setup_conan_dependencies_and_link_to_target _project_name)
 
         message(STATUS "Linking the following libs from conan: ${CONAN_LIBS}")
         conan_target_link_libraries(${_project_name})
-        message(STATUS "Done with conan")
         message(STATUS)
+        message(STATUS "Done with conan")
     else ()
         message(FATAL_ERROR "Could not run conan. \n Make sure 'conan' is installed")
     endif ()
