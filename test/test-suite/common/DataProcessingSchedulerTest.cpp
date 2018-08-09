@@ -15,12 +15,12 @@
 */
 
 
-#ifndef SPIRITSENSORGATEWAY_WORKSCHEDULERTEST_CPP
-#define SPIRITSENSORGATEWAY_WORKSCHEDULERTEST_CPP
+#ifndef SENSORGATEWAY_WORKSCHEDULERTEST_CPP
+#define SENSORGATEWAY_WORKSCHEDULERTEST_CPP
 
 #include <gtest/gtest.h>
 #include "test/utilities/data-model/DataModelFixture.h"
-#include "spirit-sensor-gateway/common/data-flow/DataProcessingScheduler.hpp"
+#include "sensor-gateway/common/data-flow/DataProcessingScheduler.hpp"
 
 using DataFlow::NUMBER_OF_CONCURRENT_INPUT_FOR_SENSOR_ACCESS_LINK_ELEMENTS;
 using ExampleDataModel::NativeData;
@@ -287,4 +287,4 @@ TEST_F(DataProcessingSchedulerTest,
     ASSERT_TRUE(calledExpectedNumberOfTimes);
 }
 
-#endif //SPIRITSENSORGATEWAY_WORKSCHEDULERTEST_CPP
+#endif //SENSORGATEWAY_WORKSCHEDULERTEST_CPP

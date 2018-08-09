@@ -1,0 +1,4 @@
+#define SensorGateway_MAJOR_VERSION (@SensorGateway_MAJOR_VERSION@)
+#define SensorGateway_MINOR_VERSION (@SensorGateway_MINOR_VERSION@)
+#define SensorGateway_PATCH_VERSION (@SensorGateway_PATCH_VERSION@)
+#define SensorGateway_VERSION_STRING (@SensorGateway_VERSION@)

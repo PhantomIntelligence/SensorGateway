@@ -14,8 +14,8 @@
 	limitations under the License.
 */
 
-#ifndef SPIRITSENSORGATEWAY_SIMPLEDATA_H
-#define SPIRITSENSORGATEWAY_SIMPLEDATA_H
+#ifndef SENSORGATEWAY_SIMPLEDATA_H
+#define SENSORGATEWAY_SIMPLEDATA_H
 
 #include "Data.h"
 
@@ -70,4 +70,4 @@ namespace Defaults {
     SimpleData const DEFAULT_SIMPLE_DATA = SimpleData(DEFAULT_SIMPLE_DATA_CONTENT);
 }
 
-#endif //SPIRITSENSORGATEWAY_SIMPLEDATA_H
+#endif //SENSORGATEWAY_SIMPLEDATA_H

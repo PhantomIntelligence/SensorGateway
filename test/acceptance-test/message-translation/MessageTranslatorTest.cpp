@@ -11,47 +11,47 @@
 	limitations under the License.
 */
 
-#ifndef SPIRITSENSORGATEWAY_MESSAGETRANSLATORTEST_CPP
-#define SPIRITSENSORGATEWAY_MESSAGETRANSLATORTEST_CPP
+#ifndef SENSORGATEWAY_MESSAGETRANSLATORTEST_CPP
+#define SENSORGATEWAY_MESSAGETRANSLATORTEST_CPP
 
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 #include <fstream>
 #include "test/utilities/files/AWLMessagesFileManager.h"
-#include "test/utilities/files/SpiritFramesFileManager.h"
-#include "test/utilities/stub/AWLMessagesStub.h"
-#include "test/utilities/stub/SpiritFramesStub.h"
-#include "spirit-sensor-gateway/message-translation/AWLMessageToSpiritMessageTranslationStrategy.h"
+#include "test/utilities/files/FrameFileManager.h"
+#include "test/utilities/stub/AWLMessageStub.h"
+#include "test/utilities/stub/FrameStub.h"
+#include "sensor-gateway/message-translation/AWLTranslationStrategy.h"
 #include "test/utilities/mock/FrameSinkMock.h"
 
 using Mock::FrameProcessingScheduler;
 using Mock::FrameSinkMock;
 using TestUtilities::AWLMessagesFileManager;
-using TestUtilities::SpiritFramesFileManager;
+using TestUtilities::FrameFileManager;
 using Stub::createAWLMessageStub;
-using Stub::createSpiritFramesStub;
-using MessageTranslation::AWLMessageToSpiritMessageTranslationStrategy;
+using Stub::createFrameStub;
+using MessageTranslation::AWLTranslationStrategy;
 
-class AWLMessageToSpiritMessageTranslationStrategyTest : public ::testing::Test {
+class AWLTranslationStrategyTest : public ::testing::Test {
 protected:
     char const* AWLMESSAGES_INPUT_FILE_NAME = "AWLMessagesInputFile.txt";
-    char const* EXPECTED_SPIRIT_FRAMES_OUTPUT_FILE_NAME = "ExpectedSpiritFramesOutputFile.txt";
+    char const* EXPECTED__FRAMES_OUTPUT_FILE_NAME = "ExpectedFramesOutputFile.txt";
 
     virtual void SetUp() {
         auto awlMessages = createAWLMessageStub();
-        auto spiritFrames = createSpiritFramesStub();
+        auto Frames = createFrameStub();
         awlMessagesFileManager.writeFileWithMessages(awlMessages, AWLMESSAGES_INPUT_FILE_NAME);
-        spiritFramesFileManager.writeFileWithMessages(spiritFrames, EXPECTED_SPIRIT_FRAMES_OUTPUT_FILE_NAME);
+        frameFileManager.writeFileWithMessages(Frames, EXPECTED__FRAMES_OUTPUT_FILE_NAME);
     }
 
     AWLMessagesFileManager awlMessagesFileManager;
-    SpiritFramesFileManager spiritFramesFileManager;
+    FrameFileManager frameFileManager;
 };
 
-TEST_F(AWLMessageToSpiritMessageTranslationStrategyTest,
-       given_someInputFileContainingValidAWLMessages_when_translatingAWLMessagesIntoSpiritFrames_then_returnCorrespondingSpriritFramesOutputFile) {
-    auto ACTUAL_SPIRIT_FRAMES_OUTPUT_FILE_NAME = "ActualSpiritFramesOutputFile.txt";
-    AWLMessageToSpiritMessageTranslationStrategy awlMessageTranslator;
+TEST_F(AWLTranslationStrategyTest,
+       given_someInputFileContainingValidAWLMessages_when_translatingAWLMessagesIntoFrames_then_returnCorrespondingSpriritFramesOutputFile) {
+    auto ACTUAL__FRAMES_OUTPUT_FILE_NAME = "ActualFramesOutputFile.txt";
+    AWLTranslationStrategy awlMessageTranslator;
     FrameSinkMock frameSinkMock(1);
     FrameProcessingScheduler scheduler(&frameSinkMock);
     awlMessageTranslator.linkConsumer(&scheduler);
@@ -67,9 +67,9 @@ TEST_F(AWLMessageToSpiritMessageTranslationStrategyTest,
 
     auto frames = frameSinkMock.getConsumedData();
 
-    spiritFramesFileManager.writeFileWithFrames(frames, ACTUAL_SPIRIT_FRAMES_OUTPUT_FILE_NAME);
-    ASSERT_TRUE(spiritFramesFileManager.areFilesEqual(EXPECTED_SPIRIT_FRAMES_OUTPUT_FILE_NAME,
-                                                      ACTUAL_SPIRIT_FRAMES_OUTPUT_FILE_NAME));
+    frameFileManager.writeFileWithFrames(frames, ACTUAL__FRAMES_OUTPUT_FILE_NAME);
+    ASSERT_TRUE(frameFileManager.areFilesEqual(EXPECTED__FRAMES_OUTPUT_FILE_NAME,
+                                                      ACTUAL__FRAMES_OUTPUT_FILE_NAME));
 }
 
-#endif //SPIRITSENSORGATEWAY_MESSAGETRANSLATORTEST_CPP
+#endif //SENSORGATEWAY_MESSAGETRANSLATORTEST_CPP

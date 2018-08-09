@@ -15,13 +15,13 @@
 
 */
 
-#ifndef SPIRITSERVERGATEWAY_SENSORACCESSLINKTEST_CPP
-#define SPIRITSERVERGATEWAY_SENSORACCESSLINKTEST_CPP
+#ifndef SERVERGATEWAY_SENSORACCESSLINKTEST_CPP
+#define SERVERGATEWAY_SENSORACCESSLINKTEST_CPP
 
 #include <gtest/gtest.h>
 #include <chrono>
 
-#include "spirit-sensor-gateway/application/SensorAccessLink.hpp"
+#include "sensor-gateway/application/SensorAccessLink.hpp"
 #include "test/utilities/data-model/DataModelFixture.h"
 
 using DataModel::SimpleData;
@@ -29,7 +29,7 @@ using SimpleDataList = std::list<SimpleData>;
 using SensorCommunication::SensorCommunicationStrategy;
 using MessageTranslation::MessageTranslationStrategy;
 using ServerCommunication::ServerCommunicationStrategy;
-using SpiritSensorGateway::SensorAccessLink;
+using SensorGateway::SensorAccessLink;
 using TimePoint = std::chrono::time_point<std::chrono::steady_clock>;
 
 namespace SensorAccessLinkTestMock {
@@ -297,4 +297,4 @@ TEST_F(SensorAccessLinkTest,
     ASSERT_TRUE(connectionClosingIsValid(&sensorCommunicationStrategyMock, &serverCommunicationStrategyMock));
 }
 
-#endif //SPIRITSERVERGATEWAY_SENSORACCESSLINKTEST_CPP
+#endif //SERVERGATEWAY_SENSORACCESSLINKTEST_CPP

@@ -1,2 +1,2 @@
-# SpiritSensorGateway
-Communication gateway between Spirit and differents Sensors.
+# SensorGateway
+Communication gateway for various sensors.

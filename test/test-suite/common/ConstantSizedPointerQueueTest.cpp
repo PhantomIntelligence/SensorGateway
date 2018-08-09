@@ -15,11 +15,11 @@
 */
 
 
-#ifndef SPIRITSENSORGATEWAY_CONSTANTSIZEDPOINTERQUEUETEST_CPP
-#define SPIRITSENSORGATEWAY_CONSTANTSIZEDPOINTERQUEUETEST_CPP
+#ifndef SENSORGATEWAY_CONSTANTSIZEDPOINTERQUEUETEST_CPP
+#define SENSORGATEWAY_CONSTANTSIZEDPOINTERQUEUETEST_CPP
 
 #include <gtest/gtest.h>
-#include "spirit-sensor-gateway/common/container/ConstantSizedPointerQueue.hpp"
+#include "sensor-gateway/common/container/ConstantSizedPointerQueue.hpp"
 #include "test/utilities/data-model/DataModelFixture.h"
 
 using ExampleDataModel::NativeData;
@@ -152,4 +152,4 @@ TEST_F(ConstantSizedPointerQueueTest, given_aNonFullQueue_when_fillingAndConsumi
     }
 }
 
-#endif //SPIRITSENSORGATEWAY_CONSTANTSIZEDPOINTERQUEUETEST_CPP
+#endif //SENSORGATEWAY_CONSTANTSIZEDPOINTERQUEUETEST_CPP

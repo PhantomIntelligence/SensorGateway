@@ -11,8 +11,8 @@
 	limitations under the License.
 */
 
-#ifndef SPIRITSENSORGATEWAY_FILEMANAGER_H
-#define SPIRITSENSORGATEWAY_FILEMANAGER_H
+#ifndef SENSORGATEWAY_FILEMANAGER_H
+#define SENSORGATEWAY_FILEMANAGER_H
 
 #include <fstream>
 #include <iostream>
@@ -104,4 +104,4 @@ namespace TestUtilities {
     };
 }
 
-#endif //SPIRITSENSORGATEWAY_FILEMANAGER_H
+#endif //SENSORGATEWAY_FILEMANAGER_H

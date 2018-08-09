@@ -15,10 +15,10 @@ file(GLOB SERVER_COMM_TEST_FILES "${CMAKE_CURRENT_SOURCE_DIR}/test-suite/server-
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/test-suite")
 
 # Add all the test and mock files to the executable
-find_package(SpiritSensorGateway)
+find_package(SensorGateway)
 add_executable(runtests ${TEST_FILES} ${UTILITIES_FILES} ${MOCK_FILES} ${STUB_FILES} ${DATA_MODEL_FILES} ${APPLICATION_TEST_FILES} ${COMMON_TEST_FILES} ${DOMAIN_TEST_FILES} ${SENSOR_COMM_TEST_FILES} ${TRANSLATOR_TEST_FILES} ${SERVER_COMM_TEST_FILES})
 
-target_link_libraries(runtests gtest gmock_main ${SpiritSensorGateway_LIBRARIES} ${CONAN_LIBS})
+target_link_libraries(runtests gtest gmock_main ${SensorGateway_LIBRARIES} ${CONAN_LIBS})
 
 fetch_googletest(
         ${PROJECT_SOURCE_DIR}/cmake-module

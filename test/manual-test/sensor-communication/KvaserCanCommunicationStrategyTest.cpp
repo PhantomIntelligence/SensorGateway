@@ -1,10 +1,10 @@
-#ifndef SPIRITSENSORGATEWAY_KVASERREADMESSAGETOFILETEST_CPP
-#define SPIRITSENSORGATEWAY_KVASERREADMESSAGETOFILETEST_CPP
+#ifndef SENSORGATEWAY_KVASERREADMESSAGETOFILETEST_CPP
+#define SENSORGATEWAY_KVASERREADMESSAGETOFILETEST_CPP
 
 #include <iostream>
 #include <cstdio>
 #include <inttypes.h>
-#include "spirit-sensor-gateway/sensor-communication/KvaserCanCommunicationStrategy.cpp"
+#include "sensor-gateway/sensor-communication/KvaserCanCommunicationStrategy.cpp"
 
 
 int main(){
@@ -40,4 +40,4 @@ int main(){
     return 0;
 };
 
-#endif // SPIRITSENSORGATEWAY_KVASERREADMESSAGETOFILETEST_CPP
+#endif // SENSORGATEWAY_KVASERREADMESSAGETOFILETEST_CPP

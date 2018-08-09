@@ -15,13 +15,13 @@
 */
 
 
-#ifndef SPIRITSENSORGATEWAY_PARAMETERS_H
-#define SPIRITSENSORGATEWAY_PARAMETERS_H
+#ifndef SENSORGATEWAY_PARAMETERS_H
+#define SENSORGATEWAY_PARAMETERS_H
 
 #include "DataModelTypeDefinition.h"
 
 /**
- * @brief The Data Representation (DR) classes contained in this namespace form an basic implementation guide for DR classes in Spirit.
+ * @brief The Data Representation (DR) classes contained in this namespace form an basic implementation guide for DR classes in .
  * @note The HIC++ requirements details are documented and well explained in the Data.h file. Please refer to it for any DR implementation explanation.
  * @see Data.h for more details
  */
@@ -161,4 +161,4 @@ namespace Defaults {
     Parameters const DEFAULT_PARAMETERS = Parameters(DEFAULT_FWHM, DEFAULT_SAMPLING_TIME);
 }
 
-#endif //SPIRITSENSORGATEWAY_PARAMETERS_H
+#endif //SENSORGATEWAY_PARAMETERS_H

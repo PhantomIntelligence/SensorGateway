@@ -14,12 +14,12 @@
 	limitations under the License.
 */
 
-#ifndef SPIRITSENSORGATEWAY_RINGBUFFERPADTEST_CPP
-#define SPIRITSENSORGATEWAY_RINGBUFFERPADTEST_CPP
+#ifndef SENSORGATEWAY_RINGBUFFERPADTEST_CPP
+#define SENSORGATEWAY_RINGBUFFERPADTEST_CPP
 
 #include <gtest/gtest.h>
 
-#include "spirit-sensor-gateway/common/data-flow/RingBufferPad.hpp"
+#include "sensor-gateway/common/data-flow/RingBufferPad.hpp"
 #include "test/utilities/data-model/DataModelFixture.h"
 
 using DataFlow::RingBufferPad;
@@ -84,5 +84,5 @@ TEST_F(RingBufferPadTest, given_data_when_read_then_returnsData) {
     ASSERT_EQ(readData, data);
 }
 
-#endif //SPIRITSENSORGATEWAY_RINGBUFFERPADTEST_CPP
+#endif //SENSORGATEWAY_RINGBUFFERPADTEST_CPP
 

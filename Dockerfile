@@ -32,11 +32,11 @@ RUN wget http://canlandbucket.s3-website-eu-west-1.amazonaws.com/productionResou
     make && make install
 
 
-ENTRYPOINT sed -i 's?/.*/SpiritSensorGateway?'`pwd`'?g' cmake-build-debug/CMakeCache.txt &&\
+ENTRYPOINT sed -i 's?/.*/SensorGateway?'`pwd`'?g' cmake-build-debug/CMakeCache.txt &&\
     ./dev-script/conanUpdateDependencies &&\
     sed -i s/libstdc++/libstdc++11/g ~/.conan/profiles/default &&\
     ./dev-script/conanUpdateDependencies &&\
-    sed -i 's?/.*/SpiritSensorGateway?'`pwd`'?g' cmake-build-debug/Makefile &&\
+    sed -i 's?/.*/SensorGateway?'`pwd`'?g' cmake-build-debug/Makefile &&\
     cmake --build /builddir/cmake-build-debug --target runtests -- -j 4 &&\
     /builddir/cmake-build-debug/test/runtests
 

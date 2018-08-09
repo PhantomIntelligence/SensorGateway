@@ -6,10 +6,8 @@ echo "---- Creating build folder: ./${BUILD_FOLDER}..."
 mkdir -p $BUILD_FOLDER
 
 
-# TODO: Find a way to initialize CMake cache and indexes
-
 echo "---- Have CMake build initial folders..."
-cmake --build $BUILD_FOLDER --target all
+cmake -G "CodeBlocks - Unix Makefiles" -DCMAKE_BUILD_TYPE=Debug --build $BUILD_FOLDER --target all
 
 echo "---- Makes conan install external dependencies..."
 ./dev-script/conanUpdateDependencies
