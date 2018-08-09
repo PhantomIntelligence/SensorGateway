@@ -69,7 +69,7 @@ TEST_F(AWLTranslationStrategyTest,
 
     frameFileManager.writeFileWithFrames(frames, ACTUAL__FRAMES_OUTPUT_FILE_NAME);
     ASSERT_TRUE(frameFileManager.areFilesEqual(EXPECTED__FRAMES_OUTPUT_FILE_NAME,
-                                                      ACTUAL__FRAMES_OUTPUT_FILE_NAME));
+                                               ACTUAL__FRAMES_OUTPUT_FILE_NAME));
 }
 
 #endif //SENSORGATEWAY_MESSAGETRANSLATORTEST_CPP

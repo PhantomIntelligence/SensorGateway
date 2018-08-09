@@ -32,7 +32,8 @@ namespace AWL {
 namespace DataFlow {
     class AWLMessage {
     public:
-        explicit AWLMessage(AWL::MessageID id, AWL::MessageTimestamp timestamp, AWL::MessageLength length, AWL::DataArray data) noexcept;
+        explicit AWLMessage(AWL::MessageID id, AWL::MessageTimestamp timestamp, AWL::MessageLength length,
+                            AWL::DataArray data) noexcept;
 
         ~AWLMessage() noexcept = default;
 
@@ -40,15 +41,15 @@ namespace DataFlow {
 
         AWLMessage(AWLMessage&& other) noexcept;
 
-        AWLMessage& operator = (AWLMessage const& other)& ;
+        AWLMessage& operator=(AWLMessage const& other)&;
 
-        AWLMessage& operator = (AWLMessage&& other)& noexcept;
+        AWLMessage& operator=(AWLMessage&& other)& noexcept;
 
         void swap(AWLMessage& current, AWLMessage& other) noexcept;
 
-        bool operator ==(AWLMessage const&) const;
+        bool operator==(AWLMessage const&) const;
 
-        bool operator != (AWLMessage const&) const;
+        bool operator!=(AWLMessage const&) const;
 
         static AWLMessage const& returnDefaultData() noexcept;
 
@@ -58,14 +59,15 @@ namespace DataFlow {
         AWL::DataArray data;
     };
 
-namespace Defaults {
-    using DataFlow::AWLMessage;
-    AWL::MessageID const DEFAULT_ID = 0;
-    AWL::MessageTimestamp const DEFAULT_TIMESTAMP = 0;
-    AWL::MessageLength const DEFAULT_LENGTH = 0;
-    AWL::DataArray const DEFAULT_AWL_DATA = AWL::DataArray();
-    AWLMessage const DEFAULT_AWL_MESSAGE = AWLMessage(DEFAULT_ID, DEFAULT_TIMESTAMP, DEFAULT_LENGTH, DEFAULT_AWL_DATA);
-}
+    namespace Defaults {
+        using DataFlow::AWLMessage;
+        AWL::MessageID const DEFAULT_ID = 0;
+        AWL::MessageTimestamp const DEFAULT_TIMESTAMP = 0;
+        AWL::MessageLength const DEFAULT_LENGTH = 0;
+        AWL::DataArray const DEFAULT_AWL_DATA = AWL::DataArray();
+        AWLMessage const DEFAULT_AWL_MESSAGE = AWLMessage(DEFAULT_ID, DEFAULT_TIMESTAMP, DEFAULT_LENGTH,
+                                                          DEFAULT_AWL_DATA);
+    }
 
 }
 #endif //SENSORGATEWAY_MESSAGE_H

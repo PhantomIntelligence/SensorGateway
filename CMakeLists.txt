@@ -1,8 +1,5 @@
 cmake_minimum_required(VERSION 3.8 FATAL_ERROR)
-
-set(PROJECT_NAME SensorGateway)
-
-project(${PROJECT_NAME} CXX)
+project(SensorGateway CXX)
 
 include(cmake-module/setupCMakeMacros.cmake)
 setup_cmake_macros(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
