@@ -1,6 +1,7 @@
 ## FROM https://github.com/google/googletest/blob/master/googletest/README.md#using-cmake
 
 macro(fetch_googletest _download_module_path _download_root)
+    message(STATUS)
     message(STATUS "Building googletest")
     message(STATUS "GoogleTest download directory: ${_download_root}")
     set(GOOGLETEST_DOWNLOAD_ROOT ${_download_root})
@@ -31,5 +32,6 @@ macro(fetch_googletest _download_module_path _download_root)
     )
 
     set_property(TARGET gtest APPEND_STRING PROPERTY COMPILE_FLAGS " -w")
-    message(STATUS "Done with googletest")
+    message(STATUS " Done with googletest")
+    message(STATUS)
 endmacro()
