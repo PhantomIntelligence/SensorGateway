@@ -20,9 +20,10 @@
 #include <canlib.h>
 #include "SensorCommunicationStrategy.hpp"
 
-using Sensor::AWL::MAXIMUM_NUMBER_OF_DATA_IN_MESSAGE;
 
 namespace SensorCommunication {
+
+    using Sensor::AWL::MAXIMUM_NUMBER_OF_DATA_IN_MESSAGE;
     using DataFlow::AWLMessage;
 
     class KvaserCanCommunicationStrategy final : public SensorCommunicationStrategy<AWLMessage> {

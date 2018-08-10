@@ -19,13 +19,12 @@
 
 #include "sensor-gateway/common/ConstantValuesDefinition.h"
 
-using Sensor::AWL::MAXIMUM_NUMBER_OF_DATA_IN_MESSAGE;
 
 namespace AWL {
     using MessageID = int64_t;
     using MessageTimestamp = int64_t;
     using MessageLength = int32_t;
-    using DataArray = std::array<unsigned char, MAXIMUM_NUMBER_OF_DATA_IN_MESSAGE>;
+    using DataArray = std::array<unsigned char, Sensor::AWL::MAXIMUM_NUMBER_OF_DATA_IN_MESSAGE>;
 }
 
 
