@@ -24,6 +24,3 @@ AWL16AccessLink::AWL16AccessLink(ServerCommunicationStrategy* serverCommunicatio
               &awlTranslationStrategy,
               &kvaserCanCommunicationStrategy) {}
 
-AWL16AccessLink::~AWL16AccessLink() noexcept {
-    super::~SensorAccessLink();
-}

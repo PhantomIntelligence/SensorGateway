@@ -35,7 +35,7 @@ namespace SensorGateway {
 
         explicit AWL16AccessLink(ServerCommunicationStrategy* serverCommunicationStrategy);
 
-        ~AWL16AccessLink() noexcept;
+        ~AWL16AccessLink() noexcept = default;
 
         AWL16AccessLink(AWL16AccessLink const& other) = delete;
 
