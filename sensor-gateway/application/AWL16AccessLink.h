@@ -47,8 +47,8 @@ namespace SensorGateway {
 
     private:
 
-        MessageTranslationStrategy messageTranslationStrategy;
-        SensorCommunicationStrategy sensorCommunicationStrategy;
+        MessageTranslation::AWLTranslationStrategy awlTranslationStrategy;
+        SensorCommunication::KvaserCanCommunicationStrategy kvaserCanCommunicationStrategy;
     };
 }
 

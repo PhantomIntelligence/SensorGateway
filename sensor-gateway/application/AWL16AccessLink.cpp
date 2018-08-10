@@ -21,8 +21,8 @@ using SensorGateway::AWL16AccessLink;
 
 AWL16AccessLink::AWL16AccessLink(ServerCommunicationStrategy* serverCommunicationStrategy) :
         super(serverCommunicationStrategy,
-              &messageTranslationStrategy,
-              &sensorCommunicationStrategy) {}
+              &awlTranslationStrategy,
+              &kvaserCanCommunicationStrategy) {}
 
 AWL16AccessLink::~AWL16AccessLink() noexcept {
     super::~SensorAccessLink();
