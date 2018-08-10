@@ -28,8 +28,6 @@ namespace SensorGateway {
         using super = SensorAccessLink<DataFlow::AWLMessage, DataFlow::Frame>;
 
         using super::ServerCommunicationStrategy;
-        using super::MessageTranslationStrategy;
-        using super::SensorCommunicationStrategy;
 
     public:
 
