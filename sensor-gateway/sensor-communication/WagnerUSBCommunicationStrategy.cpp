@@ -14,4 +14,4 @@
 	limitations under the License.
 */
 
-#include "LibUSBCommunicationStrategy.h"
+#include "WagnerUSBCommunicationStrategy.h"
