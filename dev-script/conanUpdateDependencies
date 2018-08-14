@@ -6,4 +6,8 @@ BUILD_DIRECTORY=$2
 conan remote add conan-transit https://conan-transit.bintray.com --force --insert=0
 conan remote add bincrafters https://api.bintray.com/conan/bincrafters/public-conan --force --insert=1
 
-conan install $CONAN_FILE_LOCATION -s compiler.libcxx=libstdc++11 -s build_type=Debug --install-folder=$BUILD_DIRECTORY --build missing
+# TODO: remove the "-o libusb:enable_udev=False" AS SOON AS the result of this issue:
+# TODO: ...  https://github.com/bincrafters/community/issues/400
+# TODO: ...  gets resolved and supported in here:
+# TODO: ...  https://github.com/bincrafters/conan-libusb/tree/stable/1.0.22
+conan install $CONAN_FILE_LOCATION -s compiler.libcxx=libstdc++11 -s build_type=Debug --install-folder=$BUILD_DIRECTORY -o libusb:enable_udev=False --build missing

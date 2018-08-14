@@ -26,6 +26,7 @@
 #include <unordered_map>
 #include <exception>
 #include <cstring>
+#include <sstream>
 #include <limits>
 #include <iostream>
 
@@ -33,6 +34,8 @@
 #include "ExceptionMessages.h"
 
 namespace {
+    typedef unsigned char Byte;
+
     typedef std::mutex Mutex;
     typedef std::lock_guard<Mutex> LockGuard;
 

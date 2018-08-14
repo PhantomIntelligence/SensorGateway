@@ -48,6 +48,27 @@ void TBDSensorNameUSBCommunicationStrategy::openConnection() {
     throwDeviceNotFoundErrorIfNeeded();
 
     auto errorCode = libusb_claim_interface(usbDeviceHandle, INTERFACE_TO_CLAIM_FROM_DEVICE);
+    throwUsbClaimInterfaceErrorIfNeeded(errorCode);
+
+
+    USBCommandBlock usbCommandBlock;
+    usbCommandBlock.command = GET_FIRMWARE_VERSION;
+    usbCommandBlock.numberOfByteToTransfer = 0;
+    usbCommandBlock.data = 0;
+    unsigned int timeout = 0;
+
+    doUSBBulkTransferAndReturnNumberOfByteActuallyTransferred(
+            usbConnectionParameters.endpointOut,
+            (Byte*) &usbCommandBlock,
+            sizeof(usbCommandBlock),
+            timeout);
+
+    Byte versionStrings[NUMBER_OF_VERSION_STRINGS][VERSION_STRING_MAX_LENGTH];
+    doUSBBulkTransferAndReturnNumberOfByteActuallyTransferred(
+            usbConnectionParameters.endpointIn,
+            (Byte*) &versionStrings,
+            sizeof(versionStrings),
+            timeout);
 }
 
 AWLMessage TBDSensorNameUSBCommunicationStrategy::readMessage() {
@@ -55,7 +76,13 @@ AWLMessage TBDSensorNameUSBCommunicationStrategy::readMessage() {
 }
 
 void TBDSensorNameUSBCommunicationStrategy::closeConnection() {
+    LockGuard lockGuard(closingMutex);
 
+    libusb_close(usbDeviceHandle);
+    libusb_exit(nullptr); // TODO: ask Daniel if this shouldn't be:
+//    libusb_exit(usbContext);
+    usbDeviceHandle = nullptr;
+    reconnectTime = SteadyClock::now();
 }
 
 void TBDSensorNameUSBCommunicationStrategy::throwDeviceNotFoundErrorIfNeeded() {
@@ -66,6 +93,55 @@ void TBDSensorNameUSBCommunicationStrategy::throwDeviceNotFoundErrorIfNeeded() {
 
 void TBDSensorNameUSBCommunicationStrategy::throwUsbClaimInterfaceErrorIfNeeded(int errorCode) {
     if (errorCode < 0) {
-        throwRuntimeError("");
+        std::ostringstream errorMessage("usb_claim_interface returned an error: ", std::ios_base::ate);
+        errorMessage << errorCode;
+        throwRuntimeError(errorMessage.str().c_str());
     }
 }
+
+int TBDSensorNameUSBCommunicationStrategy::doUSBBulkTransferAndReturnNumberOfByteActuallyTransferred(
+        Byte endpoint,
+        Byte* data,
+        int length,
+        unsigned int timeout) {
+
+    throwDeviceNotFoundErrorIfNeeded();
+
+    int numberOfByteActuallyTransferred = 0;
+    auto errorCode = libusb_bulk_transfer(usbDeviceHandle, endpoint, data, length,
+                                          &numberOfByteActuallyTransferred, timeout);
+    throwErrorOnLibUSBBulkTransfetErrorCode(errorCode);
+
+    if (numberOfByteActuallyTransferred != length) {
+        // TODO: log when the logger has been created
+        // TODO: throw an exception?
+        std::cout << "An incorrect number of data has been transferred... \n"
+                  << "Expected: " << length
+                  << " actual: " << numberOfByteActuallyTransferred
+                  << std::endl;
+        numberOfByteActuallyTransferred = 0;
+    }
+    return numberOfByteActuallyTransferred;
+}
+
+void TBDSensorNameUSBCommunicationStrategy::throwErrorOnLibUSBBulkTransfetErrorCode(int errorCode) {
+    if (errorCode == 0) {
+        return;
+    }
+
+    std::ostringstream errorMessage("ERROR in libusb bulk write: ", std::ios_base::ate);
+    errorMessage << errorCode;
+    if (errorCode == LIBUSB_ERROR_TIMEOUT) {
+        errorMessage << "... transfer timed out.\n";
+    } else if (errorCode == LIBUSB_ERROR_PIPE) {
+        errorMessage << "... the endpoint halted.\n";
+    } else if (errorCode == LIBUSB_ERROR_OVERFLOW) {
+        errorMessage << "... the device offered more data than expected.\n";
+    } else if (errorCode == LIBUSB_ERROR_NO_DEVICE) {
+        errorMessage << "... the device has disconnected.\n";
+    } else {
+        errorMessage << "... something went wrong.\n";
+    }
+    throwRuntimeError(errorMessage.str().c_str());
+}
+
