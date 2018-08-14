@@ -137,7 +137,7 @@ namespace DataFlow {
 
         void throwErrorIfIllegalConsumption(Consumer* consumer) {
             if (isAtWriterLocation(consumer)) {
-                throwIllegalActionException(ExceptionMessage::RING_BUFFER_ILLEGAL_CONSUMPTION_ON_WRITER_LOCATION_MESSAGE);
+                throwRuntimeError(ExceptionMessage::RING_BUFFER_ILLEGAL_CONSUMPTION_ON_WRITER_LOCATION_MESSAGE);
             }
         }
 

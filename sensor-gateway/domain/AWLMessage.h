@@ -17,7 +17,7 @@
 #ifndef SENSORGATEWAY_MESSAGE_H
 #define SENSORGATEWAY_MESSAGE_H
 
-#include "sensor-gateway/common/ConstantValuesDefinition.h"
+#include "sensor-gateway/common/ConstantFunctionsDefinition.h"
 
 
 namespace AWL {

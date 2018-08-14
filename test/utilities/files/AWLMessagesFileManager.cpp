@@ -16,6 +16,7 @@
 
 using TestUtilities::AWLMessagesFileManager;
 using DataFlow::AWLMessage;
+using Sensor::AWL::MAXIMUM_NUMBER_OF_DATA_IN_MESSAGE;
 
 AWLMessage AWLMessagesFileManager::readMessageFromFileBlock(std::string const& fileBlock) {
     auto id = std::stoi(fetchSubstringBetweenDelimiters(fileBlock, ID_LABEL+MESSAGE_LABEL_VALUE_ASSOCIATOR, "\n"));

@@ -263,6 +263,8 @@ TEST_F(SensorCommunicatorTest,
     }
 }
 
+using Sensor::AWL::MAXIMUM_NUMBER_OF_DATA_IN_MESSAGE;
+
 AWLMessage SensorCommunicatorTest::createAMessageWithValueOffsetOf(uint8_t dataValueOffset) const noexcept {
     int64_t const arbitraryId = 42 + dataValueOffset;
     uint64_t const arbitraryTimestamp = 101010 + dataValueOffset;

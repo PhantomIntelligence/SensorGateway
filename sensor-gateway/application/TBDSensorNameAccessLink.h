@@ -14,16 +14,16 @@
 	limitations under the License.
 */
 
-#ifndef SENSORGATEWAY_AWL16ACCESSLINK_H
-#define SENSORGATEWAY_AWL16ACCESSLINK_H
+#ifndef SENSORGATEWAY_TBDSENSORNAMEACCESSLINK_H
+#define SENSORGATEWAY_TBDSENSORNAMEACCESSLINK_H
 
 #include "SensorAccessLink.hpp"
-#include "sensor-gateway/sensor-communication/KvaserCanCommunicationStrategy.h"
+#include "sensor-gateway/sensor-communication/TBDSensorNameUSBCommunicationStrategy.h"
 #include "sensor-gateway/message-translation/AWLTranslationStrategy.h"
 
 namespace SensorGateway {
 
-    class AWL16AccessLink : public SensorAccessLink<DataFlow::AWLMessage, DataFlow::Frame> {
+    class TBDSensorNameAccessLink : public SensorAccessLink<DataFlow::AWLMessage, DataFlow::Frame> {
     protected:
         using super = SensorAccessLink<DataFlow::AWLMessage, DataFlow::Frame>;
 
@@ -31,26 +31,26 @@ namespace SensorGateway {
 
     public:
 
-        explicit AWL16AccessLink(ServerCommunicationStrategy* serverCommunicationStrategy)
+        explicit TBDSensorNameAccessLink(ServerCommunicationStrategy* serverCommunicationStrategy)
                 : super(serverCommunicationStrategy,
                         &awlTranslationStrategy,
-                        &kvaserCanCommunicationStrategy) {}
+                        &tbdSensorNameUSBCommunicationStrategy) {}
 
-        ~AWL16AccessLink() noexcept = default;
+        ~TBDSensorNameAccessLink() noexcept = default;
 
-        AWL16AccessLink(AWL16AccessLink const& other) = delete;
+        TBDSensorNameAccessLink(TBDSensorNameAccessLink const& other) = delete;
 
-        AWL16AccessLink(AWL16AccessLink&& other) noexcept = delete;
+        TBDSensorNameAccessLink(TBDSensorNameAccessLink&& other) noexcept = delete;
 
-        AWL16AccessLink& operator=(AWL16AccessLink const& other)& = delete;
+        TBDSensorNameAccessLink& operator=(TBDSensorNameAccessLink const& other)& = delete;
 
-        AWL16AccessLink& operator=(AWL16AccessLink&& other)& noexcept = delete;
+        TBDSensorNameAccessLink& operator=(TBDSensorNameAccessLink&& other)& noexcept = delete;
 
     private:
 
         MessageTranslation::AWLTranslationStrategy awlTranslationStrategy;
-        SensorCommunication::KvaserCanCommunicationStrategy kvaserCanCommunicationStrategy;
+        SensorCommunication::TBDSensorNameUSBCommunicationStrategy tbdSensorNameUSBCommunicationStrategy;
     };
 }
 
-#endif //SENSORGATEWAY_AWL16ACCESSLINK_H
+#endif //SENSORGATEWAY_TBDSENSORNAMEACCESSLINK_H

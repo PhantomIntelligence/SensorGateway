@@ -56,13 +56,13 @@ namespace Container {
 
         void validateNotFull() const {
             if (isFull()) {
-                throwIllegalActionException(ExceptionMessage::ABSTRACT_POINTER_ARRAY_ILLEGAL_STORE_FULL);
+                throwRuntimeError(ExceptionMessage::ABSTRACT_POINTER_ARRAY_ILLEGAL_STORE_FULL);
             }
         }
 
         void validateNotEmpty() const {
             if (isEmpty()) {
-                throwIllegalActionException(ExceptionMessage::ABSTRACT_POINTER_ARRAY_ILLEGAL_CONSUMPTION_EMPTY);
+                throwRuntimeError(ExceptionMessage::ABSTRACT_POINTER_ARRAY_ILLEGAL_CONSUMPTION_EMPTY);
             }
         }
 

@@ -52,9 +52,10 @@ namespace SensorCommunication {
             unsigned int length;
             uint8_t data[MAXIMUM_NUMBER_OF_DATA_IN_MESSAGE];
         };
-        canHandle communicationChannel;
 
         AWLMessage convertCanMessageToAwlMessage(CanMessage canMessage);
+
+        canHandle communicationChannel;
     };
 }
 #endif //SENSORGATEWAY_KVASERCANCOMMUNICATIONSTRATEGY_H
