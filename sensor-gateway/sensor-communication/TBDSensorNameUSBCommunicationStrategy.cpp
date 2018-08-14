@@ -55,7 +55,6 @@ void TBDSensorNameUSBCommunicationStrategy::openConnection() {
     usbCommandBlock.command = GET_FIRMWARE_VERSION;
     usbCommandBlock.numberOfByteToTransfer = 0;
     usbCommandBlock.data = 0;
-    unsigned int timeout = 0;
 
     doUSBBulkTransferAndReturnNumberOfByteActuallyTransferred(
             usbConnectionParameters.endpointOut,
