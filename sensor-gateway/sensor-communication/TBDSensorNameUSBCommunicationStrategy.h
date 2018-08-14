@@ -69,8 +69,7 @@ namespace SensorCommunication {
         int doUSBBulkTransferAndReturnNumberOfByteActuallyTransferred(
                 Byte endpoint,
                 Byte* data,
-                int length,
-                unsigned int timeout);
+                int length);
 
         void throwErrorOnLibUSBBulkTransfetErrorCode(int errorCode);
 

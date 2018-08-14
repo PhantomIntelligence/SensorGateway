@@ -60,15 +60,13 @@ void TBDSensorNameUSBCommunicationStrategy::openConnection() {
     doUSBBulkTransferAndReturnNumberOfByteActuallyTransferred(
             usbConnectionParameters.endpointOut,
             (Byte*) &usbCommandBlock,
-            sizeof(usbCommandBlock),
-            timeout);
+            sizeof(usbCommandBlock));
 
     Byte versionStrings[NUMBER_OF_VERSION_STRINGS][VERSION_STRING_MAX_LENGTH];
     doUSBBulkTransferAndReturnNumberOfByteActuallyTransferred(
             usbConnectionParameters.endpointIn,
             (Byte*) &versionStrings,
-            sizeof(versionStrings),
-            timeout);
+            sizeof(versionStrings));
 }
 
 AWLMessage TBDSensorNameUSBCommunicationStrategy::readMessage() {
@@ -80,7 +78,7 @@ void TBDSensorNameUSBCommunicationStrategy::closeConnection() {
 
     libusb_close(usbDeviceHandle);
     libusb_exit(nullptr); // TODO: ask Daniel if this shouldn't be:
-//    libusb_exit(usbContext);
+//    libusb_exit(usbContext); // TODO: this?
     usbDeviceHandle = nullptr;
     reconnectTime = SteadyClock::now();
 }
@@ -100,13 +98,9 @@ void TBDSensorNameUSBCommunicationStrategy::throwUsbClaimInterfaceErrorIfNeeded(
 }
 
 int TBDSensorNameUSBCommunicationStrategy::doUSBBulkTransferAndReturnNumberOfByteActuallyTransferred(
-        Byte endpoint,
-        Byte* data,
-        int length,
-        unsigned int timeout) {
-
+        Byte endpoint, Byte* data, int length) {
     throwDeviceNotFoundErrorIfNeeded();
-
+    unsigned int timeout = 0;
     int numberOfByteActuallyTransferred = 0;
     auto errorCode = libusb_bulk_transfer(usbDeviceHandle, endpoint, data, length,
                                           &numberOfByteActuallyTransferred, timeout);
