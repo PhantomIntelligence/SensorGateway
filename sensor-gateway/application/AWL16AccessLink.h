@@ -32,7 +32,9 @@ namespace SensorGateway {
     public:
 
         explicit AWL16AccessLink(ServerCommunicationStrategy* serverCommunicationStrategy)
-                : super(serverCommunicationStrategy,
+                : awlTranslationStrategy(),
+                  kvaserCanCommunicationStrategy(),
+                  super(serverCommunicationStrategy,
                         &awlTranslationStrategy,
                         &kvaserCanCommunicationStrategy) {}
 

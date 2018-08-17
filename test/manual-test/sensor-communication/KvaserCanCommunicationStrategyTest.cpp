@@ -4,7 +4,6 @@
 #include <cinttypes>
 #include "sensor-gateway/sensor-communication/KvaserCanCommunicationStrategy.h"
 
-
 int main() {
 
     const int NUMBER_OF_DETECTIONS = 42;
