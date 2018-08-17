@@ -23,9 +23,9 @@
 
 namespace SensorGateway {
 
-class TBDSensorNameAccessLink final : public SensorAccessLink<Sensor::Wagner::Str, DataFlow::Frame> {
+class TBDSensorNameAccessLink final : public SensorAccessLink<Sensor::TBDSensorName::Structures, DataFlow::Frame> {
     protected:
-        using super = SensorAccessLink<DataFlow::AWLMessage, DataFlow::Frame>;
+        using super = SensorAccessLink<Sensor::TBDSensorName::Structures, DataFlow::Frame>;
 
         using super::ServerCommunicationStrategy;
 
