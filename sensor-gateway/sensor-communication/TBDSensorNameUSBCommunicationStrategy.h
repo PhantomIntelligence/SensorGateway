@@ -18,22 +18,26 @@
 #define SENSORGATEWAY_TBDSENSORNAMEUSBCOMMUNICATIONSTRATEGY_H
 
 #include <libusb-1.0/libusb.h>
+
+#include "sensor-gateway/common/sensor-structures/TBDSensorNameStructures.h"
 #include "SensorCommunicationStrategy.hpp"
 
 namespace SensorCommunication {
 
-    // NOTE: DWORD == uint32_t
+    using Sensor::AWL::NUMBER_OF_DATA_BYTES;
 
-    using DataFlow::AWLMessage;
-
-    class TBDSensorNameUSBCommunicationStrategy final : public SensorCommunicationStrategy<AWLMessage> {
+    /**
+     * @warning This class DOES NOT handle thread safety concerns.
+     * It is meant to be called and used by a single thread from the SensorCommunicator.
+     */
+    class TBDSensorNameUSBCommunicationStrategy final
+            : public SensorCommunicationStrategy<Sensor::TBDSensorName::Structures> {
     protected:
 
         using SteadyClock = std::chrono::steady_clock;
         using ReconnectTime = std::chrono::time_point<SteadyClock>;
 
-        using super = SensorCommunicationStrategy<AWLMessage>;
-        using super::DATA;
+        using super = SensorCommunicationStrategy<Sensor::TBDSensorName::Structures>;
 
         const int INTERFACE_TO_CLAIM_FROM_DEVICE = 0;
         const int VERSION_STRING_MAX_LENGTH = 32;
@@ -55,7 +59,9 @@ namespace SensorCommunication {
 
         void openConnection() override;
 
-        DATA readMessage() override;
+        super::Messages fetchMessages() override;
+
+        super::RawDataCycles fetchRawDataCycles() override;
 
         void closeConnection() override;
 
@@ -72,6 +78,18 @@ namespace SensorCommunication {
                 int length);
 
         void throwErrorOnLibUSBBulkTransfetErrorCode(int errorCode);
+
+        void fetchSensorMessages(uint8_t numberOfMessagesToFetch);
+
+        typedef struct {
+            uint32_t id;
+            uint32_t timestamp;
+            unsigned char flags;
+            unsigned char length;
+            Byte data[NUMBER_OF_DATA_BYTES];
+        } USBSensorMessage;
+
+        super::Message convertUSBSensorMessageToSensorMessage(USBSensorMessage* sensorMessage);
 
         typedef struct {
             uint16_t vendorId;
@@ -121,6 +139,8 @@ namespace SensorCommunication {
 
             CUSTOM_COMMAND,
 
+            QUERY_NUMBER_OF_MESSAGES_AND_RAW_DATA_CYCLES_READY_TO_BE_FETCH = 88,
+
             REPEAT_OUT = 100,
             REPEAT_IN
         };
@@ -133,8 +153,8 @@ namespace SensorCommunication {
 
         typedef struct {
             uint32_t command;
-            uint32_t numberOfCyclesReady;
-            uint32_t numberOfBytes;
+            uint32_t numberOfRawDataCyclesReady;
+            uint32_t numberOfMessageReady;
             uint32_t nextMessageLength;
         } ADIBulkLoopbackLidarQueryResponse;
 

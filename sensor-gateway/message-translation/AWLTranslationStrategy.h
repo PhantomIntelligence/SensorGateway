@@ -15,7 +15,7 @@
 #define SENSORGATEWAY_AWLTRANSLATIONSTRATEGY_H
 
 #include "sensor-gateway/domain/Frame.h"
-#include "sensor-gateway/domain/AWLMessage.h"
+#include "sensor-gateway/common/sensor-structures/AWLMessage.h"
 #include "MessageTranslationStrategy.hpp"
 
 namespace MessageTranslation {

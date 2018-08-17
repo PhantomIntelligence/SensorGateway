@@ -13,7 +13,7 @@
 #ifndef SENSORGATEWAY_UNKNOWNMESSAGEEXCEPTION_H
 #define SENSORGATEWAY_UNKNOWNMESSAGEEXCEPTION_H
 
-#include "sensor-gateway/domain/AWLMessage.h"
+#include "sensor-gateway/common/sensor-structures/AWLMessage.h"
 
 using DataFlow::AWLMessage;
 

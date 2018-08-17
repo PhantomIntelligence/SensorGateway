@@ -15,11 +15,19 @@
 
 using DataFlow::AWLMessage;
 
-AWLMessage::AWLMessage(AWL::MessageID id, AWL::MessageTimestamp timestamp, AWL::MessageLength length, AWL::DataArray data) noexcept :
+AWLMessage::AWLMessage(AWL::MessageID id,
+                       AWL::MessageTimestamp timestamp,
+                       AWL::MessageLength length,
+                       AWL::DataArray data) noexcept :
         id(id),
         timestamp(timestamp),
         length(length),
         data(data) {
+}
+
+AWLMessage::AWLMessage() :
+        AWLMessage(AWLMessage::returnDefaultData()) {
+
 }
 
 AWLMessage::AWLMessage(AWLMessage const& other) :
@@ -27,20 +35,20 @@ AWLMessage::AWLMessage(AWLMessage const& other) :
 }
 
 AWLMessage::AWLMessage(AWLMessage&& other) noexcept :
-        id(std::move(other.id)),
-        timestamp(std::move(other.timestamp)),
-        length(std::move(other.length)),
-        data(std::move(other.data)) {
+        id(other.id),
+        timestamp(other.timestamp),
+        length(other.length),
+        data(other.data) {
 
 }
 
-AWLMessage& AWLMessage::operator = (AWLMessage const& other)& {
+AWLMessage& AWLMessage::operator=(AWLMessage const& other)& {
     AWLMessage temporary(other);
     swap(*this, temporary);
     return *this;
 }
 
-AWLMessage& AWLMessage::operator = (AWLMessage&& other)& noexcept {
+AWLMessage& AWLMessage::operator=(AWLMessage&& other)& noexcept {
     swap(*this, other);
     return *this;
 }
@@ -52,7 +60,7 @@ void AWLMessage::swap(AWLMessage& current, AWLMessage& other) noexcept {
     std::swap(current.data, other.data);
 }
 
-bool DataFlow::AWLMessage::operator == (AWLMessage const& other) const  {
+bool DataFlow::AWLMessage::operator==(AWLMessage const& other) const {
     auto sameId = (id == other.id);
     auto sameTimestamp = (timestamp == other.timestamp);
     auto sameLength = (length == other.length);
@@ -61,7 +69,7 @@ bool DataFlow::AWLMessage::operator == (AWLMessage const& other) const  {
     return messagesAreEqual;
 }
 
-bool DataFlow::AWLMessage::operator != (AWLMessage const& other) const  {
+bool DataFlow::AWLMessage::operator!=(AWLMessage const& other) const {
     return !operator==(other);
 }
 

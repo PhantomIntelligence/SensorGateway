@@ -24,19 +24,22 @@ namespace SensorGateway {
     template<class I, class O>
     class SensorAccessLink {
     protected:
-        typedef I INPUT;
+        typedef I INPUT_STRUCTURES;
         typedef O OUTPUT;
+
+        using SensorMessage = typename INPUT_STRUCTURES::Message;
+        using SensorRawData = typename INPUT_STRUCTURES::RawData;
 
         using ServerCommunicator = SensorAccessLinkElement::ServerCommunicator<OUTPUT>;
         using ServerCommunicationStrategy = ServerCommunication::ServerCommunicationStrategy<OUTPUT>;
         using ServerCommunicatorScheduler = DataFlow::DataProcessingScheduler<OUTPUT, ServerCommunicator, 1>;
 
-        using MessageTranslator = SensorAccessLinkElement::MessageTranslator<INPUT, OUTPUT>;
-        using MessageTranslationStrategy = MessageTranslation::MessageTranslationStrategy<INPUT, OUTPUT>;
-        using TranslatorScheduler = DataFlow::DataProcessingScheduler<INPUT, MessageTranslator, 1>;
+        using MessageTranslator = SensorAccessLinkElement::MessageTranslator<SensorMessage, OUTPUT>;
+        using MessageTranslationStrategy = MessageTranslation::MessageTranslationStrategy<SensorMessage, OUTPUT>;
+        using TranslatorScheduler = DataFlow::DataProcessingScheduler<SensorMessage, MessageTranslator, 1>;
 
-        using SensorCommunicator = SensorAccessLinkElement::SensorCommunicator<INPUT>;
-        using SensorCommunicationStrategy = SensorCommunication::SensorCommunicationStrategy<INPUT>;
+        using SensorCommunicator = SensorAccessLinkElement::SensorCommunicator<INPUT_STRUCTURES>;
+        using SensorCommunicationStrategy = SensorCommunication::SensorCommunicationStrategy<INPUT_STRUCTURES>;
 
 
     public:

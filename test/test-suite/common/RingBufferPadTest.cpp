@@ -25,7 +25,7 @@
 using DataFlow::RingBufferPad;
 using TestFunctions::DataTestUtil;
 
-typedef RingBufferPad<ExampleDataModel::NativeData> NativePad;
+typedef RingBufferPad<DataModel::SimpleData> Pad;
 
 /**
  * @brief Test Fixture meant to ensure correct behavior of RingBufferPad.
@@ -41,7 +41,7 @@ protected:
 
 
 TEST_F(RingBufferPadTest, given_aNewPad_when_fetchingNextPad_then_returnsSelf) {
-    auto initialPad = NativePad();
+    auto initialPad = Pad();
 
     auto testedNextPad = initialPad.next();
 
@@ -50,8 +50,8 @@ TEST_F(RingBufferPadTest, given_aNewPad_when_fetchingNextPad_then_returnsSelf) {
 
 
 TEST_F(RingBufferPadTest, given_aNextPad_when_fetchingNextPad_then_returnsTheNextPad) {
-    auto initialPad = NativePad();
-    auto testedPad = NativePad();
+    auto initialPad = Pad();
+    auto testedPad = Pad();
     auto nextPadPointer = &initialPad;
     testedPad.setNext(nextPadPointer);
 
@@ -61,9 +61,9 @@ TEST_F(RingBufferPadTest, given_aNextPad_when_fetchingNextPad_then_returnsTheNex
 }
 
 TEST_F(RingBufferPadTest, given_aNextPad_when_attemptingToSetANewNextPad_then_theNewNextPadIsNotAdded) {
-    auto initialPad = NativePad();
-    auto ignoredPad = NativePad();
-    auto testedPad = NativePad();
+    auto initialPad = Pad();
+    auto ignoredPad = Pad();
+    auto testedPad = Pad();
     auto nextPadPointer = &initialPad;
     testedPad.setNext(nextPadPointer);
 
@@ -75,8 +75,8 @@ TEST_F(RingBufferPadTest, given_aNextPad_when_attemptingToSetANewNextPad_then_th
 
 
 TEST_F(RingBufferPadTest, given_data_when_read_then_returnsData) {
-    auto testedPad = NativePad();
-    auto data = DataTestUtil::initNativeData();
+    auto testedPad = Pad();
+    auto data = DataTestUtil::createRandomSimpleData();
     testedPad.write(std::move(data));
 
     auto readData = testedPad.read();

@@ -17,12 +17,13 @@
 #ifndef SENSORGATEWAY_SIMPLEDATA_H
 #define SENSORGATEWAY_SIMPLEDATA_H
 
-#include "Data.h"
+#include "sensor-gateway/common/ConstantFunctionsDefinition.h"
 
 namespace DataModel {
 
     int const NUMBER_OF_SIMPLE_DATA_CONTENT = 2;
 
+    // Allows to populate SimpleData with a "complex", non-primitive, element
     typedef std::array<std::string, NUMBER_OF_SIMPLE_DATA_CONTENT> SimpleDataContent;
 
     class SimpleData {
@@ -30,6 +31,8 @@ namespace DataModel {
     public:
 
         explicit SimpleData(SimpleDataContent simpleDataContent);
+
+        explicit SimpleData();
 
         ~SimpleData() noexcept = default;
 
@@ -47,16 +50,18 @@ namespace DataModel {
 
         bool operator!=(SimpleData const& other) const;
 
+        void inverseContent();
+
+        bool isTheInverseOf(SimpleData const& other) const;
+
         std::string toString() const noexcept;
 
         SimpleData static const returnDefaultData() noexcept;
-
 
     private:
 
         SimpleDataContent content;
     };
-
 }
 
 namespace Defaults {

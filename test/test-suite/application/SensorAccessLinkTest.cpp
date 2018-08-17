@@ -29,16 +29,23 @@ using SimpleDataList = std::list<SimpleData>;
 using SensorCommunication::SensorCommunicationStrategy;
 using MessageTranslation::MessageTranslationStrategy;
 using ServerCommunication::ServerCommunicationStrategy;
-using SensorGateway::SensorAccessLink;
 using TimePoint = std::chrono::time_point<std::chrono::steady_clock>;
+using SensorAccessLink = SensorGateway::SensorAccessLink<Sensor::Test::Simple::Structures, SimpleData>;
 
 namespace SensorAccessLinkTestMock {
 
     std::string const SERVER_ADDRESS = "This is a fake address";
 
-    class SensorCommunicationStrategyMock final : public SensorCommunicationStrategy<SimpleData> {
+    class SensorCommunicationStrategyMock final : public SensorCommunicationStrategy<Sensor::Test::Simple::Structures> {
+    protected:
+
+        using super = SensorCommunicationStrategy<Sensor::Test::Simple::Structures>;
 
     public:
+
+        using super::Messages;
+        using super::RawDataCycles;
+
         explicit SensorCommunicationStrategyMock() :
                 numberOfTimesOpenConnectionIsCalled(0),
                 numberOfTimesCloseConnectionIsCalled(0),
@@ -48,7 +55,7 @@ namespace SensorAccessLinkTestMock {
                 closeConnectionFunctionCallTimePoint(TimePoint()) {
         }
 
-        ~ SensorCommunicationStrategyMock() = default;
+        ~SensorCommunicationStrategyMock() = default;
 
         void openConnection() override {
             numberOfTimesOpenConnectionIsCalled++;
@@ -60,8 +67,8 @@ namespace SensorAccessLinkTestMock {
             closeConnectionFunctionCallTimePoint = std::chrono::steady_clock::now();
         }
 
-        SimpleData readMessage() override {
-            SimpleData someMessage = TestFunctions::DataTestUtil::createRandomSimpleData();
+        super::Messages fetchMessages() override {
+            SimpleData data = TestFunctions::DataTestUtil::createRandomSimpleData();
             if (!readMessageHasBeenCalled.load()) {
                 readMessageHasBeenCalled.store(true);
                 readMessageFunctionCallTimePoint = std::chrono::steady_clock::now();
@@ -71,7 +78,13 @@ namespace SensorAccessLinkTestMock {
             std::this_thread::sleep_for(std::chrono::milliseconds(5));
             std::this_thread::yield();
 
-            return someMessage;
+            super::Messages messages = {data};
+            return messages;
+        }
+
+        super::RawDataCycles fetchRawDataCycles() override {
+            super::RawDataCycles rawDataCycles;
+            return rawDataCycles;
         }
 
         bool openConnectionHasBeenCalledOnce() {
@@ -135,6 +148,7 @@ namespace SensorAccessLinkTestMock {
 
 
     class ServerCommunicationStrategyMock final : public ServerCommunicationStrategy<SimpleData> {
+    protected:
 
     public:
         explicit ServerCommunicationStrategyMock() :
@@ -230,8 +244,9 @@ protected:
         return (readMessageIsCalledFirst && sendMessageIsCalledLast);
     }
 
-    bool connectionClosingIsValid(SensorAccessLinkTestMock::SensorCommunicationStrategyMock* sensorCommunicationStrategyMock,
-                                  SensorAccessLinkTestMock::ServerCommunicationStrategyMock* serverCommunicationStrategyMock) {
+    bool
+    connectionClosingIsValid(SensorAccessLinkTestMock::SensorCommunicationStrategyMock* sensorCommunicationStrategyMock,
+                             SensorAccessLinkTestMock::ServerCommunicationStrategyMock* serverCommunicationStrategyMock) {
 
         bool closeConnectionHasBeenCalledOnceInServerCommunicationStrategy =
                 serverCommunicationStrategyMock->closeConnectionHasBeenCalledOnce();
@@ -254,9 +269,9 @@ TEST_F(SensorAccessLinkTest, given__when_connecting_then_aValidConnectionIsEstab
     SensorAccessLinkTestMock::MessageTranslationStrategyMock messageTranslationStrategyMock;
     SensorAccessLinkTestMock::ServerCommunicationStrategyMock serverCommunicationStrategyMock;
 
-    SensorAccessLink<SimpleData, SimpleData> sensorAccessLink(&serverCommunicationStrategyMock,
-                                                              &messageTranslationStrategyMock,
-                                                              &sensorCommunicationStrategyMock);
+    SensorAccessLink sensorAccessLink(&serverCommunicationStrategyMock,
+                                      &messageTranslationStrategyMock,
+                                      &sensorCommunicationStrategyMock);
 
     sensorAccessLink.connect(SensorAccessLinkTestMock::SERVER_ADDRESS);
     sensorAccessLink.disconnect();
@@ -269,9 +284,9 @@ TEST_F(SensorAccessLinkTest, given__when_connecting_then_aValidDataFlowIsInstant
     SensorAccessLinkTestMock::MessageTranslationStrategyMock messageTranslationStrategyMock;
     SensorAccessLinkTestMock::ServerCommunicationStrategyMock serverCommunicationStrategyMock;
 
-    SensorAccessLink<SimpleData, SimpleData> sensorAccessLink(&serverCommunicationStrategyMock,
-                                                              &messageTranslationStrategyMock,
-                                                              &sensorCommunicationStrategyMock);
+    SensorAccessLink sensorAccessLink(&serverCommunicationStrategyMock,
+                                      &messageTranslationStrategyMock,
+                                      &sensorCommunicationStrategyMock);
 
     sensorAccessLink.connect(SensorAccessLinkTestMock::SERVER_ADDRESS);
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
@@ -287,9 +302,9 @@ TEST_F(SensorAccessLinkTest,
     SensorAccessLinkTestMock::MessageTranslationStrategyMock messageTranslationStrategyMock;
     SensorAccessLinkTestMock::ServerCommunicationStrategyMock serverCommunicationStrategyMock;
 
-    SensorAccessLink<SimpleData, SimpleData> sensorAccessLink(&serverCommunicationStrategyMock,
-                                                              &messageTranslationStrategyMock,
-                                                              &sensorCommunicationStrategyMock);
+    SensorAccessLink sensorAccessLink(&serverCommunicationStrategyMock,
+                                      &messageTranslationStrategyMock,
+                                      &sensorCommunicationStrategyMock);
 
     sensorAccessLink.connect(SensorAccessLinkTestMock::SERVER_ADDRESS);
     sensorAccessLink.disconnect();

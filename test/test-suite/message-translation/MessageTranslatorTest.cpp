@@ -12,7 +12,7 @@
 */
 
 #include <gtest/gtest.h>
-#include <sensor-gateway/domain/AWLMessage.h>
+#include <sensor-gateway/common/sensor-structures/AWLMessage.h>
 #include <sensor-gateway/domain/Frame.h>
 #include "sensor-gateway/message-translation/MessageTranslator.hpp"
 

@@ -21,12 +21,12 @@
 #include <gtest/gtest.h>
 #include <list>
 
-#include "sensor-gateway/sensor-communication/SensorCommunicator.hpp"
 #include "test/utilities/data-model/DataModelFixture.h"
+#include "sensor-gateway/sensor-communication/SensorCommunicator.hpp"
 
-using DataFlow::AWLMessage;
-using AWLMessages = std::list<AWLMessage>;
-using AWLCommunicator = SensorAccessLinkElement::SensorCommunicator<AWLMessage>;
+using SimpleData = Sensor::Test::Simple::Structures::Message;
+using SimpleDataList = std::list<SimpleData>;
+using SimpleDataSensorCommunicator = SensorAccessLinkElement::SensorCommunicator<Sensor::Test::Simple::Structures>;
 using TestFunctions::DataTestUtil;
 
 
@@ -37,15 +37,16 @@ protected:
 
     virtual ~SensorCommunicatorTest() = default;
 
-    AWLMessage createAMessageWithValueOffsetOf(uint8_t dataValueOffset) const noexcept;
+    SimpleDataList createASequenceOfDifferentMessagesOfSize(uint64_t numberOfMessagesToCreate) const noexcept;
 
-    AWLMessages createASequenceOfDifferentMessagesOfSize(uint64_t numberOfMessagesToCreate) const noexcept;
-
-    AWLMessages fetchMessageProducedBySensorCommunicatorExecution(AWLMessages&& messages);
+    SimpleDataList fetchMessageProducedBySensorCommunicatorExecution(SimpleDataList&& messages);
 };
 
-class SensorCommunicationStrategy final : public SensorCommunication::SensorCommunicationStrategy<AWLMessage> {
+class SensorCommunicationStrategy final
+        : public SensorCommunication::SensorCommunicationStrategy<Sensor::Test::Simple::Structures> {
+protected:
 
+    using super = SensorCommunication::SensorCommunicationStrategy<Sensor::Test::Simple::Structures>;
 public:
 
     SensorCommunicationStrategy() :
@@ -55,24 +56,43 @@ public:
             hasToReturnSpecificData(false) {
     }
 
-    void returnThisMessageSequenceWhenReadMessageIsCalled(AWLMessages&& dataToReturn) {
+    ~SensorCommunicationStrategy() noexcept final = default;
+
+    SensorCommunicationStrategy(SensorCommunicationStrategy const& other) = delete;
+
+    SensorCommunicationStrategy(SensorCommunicationStrategy&& other) noexcept = delete;
+
+    SensorCommunicationStrategy& operator=(SensorCommunicationStrategy const& other)& = delete;
+
+    SensorCommunicationStrategy&
+    operator=(SensorCommunicationStrategy&& other)& noexcept = delete;
+
+    void returnThisMessageSequenceWhenReadMessageIsCalled(SimpleDataList&& dataToReturn) {
         hasToReturnSpecificData = true;
-        this->dataToReturn = std::forward<AWLMessages>(dataToReturn);
+        this->dataToReturn = std::forward<SimpleDataList>(dataToReturn);
     }
 
-    AWLMessage readMessage() override {
+    super::Messages fetchMessages() override {
         acknowledgeReadMessageHasBeenCalled();
         if (hasToReturnSpecificData && !dataToReturn.empty()) {
-            AWLMessage awlMessage = dataToReturn.front();
+            SimpleData message = dataToReturn.front();
             dataToReturn.pop_front();
-            return awlMessage;
+            super::Messages messages = {message};
+            return messages;
         }
 
         // WARNING! This mock implementation of readMessage needs to be slowed down because the way gtest works. DO NOT REMOVE.
         std::this_thread::sleep_for(std::chrono::milliseconds(5));
         std::this_thread::yield();
 
-        return AWLMessage::returnDefaultData();
+        auto message = super::Message::returnDefaultData();
+        super::Messages messages = {message};
+        return messages;
+    }
+
+    super::RawDataCycles fetchRawDataCycles() override {
+        super::RawDataCycles rawDataCycles;
+        return rawDataCycles;
     }
 
     void openConnection() override {
@@ -120,12 +140,12 @@ private:
     mutable BooleanPromise readMessageCalledAcknowledgement;
 
     bool hasToReturnSpecificData;
-    AWLMessages dataToReturn;
+    SimpleDataList dataToReturn;
 };
 
 TEST_F(SensorCommunicatorTest, given__when_start_then_callsOpenConnectionInStrategy) {
     SensorCommunicationStrategy mockStrategy;
-    AWLCommunicator sensorCommunicator(&mockStrategy);
+    SimpleDataSensorCommunicator sensorCommunicator(&mockStrategy);
 
     sensorCommunicator.connect();
 
@@ -136,7 +156,7 @@ TEST_F(SensorCommunicatorTest, given__when_start_then_callsOpenConnectionInStrat
 
 TEST_F(SensorCommunicatorTest, given__when_terminateAndJoin_then_callsCloseConnectionInStrategy) {
     SensorCommunicationStrategy mockStrategy;
-    AWLCommunicator sensorCommunicator(&mockStrategy);
+    SimpleDataSensorCommunicator sensorCommunicator(&mockStrategy);
 
     sensorCommunicator.disconnect();
 
@@ -146,7 +166,7 @@ TEST_F(SensorCommunicatorTest, given__when_terminateAndJoin_then_callsCloseConne
 
 TEST_F(SensorCommunicatorTest, given__when_start_then_callsReadMessageInStrategy) {
     SensorCommunicationStrategy mockStrategy;
-    AWLCommunicator sensorCommunicator(&mockStrategy);
+    SimpleDataSensorCommunicator sensorCommunicator(&mockStrategy);
 
     sensorCommunicator.connect();
 
@@ -156,17 +176,15 @@ TEST_F(SensorCommunicatorTest, given__when_start_then_callsReadMessageInStrategy
     ASSERT_TRUE(strategyHasBeenCalled);
 }
 
-using AWLSink = DataFlow::DataSink<AWLMessage>;
-
-class AWLSinkMock : public AWLSink {
+class SimpleDataSinkMock : public DataFlow::DataSink<SimpleData> {
 
 protected:
 
-    using AWLSink::DATA;
+    using DataFlow::DataSink<SimpleData>::DATA;
 
 public:
 
-    explicit AWLSinkMock(uint8_t numberOfDataToConsume) :
+    explicit SimpleDataSinkMock(uint8_t numberOfDataToConsume) :
             actualNumberOfDataConsumed(0),
             numberOfDataToConsume(numberOfDataToConsume) {
 
@@ -199,7 +217,7 @@ public:
         }
     }
 
-    AWLMessages getConsumedData() const noexcept {
+    SimpleDataList getConsumedData() const noexcept {
         return consumedData;
     }
 
@@ -208,23 +226,23 @@ private:
     AtomicCounter actualNumberOfDataConsumed;
     AtomicCounter numberOfDataToConsume;
 
-    AWLMessages consumedData;
+    SimpleDataList consumedData;
 
     Mutex consumptionMutex;
     Mutex goalReachedMutex;
     mutable BooleanPromise consumptionReached;
 };
 
-using AWLProcessingScheduler = DataFlow::DataProcessingScheduler<AWLMessage, AWLSinkMock, 1>;
+using AWLProcessingScheduler = DataFlow::DataProcessingScheduler<SimpleData, SimpleDataSinkMock, 1>;
 
-AWLMessages SensorCommunicatorTest::fetchMessageProducedBySensorCommunicatorExecution(AWLMessages&& messages) {
+SimpleDataList SensorCommunicatorTest::fetchMessageProducedBySensorCommunicatorExecution(SimpleDataList&& messages) {
     auto numberOfMessagesToProcess = messages.size();
-    AWLSinkMock sink(numberOfMessagesToProcess);
+    SimpleDataSinkMock sink(numberOfMessagesToProcess);
     AWLProcessingScheduler scheduler(&sink);
 
     SensorCommunicationStrategy mockStrategy;
-    mockStrategy.returnThisMessageSequenceWhenReadMessageIsCalled(std::forward<AWLMessages>(messages));
-    AWLCommunicator sensorCommunicator(&mockStrategy);
+    mockStrategy.returnThisMessageSequenceWhenReadMessageIsCalled(std::forward<SimpleDataList>(messages));
+    SimpleDataSensorCommunicator sensorCommunicator(&mockStrategy);
     sensorCommunicator.linkConsumer(&scheduler);
 
     sensorCommunicator.connect();
@@ -234,14 +252,14 @@ AWLMessages SensorCommunicatorTest::fetchMessageProducedBySensorCommunicatorExec
     sensorCommunicator.disconnect();
     scheduler.terminateAndJoin();
 
-    AWLMessages producedMessages = sink.getConsumedData();
+    SimpleDataList producedMessages = sink.getConsumedData();
 
     return producedMessages;
 }
 
 TEST_F(SensorCommunicatorTest, given_aSequenceOfOneIncomingMessage_when_start_then_willProduceThisData) {
     auto messages = createASequenceOfDifferentMessagesOfSize(1);
-    AWLMessage expectedMessage = AWLMessage(messages.front());
+    SimpleData expectedMessage = SimpleData(messages.front());
 
     auto resultingMessage = fetchMessageProducedBySensorCommunicatorExecution(std::move(messages)).front();
 
@@ -252,7 +270,7 @@ TEST_F(SensorCommunicatorTest,
        given_aSequenceOfSeveralIncomingMessages_when_start_then_willProduceTheseMessagesInTheSameOrderTheyAreRead) {
     auto numberOfMessages = 5U;
     auto messages = createASequenceOfDifferentMessagesOfSize(numberOfMessages);
-    AWLMessages expectedMessages = messages;
+    SimpleDataList expectedMessages = messages;
 
     auto resultedMessages = fetchMessageProducedBySensorCommunicatorExecution(std::move(messages));
 
@@ -263,30 +281,11 @@ TEST_F(SensorCommunicatorTest,
     }
 }
 
-using Sensor::AWL::MAXIMUM_NUMBER_OF_DATA_IN_MESSAGE;
-
-AWLMessage SensorCommunicatorTest::createAMessageWithValueOffsetOf(uint8_t dataValueOffset) const noexcept {
-    int64_t const arbitraryId = 42 + dataValueOffset;
-    uint64_t const arbitraryTimestamp = 101010 + dataValueOffset;
-    uint32_t const arbitraryLength = 7 + dataValueOffset;
-    AWL::DataArray arbitraryData;
-
-    for (auto k = 0; k < MAXIMUM_NUMBER_OF_DATA_IN_MESSAGE; ++k) {
-        arbitraryData.at(k) = static_cast<unsigned char>(k);
-    }
-
-    AWLMessage message = AWLMessage::returnDefaultData();
-    message.id = arbitraryId;
-    message.timestamp = arbitraryTimestamp;
-    message.length = arbitraryLength;
-    message.data = arbitraryData;
-    return message;
-}
-
-AWLMessages SensorCommunicatorTest::createASequenceOfDifferentMessagesOfSize(uint64_t numberOfMessagesToCreate) const noexcept {
-    AWLMessages messages;
+SimpleDataList
+SensorCommunicatorTest::createASequenceOfDifferentMessagesOfSize(uint64_t numberOfMessagesToCreate) const noexcept {
+    SimpleDataList messages;
     for (uint8_t offset = 0; offset < numberOfMessagesToCreate; ++offset) {
-        auto message = createAMessageWithValueOffsetOf(offset);
+        auto message = TestFunctions::DataTestUtil::createRandomSimpleData();
         messages.push_back(message);
     }
     return messages;
