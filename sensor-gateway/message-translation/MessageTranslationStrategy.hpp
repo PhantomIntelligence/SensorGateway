@@ -24,8 +24,6 @@ namespace MessageTranslation {
         typedef I INPUT;
         typedef O OUTPUT;
 
-
-
     public:
         MessageTranslationStrategy() :
                 currentOutputMessage(OUTPUT::returnDefaultData()) {}

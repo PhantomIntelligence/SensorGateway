@@ -31,7 +31,7 @@ namespace MessageTranslation {
         using super::OUTPUT;
     public:
 
-        AWLTranslationStrategy();
+        explicit AWLTranslationStrategy() = default;
 
         ~ AWLTranslationStrategy() = default;
 

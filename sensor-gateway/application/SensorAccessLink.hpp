@@ -46,13 +46,14 @@ namespace SensorGateway {
         explicit SensorAccessLink(ServerCommunicationStrategy* serverCommunicationStrategy,
                                   MessageTranslationStrategy* messageTranslationStrategy,
                                   SensorCommunicationStrategy* sensorCommunicationStrategy) :
+                serverCommunicationStrategy(serverCommunicationStrategy),
+                messageTranslationStrategy(messageTranslationStrategy),
+                sensorCommunicationStrategy(sensorCommunicationStrategy),
                 serverCommunicator(serverCommunicationStrategy),
                 messageTranslator(messageTranslationStrategy),
                 sensorCommunicator(sensorCommunicationStrategy),
                 translatorScheduler(&messageTranslator),
                 serverCommunicatorScheduler(&serverCommunicator) {
-            messageTranslationStrategy->linkConsumer(&serverCommunicatorScheduler);
-            sensorCommunicator.linkConsumer(&translatorScheduler);
         }
 
         ~SensorAccessLink() noexcept {
@@ -68,6 +69,8 @@ namespace SensorGateway {
         SensorAccessLink& operator=(SensorAccessLink&& other)& noexcept = delete;
 
         void connect(std::string const& serverAddress) {
+            linkElements();
+           
             serverCommunicator.connect(serverAddress);
             sensorCommunicator.connect();
         };
@@ -81,8 +84,18 @@ namespace SensorGateway {
 
     private:
 
+        void linkElements() {
+            messageTranslationStrategy->linkConsumer(&serverCommunicatorScheduler);
+            sensorCommunicator.linkConsumer(&translatorScheduler);
+        }
+
+        ServerCommunicationStrategy* serverCommunicationStrategy;
         ServerCommunicator serverCommunicator;
+
+        MessageTranslationStrategy* messageTranslationStrategy;
         MessageTranslator messageTranslator;
+
+        SensorCommunicationStrategy* sensorCommunicationStrategy;
         SensorCommunicator sensorCommunicator;
 
         ServerCommunicatorScheduler serverCommunicatorScheduler;
