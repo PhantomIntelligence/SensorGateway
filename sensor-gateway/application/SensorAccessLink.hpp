@@ -70,7 +70,11 @@ namespace SensorGateway {
 
         void connect(std::string const& serverAddress) {
             linkElements();
-           
+
+            // Yield and sleep to allow correct connection
+            std::this_thread::yield();
+            std::this_thread::sleep_for(std::chrono::milliseconds(250));
+
             serverCommunicator.connect(serverAddress);
             sensorCommunicator.connect();
         };

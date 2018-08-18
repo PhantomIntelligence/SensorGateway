@@ -71,6 +71,7 @@ namespace SensorAccessLinkElement {
             while (!terminateOrderHasBeenReceived()) {
                 auto messages = sensorCommunicationStrategy->fetchMessages();
                 for (auto&& message : messages) {
+                    std::cout << "message.id : " << message.id << std::endl;
                     produce(std::forward<typename T::Message>(message));
                 }
             }
