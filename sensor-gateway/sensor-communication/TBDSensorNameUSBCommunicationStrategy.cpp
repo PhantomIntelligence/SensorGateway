@@ -20,7 +20,7 @@ using SensorCommunication::TBDSensorNameUSBCommunicationStrategy;
 using DataFlow::AWLMessage;
 
 TBDSensorNameUSBCommunicationStrategy::TBDSensorNameUSBCommunicationStrategy() :
-        usbConnectionParameters({0x064b, 7823,
+        usbConnectionParameters({0x064b, 0x7823,
                                  (129),
                                  (1),
                                  3000}
