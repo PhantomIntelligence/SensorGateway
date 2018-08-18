@@ -68,11 +68,15 @@ namespace SensorAccessLinkElement {
     private:
 
         void run() {
+            auto const DEFAULT_MESSAGE = T::Message::returnDefaultData();
             while (!terminateOrderHasBeenReceived()) {
                 auto messages = sensorCommunicationStrategy->fetchMessages();
-                for (auto&& message : messages) {
-                    std::cout << "message.id : " << message.id << std::endl;
-                    produce(std::forward<typename T::Message>(message));
+
+                for (auto messageIndex = 0; messageIndex < messages.size(); ++messageIndex) {
+                    auto message = messages[messageIndex];
+                    if (message != DEFAULT_MESSAGE) {
+                        produce(std::move(message));
+                    }
                 }
             }
         }

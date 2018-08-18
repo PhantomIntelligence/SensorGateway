@@ -65,7 +65,6 @@ namespace SensorCommunication {
 
         void closeConnection() override;
 
-
     private:
 
         void throwDeviceNotFoundErrorIfNeeded();
@@ -79,7 +78,7 @@ namespace SensorCommunication {
 
         void throwErrorOnLibUSBBulkTransfetErrorCode(int errorCode);
 
-        void fetchSensorMessages(uint8_t numberOfMessagesToFetch);
+        super::Messages fetchSensorMessages(uint8_t numberOfMessagesToFetch);
 
         typedef struct {
             uint32_t id;
@@ -117,6 +116,8 @@ namespace SensorCommunication {
 
             QUERY_ON_WHICH_USB_PORT_THE_CONNECTION_IS_MADE,
 
+            LOOPBACK,
+
             MEMORY_READ,
             MEMORY_WRITE,
 
@@ -139,10 +140,10 @@ namespace SensorCommunication {
 
             CUSTOM_COMMAND,
 
-            QUERY_NUMBER_OF_MESSAGES_AND_RAW_DATA_CYCLES_READY_TO_BE_FETCH = 88,
-
             REPEAT_OUT = 100,
-            REPEAT_IN
+            REPEAT_IN,
+
+            QUERY_NUMBER_OF_MESSAGES_AND_RAW_DATA_CYCLES_READY_TO_BE_FETCH = 88
         };
 
         typedef struct {
@@ -167,6 +168,10 @@ namespace SensorCommunication {
         ReconnectTime reconnectTime;
 
         Mutex closingMutex;
+
+        AtomicFlag dataCanBeFetched;
+
+        ADIBulkLoopbackLidarQueryResponse quantityOfDataThatCanBeFetched;
     };
 
 }
