@@ -21,8 +21,8 @@ using DataFlow::AWLMessage;
 
 TBDSensorNameUSBCommunicationStrategy::TBDSensorNameUSBCommunicationStrategy() :
         usbConnectionParameters({0x064b, 7823,
-                                 (LIBUSB_ENDPOINT_IN | 1),
-                                 (LIBUSB_ENDPOINT_OUT | 2),
+                                 (129),
+                                 (1),
                                  3000}
         ),
         usbContext(nullptr),
