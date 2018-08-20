@@ -14,8 +14,8 @@
 	limitations under the License.
 */
 
-#ifndef SENSORGATEWAY_SIMPLESTRUCTURES_H
-#define SENSORGATEWAY_SIMPLESTRUCTURES_H
+#ifndef SENSORGATEWAY_TESTDATASTRUCTURES_H
+#define SENSORGATEWAY_TESTDATASTRUCTURES_H
 
 #include "SimpleData.h"
 #include "sensor-gateway/common/sensor-structures/AbstractStructures.h"
@@ -28,11 +28,11 @@ namespace Sensor {
                 typedef typename DataModel::SimpleData Message;
                 typedef typename DataModel::SimpleData RawData;
 
-                static size_t const MAX_NUMBER_OF_BULK_FETCHABLE_MESSAGES = 1;
+                static size_t const MAX_NUMBER_OF_BULK_FETCHABLE_MESSAGES = 1; // IMPORTANT: this has to stay = 1!
                 static size_t const MAX_NUMBER_OF_BULK_FETCHABLE_RAW_DATA_CYCLES = 1;
             };
         }
     }
 }
 
-#endif //SENSORGATEWAY_SIMPLESTRUCTURES_H
+#endif //SENSORGATEWAY_TESTDATASTRUCTURES_H

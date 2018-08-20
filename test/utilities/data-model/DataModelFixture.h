@@ -17,7 +17,7 @@
 #ifndef SENSORGATEWAY_DATAMODELFIXTURE_H
 #define SENSORGATEWAY_DATAMODELFIXTURE_H
 
-#include "SimpleStructures.h"
+#include "TestDataStructures.h"
 
 namespace TestFunctions {
 
