@@ -56,13 +56,27 @@ namespace SensorAccessLinkTestMock {
 
         explicit MockSensorCommunicationStrategy(uint8_t minimumNumberOfMessageToCreate) :
                 promiseFulfilled(false),
+                connectCalled(false),
+                disconnectCalled(false),
                 numberOfMessageCreated(0),
                 minimumNumberOfMessageToCreate(minimumNumberOfMessageToCreate) {
         }
 
-        void openConnection() override {}
+        void openConnection() override {
+            connectCalled.store(true);
+        }
 
-        void closeConnection() override {}
+        bool hasOpenConnectionBeenCalled() const {
+            return connectCalled.load();
+        }
+
+        void closeConnection() override {
+            disconnectCalled.store(true);
+        }
+
+        bool hasCloseConnectionBeenCalled() const {
+            return disconnectCalled.load();
+        }
 
         super::Messages fetchMessages() override {
             super::Messages createdMessages;
@@ -112,6 +126,8 @@ namespace SensorAccessLinkTestMock {
         AtomicCounter minimumNumberOfMessageToCreate;
 
         AtomicFlag promiseFulfilled;
+        AtomicFlag connectCalled;
+        AtomicFlag disconnectCalled;
         Mutex numberOfMessageCreatedVerificationMutex;
         mutable BooleanPromise minimumNumberOfMessageCreated;
 
@@ -141,15 +157,27 @@ namespace SensorAccessLinkTestMock {
         using SimpleServerCommunicationStrategy::MESSAGE;
 
     public:
-        MockServerCommunicationStrategy() = default;
+        MockServerCommunicationStrategy() :
+                connectCalled(false),
+                disconnectCalled(false) {}
 
         ~MockServerCommunicationStrategy() noexcept override = default;
 
         void openConnection(std::string const& serverAddress) override {
-
+            connectCalled.store(true);
         }
 
-        void closeConnection() override {}
+        bool hasOpenConnectionBeenCalled() const {
+            return connectCalled.load();
+        }
+
+        void closeConnection() override {
+            disconnectCalled.store(true);
+        }
+
+        bool hasCloseConnectionBeenCalled() const {
+            return disconnectCalled.load();
+        }
 
         void sendMessage(MESSAGE&& message) override {
             receivedData.push_back(message);
@@ -161,7 +189,49 @@ namespace SensorAccessLinkTestMock {
 
     private:
         SimpleDataList receivedData;
+        AtomicFlag connectCalled;
+        AtomicFlag disconnectCalled;
     };
+}
+
+TEST_F(SensorAccessLinkTest,
+       given_strategies_when_connect_then_bothSensorAndServerStrategiesReceiveOpenConnectionCall) {
+    uint8_t numberOfDataToProcess = 0;
+    SensorAccessLinkTestMock::MockSensorCommunicationStrategy mockSensorCommunicationStrategy(numberOfDataToProcess);
+    SensorAccessLinkTestMock::MockTranslationStrategy mockTranslationStrategy;
+    SensorAccessLinkTestMock::MockServerCommunicationStrategy mockServerCommunicationStrategy;
+    SensorAccessLink sensorAccessLink(&mockServerCommunicationStrategy,
+                                      &mockTranslationStrategy,
+                                      &mockSensorCommunicationStrategy);
+
+    sensorAccessLink.connect(FAKE_SERVER_ADDRESS);
+    sensorAccessLink.disconnect();
+
+    auto sensorOpenConnectionHasBeenCalled = mockSensorCommunicationStrategy.hasOpenConnectionBeenCalled();
+    auto serverOpenConnectionHasBeenCalled = mockServerCommunicationStrategy.hasOpenConnectionBeenCalled();
+
+    ASSERT_TRUE(sensorOpenConnectionHasBeenCalled);
+    ASSERT_TRUE(serverOpenConnectionHasBeenCalled);
+}
+
+TEST_F(SensorAccessLinkTest,
+       given_strategies_when_disconnect_then_bothSensorAndServerStrategiesReceiveCloseConnectionCall) {
+    uint8_t numberOfDataToProcess = 0;
+    SensorAccessLinkTestMock::MockSensorCommunicationStrategy mockSensorCommunicationStrategy(numberOfDataToProcess);
+    SensorAccessLinkTestMock::MockTranslationStrategy mockTranslationStrategy;
+    SensorAccessLinkTestMock::MockServerCommunicationStrategy mockServerCommunicationStrategy;
+    SensorAccessLink sensorAccessLink(&mockServerCommunicationStrategy,
+                                      &mockTranslationStrategy,
+                                      &mockSensorCommunicationStrategy);
+
+    sensorAccessLink.connect(FAKE_SERVER_ADDRESS);
+    sensorAccessLink.disconnect();
+
+    auto sensorCloseConnectionHasBeenCalled = mockSensorCommunicationStrategy.hasCloseConnectionBeenCalled();
+    auto serverCloseConnectionHasBeenCalled = mockServerCommunicationStrategy.hasCloseConnectionBeenCalled();
+
+    ASSERT_TRUE(sensorCloseConnectionHasBeenCalled);
+    ASSERT_TRUE(serverCloseConnectionHasBeenCalled);
 }
 
 /**
