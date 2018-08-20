@@ -18,7 +18,7 @@ using DataFlow::AWLMessage;
 AWLMessage::AWLMessage(AWL::MessageID id,
                        AWL::MessageTimestamp timestamp,
                        AWL::MessageLength length,
-                       AWL::DataArray data) noexcept :
+                       AWL::MessageDataArray data) noexcept :
         id(id),
         timestamp(timestamp),
         length(length),

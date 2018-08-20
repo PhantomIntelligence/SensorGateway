@@ -17,7 +17,7 @@
 #ifndef SENSORGATEWAY_TBDSENSORNAMESTRUCTURES_H
 #define SENSORGATEWAY_TBDSENSORNAMESTRUCTURES_H
 
-#include "AWLMessage.h"
+#include "TBDSensorNameRawData.h"
 #include "AbstractStructures.h"
 
 namespace Sensor {
@@ -26,7 +26,7 @@ namespace Sensor {
         public :
 
             typedef typename DataFlow::AWLMessage Message;
-            typedef typename DataFlow::AWLMessage RawData;
+            typedef typename DataFlow::TBDSensorNameRawData RawData;
 
             static std::size_t const MAX_NUMBER_OF_BULK_FETCHABLE_MESSAGES = 32;
 //            typedef struct

@@ -25,7 +25,7 @@ namespace AWL {
     using MessageTimestamp = uint64_t;
     using MessageLength = uint32_t;
     using MessageDataUnit = uint8_t;
-    using DataArray = std::array<MessageDataUnit, Sensor::AWL::NUMBER_OF_DATA_BYTES>;
+    using MessageDataArray = std::array<MessageDataUnit, Sensor::AWL::NUMBER_OF_DATA_BYTES>;
 }
 
 namespace DataFlow {
@@ -34,7 +34,7 @@ namespace DataFlow {
         explicit AWLMessage(AWL::MessageID id,
                             AWL::MessageTimestamp timestamp,
                             AWL::MessageLength length,
-                            AWL::DataArray data) noexcept;
+                            AWL::MessageDataArray data) noexcept;
 
         explicit AWLMessage();
 
@@ -59,7 +59,7 @@ namespace DataFlow {
         AWL::MessageID id;
         AWL::MessageTimestamp timestamp;
         AWL::MessageLength length;
-        AWL::DataArray data;
+        AWL::MessageDataArray data;
     };
 
     namespace Defaults {
@@ -67,7 +67,7 @@ namespace DataFlow {
         AWL::MessageID const DEFAULT_ID = 0;
         AWL::MessageTimestamp const DEFAULT_TIMESTAMP = 0;
         AWL::MessageLength const DEFAULT_LENGTH = 0;
-        AWL::DataArray const DEFAULT_AWL_DATA = AWL::DataArray();
+        AWL::MessageDataArray const DEFAULT_AWL_DATA = AWL::MessageDataArray();
         AWLMessage const DEFAULT_AWL_MESSAGE = AWLMessage(DEFAULT_ID,
                                                           DEFAULT_TIMESTAMP,
                                                           DEFAULT_LENGTH,

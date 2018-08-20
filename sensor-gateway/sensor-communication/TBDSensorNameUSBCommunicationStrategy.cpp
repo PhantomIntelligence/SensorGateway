@@ -196,7 +196,7 @@ TBDSensorNameUSBCommunicationStrategy::fetchSensorMessages(uint8_t numberOfMessa
 
 TBDSensorNameUSBCommunicationStrategy::super::Message
 TBDSensorNameUSBCommunicationStrategy::convertUSBSensorMessageToSensorMessage(USBSensorMessage* sensorMessage) {
-    AWL::DataArray data;
+    AWL::MessageDataArray data;
     for (auto dataNumber = 0; dataNumber < sensorMessage->length; ++dataNumber) {
         data[dataNumber] = sensorMessage->data[dataNumber];
     }

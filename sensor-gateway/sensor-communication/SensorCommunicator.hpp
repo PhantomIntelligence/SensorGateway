@@ -31,6 +31,8 @@ namespace SensorAccessLinkElement {
         using super = DataFlow::DataSource<typename T::Message>;
         using super::produce;
 
+        typename T::Message const DEFAULT_MESSAGE = T::Message::returnDefaultData();
+
     public:
         explicit SensorCommunicator(SensorCommunicationStrategy* sensorCommunicationStrategy) :
                 terminateOrderReceived(false),
@@ -68,17 +70,24 @@ namespace SensorAccessLinkElement {
     private:
 
         void run() {
-            auto const DEFAULT_MESSAGE = T::Message::returnDefaultData();
             while (!terminateOrderHasBeenReceived()) {
-                auto messages = sensorCommunicationStrategy->fetchMessages();
+                handleIncomingMessages();
+                handleIncomingRawData();
+            }
+        }
 
-                for (auto messageIndex = 0; messageIndex < messages.size(); ++messageIndex) {
-                    auto message = messages[messageIndex];
-                    if (message != DEFAULT_MESSAGE) {
-                        produce(std::move(message));
-                    }
+        void handleIncomingMessages() {
+            auto messages = sensorCommunicationStrategy->fetchMessages();
+            for (auto messageIndex = 0; messageIndex < messages.size(); ++messageIndex) {
+                auto message = messages[messageIndex];
+                if (message != DEFAULT_MESSAGE) {
+                    produce(std::move(message));
                 }
             }
+        }
+
+        void handleIncomingRawData() {
+            auto rawDataCycles = sensorCommunicationStrategy->fetchRawDataCycles();
         }
 
         bool terminateOrderHasBeenReceived() const {

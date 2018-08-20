@@ -14,23 +14,6 @@
 	limitations under the License.
 */
 
-#ifndef SENSORGATEWAY_AWLSTRUCTURES_H
-#define SENSORGATEWAY_AWLSTRUCTURES_H
-
 #include "TBDSensorNameRawData.h"
-#include "AbstractStructures.h"
 
-namespace Sensor {
-    namespace AWL {
-        class Structures final : public Communication::AbstractStructures {
-        public :
-            typedef typename DataFlow::AWLMessage Message;
-            typedef typename DataFlow::TBDSensorNameRawData RawData;
 
-            static size_t const MAX_NUMBER_OF_BULK_FETCHABLE_MESSAGES = 1;
-            static size_t const MAX_NUMBER_OF_BULK_FETCHABLE_RAW_DATA_CYCLES = 1;
-        };
-    }
-}
-
-#endif //SENSORGATEWAY_AWLSTRUCTURES_H
