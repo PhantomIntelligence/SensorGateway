@@ -1,4 +1,4 @@
-find_package(SpiritSensorGateway)
+find_package(SensorGateway)
 
 file(GLOB MANUAL_TEST_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "*/")
 
@@ -15,7 +15,7 @@ foreach (file ${MANUAL_TEST_FILES})
         message(STATUS "Building manual test ${MANUAL_TEST_NAME}")
 
         add_executable(${MANUAL_TEST} ${MANUAL_TEST_FILES} ${DATA_MODEL_FILES})
-        target_link_libraries(${MANUAL_TEST} ${SpiritSensorGateway_LIBRARIES} ${CONAN_LIBS})
+        target_link_libraries(${MANUAL_TEST} ${SensorGateway_LIBRARIES} ${CONAN_LIBS})
 
 
         install(TARGETS ${MANUAL_TEST}

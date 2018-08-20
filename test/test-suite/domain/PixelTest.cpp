@@ -1,9 +1,9 @@
-#ifndef SPIRITSENSORGATEWAY_PIXELTEST_CPP
-#define SPIRITSENSORGATEWAY_PIXELTEST_CPP
+#ifndef SENSORGATEWAY_PIXELTEST_CPP
+#define SENSORGATEWAY_PIXELTEST_CPP
 
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
-#include "spirit-sensor-gateway/domain/Pixel.h"
+#include "sensor-gateway/domain/Pixel.h"
 
 using DataFlow::Pixel;
 using DataFlow::PixelID;
@@ -117,4 +117,4 @@ TEST_F(PixelTest,
 }
 
 
-#endif //SPIRITSENSORGATEWAY_PIXELTEST_CPP
+#endif //SENSORGATEWAY_PIXELTEST_CPP

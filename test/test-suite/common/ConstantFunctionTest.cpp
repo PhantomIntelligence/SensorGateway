@@ -1,10 +1,10 @@
-#ifndef SPIRITSENSORGATEWAY_CONSTANTFUNCTIONTEST_CPP
-#define SPIRITSENSORGATEWAY_CONSTANTFUNCTIONTEST_CPP
+#ifndef SENSORGATEWAY_CONSTANTFUNCTIONTEST_CPP
+#define SENSORGATEWAY_CONSTANTFUNCTIONTEST_CPP
 
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
-#include "spirit-sensor-gateway/common/ConstantFunctionsDefinition.h"
+#include "sensor-gateway/common/ConstantFunctionsDefinition.h"
 
 class ConstantFunctionTest : public ::testing::Test {
 
@@ -51,4 +51,4 @@ TEST_F(ConstantFunctionTest,given_twoBytes_when_convertingTwoBytesToSignedBigEnd
 }
 
 
-#endif //SPIRITSENSORGATEWAY_CONSTANTFUNCTIONTEST_CPP
+#endif //SENSORGATEWAY_CONSTANTFUNCTIONTEST_CPP

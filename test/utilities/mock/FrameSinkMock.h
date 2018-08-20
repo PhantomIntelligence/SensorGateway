@@ -11,11 +11,11 @@
 	limitations under the License.
 */
 
-#ifndef SPIRITSENSORGATEWAY_FRAMESINKMOCK_H
-#define SPIRITSENSORGATEWAY_FRAMESINKMOCK_H
+#ifndef SENSORGATEWAY_FRAMESINKMOCK_H
+#define SENSORGATEWAY_FRAMESINKMOCK_H
 
-#include "spirit-sensor-gateway/common/data-flow/DataSink.hpp"
-#include "test/utilities/files/SpiritFramesFileManager.h"
+#include "sensor-gateway/common/data-flow/DataSink.hpp"
+#include "test/utilities/files/FrameFileManager.h"
 
 
 namespace Mock {
@@ -59,5 +59,5 @@ namespace Mock {
 
 }
 
-#endif //SPIRITSENSORGATEWAY_FRAMESINKMOCK_H
+#endif //SENSORGATEWAY_FRAMESINKMOCK_H
 

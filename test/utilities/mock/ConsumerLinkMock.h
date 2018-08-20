@@ -14,10 +14,10 @@
 	limitations under the License.
 */
 
-#ifndef SPIRITSENSORGATEWAY_CONSUMERLINKMOCK_H
-#define SPIRITSENSORGATEWAY_CONSUMERLINKMOCK_H
+#ifndef SENSORGATEWAY_CONSUMERLINKMOCK_H
+#define SENSORGATEWAY_CONSUMERLINKMOCK_H
 
-#include "spirit-sensor-gateway/common/data-flow/ConsumerLink.hpp"
+#include "sensor-gateway/common/data-flow/ConsumerLink.hpp"
 
 namespace Mock {
 
@@ -50,4 +50,4 @@ namespace Mock {
     };
 }
 
-#endif //SPIRITSENSORGATEWAY_CONSUMERLINKMOCK_H
+#endif //SENSORGATEWAY_CONSUMERLINKMOCK_H

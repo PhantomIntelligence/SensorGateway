@@ -1,4 +1,0 @@
-#define SpiritSensorGateway_MAJOR_VERSION (@SpiritSensorGateway_MAJOR_VERSION@)
-#define SpiritSensorGateway_MINOR_VERSION (@SpiritSensorGateway_MINOR_VERSION@)
-#define SpiritSensorGateway_PATCH_VERSION (@SpiritSensorGateway_PATCH_VERSION@)
-#define SpiritSensorGateway_VERSION_STRING (@SpiritSensorGateway_VERSION@)

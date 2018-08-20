@@ -1,9 +1,9 @@
-#ifndef SPIRITSENSORGATEWAY_FRAMETEST_CPP
-#define SPIRITSENSORGATEWAY_FRAMETEST_CPP
+#ifndef SENSORGATEWAY_FRAMETEST_CPP
+#define SENSORGATEWAY_FRAMETEST_CPP
 
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
-#include "spirit-sensor-gateway/domain/Frame.h"
+#include "sensor-gateway/domain/Frame.h"
 
 using DataFlow::Frame;
 using DataFlow::PixelID;
@@ -89,4 +89,4 @@ TEST_F(FrameTest,
     ASSERT_TRUE(framesAreNotEqual);
 }
 
-#endif //SPIRITSENSORGATEWAY_FRAMETEST_H
+#endif //SENSORGATEWAY_FRAMETEST_H

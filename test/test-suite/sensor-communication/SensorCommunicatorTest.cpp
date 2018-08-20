@@ -15,13 +15,13 @@
 
 */
 
-#ifndef SPIRITSENSORGATEWAY_SENSORCOMMUNICATORTEST_CPP
-#define SPIRITSENSORGATEWAY_SENSORCOMMUNICATORTEST_CPP
+#ifndef SENSORGATEWAY_SENSORCOMMUNICATORTEST_CPP
+#define SENSORGATEWAY_SENSORCOMMUNICATORTEST_CPP
 
 #include <gtest/gtest.h>
 #include <list>
 
-#include "spirit-sensor-gateway/sensor-communication/SensorCommunicator.hpp"
+#include "sensor-gateway/sensor-communication/SensorCommunicator.hpp"
 #include "test/utilities/data-model/DataModelFixture.h"
 
 using DataFlow::AWLMessage;
@@ -290,5 +290,5 @@ AWLMessages SensorCommunicatorTest::createASequenceOfDifferentMessagesOfSize(uin
     return messages;
 }
 
-#endif //SPIRITSENSORGATEWAY_SENSORCOMMUNICATORTEST_CPP
+#endif //SENSORGATEWAY_SENSORCOMMUNICATORTEST_CPP
 

@@ -11,11 +11,11 @@
 	limitations under the License.
 */
 
-#ifndef SPIRITSENSORGATEWAY_AWLMESSAGESFILEMANAGER_H
-#define SPIRITSENSORGATEWAY_AWLMESSAGESFILEMANAGER_H
+#ifndef SENSORGATEWAY_AWLMESSAGESFILEMANAGER_H
+#define SENSORGATEWAY_AWLMESSAGESFILEMANAGER_H
 
 #include "FileManager.hpp"
-#include "spirit-sensor-gateway/domain/AWLMessage.h"
+#include "sensor-gateway/domain/AWLMessage.h"
 
 namespace TestUtilities {
 
@@ -45,4 +45,4 @@ namespace TestUtilities {
     };
 }
 
-#endif //SPIRITSENSORGATEWAY_AWLMESSAGESFILEMANAGER_H
+#endif //SENSORGATEWAY_AWLMESSAGESFILEMANAGER_H

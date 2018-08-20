@@ -15,22 +15,22 @@
 
 */
 
-#ifndef SPIRITSENSORGATEWAY_SERVERCOMMUNICATORTEST_CPP
-#define SPIRITSENSORGATEWAY_SERVERCOMMUNICATORTEST_CPP
+#ifndef SENSORGATEWAY_SERVERCOMMUNICATORTEST_CPP
+#define SENSORGATEWAY_SERVERCOMMUNICATORTEST_CPP
 
 #include <gtest/gtest.h>
 #include <list>
 
-#include "spirit-sensor-gateway/server-communication/ServerCommunicator.hpp"
+#include "sensor-gateway/server-communication/ServerCommunicator.hpp"
 #include "test/utilities/data-model/DataModelFixture.h"
-#include "test/utilities/stub/SpiritFramesStub.h"
+#include "test/utilities/stub/FrameStub.h"
 
 using DataFlow::Frame;
 using Frames = std::list<Frame>;
 using ServerCommunicator = SensorAccessLinkElement::ServerCommunicator<Frame>;
 using ServerCommunication::ServerCommunicationStrategy;
 using TestFunctions::DataTestUtil;
-using Stub::createArbitrarySpiritFrame;
+using Stub::createArbitraryFrame;
 
 class ServerCommunicatorTest : public ::testing::Test {
 
@@ -107,7 +107,7 @@ TEST_F(ServerCommunicatorTest, given__when_connect_then_callsOpenConnectionInStr
 TEST_F(ServerCommunicatorTest, given_aMessageToSend_when_consume_then_callsSendMessageInStrategy) {
     ServerCommunicatorTestMock::MockServerCommunicatorStrategy mockStrategy;
     ServerCommunicator serverCommunicator(&mockStrategy);
-    auto frame = createArbitrarySpiritFrame();
+    auto frame = createArbitraryFrame();
 
     serverCommunicator.consume(std::move(frame));
 
@@ -118,7 +118,7 @@ TEST_F(ServerCommunicatorTest, given_aMessageToSend_when_consume_then_callsSendM
 TEST_F(ServerCommunicatorTest, given_aMessageToSend_when_consume_then_callsSendMessageInStrategyWithTheMessage) {
     ServerCommunicatorTestMock::MockServerCommunicatorStrategy mockStrategy;
     ServerCommunicator serverCommunicator(&mockStrategy);
-    auto frame = createArbitrarySpiritFrame();
+    auto frame = createArbitraryFrame();
     auto frameCopy = Frame(frame);
 
     serverCommunicator.consume(std::move(frame));
@@ -137,5 +137,5 @@ TEST_F(ServerCommunicatorTest, given__when_disconnect_then_callsCloseConnectionI
     ASSERT_TRUE(strategyHasBeenCalled);
 }
 
-#endif //SPIRITSENSORGATEWAY_SERVERCOMMUNICATORTEST_CPP
+#endif //SENSORGATEWAY_SERVERCOMMUNICATORTEST_CPP
 

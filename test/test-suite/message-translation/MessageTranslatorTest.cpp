@@ -12,9 +12,9 @@
 */
 
 #include <gtest/gtest.h>
-#include <spirit-sensor-gateway/domain/AWLMessage.h>
-#include <spirit-sensor-gateway/domain/Frame.h>
-#include "spirit-sensor-gateway/message-translation/MessageTranslator.hpp"
+#include <sensor-gateway/domain/AWLMessage.h>
+#include <sensor-gateway/domain/Frame.h>
+#include "sensor-gateway/message-translation/MessageTranslator.hpp"
 
 using DataFlow::AWLMessage;
 using DataFlow::Frame;

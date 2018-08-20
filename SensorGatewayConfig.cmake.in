@@ -1,0 +1,21 @@
+# - Config file for the SensorGateway package
+# It defines the following variables
+#  SensorGateway_INCLUDE_DIRS - include directories for SensorGateway
+#  SensorGateway_LIBRARIES    - libraries to link against
+#  SensorGateway_EXECUTABLE   - the test executable
+
+# Compute paths
+get_filename_component(SensorGateway_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
+
+include(CMakeFindDependencyMacro)
+
+set(SensorGateway_INCLUDE_DIRS "@CONF_INCLUDE_DIRS@")
+
+# This library dependencies (contains definitions for IMPORTED targets)
+if(NOT TARGET SensorGateway AND NOT SensorGateway_BINARY_DIR)
+    include_directories("${SensorGateway_CMAKE_DIR}/sensor-gateway")
+    include("${SensorGateway_CMAKE_DIR}/SensorGatewayTargets.cmake")
+endif()
+
+# These are IMPORTED targets created by SensorGatewayTargets.cmake
+set(SensorGateway_LIBRARIES SensorGateway)

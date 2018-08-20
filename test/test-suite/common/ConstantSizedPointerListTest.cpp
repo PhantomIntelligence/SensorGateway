@@ -14,12 +14,12 @@
 	limitations under the License.
 */
 
-#ifndef SPIRITSENSORGATEWAY_CONSTANTSIZEDPOINTERLISTTEST_CPP
-#define SPIRITSENSORGATEWAY_CONSTANTSIZEDPOINTERLISTTEST_CPP
+#ifndef SENSORGATEWAY_CONSTANTSIZEDPOINTERLISTTEST_CPP
+#define SENSORGATEWAY_CONSTANTSIZEDPOINTERLISTTEST_CPP
 
 #include <gtest/gtest.h>
 
-#include "spirit-sensor-gateway/common/container/ConstantSizedPointerList.hpp"
+#include "sensor-gateway/common/container/ConstantSizedPointerList.hpp"
 #include "test/utilities/data-model/DataModelFixture.h"
 
 using ExampleDataModel::NativeData;
@@ -190,4 +190,4 @@ TEST_F(ConstantSizedPointerListTest, given_aPointerInTheList_when_askedToRemoveI
     ASSERT_TRUE(empty);
 }
 
-#endif //SPIRITSENSORGATEWAY_CONSTANTSIZEDPOINTERLISTTEST_CPP
+#endif //SENSORGATEWAY_CONSTANTSIZEDPOINTERLISTTEST_CPP

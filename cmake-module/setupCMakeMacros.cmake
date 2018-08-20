@@ -8,5 +8,4 @@ macro(setup_cmake_macros _source_dir _binary_dir)
 
     include(cmake-module/setupConanDependenciesAndLinkToTarget.cmake)
     include(cmake-module/googletest.cmake)
-    include(cmake-module/uws.cmake)
 endmacro()

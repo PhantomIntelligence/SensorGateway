@@ -15,15 +15,15 @@
 */
 
 
-#ifndef SPIRITSENSORGATEWAY_SENSORDATA_H
-#define SPIRITSENSORGATEWAY_SENSORDATA_H
+#ifndef SENSORGATEWAY_SENSORDATA_H
+#define SENSORGATEWAY_SENSORDATA_H
 
 #include <cstdint>
 #include <cassert>
 #include "ProcessedData.h"
 
 /**
- * @brief The Data Representation (DR) classes contained in this namespace form an basic implementation guide for DR classes in Spirit.
+ * @brief The Data Representation (DR) classes contained in this namespace form an basic implementation guide for DR classes in .
  * @note The DR classes member function signatures are important, as they insure compliance with the High Integrity C++ Coding Standard Version 4.0.
  * @see http://www.codingstandard.com/
  */
@@ -31,7 +31,7 @@ namespace ExampleDataModel {
 
     /**
      * @brief Example of a complement that could be used to create a data structure
-     * @note As with all Data Representation used in Spirit, the construction of a DR requires a Complement.
+     * @note As with all Data Representation used in , the construction of a DR requires a Complement.
      * @see the ExampleDataModel::Data::returnDefaultComplement() method.
      */
     struct Complement {
@@ -40,11 +40,11 @@ namespace ExampleDataModel {
 
 
     /**
-     * @brief The main Data Representation (DR) example of Spirit. It is stateless, as all DR used in Spirit should be.
+     * @brief The main Data Representation (DR) example of . It is stateless, as all DR used in  should be.
      * @note This particular class inherits another DR.
      * It is useful to build DR this way when building data from other data (see NativeData and ProcessedData) for several reasons:
      *  - it preserves the statelessness of the data structure when creating new results from the data already in a DR class;
-     *  - it allows to chose when and where to split the different procedures and manipulations to better control memory and cpu used by Spirit.
+     *  - it allows to chose when and where to split the different procedures and manipulations to better control memory and cpu used by .
      * @note Inheritance of previous DR class is not mandatory, as some DR could represent user command to send to the sensor or be used for debugging and logging purposes.
      */
     class Data final : public ProcessedData {
@@ -66,14 +66,14 @@ namespace ExampleDataModel {
 
         /**
          * @brief Copy constructor for the Data example Data Representation (DR) class.
-         * @note It is important all DR of Spirit implement a copy constructor, as it is used in many instances of Spirit's classes.
+         * @note It is important all DR of  implement a copy constructor, as it is used in many instances of 's classes.
          * @param other the Data DR instance from which the data is copied to construct this instance.
          */
         Data(Data const& other);
 
         /**
          * @brief Move constructor for the Data example Data Representation (DR) class.
-         * @note It is important all DR of Spirit implement a move constructor, as it is used in many instances of Spirit's classes.
+         * @note It is important all DR of  implement a move constructor, as it is used in many instances of 's classes.
          * @param other the Data DR instance from which the data is moved into this instance.
          * @attention the *other* param should be used in any way after having been used in a move constructor
          */
@@ -81,7 +81,7 @@ namespace ExampleDataModel {
 
         /**
          * @brief Copy assignment operator for the Data example Data Representation (DR) class.
-         * @note It is important all DR of Spirit implement a copy assignment operator, as it is used in many instances of Spirit's classes.
+         * @note It is important all DR of  implement a copy assignment operator, as it is used in many instances of 's classes.
          * @param other the Data DR instance copy-assigned to this instance.
          * @return A handle to this instance.
          */
@@ -93,7 +93,7 @@ namespace ExampleDataModel {
 
         /**
          * @brief Move assignment operator for the Data example Data Representation (DR) class.
-         * @note It is important all DR of Spirit implement a move assignment operator, as it is used in many instances of Spirit's classes.
+         * @note It is important all DR of  implement a move assignment operator, as it is used in many instances of 's classes.
          * @param other the DR instance move-assigned to this instance.
          * @return A handle to this instance.
          * @attention the *other* param should be used in any way after having been used in a move assignation.
@@ -161,4 +161,4 @@ namespace Defaults {
     const Data DEFAULT_DATA = Data(DEFAULT_PROCESSED_DATA, DEFAULT_COMPLEMENT);
 }
 
-#endif //SPIRITSENSORGATEWAY_SENSORDATA_H
+#endif //SENSORGATEWAY_SENSORDATA_H

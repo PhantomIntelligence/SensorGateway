@@ -1,6 +1,0 @@
-[requires]
-jsonformoderncpp/3.1.2@vthiery/stable
-
-[generators]
-cmake
-
