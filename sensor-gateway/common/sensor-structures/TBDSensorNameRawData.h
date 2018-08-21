@@ -25,7 +25,7 @@ namespace DataFlow {
         using AquisitionBuffer = std::array<int16_t, Sensor::Guardian::ACQUISITION_BUFFER_SIZE>;
         using Detections = std::array<RawData::DetectionType, Sensor::Guardian::DETECTIONS_SIZE>;
         typedef struct {
-            AquisitionBuffer aquisitionBuffer;
+            AquisitionBuffer acquisitionBuffer;
             Detections detections;
         } RawDataBuffer;
     }
