@@ -39,7 +39,8 @@ protected:
 
     SimpleDataList createASequenceOfDifferentMessagesOfSize(uint64_t numberOfMessagesToCreate) const noexcept;
 
-    SimpleDataList fetchMessageProducedBySensorCommunicatorExecution(SimpleDataList&& messages);
+    SimpleDataList fetchMessageProducedBySensorCommunicatorExecution(
+            SimpleDataList&& messages, uint8_t numberOfMessagesToReceive);
 };
 
 namespace SensorCommunicatorTestMock {
@@ -153,7 +154,7 @@ namespace SensorCommunicatorTestMock {
             if (!hasFetchMessagesBeenCalled()) {
                 fetchMessagesCalled.store(true);
                 fetchMessagesCalledAcknowledgement.set_value(true);
-                if(!hasFetchRawDataCyclesBeenCalled()) {
+                if (!hasFetchRawDataCyclesBeenCalled()) {
                     fetchMessagesCalledBeforeFetchRawDataCycles.store(true);
                 }
             }
@@ -310,9 +311,9 @@ private:
 
 using AWLProcessingScheduler = DataFlow::DataProcessingScheduler<SimpleData, SimpleDataSinkMock, 1>;
 
-SimpleDataList SensorCommunicatorTest::fetchMessageProducedBySensorCommunicatorExecution(SimpleDataList&& messages) {
-    auto numberOfMessagesToProcess = messages.size();
-    SimpleDataSinkMock sink(numberOfMessagesToProcess);
+SimpleDataList SensorCommunicatorTest::fetchMessageProducedBySensorCommunicatorExecution(
+        SimpleDataList&& messages, uint8_t numberOfMessagesToReceive) {
+    SimpleDataSinkMock sink(numberOfMessagesToReceive);
     AWLProcessingScheduler scheduler(&sink);
 
     SensorCommunicatorTestMock::SensorCommunicationStrategy mockStrategy;
@@ -333,10 +334,12 @@ SimpleDataList SensorCommunicatorTest::fetchMessageProducedBySensorCommunicatorE
 }
 
 TEST_F(SensorCommunicatorTest, given_aSequenceOfOneIncomingMessage_when_connect_then_willProduceThisData) {
-    auto messages = createASequenceOfDifferentMessagesOfSize(1);
+    auto numberOfMessages = 1U;
+    auto messages = createASequenceOfDifferentMessagesOfSize(numberOfMessages);
     SimpleData expectedMessage = SimpleData(messages.front());
 
-    auto resultingMessage = fetchMessageProducedBySensorCommunicatorExecution(std::move(messages)).front();
+    auto resultingMessage = fetchMessageProducedBySensorCommunicatorExecution(
+            std::move(messages), numberOfMessages).front();
 
     ASSERT_EQ(expectedMessage, resultingMessage);
 }
@@ -347,7 +350,32 @@ TEST_F(SensorCommunicatorTest,
     auto messages = createASequenceOfDifferentMessagesOfSize(numberOfMessages);
     SimpleDataList expectedMessages = messages;
 
-    auto resultedMessages = fetchMessageProducedBySensorCommunicatorExecution(std::move(messages));
+    auto resultedMessages = fetchMessageProducedBySensorCommunicatorExecution(
+            std::move(messages), numberOfMessages);
+
+    for (auto t = 0; t < numberOfMessages; ++t) {
+        ASSERT_EQ(expectedMessages.front(), resultedMessages.front());
+        expectedMessages.pop_front();
+        resultedMessages.pop_front();
+    }
+}
+
+TEST_F(SensorCommunicatorTest, given_aStrategyThatReturnsDefaultData_when_connect_then_willNotProduceDefaultData) {
+    auto numberOfDefaultMessages = 5U;
+    auto numberOfMessages = 2U;
+    auto messages = createASequenceOfDifferentMessagesOfSize(numberOfMessages);
+    SimpleDataList expectedMessages = messages;
+    SimpleDataList messageToProduce;
+    for (auto defaultMessageIndex = 0; defaultMessageIndex < numberOfDefaultMessages; ++defaultMessageIndex) {
+        messageToProduce.push_back(SimpleData::returnDefaultData());
+    }
+    for (auto realMessageIndex = 0; realMessageIndex < numberOfMessages; ++realMessageIndex) {
+        messageToProduce.push_back(messages.front());
+        messages.pop_front();
+    }
+
+    auto resultedMessages = fetchMessageProducedBySensorCommunicatorExecution(
+            std::move(messageToProduce), numberOfMessages);
 
     for (auto t = 0; t < numberOfMessages; ++t) {
         ASSERT_EQ(expectedMessages.front(), resultedMessages.front());
@@ -367,4 +395,3 @@ SensorCommunicatorTest::createASequenceOfDifferentMessagesOfSize(uint64_t number
 }
 
 #endif //SENSORGATEWAY_SENSORCOMMUNICATORTEST_CPP
-

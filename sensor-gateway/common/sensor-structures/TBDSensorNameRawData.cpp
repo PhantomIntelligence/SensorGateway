@@ -16,4 +16,40 @@
 
 #include "TBDSensorNameRawData.h"
 
+using DataFlow::TBDSensorNameRawData;
 
+TBDSensorNameRawData::TBDSensorNameRawData(Guardian::RawDataBuffer rawDataBuffer) :
+        rawDataBuffer(rawDataBuffer) {}
+
+TBDSensorNameRawData::TBDSensorNameRawData() :
+        TBDSensorNameRawData(TBDSensorNameRawData::returnDefaultData()) {}
+
+TBDSensorNameRawData::~TBDSensorNameRawData() noexcept = default;
+
+TBDSensorNameRawData::TBDSensorNameRawData(TBDSensorNameRawData const& other) :
+        TBDSensorNameRawData(other.rawDataBuffer) {}
+
+TBDSensorNameRawData::TBDSensorNameRawData(TBDSensorNameRawData&& other) noexcept :
+        rawDataBuffer(other.rawDataBuffer) {}
+
+TBDSensorNameRawData&
+TBDSensorNameRawData::operator=(TBDSensorNameRawData const& other)& {
+    TBDSensorNameRawData temporary(other);
+    swap(*this, temporary);
+    return *this;
+}
+
+TBDSensorNameRawData&
+TBDSensorNameRawData::operator=(TBDSensorNameRawData&& other)& noexcept {
+    swap(*this, other);
+    return *this;
+}
+
+void TBDSensorNameRawData::swap(TBDSensorNameRawData& current,
+                                TBDSensorNameRawData& other) noexcept {
+    std::swap(current.rawDataBuffer, other.rawDataBuffer);
+}
+
+TBDSensorNameRawData const& TBDSensorNameRawData::returnDefaultData() noexcept {
+    return Defaults::DEFAULT_TBD_SENSOR_NAME_RAW_DATA;
+}

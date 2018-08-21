@@ -22,8 +22,8 @@
 namespace DataFlow {
 
     namespace Guardian {
-        using AquisitionBuffer = int16_t[Sensor::Guardian::ACQUISITION_BUFFER_SIZE];
-        using Detections = RawData::DetectionType[Sensor::Guardian::DETECTIONS_SIZE];
+        using AquisitionBuffer = std::array<int16_t, Sensor::Guardian::ACQUISITION_BUFFER_SIZE>;
+        using Detections = std::array<RawData::DetectionType, Sensor::Guardian::DETECTIONS_SIZE>;
         typedef struct {
             AquisitionBuffer aquisitionBuffer;
             Detections detections;
@@ -35,7 +35,7 @@ namespace DataFlow {
 
     public:
 
-        explicit TBDSensorNameRawData(Guardian::RawDataBuffer);
+        explicit TBDSensorNameRawData(Guardian::RawDataBuffer rawDataBuffer);
 
         explicit TBDSensorNameRawData();
 
@@ -50,8 +50,19 @@ namespace DataFlow {
         TBDSensorNameRawData& operator=(TBDSensorNameRawData&& other)& noexcept;
 
         void swap(TBDSensorNameRawData& current, TBDSensorNameRawData& other) noexcept;
+
+        static TBDSensorNameRawData const& returnDefaultData() noexcept;
+
+        Guardian::RawDataBuffer rawDataBuffer;
     };
 
+    namespace Defaults {
+        using DataFlow::TBDSensorNameRawData;
+        Guardian::AquisitionBuffer const DEFAULT_ACQUISITION_BUFFER = Guardian::AquisitionBuffer();
+        Guardian::Detections const DEFAULT_DETECTIONS = Guardian::Detections();
+        Guardian::RawDataBuffer const DEFAULT_RAW_DATA_BUFFER{DEFAULT_ACQUISITION_BUFFER, DEFAULT_DETECTIONS};
+        TBDSensorNameRawData const DEFAULT_TBD_SENSOR_NAME_RAW_DATA = TBDSensorNameRawData(DEFAULT_RAW_DATA_BUFFER);
+    }
 }
 
 #endif //SENSORGATEWAY_TBDSENSORNAMERAWDATA_H
