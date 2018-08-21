@@ -205,8 +205,8 @@ TEST_F(SensorAccessLinkTest,
                                       &mockTranslationStrategy,
                                       &mockSensorCommunicationStrategy);
 
-    sensorAccessLink.connect(FAKE_SERVER_ADDRESS);
-    sensorAccessLink.disconnect();
+    sensorAccessLink.start(FAKE_SERVER_ADDRESS);
+    sensorAccessLink.terminateAndJoin();
 
     auto sensorOpenConnectionHasBeenCalled = mockSensorCommunicationStrategy.hasOpenConnectionBeenCalled();
     auto serverOpenConnectionHasBeenCalled = mockServerCommunicationStrategy.hasOpenConnectionBeenCalled();
@@ -225,8 +225,8 @@ TEST_F(SensorAccessLinkTest,
                                       &mockTranslationStrategy,
                                       &mockSensorCommunicationStrategy);
 
-    sensorAccessLink.connect(FAKE_SERVER_ADDRESS);
-    sensorAccessLink.disconnect();
+    sensorAccessLink.start(FAKE_SERVER_ADDRESS);
+    sensorAccessLink.terminateAndJoin();
 
     auto sensorCloseConnectionHasBeenCalled = mockSensorCommunicationStrategy.hasCloseConnectionBeenCalled();
     auto serverCloseConnectionHasBeenCalled = mockServerCommunicationStrategy.hasCloseConnectionBeenCalled();
@@ -248,11 +248,11 @@ TEST_F(SensorAccessLinkTest,
                                       &mockTranslationStrategy,
                                       &mockSensorCommunicationStrategy);
 
-    sensorAccessLink.connect(FAKE_SERVER_ADDRESS);
+    sensorAccessLink.start(FAKE_SERVER_ADDRESS);
 
     mockSensorCommunicationStrategy.waitUntilFetchMessagesHasBeenCalledEnough();
 
-    sensorAccessLink.disconnect();
+    sensorAccessLink.terminateAndJoin();
 
     auto createdDataList = mockSensorCommunicationStrategy.getCreatedMessageCopies();
     auto receivedDataList = mockServerCommunicationStrategy.getReceivedData();
@@ -274,11 +274,11 @@ TEST_F(SensorAccessLinkTest,
                                       &mockSensorCommunicationStrategy);
 
 
-    sensorAccessLink.connect(FAKE_SERVER_ADDRESS);
+    sensorAccessLink.start(FAKE_SERVER_ADDRESS);
 
     mockSensorCommunicationStrategy.waitUntilFetchMessagesHasBeenCalledEnough();
 
-    sensorAccessLink.disconnect();
+    sensorAccessLink.terminateAndJoin();
 
     auto createdDataList = mockSensorCommunicationStrategy.getCreatedMessageCopies();
     std::vector<SensorAccessLinkTestMock::SimpleSensorCommunicationStrategy::Message> flattenMessages;
@@ -295,7 +295,6 @@ TEST_F(SensorAccessLinkTest,
     }
     auto receivedDataList = mockServerCommunicationStrategy.getReceivedData();
 
-    auto numberOfProcessedData = receivedDataList.size();
     bool dataHasPassedThroughCorrectly = true;
     for (uint32_t messageIndex = 0;
          messageIndex < totalNumberOfMessages && dataHasPassedThroughCorrectly; ++messageIndex) {

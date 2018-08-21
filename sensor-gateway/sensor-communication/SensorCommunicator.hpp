@@ -51,12 +51,12 @@ namespace SensorAccessLinkElement {
 
         SensorCommunicator& operator=(SensorCommunicator&& other)& noexcept = delete;
 
-        void connect() {
+        void start() {
             sensorCommunicationStrategy->openConnection();
             communicatorThread = JoinableThread(&SensorCommunicator::run, this);
         };
 
-        void disconnect() {
+        void terminateAndJoin() {
             sensorCommunicationStrategy->closeConnection();
 
             if (!terminateOrderHasBeenReceived()) {
@@ -73,6 +73,7 @@ namespace SensorAccessLinkElement {
             while (!terminateOrderHasBeenReceived()) {
                 handleIncomingMessages();
                 handleIncomingRawData();
+                // TODO : investigate the avantages of sleep and/or yield here.
             }
         }
 

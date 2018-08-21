@@ -57,7 +57,7 @@ namespace SensorGateway {
         }
 
         ~SensorAccessLink() noexcept {
-            disconnect();
+            terminateAndJoin();
         };
 
         SensorAccessLink(SensorAccessLink const& other) = delete;
@@ -68,7 +68,7 @@ namespace SensorGateway {
 
         SensorAccessLink& operator=(SensorAccessLink&& other)& noexcept = delete;
 
-        void connect(std::string const& serverAddress) {
+        void start(std::string const& serverAddress) {
             linkElements();
 
             // Yield and sleep to allow correct connection
@@ -76,11 +76,11 @@ namespace SensorGateway {
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
             serverCommunicator.connect(serverAddress);
-            sensorCommunicator.connect();
+            sensorCommunicator.start();
         };
 
-        void disconnect() {
-            sensorCommunicator.disconnect();
+        void terminateAndJoin() {
+            sensorCommunicator.terminateAndJoin();
             translatorScheduler.terminateAndJoin();
             serverCommunicatorScheduler.terminateAndJoin();
             serverCommunicator.disconnect();

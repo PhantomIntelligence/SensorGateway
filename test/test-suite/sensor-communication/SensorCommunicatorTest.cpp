@@ -195,13 +195,13 @@ namespace SensorCommunicatorTestMock {
     };
 }
 
-TEST_F(SensorCommunicatorTest, given__when_connect_then_callsOpenConnectionInStrategy) {
+TEST_F(SensorCommunicatorTest, given__when_start_then_callsOpenConnectionInStrategy) {
     SensorCommunicatorTestMock::SensorCommunicationStrategy mockStrategy;
     SimpleDataSensorCommunicator sensorCommunicator(&mockStrategy);
 
-    sensorCommunicator.connect();
+    sensorCommunicator.start();
 
-    sensorCommunicator.disconnect();
+    sensorCommunicator.terminateAndJoin();
     auto strategyHasBeenCalled = mockStrategy.hasOpenConnectionBeenCalled();
     ASSERT_TRUE(strategyHasBeenCalled);
 }
@@ -210,45 +210,45 @@ TEST_F(SensorCommunicatorTest, given__when_terminateAndJoin_then_callsCloseConne
     SensorCommunicatorTestMock::SensorCommunicationStrategy mockStrategy;
     SimpleDataSensorCommunicator sensorCommunicator(&mockStrategy);
 
-    sensorCommunicator.disconnect();
+    sensorCommunicator.terminateAndJoin();
 
     auto strategyHasBeenCalled = mockStrategy.hasCloseConnectionBeenCalled();
     ASSERT_TRUE(strategyHasBeenCalled);
 }
 
-TEST_F(SensorCommunicatorTest, given__when_connect_then_callsFetchMessagesInStrategy) {
+TEST_F(SensorCommunicatorTest, given__when_start_then_callsFetchMessagesInStrategy) {
     SensorCommunicatorTestMock::SensorCommunicationStrategy mockStrategy;
     SimpleDataSensorCommunicator sensorCommunicator(&mockStrategy);
 
-    sensorCommunicator.connect();
+    sensorCommunicator.start();
 
     mockStrategy.waitUntilFetchMessagesIsCalled();
     auto strategyHasBeenCalled = mockStrategy.hasFetchMessagesBeenCalled();
-    sensorCommunicator.disconnect();
+    sensorCommunicator.terminateAndJoin();
     ASSERT_TRUE(strategyHasBeenCalled);
 }
 
-TEST_F(SensorCommunicatorTest, given__when_connect_then_callsFetchRawDataCyclesInStrategy) {
+TEST_F(SensorCommunicatorTest, given__when_start_then_callsFetchRawDataCyclesInStrategy) {
     SensorCommunicatorTestMock::SensorCommunicationStrategy mockStrategy;
     SimpleDataSensorCommunicator sensorCommunicator(&mockStrategy);
 
-    sensorCommunicator.connect();
+    sensorCommunicator.start();
 
     mockStrategy.waitUntilFetchRawDataCyclesIsCalled();
     auto strategyHasBeenCalled = mockStrategy.hasFetchRawDataCyclesBeenCalled();
-    sensorCommunicator.disconnect();
+    sensorCommunicator.terminateAndJoin();
     ASSERT_TRUE(strategyHasBeenCalled);
 }
 
-TEST_F(SensorCommunicatorTest, given__when_connect_then_callsFetchMessagesBeforeFetchRawData) {
+TEST_F(SensorCommunicatorTest, given__when_start_then_callsFetchMessagesBeforeFetchRawData) {
     SensorCommunicatorTestMock::SensorCommunicationStrategy mockStrategy;
     SimpleDataSensorCommunicator sensorCommunicator(&mockStrategy);
 
-    sensorCommunicator.connect();
+    sensorCommunicator.start();
 
     mockStrategy.waitUntilFetchRawDataCyclesIsCalled();
     auto sequenceRespected = mockStrategy.hasMessageAndRawDataCallSequenceBeenRespected();
-    sensorCommunicator.disconnect();
+    sensorCommunicator.terminateAndJoin();
     ASSERT_TRUE(sequenceRespected);
 }
 
@@ -321,11 +321,11 @@ SimpleDataList SensorCommunicatorTest::fetchMessageProducedBySensorCommunicatorE
     SimpleDataSensorCommunicator sensorCommunicator(&mockStrategy);
     sensorCommunicator.linkConsumer(&scheduler);
 
-    sensorCommunicator.connect();
+    sensorCommunicator.start();
 
     sink.waitConsumptionToBeReached();
 
-    sensorCommunicator.disconnect();
+    sensorCommunicator.terminateAndJoin();
     scheduler.terminateAndJoin();
 
     SimpleDataList producedMessages = sink.getConsumedData();
@@ -333,7 +333,7 @@ SimpleDataList SensorCommunicatorTest::fetchMessageProducedBySensorCommunicatorE
     return producedMessages;
 }
 
-TEST_F(SensorCommunicatorTest, given_aSequenceOfOneIncomingMessage_when_connect_then_willProduceThisData) {
+TEST_F(SensorCommunicatorTest, given_aSequenceOfOneIncomingMessage_when_start_then_willProduceThisData) {
     auto numberOfMessages = 1U;
     auto messages = createASequenceOfDifferentMessagesOfSize(numberOfMessages);
     SimpleData expectedMessage = SimpleData(messages.front());
@@ -345,7 +345,7 @@ TEST_F(SensorCommunicatorTest, given_aSequenceOfOneIncomingMessage_when_connect_
 }
 
 TEST_F(SensorCommunicatorTest,
-       given_aSequenceOfSeveralIncomingMessages_when_connect_then_willProduceTheseMessagesInTheSameOrderTheyAreRead) {
+       given_aSequenceOfSeveralIncomingMessages_when_start_then_willProduceTheseMessagesInTheSameOrderTheyAreRead) {
     auto numberOfMessages = 5U;
     auto messages = createASequenceOfDifferentMessagesOfSize(numberOfMessages);
     SimpleDataList expectedMessages = messages;
@@ -360,7 +360,8 @@ TEST_F(SensorCommunicatorTest,
     }
 }
 
-TEST_F(SensorCommunicatorTest, given_aStrategyThatReturnsDefaultData_when_connect_then_willNotProduceDefaultData) {
+TEST_F(SensorCommunicatorTest,
+       given_aStrategyThatReturnsDefaultAndNonDefaultData_when_start_then_willNotProduceDefaultData) {
     auto numberOfDefaultMessages = 5U;
     auto numberOfMessages = 2U;
     auto messages = createASequenceOfDifferentMessagesOfSize(numberOfMessages);
