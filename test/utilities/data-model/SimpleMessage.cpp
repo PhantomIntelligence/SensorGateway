@@ -17,16 +17,13 @@
 #include "SimpleMessage.h"
 
 using DataModel::SimpleMessage;
-using DataModel::SimpleMessageContent;
-using Defaults::DEFAULT_SIMPLE_MESSAGE_CONTENT;
+using DataModel::TestSensor::SimpleMessageContent;
+using DataModel::Defaults::DEFAULT_SIMPLE_MESSAGE_CONTENT;
 
 SimpleMessage::SimpleMessage(SimpleMessageContent simpleDataContent) :
-        content(std::move(simpleDataContent)) {
-}
+        content(std::move(simpleDataContent)) {}
 
-SimpleMessage::SimpleMessage() : SimpleMessage(SimpleMessage::returnDefaultData()) {
-
-}
+SimpleMessage::SimpleMessage() : SimpleMessage(SimpleMessage::returnDefaultData()) {}
 
 SimpleMessage::SimpleMessage(SimpleMessage&& other) noexcept:
         content(std::move(other.content)) {
@@ -50,7 +47,7 @@ void SimpleMessage::swap(SimpleMessage& current, SimpleMessage& other) noexcept 
 
 bool SimpleMessage::operator==(SimpleMessage const& other) const {
     bool sameContent = true;
-    for (unsigned long contentIndex = 0; contentIndex < content.size() && sameContent; ++contentIndex) {
+    for (auto contentIndex = 0U; contentIndex < content.size() && sameContent; ++contentIndex) {
         sameContent = (content.at(contentIndex) == other.content.at(contentIndex));
     }
     return sameContent;

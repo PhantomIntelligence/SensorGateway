@@ -21,16 +21,17 @@
 
 namespace DataModel {
 
-    int const NUMBER_OF_SIMPLE_MESSAGE_CONTENT = 2;
-
-    // Allows to populate SimpleMessage with a "complex", non-primitive, element
-    typedef std::array<std::string, NUMBER_OF_SIMPLE_MESSAGE_CONTENT> SimpleMessageContent;
+    namespace TestSensor {
+        int const NUMBER_OF_SIMPLE_MESSAGE_CONTENT = 2;
+        // Allows to populate SimpleMessage with a "complex", non-primitive, element
+        typedef std::array<std::string, NUMBER_OF_SIMPLE_MESSAGE_CONTENT> SimpleMessageContent;
+    }
 
     class SimpleMessage {
 
     public:
 
-        explicit SimpleMessage(SimpleMessageContent simpleDataContent);
+        explicit SimpleMessage(TestSensor::SimpleMessageContent simpleDataContent);
 
         explicit SimpleMessage();
 
@@ -60,19 +61,19 @@ namespace DataModel {
 
     private:
 
-        SimpleMessageContent content;
+        TestSensor::SimpleMessageContent content;
     };
-}
 
-namespace Defaults {
-    using DataModel::SimpleMessage;
-    using DataModel::SimpleMessageContent;
+    namespace Defaults {
+        using DataModel::SimpleMessage;
+        using DataModel::TestSensor::SimpleMessageContent;
 
-    std::string const DEFAULT_FIRST_SIMPLE_MESSAGE_CONTENT = "Some first simple data content";
-    std::string const DEFAULT_SECOND_SIMPLE_MESSAGE_CONTENT = "Some second simple data content.";
-    SimpleMessageContent const DEFAULT_SIMPLE_MESSAGE_CONTENT = SimpleMessageContent({DEFAULT_FIRST_SIMPLE_MESSAGE_CONTENT,
-                                                                             DEFAULT_SECOND_SIMPLE_MESSAGE_CONTENT});
-    SimpleMessage const DEFAULT_SIMPLE_MESSAGE = SimpleMessage(DEFAULT_SIMPLE_MESSAGE_CONTENT);
+        std::string const DEFAULT_FIRST_SIMPLE_MESSAGE_CONTENT = "Some first simple data content";
+        std::string const DEFAULT_SECOND_SIMPLE_MESSAGE_CONTENT = "Some second simple data content.";
+        SimpleMessageContent const DEFAULT_SIMPLE_MESSAGE_CONTENT = SimpleMessageContent({DEFAULT_FIRST_SIMPLE_MESSAGE_CONTENT,
+                                                                                          DEFAULT_SECOND_SIMPLE_MESSAGE_CONTENT});
+        SimpleMessage const DEFAULT_SIMPLE_MESSAGE = SimpleMessage(DEFAULT_SIMPLE_MESSAGE_CONTENT);
+    }
 }
 
 #endif //SENSORGATEWAY_SIMPLEMESSAGE_H
