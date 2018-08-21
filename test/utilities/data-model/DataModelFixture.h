@@ -25,7 +25,7 @@ namespace TestFunctions {
 
     public:
 
-        static const DataModel::SimpleData createRandomSimpleData() {
+        static const DataModel::SimpleMessage createRandomSimpleData() {
             auto const lengthOfDataToCreate = 42;
             typedef std::array<char, 62> CharArray;
             auto charSet = CharArray({'0', '1', '2', '3', '4',
@@ -52,7 +52,7 @@ namespace TestFunctions {
             for (unsigned long i = 0; i < numberOfStringToCreate; ++i) {
                 content.at(i) = createRandomStringOfLength(lengthOfDataToCreate, randomCharFunction);
             }
-            DataModel::SimpleData randomSimpleData(content);
+            DataModel::SimpleMessage randomSimpleData(content);
 
             return randomSimpleData;
         }

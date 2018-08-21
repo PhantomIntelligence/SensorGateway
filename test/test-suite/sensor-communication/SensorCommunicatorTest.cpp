@@ -368,7 +368,7 @@ TEST_F(SensorCommunicatorTest,
     SimpleDataList expectedMessages = messages;
     SimpleDataList messageToProduce;
     for (auto defaultMessageIndex = 0; defaultMessageIndex < numberOfDefaultMessages; ++defaultMessageIndex) {
-        messageToProduce.push_back(SimpleData::returnDefaultData());
+        messageToProduce.push_back(SimpleData::SimpleMessage());
     }
     for (auto realMessageIndex = 0; realMessageIndex < numberOfMessages; ++realMessageIndex) {
         messageToProduce.push_back(messages.front());

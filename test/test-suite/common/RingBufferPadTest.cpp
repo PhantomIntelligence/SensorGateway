@@ -25,7 +25,7 @@
 using DataFlow::RingBufferPad;
 using TestFunctions::DataTestUtil;
 
-typedef RingBufferPad<DataModel::SimpleData> Pad;
+typedef RingBufferPad<DataModel::SimpleMessage> Pad;
 
 /**
  * @brief Test Fixture meant to ensure correct behavior of RingBufferPad.

@@ -24,11 +24,11 @@
 #include "sensor-gateway/application/SensorAccessLink.hpp"
 #include "test/utilities/data-model/DataModelFixture.h"
 
-using DataModel::SimpleData;
+using DataModel::SimpleMessage;
 using DataModel::SimpleDataContent;
-using SimpleDataList = std::list<SimpleData>;
+using SimpleDataList = std::list<SimpleMessage>;
 using TestFunctions::DataTestUtil;
-using SensorAccessLink = SensorGateway::SensorAccessLink<Sensor::Test::Simple::Structures, SimpleData>;
+using SensorAccessLink = SensorGateway::SensorAccessLink<Sensor::Test::Simple::Structures, SimpleMessage>;
 
 class SensorAccessLinkTest : public ::testing::Test {
 
@@ -135,7 +135,7 @@ namespace SensorAccessLinkTestMock {
         DataList createdDataCopies;
     };
 
-    using SimpleTranslationStrategy = MessageTranslation::MessageTranslationStrategy<SimpleData, SimpleData>;
+    using SimpleTranslationStrategy = MessageTranslation::MessageTranslationStrategy<SimpleMessage, SimpleMessage>;
 
     class MockTranslationStrategy final : public SimpleTranslationStrategy {
     protected:
@@ -151,7 +151,7 @@ namespace SensorAccessLinkTestMock {
         }
     };
 
-    using SimpleServerCommunicationStrategy = ServerCommunication::ServerCommunicationStrategy<SimpleData>;
+    using SimpleServerCommunicationStrategy = ServerCommunication::ServerCommunicationStrategy<SimpleMessage>;
 
     class MockServerCommunicationStrategy final : public SimpleServerCommunicationStrategy {
     protected:

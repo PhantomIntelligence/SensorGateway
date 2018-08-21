@@ -14,41 +14,41 @@
 	limitations under the License.
 */
 
-#include "SimpleData.h"
+#include "SimpleMessage.h"
 
-using DataModel::SimpleData;
-using DataModel::SimpleDataContent;
-using Defaults::DEFAULT_SIMPLE_DATA_CONTENT;
+using DataModel::SimpleMessage;
+using DataModel::SimpleMessageContent;
+using Defaults::DEFAULT_SIMPLE_MESSAGE_CONTENT;
 
-SimpleData::SimpleData(SimpleDataContent simpleDataContent) :
+SimpleMessage::SimpleMessage(SimpleMessageContent simpleDataContent) :
         content(std::move(simpleDataContent)) {
 }
 
-SimpleData::SimpleData() : SimpleData(SimpleData::returnDefaultData()) {
+SimpleMessage::SimpleMessage() : SimpleMessage(SimpleMessage::returnDefaultData()) {
 
 }
 
-SimpleData::SimpleData(SimpleData&& other) noexcept:
+SimpleMessage::SimpleMessage(SimpleMessage&& other) noexcept:
         content(std::move(other.content)) {
-    other.content = DEFAULT_SIMPLE_DATA_CONTENT;
+    other.content = DEFAULT_SIMPLE_MESSAGE_CONTENT;
 }
 
-SimpleData& SimpleData::operator=(SimpleData const& other)& {
-    SimpleData temporary(other);
+SimpleMessage& SimpleMessage::operator=(SimpleMessage const& other)& {
+    SimpleMessage temporary(other);
     swap(*this, temporary);
     return *this;
 }
 
-SimpleData& SimpleData::operator=(SimpleData&& other)& noexcept {
+SimpleMessage& SimpleMessage::operator=(SimpleMessage&& other)& noexcept {
     swap(*this, other);
     return *this;
 }
 
-void SimpleData::swap(SimpleData& current, SimpleData& other) noexcept {
+void SimpleMessage::swap(SimpleMessage& current, SimpleMessage& other) noexcept {
     std::swap(current.content, other.content);
 }
 
-bool SimpleData::operator==(SimpleData const& other) const {
+bool SimpleMessage::operator==(SimpleMessage const& other) const {
     bool sameContent = true;
     for (unsigned long contentIndex = 0; contentIndex < content.size() && sameContent; ++contentIndex) {
         sameContent = (content.at(contentIndex) == other.content.at(contentIndex));
@@ -56,12 +56,12 @@ bool SimpleData::operator==(SimpleData const& other) const {
     return sameContent;
 }
 
-bool SimpleData::operator!=(SimpleData const& other) const {
+bool SimpleMessage::operator!=(SimpleMessage const& other) const {
     return !operator==(other);
 }
 
-void SimpleData::inverseContent() {
-    auto oldContent = SimpleDataContent(content);
+void SimpleMessage::inverseContent() {
+    auto oldContent = SimpleMessageContent(content);
     auto size = content.size();
     if (size < 2) {
         throw std::runtime_error("Warning! Some tests may misbehave. Content size needs to be more than 2.");
@@ -71,13 +71,13 @@ void SimpleData::inverseContent() {
     }
 }
 
-bool SimpleData::isTheInverseOf(SimpleData const& other) const {
-    auto inversedOther = SimpleData(other);
+bool SimpleMessage::isTheInverseOf(SimpleMessage const& other) const {
+    auto inversedOther = SimpleMessage(other);
     inversedOther.inverseContent();
     return operator==(inversedOther);
 }
 
-std::string SimpleData::toString() const noexcept {
+std::string SimpleMessage::toString() const noexcept {
     std::string stringifiedContent;
     for (unsigned long i = 0; i < content.size(); ++i) {
         stringifiedContent += " " + content.at(i);
@@ -85,8 +85,8 @@ std::string SimpleData::toString() const noexcept {
     return stringifiedContent;
 }
 
-const SimpleData SimpleData::returnDefaultData() noexcept {
-    return Defaults::DEFAULT_SIMPLE_DATA;
+const SimpleMessage SimpleMessage::returnDefaultData() noexcept {
+    return Defaults::DEFAULT_SIMPLE_MESSAGE;
 }
 
 
