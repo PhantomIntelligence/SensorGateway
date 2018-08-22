@@ -73,6 +73,7 @@ namespace SensorAccessLinkElement {
             while (!terminateOrderHasBeenReceived()) {
                 handleIncomingMessages();
                 handleIncomingRawData();
+                std::this_thread::yield();
                 // TODO : investigate the avantages of sleep and/or yield here.
             }
         }

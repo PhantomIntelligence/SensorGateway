@@ -85,5 +85,5 @@ std::string SimpleRawData::toString() const noexcept {
 }
 
 SimpleRawData const SimpleRawData::returnDefaultData() noexcept {
-    return SimpleRawData();
+    return Defaults::DEFAULT_SIMPLE_RAW_DATA;
 }

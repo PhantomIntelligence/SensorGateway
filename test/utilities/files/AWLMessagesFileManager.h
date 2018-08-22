@@ -19,7 +19,7 @@
 
 namespace TestUtilities {
 
-class AWLMessagesFileManager : public FileManager<DataFlow::AWLMessage> {
+    class AWLMessagesFileManager : public FileManager<DataFlow::AWLMessage> {
 
     public:
         AWLMessagesFileManager() = default;

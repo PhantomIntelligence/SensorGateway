@@ -33,9 +33,9 @@ RingBufferTest::~RingBufferTest() {}
 
 
 SimpleMessage createRandomSimpleData() {
-    auto simpleData = DataTestUtil::createRandomSimpleData();
-    while (simpleData == SimpleMessage::SimpleMessage()) {
-        simpleData = DataTestUtil::createRandomSimpleData();
+    auto simpleData = DataTestUtil::createRandomSimpleMessage();
+    while (simpleData == SimpleMessage::returnDefaultData()) {
+        simpleData = DataTestUtil::createRandomSimpleMessage();
     }
     return simpleData;
 }

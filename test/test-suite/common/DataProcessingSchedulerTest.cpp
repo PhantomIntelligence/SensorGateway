@@ -45,7 +45,7 @@ class MockInputBuffer : public SimpleBuffer {
 public:
     explicit MockInputBuffer(uint16_t numberOfConsumptionBeforeStop) :
             numberOfTimesToBeConsumedBeforeStop(numberOfConsumptionBeforeStop),
-            data(DataTestUtil::createRandomSimpleData()),
+            data(DataTestUtil::createRandomSimpleMessage()),
             numberOfCallsToConsumeNextData(0) {
     }
 
@@ -181,7 +181,7 @@ TEST_F(DataProcessingSchedulerTest,
     scheduler.linkWith(&inputBufferMock);
 
     for (auto l = 0; l < ARBITRARY_NUMBER_OF_CALL_GOAL; ++l) {
-        auto newData = DataTestUtil::createRandomSimpleData();
+        auto newData = DataTestUtil::createRandomSimpleMessage();
         inputBufferMock.write(std::move(newData));
     }
 
@@ -246,7 +246,7 @@ TEST_F(DataProcessingSchedulerTest,
     scheduler.linkWith(&secondBufferMock);
 
     for (auto l = 0; l < numberOfConsumptionExpectedForSecondBuffer; ++l) {
-        auto nativeData = DataTestUtil::createRandomSimpleData();
+        auto nativeData = DataTestUtil::createRandomSimpleMessage();
         secondBufferMock.write(std::move(nativeData));
     }
 
@@ -273,7 +273,7 @@ TEST_F(DataProcessingSchedulerTest,
     scheduler.linkWith(&inputBuffer);
 
     for (auto k = 0; k < ARBITRARY_NUMBER_OF_CALL_GOAL; ++k) {
-        auto nativeData = DataTestUtil::createRandomSimpleData();
+        auto nativeData = DataTestUtil::createRandomSimpleMessage();
         inputBuffer.write(std::move(nativeData));
     }
 
