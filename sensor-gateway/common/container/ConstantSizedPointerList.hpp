@@ -101,7 +101,7 @@ namespace Container {
         }
 
         [[noreturn]] void throwIllegalRemovalException() const {
-            throwIllegalActionException(ExceptionMessage::CONSTANT_SIZED_POINTER_LIST_ILLEGAL_REMOVAL_OF_POINTER);
+            throwRuntimeError(ExceptionMessage::CONSTANT_SIZED_POINTER_LIST_ILLEGAL_REMOVAL_OF_POINTER);
         }
 
         using super::pointers;

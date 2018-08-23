@@ -16,28 +16,38 @@
 
 using TestUtilities::AWLMessagesFileManager;
 using DataFlow::AWLMessage;
+using Sensor::AWL::NUMBER_OF_DATA_BYTES;
 
 AWLMessage AWLMessagesFileManager::readMessageFromFileBlock(std::string const& fileBlock) {
-    auto id = std::stoi(fetchSubstringBetweenDelimiters(fileBlock, ID_LABEL+MESSAGE_LABEL_VALUE_ASSOCIATOR, "\n"));
-    auto length = static_cast<unsigned int>(std::stoi(fetchSubstringBetweenDelimiters(fileBlock, LENGTH_LABEL+MESSAGE_LABEL_VALUE_ASSOCIATOR, "\n")));
-    auto timestamp = static_cast<unsigned int> (std::stoi(fetchSubstringBetweenDelimiters(fileBlock, TIMESTAMP_LABEL+MESSAGE_LABEL_VALUE_ASSOCIATOR, "\n")));
+    auto id = static_cast<AWL::MessageID>(std::stoi(
+            fetchSubstringBetweenDelimiters(fileBlock, ID_LABEL + MESSAGE_LABEL_VALUE_ASSOCIATOR, "\n")));
+    auto length = static_cast<AWL::MessageLength>(std::stoi(
+            fetchSubstringBetweenDelimiters(fileBlock, LENGTH_LABEL + MESSAGE_LABEL_VALUE_ASSOCIATOR, "\n")));
+    auto timestamp = static_cast<AWL::MessageTimestamp> (std::stoi(
+            fetchSubstringBetweenDelimiters(fileBlock, TIMESTAMP_LABEL + MESSAGE_LABEL_VALUE_ASSOCIATOR, "\n")));
     AWL::DataArray data;
-    for (auto dataPosition = 0; dataPosition < MAXIMUM_NUMBER_OF_DATA_IN_MESSAGE; dataPosition++) {
-        auto dataValue = std::stoi(fetchSubstringBetweenDelimiters(fileBlock, DATA_POSITION_LABEL+ " " +std::to_string(dataPosition + 1) +MESSAGE_LABEL_VALUE_ASSOCIATOR, "\n"));
-        data[dataPosition] = static_cast<unsigned char>(dataValue);
+    for (auto dataPosition = 0; dataPosition < NUMBER_OF_DATA_BYTES; dataPosition++) {
+        auto dataValue = std::stoi(fetchSubstringBetweenDelimiters(fileBlock, DATA_POSITION_LABEL + " " +
+                                                                              std::to_string(dataPosition + 1) +
+                                                                              MESSAGE_LABEL_VALUE_ASSOCIATOR, "\n"));
+        data[dataPosition] = static_cast<AWL::MessageDataUnit>(dataValue);
     }
-    AWLMessage message = AWLMessage(id,timestamp,length,data);
+    AWLMessage message = AWLMessage(id, timestamp, length, data);
     return message;
 }
 
 void AWLMessagesFileManager::writeFileBlockWithMessage(AWLMessage message, std::FILE* file) {
-    std::fprintf(file, "%s%s%d\n", ID_LABEL.c_str(), MESSAGE_LABEL_VALUE_ASSOCIATOR.c_str(), static_cast<int>(message.id));
-    std::fprintf(file, "%s%s%d\n", LENGTH_LABEL.c_str(), MESSAGE_LABEL_VALUE_ASSOCIATOR.c_str(), static_cast<int>(message.length));
-    std::fprintf(file, "%s%s%ld\n", TIMESTAMP_LABEL.c_str(), MESSAGE_LABEL_VALUE_ASSOCIATOR.c_str(), static_cast<long>(message.timestamp));
+    std::fprintf(file, "%s%s%d\n", ID_LABEL.c_str(), MESSAGE_LABEL_VALUE_ASSOCIATOR.c_str(),
+                 static_cast<int>(message.id));
+    std::fprintf(file, "%s%s%d\n", LENGTH_LABEL.c_str(), MESSAGE_LABEL_VALUE_ASSOCIATOR.c_str(),
+                 static_cast<int>(message.length));
+    std::fprintf(file, "%s%s%ld\n", TIMESTAMP_LABEL.c_str(), MESSAGE_LABEL_VALUE_ASSOCIATOR.c_str(),
+                 static_cast<long>(message.timestamp));
     std::fprintf(file, "%s%s\n", DATA_LABEL.c_str(), MESSAGE_LABEL_VALUE_ASSOCIATOR.c_str());
-    for (auto dataPosition = 0; dataPosition < MAXIMUM_NUMBER_OF_DATA_IN_MESSAGE; dataPosition++) {
+    for (auto dataPosition = 0; dataPosition < NUMBER_OF_DATA_BYTES; dataPosition++) {
         std::fprintf(file, "%s", MESSAGE_CONTENT_TABULATOR.c_str());
-        std::fprintf(file, "%s %d%s%d\n", DATA_POSITION_LABEL.c_str(), dataPosition + 1, MESSAGE_LABEL_VALUE_ASSOCIATOR.c_str(),
+        std::fprintf(file, "%s %d%s%d\n", DATA_POSITION_LABEL.c_str(), dataPosition + 1,
+                     MESSAGE_LABEL_VALUE_ASSOCIATOR.c_str(),
                      static_cast<int> (message.data[dataPosition]));
     }
     std::fprintf(file, "%s\n", MESSAGES_SEPARATOR.c_str());

@@ -13,9 +13,7 @@
 #ifndef SENSORGATEWAY_AWLMESSAGESTUB_H
 #define SENSORGATEWAY_AWLMESSAGESTUB_H
 
-#include <vector>
-#include <string>
-#include "sensor-gateway/domain/AWLMessage.h"
+#include "sensor-gateway/common/sensor-structures/AWLMessage.h"
 
 namespace Stub {
     using DataFlow::AWLMessage;

@@ -22,7 +22,7 @@
 #include "sensor-gateway/common/container/ConstantSizedPointerQueue.hpp"
 #include "test/utilities/data-model/DataModelFixture.h"
 
-using ExampleDataModel::NativeData;
+using DataModel::SimpleData;
 
 using TestFunctions::DataTestUtil;
 
@@ -37,10 +37,10 @@ public:
 
     static const uint16_t TEST_SIZE = 8;
 
-    using Queue = Container::ConstantSizedPointerQueue<NativeData, ConstantSizedPointerQueueTest::TEST_SIZE>;
+    using Queue = Container::ConstantSizedPointerQueue<SimpleData, ConstantSizedPointerQueueTest::TEST_SIZE>;
 
     void fillQueue(Queue* queue) const {
-        NativeData data = DataTestUtil::generateRandomNativeData();
+        SimpleData data = DataTestUtil::createRandomSimpleData();
         auto pointer = &data;
 
         for (auto i = 0; i < ConstantSizedPointerQueueTest::TEST_SIZE; ++i) {
@@ -59,7 +59,7 @@ TEST_F(ConstantSizedPointerQueueTest, given_anEmptyQueue_when_askedIfIsEmpty_the
 
 TEST_F(ConstantSizedPointerQueueTest, given_anQueueWithOneElement_when_askedIfIsEmpty_then_returnsFalse) {
     Queue queue;
-    NativeData data = DataTestUtil::generateRandomNativeData();
+    SimpleData data = DataTestUtil::createRandomSimpleData();
     auto pointer = &data;
     queue.store(pointer);
 
@@ -95,7 +95,7 @@ TEST_F(ConstantSizedPointerQueueTest, given_aFullQueue_when_storingANewPointer_t
     Queue queue;
     fillQueue(&queue);
 
-    NativeData data = DataTestUtil::generateRandomNativeData();
+    SimpleData data = DataTestUtil::createRandomSimpleData();
     auto pointer = &data;
 
     ASSERT_THROW(queue.store(pointer), std::runtime_error);
@@ -103,7 +103,7 @@ TEST_F(ConstantSizedPointerQueueTest, given_aFullQueue_when_storingANewPointer_t
 
 TEST_F(ConstantSizedPointerQueueTest, given_aStoredPointer_when_consumeNext_then_returnsThePointer) {
     Queue queue;
-    NativeData data = DataTestUtil::generateRandomNativeData();
+    SimpleData data = DataTestUtil::createRandomSimpleData();
     auto pointer = &data;
     queue.store(pointer);
 
@@ -114,8 +114,8 @@ TEST_F(ConstantSizedPointerQueueTest, given_aStoredPointer_when_consumeNext_then
 
 TEST_F(ConstantSizedPointerQueueTest, given_twoPointerStoredInOrder_when_consumed_then_returnedInTheOrderTheyWereStored) {
     Queue queue;
-    NativeData firstData = DataTestUtil::generateRandomNativeData();
-    NativeData secondData = DataTestUtil::generateRandomNativeData();
+    SimpleData firstData = DataTestUtil::createRandomSimpleData();
+    SimpleData secondData = DataTestUtil::createRandomSimpleData();
     auto firstPointer = &firstData;
     auto secondPointer = &secondData;
     queue.store(firstPointer);
@@ -130,7 +130,7 @@ TEST_F(ConstantSizedPointerQueueTest, given_twoPointerStoredInOrder_when_consume
 
 TEST_F(ConstantSizedPointerQueueTest, given_aPointerInTheQueue_when_consumeNext_then_returnsThePointer) {
     Queue queue;
-    NativeData data = DataTestUtil::generateRandomNativeData();
+    SimpleData data = DataTestUtil::createRandomSimpleData();
     auto pointer = &data;
     queue.store(pointer);
 
@@ -143,7 +143,7 @@ TEST_F(ConstantSizedPointerQueueTest, given_aNonFullQueue_when_fillingAndConsumi
     Queue queue;
 
     for (auto j = 0; j < ConstantSizedPointerQueueTest::TEST_SIZE * 2; ++j) {
-        NativeData data = DataTestUtil::generateRandomNativeData();
+        SimpleData data = DataTestUtil::createRandomSimpleData();
         auto pointer = &data;
         queue.store(pointer);
         auto storedPointer = queue.consumeNext();

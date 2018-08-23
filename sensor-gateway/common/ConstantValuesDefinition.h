@@ -58,12 +58,16 @@ namespace CommandType {
 
 namespace Sensor {
     using SensorID = uint16_t;
+
+    namespace Wagner {
+        const int MAX_NUMBER_OF_BULK_FETCHABLE_MESSAGES = 32;
+    }
     namespace AWL {
         using MessageID = uint64_t;
         MessageID const END_OF_FRAME = 0x09;
         MessageID const DETECTION_TRACK = 0x0A;
         MessageID const DETECTION_VELOCITY = 0x0B;
-        int const MAXIMUM_NUMBER_OF_DATA_IN_MESSAGE = 8;
+        int const NUMBER_OF_DATA_BYTES = 8;
         namespace _7 {
             SensorID const SENSOR_ID = 0x0010;
         }

@@ -10,8 +10,10 @@
 	See the License for the specific language governing permissions and
 	limitations under the License.
 */
-#ifndef SENSORGATEWAY_MESSAGETRANSLATIONSTRATEGY_H
-#define SENSORGATEWAY_MESSAGETRANSLATIONSTRATEGY_H
+#ifndef SENSORGATEWAY_MESSAGETRANSLATIONSTRATEGY_HPP
+#define SENSORGATEWAY_MESSAGETRANSLATIONSTRATEGY_HPP
+
+#include "sensor-gateway/common/data-flow/DataSource.hpp"
 
 namespace MessageTranslation {
 
@@ -28,6 +30,14 @@ namespace MessageTranslation {
 
         virtual ~MessageTranslationStrategy() noexcept = default;
 
+        MessageTranslationStrategy(MessageTranslationStrategy const& other) = delete;
+
+        MessageTranslationStrategy(MessageTranslationStrategy&& other) noexcept = delete;
+
+        MessageTranslationStrategy& operator=(MessageTranslationStrategy const& other)& = delete;
+
+        MessageTranslationStrategy& operator=(MessageTranslationStrategy&& other)& noexcept = delete;
+
         virtual void translateMessage(INPUT&& inputMessage) = 0;
 
     protected:
@@ -36,4 +46,4 @@ namespace MessageTranslation {
     };
 }
 
-#endif //SENSORGATEWAY_MESSAGETRANSLATIONSTRATEGY_H
+#endif //SENSORGATEWAY_MESSAGETRANSLATIONSTRATEGY_HPP

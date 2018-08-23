@@ -1,5 +1,5 @@
 [requires]
+libusb/1.0.22@bincrafters/stable
 
 [generators]
 cmake
-

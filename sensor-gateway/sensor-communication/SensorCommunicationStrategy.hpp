@@ -14,10 +14,11 @@
 #ifndef SENSORGATEWAY_SENSORCOMMUNICATIONSTRATEGY_H
 #define SENSORGATEWAY_SENSORCOMMUNICATIONSTRATEGY_H
 
-#include "sensor-gateway/domain/AWLMessage.h"
+#include "sensor-gateway/common/ConstantFunctionsDefinition.h"
 
 namespace SensorCommunication {
 
+    // TODO: add std::enable_if condition to force SFINAE with structures
     template<class T>
     class SensorCommunicationStrategy {
 
@@ -25,14 +26,21 @@ namespace SensorCommunication {
         typedef T DATA;
 
     public:
+        typedef typename DATA::Message Message;
+        typedef typename DATA::RawData RawData;
+
+        using Messages = std::array<Message, DATA::MAX_NUMBER_OF_BULK_FETCHABLE_MESSAGES>;
+        using RawDataCycles = std::array<RawData, DATA::MAX_NUMBER_OF_BULK_FETCHABLE_RAW_DATA_CYCLES>;
 
         virtual ~SensorCommunicationStrategy() noexcept = default;
 
-        virtual DATA readMessage() = 0;
+        virtual void openConnection() = 0;
 
-        virtual void openConnection()=0;
+        virtual Messages fetchMessages() = 0;
 
-        virtual void closeConnection()=0;
+        virtual RawDataCycles fetchRawDataCycles() = 0;
+
+        virtual void closeConnection() = 0;
 
     };
 }

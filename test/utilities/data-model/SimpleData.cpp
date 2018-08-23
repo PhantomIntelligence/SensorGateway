@@ -24,6 +24,10 @@ SimpleData::SimpleData(SimpleDataContent simpleDataContent) :
         content(std::move(simpleDataContent)) {
 }
 
+SimpleData::SimpleData() : SimpleData(SimpleData::returnDefaultData()) {
+
+}
+
 SimpleData::SimpleData(SimpleData&& other) noexcept:
         content(std::move(other.content)) {
     other.content = DEFAULT_SIMPLE_DATA_CONTENT;
@@ -56,9 +60,26 @@ bool SimpleData::operator!=(SimpleData const& other) const {
     return !operator==(other);
 }
 
+void SimpleData::inverseContent() {
+    auto oldContent = SimpleDataContent(content);
+    auto size = content.size();
+    if (size < 2) {
+        throw std::runtime_error("Warning! Some tests may misbehave. Content size needs to be more than 2.");
+    }
+    for (unsigned long i = 0; i < content.size(); ++i) {
+        content.at(i) = std::move(oldContent.at(size - 1 - i));
+    }
+}
+
+bool SimpleData::isTheInverseOf(SimpleData const& other) const {
+    auto inversedOther = SimpleData(other);
+    inversedOther.inverseContent();
+    return operator==(inversedOther);
+}
+
 std::string SimpleData::toString() const noexcept {
     std::string stringifiedContent;
-    for(unsigned long i = 0; i < content.size(); ++i) {
+    for (unsigned long i = 0; i < content.size(); ++i) {
         stringifiedContent += " " + content.at(i);
     }
     return stringifiedContent;

@@ -120,7 +120,7 @@ namespace DataFlow {
 
         void throwExceptionIfSchedulerHasReceivedTerminationOrder() const {
             if (terminateOrderHasBeenReceived()) {
-                throwIllegalActionException(
+                throwRuntimeError(
                         ExceptionMessage::DATA_PROCESSING_SCHEDULER_ILLEGAL_LINKING_SCHEDULER_HAS_BEEN_STOPPED);
             }
         }
@@ -133,21 +133,21 @@ namespace DataFlow {
 
         void throwExceptionIfInputBufferIsLinked(InputBuffer* inputBuffer) const {
             if (isInputBufferLinked(inputBuffer)) {
-                throwIllegalActionException(
+                throwRuntimeError(
                         ExceptionMessage::DATA_PROCESSING_SCHEDULER_ILLEGAL_LINKING_OF_ALREADY_LINKED_BUFFER_MESSAGE);
             }
         }
 
         void throwExceptionIfMaximumOfLinkedBufferReached() const {
             if (numberOfLinkedBuffers.load() == NUMBER_OF_CONCURRENT_INPUTS) {
-                throwIllegalActionException(
+                throwRuntimeError(
                         ExceptionMessage::DATA_PROCESSING_SCHEDULER_ILLEGAL_NUMBER_OF_INPUT_BUFFER_MESSAGE);
             }
         }
 
         void throwExceptionIfInputBufferIsNotLinked(InputBuffer* inputBuffer, char const* message) const {
             if (!isInputBufferLinked(inputBuffer)) {
-                throwIllegalActionException(message);
+                throwRuntimeError(message);
             }
         }
 

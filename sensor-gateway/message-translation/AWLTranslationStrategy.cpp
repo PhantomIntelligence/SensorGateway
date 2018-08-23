@@ -31,9 +31,6 @@ using Sensor::AWL::_16::NUMBER_OF_PIXELS_IN_FRAME;
 using Sensor::AWL::_16::HORIZONTAL_FIELD_OF_VIEW;
 using Sensor::AWL::_16::ANGLE_RANGE;
 
-AWLTranslationStrategy::AWLTranslationStrategy() :
-        super() {}
-
 void AWLTranslationStrategy::translateMessage(AWLMessage&& inputMessage) {
     switch (inputMessage.id) {
         case END_OF_FRAME:

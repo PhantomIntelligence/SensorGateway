@@ -14,26 +14,29 @@
 	limitations under the License.
 
 */
-#ifndef SENSORGATEWAY_MESSAGE_H
-#define SENSORGATEWAY_MESSAGE_H
+#ifndef SENSORGATEWAY_AWLMESSAGE_H
+#define SENSORGATEWAY_AWLMESSAGE_H
 
-#include "sensor-gateway/common/ConstantValuesDefinition.h"
+#include "sensor-gateway/common/ConstantFunctionsDefinition.h"
 
-using Sensor::AWL::MAXIMUM_NUMBER_OF_DATA_IN_MESSAGE;
 
 namespace AWL {
     using MessageID = int64_t;
-    using MessageTimestamp = int64_t;
-    using MessageLength = int32_t;
-    using DataArray = std::array<unsigned char, MAXIMUM_NUMBER_OF_DATA_IN_MESSAGE>;
+    using MessageTimestamp = uint64_t;
+    using MessageLength = uint32_t;
+    using MessageDataUnit = uint8_t;
+    using DataArray = std::array<MessageDataUnit, Sensor::AWL::NUMBER_OF_DATA_BYTES>;
 }
-
 
 namespace DataFlow {
     class AWLMessage {
     public:
-        explicit AWLMessage(AWL::MessageID id, AWL::MessageTimestamp timestamp, AWL::MessageLength length,
+        explicit AWLMessage(AWL::MessageID id,
+                            AWL::MessageTimestamp timestamp,
+                            AWL::MessageLength length,
                             AWL::DataArray data) noexcept;
+
+        explicit AWLMessage();
 
         ~AWLMessage() noexcept = default;
 
@@ -65,9 +68,11 @@ namespace DataFlow {
         AWL::MessageTimestamp const DEFAULT_TIMESTAMP = 0;
         AWL::MessageLength const DEFAULT_LENGTH = 0;
         AWL::DataArray const DEFAULT_AWL_DATA = AWL::DataArray();
-        AWLMessage const DEFAULT_AWL_MESSAGE = AWLMessage(DEFAULT_ID, DEFAULT_TIMESTAMP, DEFAULT_LENGTH,
+        AWLMessage const DEFAULT_AWL_MESSAGE = AWLMessage(DEFAULT_ID,
+                                                          DEFAULT_TIMESTAMP,
+                                                          DEFAULT_LENGTH,
                                                           DEFAULT_AWL_DATA);
     }
-
 }
-#endif //SENSORGATEWAY_MESSAGE_H
+
+#endif //SENSORGATEWAY_AWLMESSAGE_H

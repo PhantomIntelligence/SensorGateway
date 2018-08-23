@@ -29,7 +29,7 @@ namespace SensorAccessLinkElement {
         explicit MessageTranslator(MessageTranslation::MessageTranslationStrategy<INPUT, OUTPUT>* messageTranslationStrategy) :
                 messageTranslationStrategy(messageTranslationStrategy) {};
 
-        ~MessageTranslator() noexcept {};
+        ~MessageTranslator() noexcept = default;
 
         MessageTranslator(MessageTranslator const& other) = delete;
 

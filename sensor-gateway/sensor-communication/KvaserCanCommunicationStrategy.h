@@ -18,42 +18,55 @@
 #define SENSORGATEWAY_KVASERCANCOMMUNICATIONSTRATEGY_H
 
 #include <canlib.h>
+
+#include "sensor-gateway/common/sensor-structures/AWLStructures.h"
 #include "SensorCommunicationStrategy.hpp"
 
-using Sensor::AWL::MAXIMUM_NUMBER_OF_DATA_IN_MESSAGE;
 
 namespace SensorCommunication {
-    using DataFlow::AWLMessage;
 
-    class KvaserCanCommunicationStrategy final : public SensorCommunicationStrategy<AWLMessage> {
+    using Sensor::AWL::NUMBER_OF_DATA_BYTES;
+
+    class KvaserCanCommunicationStrategy final : public SensorCommunicationStrategy<Sensor::AWL::Structures> {
 
         unsigned long const CANLIB_READ_WAIT_INFINITE_DELAY = -1; // WARNING !!! --> NEVER change -1 with infinity because the code CRASH
-        using super = SensorCommunicationStrategy<AWLMessage>;
-        using super::DATA;
+        using super = SensorCommunicationStrategy<Sensor::AWL::Structures>;
 
     public:
-        KvaserCanCommunicationStrategy();
+        explicit KvaserCanCommunicationStrategy();
 
-        ~KvaserCanCommunicationStrategy();
+        ~KvaserCanCommunicationStrategy() noexcept final;
 
-        void openConnection() override;
+        KvaserCanCommunicationStrategy(KvaserCanCommunicationStrategy const& other) = delete;
 
-        DATA readMessage() override;
+        KvaserCanCommunicationStrategy(KvaserCanCommunicationStrategy&& other) noexcept = delete;
 
-        void closeConnection() override;
+        KvaserCanCommunicationStrategy& operator=(KvaserCanCommunicationStrategy const& other)& = delete;
+
+        KvaserCanCommunicationStrategy&
+        operator=(KvaserCanCommunicationStrategy&& other)& noexcept = delete;
+
+        void openConnection() final;
+
+        super::Messages fetchMessages() final;
+
+        super::RawDataCycles fetchRawDataCycles() final;
+
+        void closeConnection() final;
 
     private:
 
-        struct CanMessage {
-            long id;
-            unsigned long timestamp;
-            unsigned int flags;
-            unsigned int length;
-            uint8_t data[MAXIMUM_NUMBER_OF_DATA_IN_MESSAGE];
-        };
-        canHandle communicationChannel;
+        typedef struct {
+            int64_t id;
+            uint64_t timestamp;
+            uint32_t flags;
+            uint32_t length;
+            uint8_t data[NUMBER_OF_DATA_BYTES];
+        } CanMessage;
 
-        AWLMessage convertCanMessageToAwlMessage(CanMessage canMessage);
+        super::Message convertCanMessageToSensorMessage(CanMessage canMessage);
+
+        canHandle communicationChannel;
     };
 }
 #endif //SENSORGATEWAY_KVASERCANCOMMUNICATIONSTRATEGY_H

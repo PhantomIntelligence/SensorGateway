@@ -4,15 +4,15 @@ macro(setup_conan_dependencies_and_link_to_target _project_name)
     message(STATUS)
 
     execute_process(
-            COMMAND "./dev-script/conanUpdateDependencies" sensor-gateway ${CMAKE_MACRO_BINARY_DIR}
+            COMMAND "./dev-script/conanUpdateDependencies" ${SENSOR_GATEWAY_CMAKE_MACRO_SOURCE_DIR}/sensor-gateway ${SENSOR_GATEWAY_CMAKE_MACRO_BINARY_DIR}
             OUTPUT_VARIABLE CONAN_SCRIPT_OUTPUT
             ERROR_VARIABLE CONAN_SCRIPT_OUTPUT
-            WORKING_DIRECTORY ${CMAKE_MACRO_SOURCE_DIR}
+            WORKING_DIRECTORY ${SENSOR_GATEWAY_CMAKE_MACRO_SOURCE_DIR}
     )
     message(${CONAN_SCRIPT_OUTPUT})
-    if (EXISTS ${CMAKE_MACRO_BINARY_DIR}/conanbuildinfo.cmake)
+    if (EXISTS ${SENSOR_GATEWAY_CMAKE_MACRO_BINARY_DIR}/conanbuildinfo.cmake)
         # Include generated cmake files
-        include(${CMAKE_MACRO_BINARY_DIR}/conanbuildinfo.cmake)
+        include(${SENSOR_GATEWAY_CMAKE_MACRO_BINARY_DIR}/conanbuildinfo.cmake)
 
         conan_basic_setup(TARGETS)
 

@@ -23,13 +23,12 @@
 namespace SensorAccessLinkElement {
 
     template<class T>
-    class SensorCommunicator : public DataFlow::DataSource<T> {
+    class SensorCommunicator : public DataFlow::DataSource<typename T::Message> {
 
     protected:
-        typedef T DATA;
-        typedef SensorCommunication::SensorCommunicationStrategy<DATA> SensorCommunicationStrategy;
+        typedef SensorCommunication::SensorCommunicationStrategy<T> SensorCommunicationStrategy;
 
-        using super = DataFlow::DataSource<DATA>;
+        using super = DataFlow::DataSource<typename T::Message>;
         using super::produce;
 
     public:
@@ -69,9 +68,16 @@ namespace SensorAccessLinkElement {
     private:
 
         void run() {
+            auto const DEFAULT_MESSAGE = T::Message::returnDefaultData();
             while (!terminateOrderHasBeenReceived()) {
-                auto message = sensorCommunicationStrategy->readMessage();
-                produce(std::move(message));
+                auto messages = sensorCommunicationStrategy->fetchMessages();
+
+                for (auto messageIndex = 0; messageIndex < messages.size(); ++messageIndex) {
+                    auto message = messages[messageIndex];
+                    if (message != DEFAULT_MESSAGE) {
+                        produce(std::move(message));
+                    }
+                }
             }
         }
 

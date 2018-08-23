@@ -3,7 +3,7 @@
 
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
-#include <sensor-gateway/domain/AWLMessage.h>
+#include <sensor-gateway/common/sensor-structures/AWLMessage.h>
 #include <sensor-gateway/sensor-communication/SensorCommunicator.hpp>
 #include <sensor-gateway/sensor-communication/KvaserCanCommunicationStrategy.h>
 
@@ -11,13 +11,11 @@
 #include "test/utilities/data-model/DataModelFixture.h"
 #include "test/utilities/mock/ConsumerLinkMock.h"
 
-using ExampleDataModel::NativeData;
-using ExampleDataModel::ProcessedData;
-using ExampleDataModel::Data;
+using DataModel::SimpleData;
 using TestFunctions::DataTestUtil;
 
-using NativeBuffer = DataFlow::RingBuffer<NativeData>;
-using MockConsumerLink = Mock::ConsumerLinkMock<NativeData>;
+using SimpleBuffer = DataFlow::RingBuffer<SimpleData>;
+using MockConsumerLink = Mock::ConsumerLinkMock<SimpleData>;
 
 class RingBufferTest : public ::testing::Test {
 
@@ -34,134 +32,134 @@ RingBufferTest::RingBufferTest() {
 RingBufferTest::~RingBufferTest() {}
 
 
-NativeData generateRandomNativeData() {
-    auto nativeData = DataTestUtil::generateRandomNativeData();
-    while (nativeData == NativeData::returnDefaultData()) {
-        nativeData = DataTestUtil::generateRandomNativeData();
+SimpleData createRandomSimpleData() {
+    auto simpleData = DataTestUtil::createRandomSimpleData();
+    while (simpleData == SimpleData::returnDefaultData()) {
+        simpleData = DataTestUtil::createRandomSimpleData();
     }
-    return nativeData;
+    return simpleData;
 }
 
 
 TEST_F(RingBufferTest, given_aData_when_consumeNextDataForALink_then_returnsData) {
-    NativeBuffer nativeBuffer;
+    SimpleBuffer simpleBuffer;
     auto linkMock = MockConsumerLink();
-    auto nativeData = generateRandomNativeData();
-    auto nativeDataCopy = NativeData(nativeData);
-    nativeBuffer.write(std::move(nativeData));
+    auto simpleData = createRandomSimpleData();
+    auto simpleDataCopy = SimpleData(simpleData);
+    simpleBuffer.write(std::move(simpleData));
 
-    auto consumedData = nativeBuffer.consumeNextDataFor(&linkMock);
+    auto consumedData = simpleBuffer.consumeNextDataFor(&linkMock);
 
-    ASSERT_EQ(nativeDataCopy, consumedData);
+    ASSERT_EQ(simpleDataCopy, consumedData);
 }
 
 TEST_F(RingBufferTest, given_twoDataOfWhichOneHasAlreadyBeenConsumed_when_consumeNextDataForALink_then_returnsTheSecondData) {
-    NativeBuffer nativeBuffer;
+    SimpleBuffer simpleBuffer;
     auto linkMock = MockConsumerLink();
-    auto nativeDataOne = generateRandomNativeData();
-    auto nativeDataTwo = generateRandomNativeData();
-    auto nativeDataTwoCopy = NativeData(nativeDataTwo);
-    nativeBuffer.write(std::move(nativeDataOne));
-    nativeBuffer.write(std::move(nativeDataTwo));
-    nativeBuffer.consumeNextDataFor(&linkMock);
+    auto simpleDataOne = createRandomSimpleData();
+    auto simpleDataTwo = createRandomSimpleData();
+    auto simpleDataTwoCopy = SimpleData(simpleDataTwo);
+    simpleBuffer.write(std::move(simpleDataOne));
+    simpleBuffer.write(std::move(simpleDataTwo));
+    simpleBuffer.consumeNextDataFor(&linkMock);
 
-    auto consumedData = nativeBuffer.consumeNextDataFor(&linkMock);
+    auto consumedData = simpleBuffer.consumeNextDataFor(&linkMock);
 
-    ASSERT_EQ(nativeDataTwoCopy, consumedData);
+    ASSERT_EQ(simpleDataTwoCopy, consumedData);
 }
 
 TEST_F(RingBufferTest, given_noData_when_consumeNextDataForALink_then_throwsARuntimeException) {
-    NativeBuffer nativeBuffer;
+    SimpleBuffer simpleBuffer;
     auto linkMock = MockConsumerLink();
 
-    EXPECT_THROW(nativeBuffer.consumeNextDataFor(&linkMock), std::runtime_error);
+    EXPECT_THROW(simpleBuffer.consumeNextDataFor(&linkMock), std::runtime_error);
 }
 
 TEST_F(RingBufferTest, given_aDataAndTwoConsumers_when_consumeNextDataForALinkAfterTheOtherOne_then_returnsTheData) {
-    NativeBuffer nativeBuffer;
+    SimpleBuffer simpleBuffer;
     auto firstLinkMock = MockConsumerLink();
     auto secondLinkMock = MockConsumerLink();
-    auto nativeData = generateRandomNativeData();
-    auto nativeDataCopy = NativeData(nativeData);
-    nativeBuffer.write(std::move(std::move(nativeData)));
+    auto simpleData = createRandomSimpleData();
+    auto simpleDataCopy = SimpleData(simpleData);
+    simpleBuffer.write(std::move(std::move(simpleData)));
 
-    nativeBuffer.consumeNextDataFor(&firstLinkMock);
-    auto consumedData = nativeBuffer.consumeNextDataFor(&secondLinkMock);
+    simpleBuffer.consumeNextDataFor(&firstLinkMock);
+    auto consumedData = simpleBuffer.consumeNextDataFor(&secondLinkMock);
 
-    ASSERT_EQ(nativeDataCopy, consumedData);
+    ASSERT_EQ(simpleDataCopy, consumedData);
 
 }
 
 TEST_F(RingBufferTest, given_aLinkedConsumer_when_writesData_then_activatesConsumer) {
-    NativeBuffer nativeBuffer;
+    SimpleBuffer simpleBuffer;
     auto linkMock = MockConsumerLink();
-    nativeBuffer.linkWith(&linkMock);
+    simpleBuffer.linkWith(&linkMock);
 
-    auto nativeData = generateRandomNativeData();
-    nativeBuffer.write(std::move(std::move(nativeData)));
+    auto simpleData = createRandomSimpleData();
+    simpleBuffer.write(std::move(std::move(simpleData)));
 
     ASSERT_TRUE(linkMock.isActive());
 }
 
 TEST_F(RingBufferTest, given_dataAndAConsumer_when_consumesTheLastDataForThatConsumer_then_deactivatesConsumer) {
-    NativeBuffer nativeBuffer;
+    SimpleBuffer simpleBuffer;
     auto linkMock = MockConsumerLink();
-    nativeBuffer.linkWith(&linkMock);
-    auto nativeData = generateRandomNativeData();
-    nativeBuffer.write(std::move(std::move(nativeData)));
+    simpleBuffer.linkWith(&linkMock);
+    auto simpleData = createRandomSimpleData();
+    simpleBuffer.write(std::move(std::move(simpleData)));
 
-    nativeBuffer.consumeNextDataFor(&linkMock);
+    simpleBuffer.consumeNextDataFor(&linkMock);
 
     ASSERT_FALSE(linkMock.isActive());
 }
 
 TEST_F(RingBufferTest, given_twoDataAndAConsumerThatConsumedThemAll_when_consumesNextDataForANewConsumer_then_returnsTheFirstData) {
-    NativeBuffer nativeBuffer;
+    SimpleBuffer simpleBuffer;
     auto firstLinkMock = MockConsumerLink();
-    auto nativeDataOne = generateRandomNativeData();
-    auto nativeDataTwo = generateRandomNativeData();
-    auto nativeDataOneCopy = NativeData(nativeDataOne);
-    auto nativeDataTwoCopy = NativeData(nativeDataTwo);
-    nativeBuffer.write(std::move(nativeDataOne));
-    nativeBuffer.write(std::move(nativeDataTwo));
-    nativeBuffer.consumeNextDataFor(&firstLinkMock);
-    nativeBuffer.consumeNextDataFor(&firstLinkMock);
+    auto simpleDataOne = createRandomSimpleData();
+    auto simpleDataTwo = createRandomSimpleData();
+    auto simpleDataOneCopy = SimpleData(simpleDataOne);
+    auto simpleDataTwoCopy = SimpleData(simpleDataTwo);
+    simpleBuffer.write(std::move(simpleDataOne));
+    simpleBuffer.write(std::move(simpleDataTwo));
+    simpleBuffer.consumeNextDataFor(&firstLinkMock);
+    simpleBuffer.consumeNextDataFor(&firstLinkMock);
 
     auto newLinkMock = MockConsumerLink();
-    auto consumedData = nativeBuffer.consumeNextDataFor(&newLinkMock);
+    auto consumedData = simpleBuffer.consumeNextDataFor(&newLinkMock);
 
-    ASSERT_EQ(nativeDataOneCopy, consumedData);
+    ASSERT_EQ(simpleDataOneCopy, consumedData);
 }
 
 TEST_F(RingBufferTest, given_aFullBuffer_when_writesOneNewData_then_overwritesTheFirstData) {
-    NativeBuffer nativeBuffer;
-    auto firstData = generateRandomNativeData();
-    auto firstDataCopy = NativeData(firstData);
-    nativeBuffer.write(std::move(firstData));
+    SimpleBuffer simpleBuffer;
+    auto firstData = createRandomSimpleData();
+    auto firstDataCopy = SimpleData(firstData);
+    simpleBuffer.write(std::move(firstData));
     for (auto i = 0; i < RING_BUFFER_SIZE; ++i) {
-        nativeBuffer.write(generateRandomNativeData());
+        simpleBuffer.write(createRandomSimpleData());
     }
 
     auto newLinkMock = MockConsumerLink();
-    auto lastWrittenData = nativeBuffer.consumeNextDataFor(&newLinkMock);
+    auto lastWrittenData = simpleBuffer.consumeNextDataFor(&newLinkMock);
 
     ASSERT_NE(firstDataCopy, lastWrittenData);
 }
 
 TEST_F(RingBufferTest, given_aFullBuffer_when_writesMoreThanOneData_then_overwritesTheOldestDataEachTime) {
-    NativeBuffer nativeBuffer;
-    auto firstData = generateRandomNativeData();
-    auto secondData = generateRandomNativeData();
-    auto secondDataCopy = NativeData(firstData);
-    nativeBuffer.write(std::move(firstData));
-    nativeBuffer.write(std::move(secondData));
+    SimpleBuffer simpleBuffer;
+    auto firstData = createRandomSimpleData();
+    auto secondData = createRandomSimpleData();
+    auto secondDataCopy = SimpleData(firstData);
+    simpleBuffer.write(std::move(firstData));
+    simpleBuffer.write(std::move(secondData));
     for (auto i = 0; i < RING_BUFFER_SIZE; ++i) {
-        nativeBuffer.write(generateRandomNativeData());
+        simpleBuffer.write(createRandomSimpleData());
     }
 
     auto newLinkMock = MockConsumerLink();
-    nativeBuffer.consumeNextDataFor(&newLinkMock);
-    auto lastWrittenData = nativeBuffer.consumeNextDataFor(&newLinkMock);
+    simpleBuffer.consumeNextDataFor(&newLinkMock);
+    auto lastWrittenData = simpleBuffer.consumeNextDataFor(&newLinkMock);
 
     ASSERT_NE(secondDataCopy, lastWrittenData);
 }

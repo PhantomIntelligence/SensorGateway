@@ -38,7 +38,7 @@ namespace {
       */
     void doNothing() {}
 
-    [[noreturn]] void throwIllegalActionException(char const* message) {
+    [[noreturn]] void throwRuntimeError(char const* message) {
         throw std::runtime_error(message);
     }
 

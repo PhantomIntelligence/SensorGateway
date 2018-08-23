@@ -19,17 +19,15 @@
 
 using SensorCommunication::KvaserCanCommunicationStrategy;
 
-const long CANLIB_KVASER_CAN_BIT_RATE = canBITRATE_1M;
-const unsigned int CANLIB_TIME_SEGMENT_1 = 0;
-const unsigned int CANLIB_TIME_SEGMENT_2 = 0;
-const unsigned int CANLIB_SYNCHRONIZATION_JUMP_WIDTH = 0;
-const unsigned int CANLIB_NUMBER_OF_SAMPLING_POINTS = 0;
-const unsigned int CANLIB_SYNCMODE = 0;
-const int CANLIB_FLAGS_FOR_CHANNEL = canOPEN_EXCLUSIVE;
-const unsigned int CANLIB_CAN_DRIVER_TYPE = canDRIVER_NORMAL;
-const int CANLIB_CHANNEL_ID = 0;
-
-using DataFlow::AWLMessage;
+int32_t const CANLIB_KVASER_CAN_BIT_RATE = canBITRATE_1M;
+uint32_t const CANLIB_TIME_SEGMENT_1 = 0;
+uint32_t const CANLIB_TIME_SEGMENT_2 = 0;
+uint32_t const CANLIB_SYNCHRONIZATION_JUMP_WIDTH = 0;
+uint32_t const CANLIB_NUMBER_OF_SAMPLING_POINTS = 0;
+uint32_t const CANLIB_SYNCMODE = 0;
+int32_t const CANLIB_FLAGS_FOR_CHANNEL = canOPEN_EXCLUSIVE;
+uint32_t const CANLIB_CAN_DRIVER_TYPE = canDRIVER_NORMAL;
+int32_t const CANLIB_CHANNEL_ID = 0;
 
 KvaserCanCommunicationStrategy::KvaserCanCommunicationStrategy() : communicationChannel() {
 }
@@ -47,22 +45,31 @@ void KvaserCanCommunicationStrategy::openConnection() {
     canBusOn(communicationChannel);
 }
 
-AWLMessage KvaserCanCommunicationStrategy::readMessage() {
+KvaserCanCommunicationStrategy::super::Messages KvaserCanCommunicationStrategy::fetchMessages() {
     CanMessage canMessage{};
     canReadWait(communicationChannel, &canMessage.id, &canMessage.data, &canMessage.length, &canMessage.flags,
                 &canMessage.timestamp, CANLIB_READ_WAIT_INFINITE_DELAY);
-    return convertCanMessageToAwlMessage(canMessage);
+    auto message = convertCanMessageToSensorMessage(canMessage);
+    super::Messages messages = {message};
+    return messages;
 }
 
-AWLMessage KvaserCanCommunicationStrategy::convertCanMessageToAwlMessage(CanMessage canMessage) {
+KvaserCanCommunicationStrategy::super::RawDataCycles KvaserCanCommunicationStrategy::fetchRawDataCycles() {
+    super::RawDataCycles rawDataCycles;
+    return rawDataCycles;
+}
+
+KvaserCanCommunicationStrategy::super::Message
+KvaserCanCommunicationStrategy::convertCanMessageToSensorMessage(CanMessage canMessage) {
     AWL::DataArray data;
     for (auto dataNumber = 0; dataNumber < canMessage.length; ++dataNumber) {
         data[dataNumber] = canMessage.data[dataNumber];
     }
 
-    AWLMessage awlMessage(canMessage.id, canMessage.timestamp, canMessage.length, data);
+    KvaserCanCommunicationStrategy::super::Message
+            message(canMessage.id, canMessage.timestamp, canMessage.length, data);
 
-    return awlMessage;
+    return message;
 }
 
 void KvaserCanCommunicationStrategy::closeConnection() {

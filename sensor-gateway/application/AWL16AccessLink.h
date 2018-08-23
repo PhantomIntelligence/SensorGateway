@@ -23,19 +23,20 @@
 
 namespace SensorGateway {
 
-    class AWL16AccessLink : public SensorAccessLink<DataFlow::AWLMessage, DataFlow::Frame> {
+    class AWL16AccessLink final : public SensorAccessLink<Sensor::AWL::Structures, DataFlow::Frame> {
     protected:
-        using super = SensorAccessLink<DataFlow::AWLMessage, DataFlow::Frame>;
+        using super = SensorAccessLink<Sensor::AWL::Structures, DataFlow::Frame>;
 
         using super::ServerCommunicationStrategy;
-        using super::MessageTranslationStrategy;
-        using super::SensorCommunicationStrategy;
 
     public:
 
-        explicit AWL16AccessLink(ServerCommunicationStrategy* serverCommunicationStrategy);
+        explicit AWL16AccessLink(ServerCommunicationStrategy* serverCommunicationStrategy)
+                : super(serverCommunicationStrategy,
+                        &awlTranslationStrategy,
+                        &kvaserCanCommunicationStrategy) {}
 
-        ~AWL16AccessLink() noexcept;
+        ~AWL16AccessLink() noexcept = default;
 
         AWL16AccessLink(AWL16AccessLink const& other) = delete;
 
@@ -47,8 +48,8 @@ namespace SensorGateway {
 
     private:
 
-        MessageTranslationStrategy messageTranslationStrategy;
-        SensorCommunicationStrategy sensorCommunicationStrategy;
+        MessageTranslation::AWLTranslationStrategy awlTranslationStrategy;
+        SensorCommunication::KvaserCanCommunicationStrategy kvaserCanCommunicationStrategy;
     };
 }
 
