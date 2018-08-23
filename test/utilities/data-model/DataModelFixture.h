@@ -25,7 +25,7 @@ namespace TestFunctions {
 
     public:
 
-        static const DataModel::SimpleData createRandomSimpleData() {
+        static const DataModel::SimpleMessage createRandomSimpleMessage() {
             auto const lengthOfDataToCreate = 42;
             typedef std::array<char, 62> CharArray;
             auto charSet = CharArray({'0', '1', '2', '3', '4',
@@ -47,16 +47,32 @@ namespace TestFunctions {
                 return charSet[distribution(randomEngine)];
             };
 
-            DataModel::SimpleDataContent content;
+            DataModel::TestSensor::SimpleMessageContent content;
             auto numberOfStringToCreate = content.size();
             for (unsigned long i = 0; i < numberOfStringToCreate; ++i) {
                 content.at(i) = createRandomStringOfLength(lengthOfDataToCreate, randomCharFunction);
             }
-            DataModel::SimpleData randomSimpleData(content);
+            DataModel::SimpleMessage randomSimpleMessage(content);
 
-            return randomSimpleData;
+            return randomSimpleMessage;
         }
 
+        static const DataModel::SimpleRawData createRandomSimpleRawData() {
+            auto const numberOfDataToCreate = DataModel::TestSensor::NUMBER_OF_DATA_IN_RAW_DATA;
+            auto const maximalValue = 9001;
+
+            std::default_random_engine randomEngine(std::random_device{}());
+            std::uniform_int_distribution<unsigned int> distribution(0, maximalValue);
+
+            DataModel::TestSensor::SimpleRawDataContent content;
+            auto numberOfStringToCreate = content.size();
+            for (auto i = 0u; i < numberOfStringToCreate; ++i) {
+                content.at(i) = distribution(randomEngine);
+            }
+            DataModel::SimpleRawData randomSimpleRawData(content);
+
+            return randomSimpleRawData;
+        }
     private:
 
         static std::string createRandomStringOfLength(size_t length, std::function<char(void)> const& pickRandomChar) {

@@ -23,15 +23,20 @@
 namespace SensorAccessLinkElement {
 
     template<class T>
-    class SensorCommunicator : public DataFlow::DataSource<typename T::Message> {
+    class SensorCommunicator : public DataFlow::DataSource<typename T::Message>,
+                               public DataFlow::DataSource<typename T::RawData> {
 
     protected:
         typedef SensorCommunication::SensorCommunicationStrategy<T> SensorCommunicationStrategy;
 
-        using super = DataFlow::DataSource<typename T::Message>;
-        using super::produce;
+        using MESSAGE = typename T::Message;
+        using RAW_DATA = typename T::RawData;
 
-        typename T::Message const DEFAULT_MESSAGE = T::Message::returnDefaultData();
+        using superMessage = DataFlow::DataSource<MESSAGE>;
+        using superRawData = DataFlow::DataSource<RAW_DATA>;
+
+        MESSAGE const DEFAULT_MESSAGE = T::Message::returnDefaultData();
+        RAW_DATA const DEFAULT_RAW_DATA = T::RawData::returnDefaultData();
 
     public:
         explicit SensorCommunicator(SensorCommunicationStrategy* sensorCommunicationStrategy) :
@@ -58,14 +63,15 @@ namespace SensorAccessLinkElement {
 
         void terminateAndJoin() {
             sensorCommunicationStrategy->closeConnection();
-
             if (!terminateOrderHasBeenReceived()) {
                 terminateOrderReceived.store(true);
             }
-
             communicatorThread.exitSafely();
         };
 
+        using superMessage::linkConsumer;//(DataFlow::ConsumerLink<MESSAGE>* consumer);
+
+        using superRawData::linkConsumer;//(DataFlow::ConsumerLink<RAW_DATA>* consumer);
 
     private:
 
@@ -74,6 +80,7 @@ namespace SensorAccessLinkElement {
                 handleIncomingMessages();
                 handleIncomingRawData();
                 // TODO : investigate the avantages of sleep and/or yield here.
+                std::this_thread::yield();
             }
         }
 
@@ -82,13 +89,19 @@ namespace SensorAccessLinkElement {
             for (auto messageIndex = 0; messageIndex < messages.size(); ++messageIndex) {
                 auto message = messages[messageIndex];
                 if (message != DEFAULT_MESSAGE) {
-                    produce(std::move(message));
+                    superMessage::produce(std::move(message));
                 }
             }
         }
 
         void handleIncomingRawData() {
             auto rawDataCycles = sensorCommunicationStrategy->fetchRawDataCycles();
+            for (auto rawDataIndex = 0; rawDataIndex < rawDataCycles.size(); ++rawDataIndex) {
+                auto rawDataCycle = rawDataCycles[rawDataIndex];
+                if (rawDataCycle != DEFAULT_RAW_DATA) {
+                    superRawData::produce(std::move(rawDataCycle));
+                }
+            }
         }
 
         bool terminateOrderHasBeenReceived() const {

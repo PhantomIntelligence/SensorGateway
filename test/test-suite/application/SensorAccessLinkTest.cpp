@@ -24,11 +24,8 @@
 #include "sensor-gateway/application/SensorAccessLink.hpp"
 #include "test/utilities/data-model/DataModelFixture.h"
 
-using DataModel::SimpleData;
-using DataModel::SimpleDataContent;
-using SimpleDataList = std::list<SimpleData>;
 using TestFunctions::DataTestUtil;
-using SensorAccessLink = SensorGateway::SensorAccessLink<Sensor::Test::Simple::Structures, SimpleData>;
+using SensorAccessLink = SensorGateway::SensorAccessLink<Sensor::Test::Simple::Structures, DataModel::SimpleMessage>;
 
 class SensorAccessLinkTest : public ::testing::Test {
 
@@ -50,16 +47,20 @@ namespace SensorAccessLinkTestMock {
     protected:
 
         using super = SensorCommunicationStrategy<Sensor::Test::Simple::Structures>;
-        using DataList = std::list<super::Messages>;
+        using MessagesList = std::list<super::Messages>;
+        using RawDataCyclesList = std::list<super::RawDataCycles>;
 
     public:
 
         explicit MockSensorCommunicationStrategy(uint8_t minimumNumberOfMessageToCreate) :
-                promiseFulfilled(false),
+                messagePromiseFulfilled(false),
+                rawDataPromiseFulfilled(false),
                 connectCalled(false),
                 disconnectCalled(false),
                 numberOfMessageCreated(0),
-                minimumNumberOfMessageToCreate(minimumNumberOfMessageToCreate) {
+                numberOfRawDataCyclesCreated(0),
+                minimumNumberOfMessagesToCreate(minimumNumberOfMessageToCreate),
+                minimumNumberOfRawDataCyclesToCreate(minimumNumberOfMessageToCreate) {
         }
 
         void openConnection() override {
@@ -81,16 +82,16 @@ namespace SensorAccessLinkTestMock {
         super::Messages fetchMessages() override {
             super::Messages createdMessages;
 
-            for (uint32_t i = 0; i < Sensor::Test::Simple::Structures::MAX_NUMBER_OF_BULK_FETCHABLE_MESSAGES; ++i) {
-                auto createdData = DataTestUtil::createRandomSimpleData();
+            for (auto i = 0u; i < Sensor::Test::Simple::Structures::MAX_NUMBER_OF_BULK_FETCHABLE_MESSAGES; ++i) {
+                auto createdData = DataTestUtil::createRandomSimpleMessage();
                 createdMessages[i] = createdData;
             }
             auto copy = super::Messages(createdMessages);
-            createdDataCopies.push_back(copy);
+            createdMessagesCopies.push_back(copy);
 
             ++numberOfMessageCreated;
-            if (hasCreatedMinimumNumberOfData() && !promiseFulfilled.load()) {
-                promiseFulfilled.store(true);
+            if (hasCreatedMinimumNumberOfMessages() && !messagePromiseFulfilled.load()) {
+                messagePromiseFulfilled.store(true);
                 minimumNumberOfMessageCreated.set_value(true);
             }
 
@@ -103,39 +104,79 @@ namespace SensorAccessLinkTestMock {
 
         super::RawDataCycles fetchRawDataCycles() override {
             super::RawDataCycles createdRawDataCycles;
+
+            for (auto i = 0u; i < Sensor::Test::Simple::Structures::MAX_NUMBER_OF_BULK_FETCHABLE_RAW_DATA_CYCLES; ++i) {
+                auto createdRawData = DataTestUtil::createRandomSimpleRawData();
+                createdRawDataCycles[i] = createdRawData;
+            }
+            auto copy = super::RawDataCycles(createdRawDataCycles);
+            createdRawDataCyclesCopies.push_back(copy);
+
+            ++numberOfRawDataCyclesCreated;
+            if (hasCreatedMinimumNumberOfRawDataCycles() && !rawDataPromiseFulfilled.load()) {
+                rawDataPromiseFulfilled.store(true);
+                minimumNumberOfRawDataCycleCreated.set_value(true);
+            }
+
+            // WARNING! This mock implementation of readMessage needs to be slowed down because the way gtest works. DO NOT REMOVE.
+            std::this_thread::sleep_for(std::chrono::milliseconds(5));
+            std::this_thread::yield();
             return createdRawDataCycles;
         }
 
         void waitUntilFetchMessagesHasBeenCalledEnough() {
-            if (!hasCreatedMinimumNumberOfData()) {
+            if (!hasCreatedMinimumNumberOfMessages()) {
                 minimumNumberOfMessageCreated.get_future().wait();
             }
         }
 
-        DataList const& getCreatedMessageCopies() const {
-            return createdDataCopies;
+        void waitUntilFetchRawDataCyclesHasBeenCalledEnough() {
+            if (!hasCreatedMinimumNumberOfRawDataCycles()) {
+                minimumNumberOfRawDataCycleCreated.get_future().wait();
+            }
+        }
+
+        MessagesList const& getCreatedMessageCopies() const {
+            return createdMessagesCopies;
+        }
+
+        RawDataCyclesList const& getCreatedRawDataCopies() const {
+            return createdRawDataCyclesCopies;
         }
 
     private:
 
-        bool hasCreatedMinimumNumberOfData() {
+        bool hasCreatedMinimumNumberOfMessages() {
             LockGuard guard(numberOfMessageCreatedVerificationMutex);
-            return numberOfMessageCreated.load() == minimumNumberOfMessageToCreate.load();
+            return numberOfMessageCreated.load() >= minimumNumberOfMessagesToCreate.load();
+        }
+
+        bool hasCreatedMinimumNumberOfRawDataCycles() {
+            LockGuard guard(numberOfRawDataCyclesCreatedVerificationMutex);
+            return numberOfRawDataCyclesCreated.load() >= minimumNumberOfRawDataCyclesToCreate.load();
         }
 
         AtomicCounter numberOfMessageCreated;
-        AtomicCounter minimumNumberOfMessageToCreate;
+        AtomicCounter numberOfRawDataCyclesCreated;
+        AtomicCounter minimumNumberOfMessagesToCreate;
+        AtomicCounter minimumNumberOfRawDataCyclesToCreate;
 
-        AtomicFlag promiseFulfilled;
+        AtomicFlag messagePromiseFulfilled;
+        AtomicFlag rawDataPromiseFulfilled;
         AtomicFlag connectCalled;
         AtomicFlag disconnectCalled;
-        Mutex numberOfMessageCreatedVerificationMutex;
-        mutable BooleanPromise minimumNumberOfMessageCreated;
 
-        DataList createdDataCopies;
+        Mutex numberOfMessageCreatedVerificationMutex;
+        Mutex numberOfRawDataCyclesCreatedVerificationMutex;
+
+        mutable BooleanPromise minimumNumberOfMessageCreated;
+        mutable BooleanPromise minimumNumberOfRawDataCycleCreated;
+
+        MessagesList createdMessagesCopies;
+        RawDataCyclesList createdRawDataCyclesCopies;
     };
 
-    using SimpleTranslationStrategy = MessageTranslation::MessageTranslationStrategy<SimpleData, SimpleData>;
+    using SimpleTranslationStrategy = DataTranslation::DataTranslationStrategy<DataModel::SimpleMessage, DataModel::SimpleMessage>;
 
     class MockTranslationStrategy final : public SimpleTranslationStrategy {
     protected:
@@ -151,7 +192,7 @@ namespace SensorAccessLinkTestMock {
         }
     };
 
-    using SimpleServerCommunicationStrategy = ServerCommunication::ServerCommunicationStrategy<SimpleData>;
+    using SimpleServerCommunicationStrategy = ServerCommunication::ServerCommunicationStrategy<DataModel::SimpleMessage>;
 
     class MockServerCommunicationStrategy final : public SimpleServerCommunicationStrategy {
     protected:
@@ -184,12 +225,12 @@ namespace SensorAccessLinkTestMock {
             receivedData.push_back(message);
         }
 
-        SimpleDataList const& getReceivedData() const {
+        std::list<DataModel::SimpleMessage> const& getReceivedData() const {
             return receivedData;
         }
 
     private:
-        SimpleDataList receivedData;
+        std::list<DataModel::SimpleMessage> receivedData;
         AtomicFlag connectCalled;
         AtomicFlag disconnectCalled;
     };
@@ -206,13 +247,14 @@ TEST_F(SensorAccessLinkTest,
                                       &mockSensorCommunicationStrategy);
 
     sensorAccessLink.start(FAKE_SERVER_ADDRESS);
-    sensorAccessLink.terminateAndJoin();
 
     auto sensorOpenConnectionHasBeenCalled = mockSensorCommunicationStrategy.hasOpenConnectionBeenCalled();
     auto serverOpenConnectionHasBeenCalled = mockServerCommunicationStrategy.hasOpenConnectionBeenCalled();
 
-    ASSERT_TRUE(sensorOpenConnectionHasBeenCalled);
+    sensorAccessLink.terminateAndJoin();
+
     ASSERT_TRUE(serverOpenConnectionHasBeenCalled);
+    ASSERT_TRUE(sensorOpenConnectionHasBeenCalled);
 }
 
 TEST_F(SensorAccessLinkTest,
@@ -226,20 +268,20 @@ TEST_F(SensorAccessLinkTest,
                                       &mockSensorCommunicationStrategy);
 
     sensorAccessLink.start(FAKE_SERVER_ADDRESS);
+    std::this_thread::yield();
     sensorAccessLink.terminateAndJoin();
 
     auto sensorCloseConnectionHasBeenCalled = mockSensorCommunicationStrategy.hasCloseConnectionBeenCalled();
     auto serverCloseConnectionHasBeenCalled = mockServerCommunicationStrategy.hasCloseConnectionBeenCalled();
 
-    ASSERT_TRUE(sensorCloseConnectionHasBeenCalled);
     ASSERT_TRUE(serverCloseConnectionHasBeenCalled);
+    ASSERT_TRUE(sensorCloseConnectionHasBeenCalled);
 }
-
 /**
  * Medium test
  */
 TEST_F(SensorAccessLinkTest,
-       given_aNumberOfDataCreatedByTheSensorCommunicationStrategy_when_executing_then_aSimilarNumberOfDataEndsUpInTheServerCommunicationStrategy) {
+       given_aNumberOfDataCreatedByTheSensorCommunicationStrategy_when_executing_then_theSameNumberOfDataEndsUpInTheServerCommunicationStrategy) {
     uint8_t numberOfDataToProcess = 42;
     SensorAccessLinkTestMock::MockSensorCommunicationStrategy mockSensorCommunicationStrategy(numberOfDataToProcess);
     SensorAccessLinkTestMock::MockTranslationStrategy mockTranslationStrategy;
@@ -251,6 +293,7 @@ TEST_F(SensorAccessLinkTest,
     sensorAccessLink.start(FAKE_SERVER_ADDRESS);
 
     mockSensorCommunicationStrategy.waitUntilFetchMessagesHasBeenCalledEnough();
+    mockSensorCommunicationStrategy.waitUntilFetchRawDataCyclesHasBeenCalledEnough();
 
     sensorAccessLink.terminateAndJoin();
 
@@ -277,6 +320,7 @@ TEST_F(SensorAccessLinkTest,
     sensorAccessLink.start(FAKE_SERVER_ADDRESS);
 
     mockSensorCommunicationStrategy.waitUntilFetchMessagesHasBeenCalledEnough();
+    mockSensorCommunicationStrategy.waitUntilFetchRawDataCyclesHasBeenCalledEnough();
 
     sensorAccessLink.terminateAndJoin();
 

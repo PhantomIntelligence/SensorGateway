@@ -11,8 +11,8 @@
 	limitations under the License.
 */
 
-#ifndef SENSORGATEWAY_MESSAGETRANSLATORTEST_CPP
-#define SENSORGATEWAY_MESSAGETRANSLATORTEST_CPP
+#ifndef SENSORGATEWAY_AWLDATATRANSLATORTEST_CPP
+#define SENSORGATEWAY_AWLDATATRANSLATORTEST_CPP
 
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
@@ -21,7 +21,7 @@
 #include "test/utilities/files/FrameFileManager.h"
 #include "test/utilities/stub/AWLMessageStub.h"
 #include "test/utilities/stub/FrameStub.h"
-#include "sensor-gateway/message-translation/AWLTranslationStrategy.h"
+#include "sensor-gateway/data-translation/AWLTranslationStrategy.h"
 #include "test/utilities/mock/FrameSinkMock.h"
 
 using Mock::FrameProcessingScheduler;
@@ -30,17 +30,17 @@ using TestUtilities::AWLMessagesFileManager;
 using TestUtilities::FrameFileManager;
 using Stub::createAWLMessageStub;
 using Stub::createFrameStub;
-using MessageTranslation::AWLTranslationStrategy;
+using DataTranslation::AWLTranslationStrategy;
 
 class AWLTranslationStrategyTest : public ::testing::Test {
 protected:
-    char const* AWLMESSAGES_INPUT_FILE_NAME = "AWLMessagesInputFile.txt";
+    char const* AWLDATAS_INPUT_FILE_NAME = "AWLMessagesInputFile.txt";
     char const* EXPECTED__FRAMES_OUTPUT_FILE_NAME = "ExpectedFramesOutputFile.txt";
 
     virtual void SetUp() {
         auto awlMessages = createAWLMessageStub();
         auto Frames = createFrameStub();
-        awlMessagesFileManager.writeFileWithMessages(awlMessages, AWLMESSAGES_INPUT_FILE_NAME);
+        awlMessagesFileManager.writeFileWithMessages(awlMessages, AWLDATAS_INPUT_FILE_NAME);
         frameFileManager.writeFileWithMessages(Frames, EXPECTED__FRAMES_OUTPUT_FILE_NAME);
     }
 
@@ -57,7 +57,7 @@ TEST_F(AWLTranslationStrategyTest,
     awlMessageTranslator.linkConsumer(&scheduler);
     int counter = 0;
 
-    auto messages = awlMessagesFileManager.readMessagesFromFile(AWLMESSAGES_INPUT_FILE_NAME);
+    auto messages = awlMessagesFileManager.readMessagesFromFile(AWLDATAS_INPUT_FILE_NAME);
     for (auto message : messages) {
         awlMessageTranslator.translateMessage(std::move(message));
         ++counter;
@@ -72,4 +72,4 @@ TEST_F(AWLTranslationStrategyTest,
                                                ACTUAL__FRAMES_OUTPUT_FILE_NAME));
 }
 
-#endif //SENSORGATEWAY_MESSAGETRANSLATORTEST_CPP
+#endif //SENSORGATEWAY_AWLDATATRANSLATORTEST_CPP

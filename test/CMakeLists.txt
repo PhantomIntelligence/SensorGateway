@@ -10,7 +10,7 @@ file(GLOB DATA_MODEL_FILES "${CMAKE_CURRENT_SOURCE_DIR}/utilities/data-model/*")
 file(GLOB APPLICATION_TEST_FILES "${CMAKE_CURRENT_SOURCE_DIR}/test-suite/application/*")
 file(GLOB COMMON_TEST_FILES "${CMAKE_CURRENT_SOURCE_DIR}/test-suite/common/*")
 file(GLOB DOMAIN_TEST_FILES "${CMAKE_CURRENT_SOURCE_DIR}/test-suite/domain/*")
-file(GLOB TRANSLATOR_TEST_FILES "${CMAKE_CURRENT_SOURCE_DIR}/test-suite/message-translation/*")
+file(GLOB TRANSLATOR_TEST_FILES "${CMAKE_CURRENT_SOURCE_DIR}/test-suite/data-translation/*")
 file(GLOB SENSOR_COMM_TEST_FILES "${CMAKE_CURRENT_SOURCE_DIR}/test-suite/sensor-communication/*")
 file(GLOB SERVER_COMM_TEST_FILES "${CMAKE_CURRENT_SOURCE_DIR}/test-suite/server-communication/*")
 

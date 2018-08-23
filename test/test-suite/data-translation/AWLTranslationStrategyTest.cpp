@@ -18,12 +18,12 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 #include "test/utilities/mock/FrameSinkMock.h"
-#include "sensor-gateway/message-translation/AWLTranslationStrategy.h"
+#include "sensor-gateway/data-translation/AWLTranslationStrategy.h"
 
 using Defaults::Track::DEFAULT_ACCELERATION;
 using Defaults::Track::DEFAULT_DISTANCE;
 using Defaults::Track::DEFAULT_SPEED;
-using MessageTranslation::AWLTranslationStrategy;
+using DataTranslation::AWLTranslationStrategy;
 using Mock::FrameProcessingScheduler;
 using Mock::FrameSinkMock;
 using DataFlow::PixelsArray;

@@ -22,7 +22,7 @@
 #include "sensor-gateway/common/container/ConstantSizedPointerList.hpp"
 #include "test/utilities/data-model/DataModelFixture.h"
 
-using DataModel::SimpleData;
+using DataModel::SimpleMessage;
 using TestFunctions::DataTestUtil;
 using std::runtime_error;
 
@@ -37,10 +37,10 @@ public:
 
     static const uint16_t TEST_SIZE = 8;
 
-    using List = Container::ConstantSizedPointerList<SimpleData, ConstantSizedPointerListTest::TEST_SIZE>;
+    using List = Container::ConstantSizedPointerList<SimpleMessage, ConstantSizedPointerListTest::TEST_SIZE>;
 
     void fillList(List* list) const {
-        SimpleData data = DataTestUtil::createRandomSimpleData();
+        SimpleMessage data = DataTestUtil::createRandomSimpleMessage();
         auto pointer = &data;
 
         for (auto i = 0; i < ConstantSizedPointerListTest::TEST_SIZE; ++i) {
@@ -60,7 +60,7 @@ TEST_F(ConstantSizedPointerListTest, given_anEmptyList_when_askedIfIsEmpty_then_
 
 TEST_F(ConstantSizedPointerListTest, given_aListHoldingOneData_when_askedIfIsEmpty_then_returnsFalse) {
     List list;
-    SimpleData data = DataTestUtil::createRandomSimpleData();
+    SimpleMessage data = DataTestUtil::createRandomSimpleMessage();
     auto pointer = &data;
     list.store(pointer);
 
@@ -96,7 +96,7 @@ TEST_F(ConstantSizedPointerListTest, given_aFullList_when_storingANewPointer_the
     List list;
     fillList(&list);
 
-    SimpleData data = DataTestUtil::createRandomSimpleData();
+    SimpleMessage data = DataTestUtil::createRandomSimpleMessage();
     auto pointer = &data;
 
     ASSERT_THROW(list.store(pointer), std::runtime_error);
@@ -104,7 +104,7 @@ TEST_F(ConstantSizedPointerListTest, given_aFullList_when_storingANewPointer_the
 
 TEST_F(ConstantSizedPointerListTest, given_aStoredPointer_when_consumeNext_then_returnsThePointer) {
     List list;
-    SimpleData data = DataTestUtil::createRandomSimpleData();
+    SimpleMessage data = DataTestUtil::createRandomSimpleMessage();
     auto pointer = &data;
     list.store(pointer);
 
@@ -117,7 +117,7 @@ TEST_F(ConstantSizedPointerListTest, given_aListOfSizeN_when_storingAndConsuming
     List list;
 
     for (auto j = 0; j < ConstantSizedPointerListTest::TEST_SIZE * 2; ++j) {
-        SimpleData data = DataTestUtil::createRandomSimpleData();
+        SimpleMessage data = DataTestUtil::createRandomSimpleMessage();
         auto pointer = &data;
         list.store(pointer);
         auto storedPointer = list.consumeNext();
@@ -139,7 +139,7 @@ TEST_F(ConstantSizedPointerListTest, given_aFullList_when_readAllTheElementsAndA
 
 TEST_F(ConstantSizedPointerListTest, given_aPointerNotInTheList_when_askedIfItIsContained_then_returnsFalse) {
     List list;
-    SimpleData data = DataTestUtil::createRandomSimpleData();
+    SimpleMessage data = DataTestUtil::createRandomSimpleMessage();
     auto pointer = &data;
 
     auto isInList = list.contains(pointer);
@@ -149,7 +149,7 @@ TEST_F(ConstantSizedPointerListTest, given_aPointerNotInTheList_when_askedIfItIs
 
 TEST_F(ConstantSizedPointerListTest, given_aPointerInTheList_when_askedIfItIsContained_then_returnsTrue) {
     List list;
-    SimpleData data = DataTestUtil::createRandomSimpleData();
+    SimpleMessage data = DataTestUtil::createRandomSimpleMessage();
     auto pointer = &data;
     list.store(pointer);
 
@@ -160,7 +160,7 @@ TEST_F(ConstantSizedPointerListTest, given_aPointerInTheList_when_askedIfItIsCon
 
 TEST_F(ConstantSizedPointerListTest, given_aPointerNotInTheList_when_askedToRemoveIt_then_throwsAnException) {
     List list;
-    SimpleData data = DataTestUtil::createRandomSimpleData();
+    SimpleMessage data = DataTestUtil::createRandomSimpleMessage();
     auto pointer = &data;
 
     ASSERT_THROW(list.remove(pointer), std::runtime_error);
@@ -168,7 +168,7 @@ TEST_F(ConstantSizedPointerListTest, given_aPointerNotInTheList_when_askedToRemo
 
 TEST_F(ConstantSizedPointerListTest, given_aPointerInTheList_when_askedToRemoveIt_then_thePointerIsNoLongerContainedInTheList) {
     List list;
-    SimpleData data = DataTestUtil::createRandomSimpleData();
+    SimpleMessage data = DataTestUtil::createRandomSimpleMessage();
     auto pointer = &data;
     list.store(pointer);
 
@@ -180,7 +180,7 @@ TEST_F(ConstantSizedPointerListTest, given_aPointerInTheList_when_askedToRemoveI
 
 TEST_F(ConstantSizedPointerListTest, given_aPointerInTheList_when_askedToRemoveIt_then_theListIsEmpty) {
     List list;
-    SimpleData data = DataTestUtil::createRandomSimpleData();
+    SimpleMessage data = DataTestUtil::createRandomSimpleMessage();
     auto pointer = &data;
     list.store(pointer);
 

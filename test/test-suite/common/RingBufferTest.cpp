@@ -11,11 +11,11 @@
 #include "test/utilities/data-model/DataModelFixture.h"
 #include "test/utilities/mock/ConsumerLinkMock.h"
 
-using DataModel::SimpleData;
+using DataModel::SimpleMessage;
 using TestFunctions::DataTestUtil;
 
-using SimpleBuffer = DataFlow::RingBuffer<SimpleData>;
-using MockConsumerLink = Mock::ConsumerLinkMock<SimpleData>;
+using SimpleBuffer = DataFlow::RingBuffer<SimpleMessage>;
+using MockConsumerLink = Mock::ConsumerLinkMock<SimpleMessage>;
 
 class RingBufferTest : public ::testing::Test {
 
@@ -32,10 +32,10 @@ RingBufferTest::RingBufferTest() {
 RingBufferTest::~RingBufferTest() {}
 
 
-SimpleData createRandomSimpleData() {
-    auto simpleData = DataTestUtil::createRandomSimpleData();
-    while (simpleData == SimpleData::returnDefaultData()) {
-        simpleData = DataTestUtil::createRandomSimpleData();
+SimpleMessage createRandomSimpleData() {
+    auto simpleData = DataTestUtil::createRandomSimpleMessage();
+    while (simpleData == SimpleMessage::returnDefaultData()) {
+        simpleData = DataTestUtil::createRandomSimpleMessage();
     }
     return simpleData;
 }
@@ -45,7 +45,7 @@ TEST_F(RingBufferTest, given_aData_when_consumeNextDataForALink_then_returnsData
     SimpleBuffer simpleBuffer;
     auto linkMock = MockConsumerLink();
     auto simpleData = createRandomSimpleData();
-    auto simpleDataCopy = SimpleData(simpleData);
+    auto simpleDataCopy = SimpleMessage(simpleData);
     simpleBuffer.write(std::move(simpleData));
 
     auto consumedData = simpleBuffer.consumeNextDataFor(&linkMock);
@@ -58,7 +58,7 @@ TEST_F(RingBufferTest, given_twoDataOfWhichOneHasAlreadyBeenConsumed_when_consum
     auto linkMock = MockConsumerLink();
     auto simpleDataOne = createRandomSimpleData();
     auto simpleDataTwo = createRandomSimpleData();
-    auto simpleDataTwoCopy = SimpleData(simpleDataTwo);
+    auto simpleDataTwoCopy = SimpleMessage(simpleDataTwo);
     simpleBuffer.write(std::move(simpleDataOne));
     simpleBuffer.write(std::move(simpleDataTwo));
     simpleBuffer.consumeNextDataFor(&linkMock);
@@ -80,7 +80,7 @@ TEST_F(RingBufferTest, given_aDataAndTwoConsumers_when_consumeNextDataForALinkAf
     auto firstLinkMock = MockConsumerLink();
     auto secondLinkMock = MockConsumerLink();
     auto simpleData = createRandomSimpleData();
-    auto simpleDataCopy = SimpleData(simpleData);
+    auto simpleDataCopy = SimpleMessage(simpleData);
     simpleBuffer.write(std::move(std::move(simpleData)));
 
     simpleBuffer.consumeNextDataFor(&firstLinkMock);
@@ -118,8 +118,8 @@ TEST_F(RingBufferTest, given_twoDataAndAConsumerThatConsumedThemAll_when_consume
     auto firstLinkMock = MockConsumerLink();
     auto simpleDataOne = createRandomSimpleData();
     auto simpleDataTwo = createRandomSimpleData();
-    auto simpleDataOneCopy = SimpleData(simpleDataOne);
-    auto simpleDataTwoCopy = SimpleData(simpleDataTwo);
+    auto simpleDataOneCopy = SimpleMessage(simpleDataOne);
+    auto simpleDataTwoCopy = SimpleMessage(simpleDataTwo);
     simpleBuffer.write(std::move(simpleDataOne));
     simpleBuffer.write(std::move(simpleDataTwo));
     simpleBuffer.consumeNextDataFor(&firstLinkMock);
@@ -134,7 +134,7 @@ TEST_F(RingBufferTest, given_twoDataAndAConsumerThatConsumedThemAll_when_consume
 TEST_F(RingBufferTest, given_aFullBuffer_when_writesOneNewData_then_overwritesTheFirstData) {
     SimpleBuffer simpleBuffer;
     auto firstData = createRandomSimpleData();
-    auto firstDataCopy = SimpleData(firstData);
+    auto firstDataCopy = SimpleMessage(firstData);
     simpleBuffer.write(std::move(firstData));
     for (auto i = 0; i < RING_BUFFER_SIZE; ++i) {
         simpleBuffer.write(createRandomSimpleData());
@@ -150,7 +150,7 @@ TEST_F(RingBufferTest, given_aFullBuffer_when_writesMoreThanOneData_then_overwri
     SimpleBuffer simpleBuffer;
     auto firstData = createRandomSimpleData();
     auto secondData = createRandomSimpleData();
-    auto secondDataCopy = SimpleData(firstData);
+    auto secondDataCopy = SimpleMessage(firstData);
     simpleBuffer.write(std::move(firstData));
     simpleBuffer.write(std::move(secondData));
     for (auto i = 0; i < RING_BUFFER_SIZE; ++i) {

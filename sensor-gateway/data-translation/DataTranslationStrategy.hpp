@@ -10,33 +10,33 @@
 	See the License for the specific language governing permissions and
 	limitations under the License.
 */
-#ifndef SENSORGATEWAY_MESSAGETRANSLATIONSTRATEGY_HPP
-#define SENSORGATEWAY_MESSAGETRANSLATIONSTRATEGY_HPP
+#ifndef SENSORGATEWAY_DATATRANSLATIONSTRATEGY_HPP
+#define SENSORGATEWAY_DATATRANSLATIONSTRATEGY_HPP
 
 #include "sensor-gateway/common/data-flow/DataSource.hpp"
 
-namespace MessageTranslation {
+namespace DataTranslation {
 
     template<class I, class O>
-    class MessageTranslationStrategy : public DataFlow::DataSource<O> {
+    class DataTranslationStrategy : public DataFlow::DataSource<O> {
 
     protected:
         typedef I INPUT;
         typedef O OUTPUT;
 
     public:
-        MessageTranslationStrategy() :
+        DataTranslationStrategy() :
                 currentOutputMessage(OUTPUT::returnDefaultData()) {}
 
-        virtual ~MessageTranslationStrategy() noexcept = default;
+        virtual ~DataTranslationStrategy() noexcept = default;
 
-        MessageTranslationStrategy(MessageTranslationStrategy const& other) = delete;
+        DataTranslationStrategy(DataTranslationStrategy const& other) = delete;
 
-        MessageTranslationStrategy(MessageTranslationStrategy&& other) noexcept = delete;
+        DataTranslationStrategy(DataTranslationStrategy&& other) noexcept = delete;
 
-        MessageTranslationStrategy& operator=(MessageTranslationStrategy const& other)& = delete;
+        DataTranslationStrategy& operator=(DataTranslationStrategy const& other)& = delete;
 
-        MessageTranslationStrategy& operator=(MessageTranslationStrategy&& other)& noexcept = delete;
+        DataTranslationStrategy& operator=(DataTranslationStrategy&& other)& noexcept = delete;
 
         virtual void translateMessage(INPUT&& inputMessage) = 0;
 
@@ -46,4 +46,4 @@ namespace MessageTranslation {
     };
 }
 
-#endif //SENSORGATEWAY_MESSAGETRANSLATIONSTRATEGY_HPP
+#endif //SENSORGATEWAY_DATATRANSLATIONSTRATEGY_HPP

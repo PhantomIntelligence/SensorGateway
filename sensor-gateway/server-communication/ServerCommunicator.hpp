@@ -14,7 +14,7 @@
 #ifndef SENSORGATEWAY_SERVERCOMMUNICATOR_H
 #define SENSORGATEWAY_SERVERCOMMUNICATOR_H
 
-#include "sensor-gateway/message-translation/MessageTranslator.hpp"
+#include "sensor-gateway/data-translation/DataTranslator.hpp"
 #include "ServerCommunicationStrategy.hpp"
 
 namespace SensorAccessLinkElement {
@@ -52,8 +52,8 @@ namespace SensorAccessLinkElement {
             serverCommunicationStrategy->closeConnection();
         }
 
-        void consume(MESSAGE&& message) override {
-            serverCommunicationStrategy->sendMessage(std::forward<MESSAGE>(message));
+        void consume(MESSAGE&& data) override {
+            serverCommunicationStrategy->sendMessage(std::forward<MESSAGE>(data));
         }
 
 

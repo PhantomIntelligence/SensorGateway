@@ -23,11 +23,11 @@
 #include "sensor-gateway/common/data-flow/DataProcessingScheduler.hpp"
 
 using DataFlow::NUMBER_OF_CONCURRENT_INPUT_FOR_SENSOR_ACCESS_LINK_ELEMENTS;
-using DataModel::SimpleData;
+using DataModel::SimpleMessage;
 using TestFunctions::DataTestUtil;
-using SimpleBuffer = DataFlow::RingBuffer<SimpleData>;
-using ProcessingStrategy = DataFlow::DataSink<SimpleData>;
-using SimpleSink = DataFlow::DataSink<SimpleData>;
+using SimpleBuffer = DataFlow::RingBuffer<SimpleMessage>;
+using ProcessingStrategy = DataFlow::DataSink<SimpleMessage>;
+using SimpleSink = DataFlow::DataSink<SimpleMessage>;
 
 class DataProcessingSchedulerTest : public ::testing::Test {
 protected:
@@ -45,11 +45,11 @@ class MockInputBuffer : public SimpleBuffer {
 public:
     explicit MockInputBuffer(uint16_t numberOfConsumptionBeforeStop) :
             numberOfTimesToBeConsumedBeforeStop(numberOfConsumptionBeforeStop),
-            data(DataTestUtil::createRandomSimpleData()),
+            data(DataTestUtil::createRandomSimpleMessage()),
             numberOfCallsToConsumeNextData(0) {
     }
 
-    auto consumeNextDataFor(Consumer* consumer) -> SimpleData const& override {
+    auto consumeNextDataFor(Consumer* consumer) -> SimpleMessage const& override {
         numberOfCallsToConsumeNextData++;
         if (hasBeenCalledExpectedNumberOfTimes()) {
             consumptionGoalReached.set_value(true);
@@ -79,7 +79,7 @@ public:
 private:
     uint16_t const numberOfTimesToBeConsumedBeforeStop;
     AtomicCounter numberOfCallsToConsumeNextData;
-    SimpleData data;
+    SimpleMessage data;
     Consumer* linkedConsumer = nullptr;
     mutable BooleanPromise consumptionGoalReached;
 };
@@ -91,7 +91,7 @@ public:
             actualNumberOfWrites(0) {
     }
 
-    void consume(SimpleData&& data) override {
+    void consume(SimpleMessage&& data) override {
         ++actualNumberOfWrites;
         if (hasBeenCalledExpectedNumberOfTimes()) {
             numberOfWritesAchieved.set_value(true);
@@ -114,7 +114,7 @@ private:
     mutable BooleanPromise numberOfWritesAchieved;
 };
 
-using SingleInputScheduler = DataFlow::DataProcessingScheduler<SimpleData, MockSink, NUMBER_OF_CONCURRENT_INPUT_FOR_SENSOR_ACCESS_LINK_ELEMENTS>;
+using SingleInputScheduler = DataFlow::DataProcessingScheduler<SimpleMessage, MockSink, NUMBER_OF_CONCURRENT_INPUT_FOR_SENSOR_ACCESS_LINK_ELEMENTS>;
 
 TEST_F(DataProcessingSchedulerTest, given_aStoppedWorkScheduler_when_linksAnInputBuffer_then_throwsAnException) {
     MockSink mockSink(ARBITRARY_NUMBER_OF_CALL_GOAL);
@@ -181,7 +181,7 @@ TEST_F(DataProcessingSchedulerTest,
     scheduler.linkWith(&inputBufferMock);
 
     for (auto l = 0; l < ARBITRARY_NUMBER_OF_CALL_GOAL; ++l) {
-        auto newData = DataTestUtil::createRandomSimpleData();
+        auto newData = DataTestUtil::createRandomSimpleMessage();
         inputBufferMock.write(std::move(newData));
     }
 
@@ -233,7 +233,7 @@ TEST_F(DataProcessingSchedulerTest, given_anInputBuffer_when_linkingItMoreThanOn
 TEST_F(DataProcessingSchedulerTest,
        given_twoLinkedInputBuffer_when_activatesForTheSecondBuffer_then_theFirstBufferIsNotCalledAndTheSecondBufferIsCalled) {
     uint8_t const NUMBER_OF_INPUT_BUFFERS = 2;
-    using Scheduler = DataFlow::DataProcessingScheduler<SimpleData, MockSink, NUMBER_OF_INPUT_BUFFERS>;
+    using Scheduler = DataFlow::DataProcessingScheduler<SimpleMessage, MockSink, NUMBER_OF_INPUT_BUFFERS>;
     uint8_t const noConsumption = 0;
     uint8_t const numberOfConsumptionExpectedForSecondBuffer = 8;
     uint8_t const numberOfConsumptionBeforeStop = noConsumption + numberOfConsumptionExpectedForSecondBuffer;
@@ -246,7 +246,7 @@ TEST_F(DataProcessingSchedulerTest,
     scheduler.linkWith(&secondBufferMock);
 
     for (auto l = 0; l < numberOfConsumptionExpectedForSecondBuffer; ++l) {
-        auto nativeData = DataTestUtil::createRandomSimpleData();
+        auto nativeData = DataTestUtil::createRandomSimpleMessage();
         secondBufferMock.write(std::move(nativeData));
     }
 
@@ -273,7 +273,7 @@ TEST_F(DataProcessingSchedulerTest,
     scheduler.linkWith(&inputBuffer);
 
     for (auto k = 0; k < ARBITRARY_NUMBER_OF_CALL_GOAL; ++k) {
-        auto nativeData = DataTestUtil::createRandomSimpleData();
+        auto nativeData = DataTestUtil::createRandomSimpleMessage();
         inputBuffer.write(std::move(nativeData));
     }
 

@@ -14,7 +14,7 @@
 #include "AWLTranslationStrategy.h"
 #include "UnknownMessageException.h"
 
-using MessageTranslation::AWLTranslationStrategy;
+using DataTranslation::AWLTranslationStrategy;
 using DataFlow::FrameID;
 using DataFlow::SystemID;
 using DataFlow::TrackID;
@@ -34,16 +34,17 @@ using Sensor::AWL::_16::ANGLE_RANGE;
 void AWLTranslationStrategy::translateMessage(AWLMessage&& inputMessage) {
     switch (inputMessage.id) {
         case END_OF_FRAME:
-            translateEndOfFrameMessage(std::forward<INPUT>(inputMessage));
+            translateEndOfFrameMessage(std::move(inputMessage));
             break;
         case DETECTION_TRACK :
-            translateDetectionTrackMessage(std::forward<INPUT>(inputMessage));
+            translateDetectionTrackMessage(std::move(inputMessage));
             break;
         case DETECTION_VELOCITY :
-            translateDetectionVelocityMessage(std::forward<INPUT>(inputMessage));
+            translateDetectionVelocityMessage(std::move(inputMessage));
             break;
         default:
-            throw UnknownMessageException(std::forward<INPUT>(inputMessage));
+            auto message = UnknownMessageException(std::move(inputMessage));
+            throw std::runtime_error(message.getMessage());
     }
 }
 

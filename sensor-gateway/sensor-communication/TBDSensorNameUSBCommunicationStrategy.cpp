@@ -20,17 +20,22 @@ using SensorCommunication::TBDSensorNameUSBCommunicationStrategy;
 using DataFlow::AWLMessage;
 
 TBDSensorNameUSBCommunicationStrategy::TBDSensorNameUSBCommunicationStrategy() :
+// Guardian
+//        usbConnectionParameters({0x058b, 0x0050,
+//                                 (129),
+//                                 (2),
+//                                 3000}),
+// ADI
         usbConnectionParameters({0x064b, 0x7823,
                                  (129),
                                  (1),
-                                 3000}
-        ),
+                                 3000}),
         usbContext(nullptr),
         usbDeviceHandle(nullptr),
         reconnectTime(SteadyClock::now()),
-        dataCanBeFetched(false) {
-
-}
+        dataCanBeFetched(false),
+        numberOfMessagesToFetch(0),
+        numberOfRawDataCyclesToFetch(0) {}
 
 TBDSensorNameUSBCommunicationStrategy::~TBDSensorNameUSBCommunicationStrategy() noexcept = default;
 
@@ -49,27 +54,20 @@ void TBDSensorNameUSBCommunicationStrategy::openConnection() {
     auto errorCode = libusb_claim_interface(usbDeviceHandle, INTERFACE_TO_CLAIM_FROM_DEVICE);
     throwUsbClaimInterfaceErrorIfNeeded(errorCode);
 
+    setupCleanConnection();
 
-    USBCommandBlock usbCommandBlock{GET_FIRMWARE_VERSION, 0, 0};
-
-    doUSBBulkTransferAndReturnNumberOfByteActuallyTransferred(
-            usbConnectionParameters.endpointOut,
-            (Byte*) &usbCommandBlock,
-            sizeof(usbCommandBlock));
-
-    Byte versionStrings[NUMBER_OF_VERSION_STRINGS][VERSION_STRING_MAX_LENGTH];
-    doUSBBulkTransferAndReturnNumberOfByteActuallyTransferred(
-            usbConnectionParameters.endpointIn,
-            (Byte*) &versionStrings,
-            sizeof(versionStrings));
 }
 
 TBDSensorNameUSBCommunicationStrategy::super::Messages TBDSensorNameUSBCommunicationStrategy::fetchMessages() {
-    USBCommandBlock lidarQueryCommandBlock{LIDAR_QUERY, 0, 0};
+    USBSensorMessage lidarQueryCommandBlock;
+    lidarQueryCommandBlock.id = LIDAR_QUERY;
+
     doUSBBulkTransferAndReturnNumberOfByteActuallyTransferred(
             usbConnectionParameters.endpointOut,
             (Byte*) &lidarQueryCommandBlock,
             sizeof(lidarQueryCommandBlock));
+
+    USBSensorMessage quantityOfDataThatCanBeFetched;
     auto numberOfByteReceived = doUSBBulkTransferAndReturnNumberOfByteActuallyTransferred(
             usbConnectionParameters.endpointIn,
             (Byte*) &quantityOfDataThatCanBeFetched,
@@ -78,8 +76,14 @@ TBDSensorNameUSBCommunicationStrategy::super::Messages TBDSensorNameUSBCommunica
     dataCanBeFetched.store(numberOfByteReceived == sizeof(quantityOfDataThatCanBeFetched));
 
     TBDSensorNameUSBCommunicationStrategy::super::Messages messages;
-    if (dataCanBeFetched.load() && quantityOfDataThatCanBeFetched.numberOfMessageReady > 0) {
-        messages = fetchSensorMessages(static_cast<uint8_t>(quantityOfDataThatCanBeFetched.numberOfMessageReady));
+    if (dataCanBeFetched.load()) {
+
+        numberOfRawDataCyclesToFetch = *((NumberOfDataToFetch*) &quantityOfDataThatCanBeFetched.data[0]);
+        numberOfMessagesToFetch = *((NumberOfDataToFetch*) &quantityOfDataThatCanBeFetched.data[4]);
+
+        if (numberOfMessagesToFetch > 0) {
+            messages = fetchMessagesOnSensor(numberOfMessagesToFetch);
+        }
     }
     return messages;
 }
@@ -87,7 +91,8 @@ TBDSensorNameUSBCommunicationStrategy::super::Messages TBDSensorNameUSBCommunica
 TBDSensorNameUSBCommunicationStrategy::super::RawDataCycles
 TBDSensorNameUSBCommunicationStrategy::fetchRawDataCycles() {
     super::RawDataCycles rawDataCycles;
-    if (dataCanBeFetched.load() && quantityOfDataThatCanBeFetched.numberOfRawDataCyclesReady > 0) {
+    if (dataCanBeFetched.load() && numberOfRawDataCyclesToFetch > 0) {
+        rawDataCycles = fetchRawDataCyclesOnSensor(numberOfRawDataCyclesToFetch);
     }
     return rawDataCycles;
 }
@@ -116,13 +121,19 @@ void TBDSensorNameUSBCommunicationStrategy::throwUsbClaimInterfaceErrorIfNeeded(
 }
 
 int TBDSensorNameUSBCommunicationStrategy::doUSBBulkTransferAndReturnNumberOfByteActuallyTransferred(
-        Byte endpoint, Byte* data, int length) {
+        Byte endpoint, Byte* data, int32_t length) {
+    uint32_t timeout = 0;
+    return doUSBBulkTransferAndReturnNumberOfByteActuallyTransferredWithTimeout(
+            endpoint, data, length, timeout);
+}
+
+int TBDSensorNameUSBCommunicationStrategy::doUSBBulkTransferAndReturnNumberOfByteActuallyTransferredWithTimeout(
+        Byte endpoint, Byte* data, int32_t length, uint32_t timeout) {
     throwDeviceNotFoundErrorIfNeeded();
-    unsigned int timeout = 0;
     int numberOfByteActuallyTransferred = 0;
     auto errorCode = libusb_bulk_transfer(usbDeviceHandle, endpoint, data, length,
                                           &numberOfByteActuallyTransferred, timeout);
-    throwErrorOnLibUSBBulkTransfetErrorCode(errorCode);
+    throwErrorOnLibUSBBulkTransferErrorCode(errorCode);
 
     if (numberOfByteActuallyTransferred != length) {
         // TODO: log when the logger has been created
@@ -136,7 +147,27 @@ int TBDSensorNameUSBCommunicationStrategy::doUSBBulkTransferAndReturnNumberOfByt
     return numberOfByteActuallyTransferred;
 }
 
-void TBDSensorNameUSBCommunicationStrategy::throwErrorOnLibUSBBulkTransfetErrorCode(int errorCode) {
+void TBDSensorNameUSBCommunicationStrategy::setupCleanConnection() noexcept {
+    bool hasNotThrownError = true;
+    bool hasReceivedData = true;
+    uint32_t timeout = 1;
+    while (hasNotThrownError && hasReceivedData) {
+        try {
+            Byte trashDataBuffer[256];
+            auto numberOfReturnedData = doUSBBulkTransferAndReturnNumberOfByteActuallyTransferredWithTimeout(
+                    usbConnectionParameters.endpointIn,
+                    trashDataBuffer,
+                    sizeof(Byte[256]),
+                    timeout);
+            hasReceivedData = numberOfReturnedData != 0;
+        } catch (std::runtime_error& error) {
+            hasNotThrownError = false;
+        }
+
+    }
+}
+
+void TBDSensorNameUSBCommunicationStrategy::throwErrorOnLibUSBBulkTransferErrorCode(int errorCode) {
     if (errorCode == 0) {
         return;
     }
@@ -158,17 +189,17 @@ void TBDSensorNameUSBCommunicationStrategy::throwErrorOnLibUSBBulkTransfetErrorC
 }
 
 TBDSensorNameUSBCommunicationStrategy::super::Messages
-TBDSensorNameUSBCommunicationStrategy::fetchSensorMessages(uint8_t numberOfMessagesToFetch) {
+TBDSensorNameUSBCommunicationStrategy::fetchMessagesOnSensor(NumberOfDataToFetch numberOfMessagesToFetch) {
     super::Messages fetchedMessages;
     auto const MAX_FETCHABLE_SIZE = fetchedMessages.size();
 
     if (numberOfMessagesToFetch > MAX_FETCHABLE_SIZE) {
-        numberOfMessagesToFetch = MAX_FETCHABLE_SIZE;
+        numberOfMessagesToFetch = static_cast<uint8_t>(MAX_FETCHABLE_SIZE);
         // TODO: log warning?
     }
 
     USBSensorMessage sensorMessageRequest;
-    sensorMessageRequest.id = QUERY_NUMBER_OF_MESSAGES_AND_RAW_DATA_CYCLES_READY_TO_BE_FETCH;
+    sensorMessageRequest.id = POLL_MESSAGES;
     sensorMessageRequest.data[0] = (Byte) numberOfMessagesToFetch;
     doUSBBulkTransferAndReturnNumberOfByteActuallyTransferred(
             usbConnectionParameters.endpointOut,
@@ -182,8 +213,7 @@ TBDSensorNameUSBCommunicationStrategy::fetchSensorMessages(uint8_t numberOfMessa
             numberOfMessagesToFetch * sizeof(USBSensorMessage));
 
 
-
-    for (uint32_t messageIndex = 0; messageIndex < numberOfMessagesToFetch; ++messageIndex) {
+    for (auto messageIndex = 0u; messageIndex < numberOfMessagesToFetch; ++messageIndex) {
         auto sensorMessage = sensorMessageResponse[messageIndex];
         if (sensorMessage.id != 0) {
             auto message = convertUSBSensorMessageToSensorMessage(&sensorMessage);
@@ -204,3 +234,37 @@ TBDSensorNameUSBCommunicationStrategy::convertUSBSensorMessageToSensorMessage(US
             message(sensorMessage->id, sensorMessage->timestamp, sensorMessage->length, data);
     return message;
 }
+
+
+TBDSensorNameUSBCommunicationStrategy::super::RawDataCycles
+TBDSensorNameUSBCommunicationStrategy::fetchRawDataCyclesOnSensor(NumberOfDataToFetch numberOfRawDataCyclesToFetch) {
+    super::RawDataCycles fetchedRawDataCycles;
+    auto const MAX_FETCHABLE_SIZE = fetchedRawDataCycles.size();
+    if (numberOfRawDataCyclesToFetch > MAX_FETCHABLE_SIZE) {
+        numberOfRawDataCyclesToFetch = static_cast<uint8_t>(MAX_FETCHABLE_SIZE);
+        // TODO: log warning?
+    }
+
+    USBSensorMessage sensorMessageRequest;
+    sensorMessageRequest.id = FETCH_RAW_DATA_CYCLES;
+    sensorMessageRequest.data[0] = (Byte) numberOfRawDataCyclesToFetch;
+    doUSBBulkTransferAndReturnNumberOfByteActuallyTransferred(
+            usbConnectionParameters.endpointOut,
+            (Byte*) &sensorMessageRequest,
+            sizeof(USBSensorMessage));
+
+    super::RawData::RawDataContent rawDataCyclesContent[MAX_FETCHABLE_SIZE];
+    doUSBBulkTransferAndReturnNumberOfByteActuallyTransferred(
+            usbConnectionParameters.endpointIn,
+            (Byte*) &rawDataCyclesContent,
+            numberOfRawDataCyclesToFetch * sizeof(super::RawData::RawDataContent));
+
+
+    for (auto rawDataIndex = 0u; rawDataIndex < numberOfRawDataCyclesToFetch; ++rawDataIndex) {
+        auto rawDataContent = rawDataCyclesContent[rawDataIndex];
+        fetchedRawDataCycles.at(rawDataIndex) = super::RawData(rawDataContent);
+    }
+
+    return fetchedRawDataCycles;
+}
+

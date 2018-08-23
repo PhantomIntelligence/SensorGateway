@@ -19,14 +19,20 @@
 #define SENSORGATEWAY_SENSORCOMMUNICATORTEST_CPP
 
 #include <gtest/gtest.h>
-#include <list>
 
-#include "test/utilities/data-model/DataModelFixture.h"
 #include "sensor-gateway/sensor-communication/SensorCommunicator.hpp"
+#include "test/utilities/mock/SimpleStructuresSinkMock.h"
 
-using SimpleData = Sensor::Test::Simple::Structures::Message;
-using SimpleDataList = std::list<SimpleData>;
-using SimpleDataSensorCommunicator = SensorAccessLinkElement::SensorCommunicator<Sensor::Test::Simple::Structures>;
+using SimpleMessage = Sensor::Test::Simple::Structures::Message;
+using SimpleRawData = Sensor::Test::Simple::Structures::RawData;
+
+using SimpleMessageSinkMock = Mock::SimpleDataSinkMock<SimpleMessage>;
+using SimpleRawDataSinkMock = Mock::SimpleDataSinkMock<SimpleRawData>;
+
+using SimpleMessageList = SimpleMessageSinkMock::DataList;
+using SimpleRawDataList = SimpleRawDataSinkMock::DataList;
+
+using SimpleMessageSensorCommunicator = SensorAccessLinkElement::SensorCommunicator<Sensor::Test::Simple::Structures>;
 using TestFunctions::DataTestUtil;
 
 
@@ -37,10 +43,16 @@ protected:
 
     virtual ~SensorCommunicatorTest() = default;
 
-    SimpleDataList createASequenceOfDifferentMessagesOfSize(uint64_t numberOfMessagesToCreate) const noexcept;
+    SimpleMessageList createASequenceOfDifferentMessagesOfSize(uint64_t numberOfMessagesToCreate) const noexcept;
 
-    SimpleDataList fetchMessageProducedBySensorCommunicatorExecution(
-            SimpleDataList&& messages, uint8_t numberOfMessagesToReceive);
+    SimpleRawDataList
+    createASequenceOfDifferentRawDataCyclesOfSize(uint64_t numberOfRawDataCyclesToCreate) const noexcept;
+
+    SimpleMessageList fetchMessageProducedBySensorCommunicatorExecution(
+            SimpleMessageList&& messages, uint8_t numberOfMessagesToReceive);
+
+    SimpleRawDataList fetchRawDataProducedBySensorCommunicatorExecution(
+            SimpleRawDataList&& rawDataCycles, uint8_t numberOfRawDataToReceive);
 };
 
 namespace SensorCommunicatorTestMock {
@@ -59,7 +71,8 @@ namespace SensorCommunicatorTestMock {
                 sendCommandCalled(false),
                 fetchMessagesCalledBeforeFetchRawDataCycles(false),
                 fetchRawDataCyclesCalledBeforeSendCommand(false),
-                hasToReturnSpecificData(false) {
+                hasToReturnSpecificMessages(false),
+                hasToReturnSpecificRawDataCycles(false) {
         }
 
         ~SensorCommunicationStrategy() noexcept final = default;
@@ -73,16 +86,21 @@ namespace SensorCommunicatorTestMock {
         SensorCommunicationStrategy&
         operator=(SensorCommunicationStrategy&& other)& noexcept = delete;
 
-        void returnThisMessageSequenceWhenFetchMessagesIsCalled(SimpleDataList&& dataToReturn) {
-            hasToReturnSpecificData = true;
-            this->dataToReturn = std::forward<SimpleDataList>(dataToReturn);
+        void returnThisMessageSequenceWhenFetchMessagesIsCalled(SimpleMessageList&& dataToReturn) {
+            hasToReturnSpecificMessages = true;
+            this->messagesToReturn = std::forward<SimpleMessageList>(dataToReturn);
+        }
+
+        void returnThisRawDataCyclesSequenceWhenFetchRawDataCyclesIsCalled(SimpleRawDataList&& dataToReturn) {
+            hasToReturnSpecificRawDataCycles = true;
+            this->rawDataCyclesToReturn = std::forward<SimpleRawDataList>(dataToReturn);
         }
 
         super::Messages fetchMessages() override {
             acknowledgeFetchMessagesHasBeenCalled();
-            if (hasToReturnSpecificData && !dataToReturn.empty()) {
-                SimpleData message = dataToReturn.front();
-                dataToReturn.pop_front();
+            if (hasToReturnSpecificMessages && !messagesToReturn.empty()) {
+                SimpleMessage message = messagesToReturn.front();
+                messagesToReturn.pop_front();
                 super::Messages messages = {message};
                 return messages;
             }
@@ -97,7 +115,16 @@ namespace SensorCommunicatorTestMock {
 
         super::RawDataCycles fetchRawDataCycles() override {
             acknowledgeFetchRawDataCyclesHasBeenCalled();
-            super::RawDataCycles rawDataCycles;
+            if (hasToReturnSpecificRawDataCycles && !rawDataCyclesToReturn.empty()) {
+                SimpleRawData rawDataCycle = rawDataCyclesToReturn.front();
+                rawDataCyclesToReturn.pop_front();
+                super::RawDataCycles rawDataCycles = {rawDataCycle};
+                return rawDataCycles;
+            }
+            std::this_thread::yield();
+
+            auto rawDataCycle = super::RawData::returnDefaultData();
+            super::RawDataCycles rawDataCycles = {rawDataCycle};
             return rawDataCycles;
         }
 
@@ -190,14 +217,16 @@ namespace SensorCommunicatorTestMock {
         Mutex fetchRawDataCyclesAckMutex;
         mutable BooleanPromise fetchRawDataCyclesCalledAcknowledgement;
 
-        bool hasToReturnSpecificData;
-        SimpleDataList dataToReturn;
+        bool hasToReturnSpecificMessages;
+        bool hasToReturnSpecificRawDataCycles;
+        SimpleMessageList messagesToReturn;
+        SimpleRawDataList rawDataCyclesToReturn;
     };
 }
 
 TEST_F(SensorCommunicatorTest, given__when_start_then_callsOpenConnectionInStrategy) {
     SensorCommunicatorTestMock::SensorCommunicationStrategy mockStrategy;
-    SimpleDataSensorCommunicator sensorCommunicator(&mockStrategy);
+    SimpleMessageSensorCommunicator sensorCommunicator(&mockStrategy);
 
     sensorCommunicator.start();
 
@@ -208,7 +237,7 @@ TEST_F(SensorCommunicatorTest, given__when_start_then_callsOpenConnectionInStrat
 
 TEST_F(SensorCommunicatorTest, given__when_terminateAndJoin_then_callsCloseConnectionInStrategy) {
     SensorCommunicatorTestMock::SensorCommunicationStrategy mockStrategy;
-    SimpleDataSensorCommunicator sensorCommunicator(&mockStrategy);
+    SimpleMessageSensorCommunicator sensorCommunicator(&mockStrategy);
 
     sensorCommunicator.terminateAndJoin();
 
@@ -218,11 +247,12 @@ TEST_F(SensorCommunicatorTest, given__when_terminateAndJoin_then_callsCloseConne
 
 TEST_F(SensorCommunicatorTest, given__when_start_then_callsFetchMessagesInStrategy) {
     SensorCommunicatorTestMock::SensorCommunicationStrategy mockStrategy;
-    SimpleDataSensorCommunicator sensorCommunicator(&mockStrategy);
+    SimpleMessageSensorCommunicator sensorCommunicator(&mockStrategy);
 
     sensorCommunicator.start();
 
     mockStrategy.waitUntilFetchMessagesIsCalled();
+
     auto strategyHasBeenCalled = mockStrategy.hasFetchMessagesBeenCalled();
     sensorCommunicator.terminateAndJoin();
     ASSERT_TRUE(strategyHasBeenCalled);
@@ -230,11 +260,12 @@ TEST_F(SensorCommunicatorTest, given__when_start_then_callsFetchMessagesInStrate
 
 TEST_F(SensorCommunicatorTest, given__when_start_then_callsFetchRawDataCyclesInStrategy) {
     SensorCommunicatorTestMock::SensorCommunicationStrategy mockStrategy;
-    SimpleDataSensorCommunicator sensorCommunicator(&mockStrategy);
+    SimpleMessageSensorCommunicator sensorCommunicator(&mockStrategy);
 
     sensorCommunicator.start();
 
     mockStrategy.waitUntilFetchRawDataCyclesIsCalled();
+
     auto strategyHasBeenCalled = mockStrategy.hasFetchRawDataCyclesBeenCalled();
     sensorCommunicator.terminateAndJoin();
     ASSERT_TRUE(strategyHasBeenCalled);
@@ -242,7 +273,7 @@ TEST_F(SensorCommunicatorTest, given__when_start_then_callsFetchRawDataCyclesInS
 
 TEST_F(SensorCommunicatorTest, given__when_start_then_callsFetchMessagesBeforeFetchRawData) {
     SensorCommunicatorTestMock::SensorCommunicationStrategy mockStrategy;
-    SimpleDataSensorCommunicator sensorCommunicator(&mockStrategy);
+    SimpleMessageSensorCommunicator sensorCommunicator(&mockStrategy);
 
     sensorCommunicator.start();
 
@@ -252,73 +283,16 @@ TEST_F(SensorCommunicatorTest, given__when_start_then_callsFetchMessagesBeforeFe
     ASSERT_TRUE(sequenceRespected);
 }
 
-class SimpleDataSinkMock : public DataFlow::DataSink<SimpleData> {
+using SimpleMessageProcessingScheduler = DataFlow::DataProcessingScheduler<SimpleMessage, SimpleMessageSinkMock, 1>;
 
-protected:
-
-    using DataFlow::DataSink<SimpleData>::DATA;
-
-public:
-
-    explicit SimpleDataSinkMock(uint8_t numberOfDataToConsume) :
-            actualNumberOfDataConsumed(0),
-            numberOfDataToConsume(numberOfDataToConsume) {
-
-    }
-
-    void consume(DATA&& data) override {
-        ++actualNumberOfDataConsumed;
-        if (hasBeenCalledLessOrEqualToTheExpectedNumberOfTimes()) {
-            consumedData.push_back(data);
-        }
-        if (hasBeenCalledExpectedNumberOfTimes()) {
-            consumptionReached.set_value(true);
-        }
-    }
-
-    bool hasBeenCalledLessOrEqualToTheExpectedNumberOfTimes() {
-        LockGuard guard(consumptionMutex);
-        return actualNumberOfDataConsumed.load() <= numberOfDataToConsume.load();
-    }
-
-    bool hasBeenCalledExpectedNumberOfTimes() {
-        LockGuard guard(consumptionMutex);
-        return actualNumberOfDataConsumed.load() == numberOfDataToConsume.load();
-    };
-
-    void waitConsumptionToBeReached() {
-        LockGuard guard(goalReachedMutex);
-        if (!hasBeenCalledExpectedNumberOfTimes()) {
-            consumptionReached.get_future().wait();
-        }
-    }
-
-    SimpleDataList getConsumedData() const noexcept {
-        return consumedData;
-    }
-
-private:
-
-    AtomicCounter actualNumberOfDataConsumed;
-    AtomicCounter numberOfDataToConsume;
-
-    SimpleDataList consumedData;
-
-    Mutex consumptionMutex;
-    Mutex goalReachedMutex;
-    mutable BooleanPromise consumptionReached;
-};
-
-using AWLProcessingScheduler = DataFlow::DataProcessingScheduler<SimpleData, SimpleDataSinkMock, 1>;
-
-SimpleDataList SensorCommunicatorTest::fetchMessageProducedBySensorCommunicatorExecution(
-        SimpleDataList&& messages, uint8_t numberOfMessagesToReceive) {
-    SimpleDataSinkMock sink(numberOfMessagesToReceive);
-    AWLProcessingScheduler scheduler(&sink);
+SimpleMessageList SensorCommunicatorTest::fetchMessageProducedBySensorCommunicatorExecution(
+        SimpleMessageList&& messages, uint8_t numberOfMessagesToReceive) {
+    SimpleMessageSinkMock sink(numberOfMessagesToReceive);
+    SimpleMessageProcessingScheduler scheduler(&sink);
 
     SensorCommunicatorTestMock::SensorCommunicationStrategy mockStrategy;
-    mockStrategy.returnThisMessageSequenceWhenFetchMessagesIsCalled(std::forward<SimpleDataList>(messages));
-    SimpleDataSensorCommunicator sensorCommunicator(&mockStrategy);
+    mockStrategy.returnThisMessageSequenceWhenFetchMessagesIsCalled(std::forward<SimpleMessageList>(messages));
+    SimpleMessageSensorCommunicator sensorCommunicator(&mockStrategy);
     sensorCommunicator.linkConsumer(&scheduler);
 
     sensorCommunicator.start();
@@ -328,15 +302,15 @@ SimpleDataList SensorCommunicatorTest::fetchMessageProducedBySensorCommunicatorE
     sensorCommunicator.terminateAndJoin();
     scheduler.terminateAndJoin();
 
-    SimpleDataList producedMessages = sink.getConsumedData();
+    SimpleMessageList producedMessages = sink.getConsumedData();
 
     return producedMessages;
 }
 
 TEST_F(SensorCommunicatorTest, given_aSequenceOfOneIncomingMessage_when_start_then_willProduceThisData) {
-    auto numberOfMessages = 1U;
+    auto numberOfMessages = 1u;
     auto messages = createASequenceOfDifferentMessagesOfSize(numberOfMessages);
-    SimpleData expectedMessage = SimpleData(messages.front());
+    SimpleMessage expectedMessage = SimpleMessage(messages.front());
 
     auto resultingMessage = fetchMessageProducedBySensorCommunicatorExecution(
             std::move(messages), numberOfMessages).front();
@@ -346,9 +320,9 @@ TEST_F(SensorCommunicatorTest, given_aSequenceOfOneIncomingMessage_when_start_th
 
 TEST_F(SensorCommunicatorTest,
        given_aSequenceOfSeveralIncomingMessages_when_start_then_willProduceTheseMessagesInTheSameOrderTheyAreRead) {
-    auto numberOfMessages = 5U;
+    auto numberOfMessages = 5u;
     auto messages = createASequenceOfDifferentMessagesOfSize(numberOfMessages);
-    SimpleDataList expectedMessages = messages;
+    SimpleMessageList expectedMessages = messages;
 
     auto resultedMessages = fetchMessageProducedBySensorCommunicatorExecution(
             std::move(messages), numberOfMessages);
@@ -361,14 +335,14 @@ TEST_F(SensorCommunicatorTest,
 }
 
 TEST_F(SensorCommunicatorTest,
-       given_aStrategyThatReturnsDefaultAndNonDefaultData_when_start_then_willNotProduceDefaultData) {
-    auto numberOfDefaultMessages = 5U;
-    auto numberOfMessages = 2U;
+       given_aStrategyThatReturnsDefaultAndNonDefaultMessages_when_start_then_willNotProduceDefaultMessages) {
+    auto numberOfDefaultMessages = 5u;
+    auto numberOfMessages = 2u;
     auto messages = createASequenceOfDifferentMessagesOfSize(numberOfMessages);
-    SimpleDataList expectedMessages = messages;
-    SimpleDataList messageToProduce;
+    SimpleMessageList expectedMessages = messages;
+    SimpleMessageList messageToProduce;
     for (auto defaultMessageIndex = 0; defaultMessageIndex < numberOfDefaultMessages; ++defaultMessageIndex) {
-        messageToProduce.push_back(SimpleData::returnDefaultData());
+        messageToProduce.push_back(SimpleMessage::returnDefaultData());
     }
     for (auto realMessageIndex = 0; realMessageIndex < numberOfMessages; ++realMessageIndex) {
         messageToProduce.push_back(messages.front());
@@ -385,14 +359,101 @@ TEST_F(SensorCommunicatorTest,
     }
 }
 
-SimpleDataList
+SimpleMessageList
 SensorCommunicatorTest::createASequenceOfDifferentMessagesOfSize(uint64_t numberOfMessagesToCreate) const noexcept {
-    SimpleDataList messages;
+    SimpleMessageList messages;
     for (uint8_t offset = 0; offset < numberOfMessagesToCreate; ++offset) {
-        auto message = TestFunctions::DataTestUtil::createRandomSimpleData();
+        auto message = TestFunctions::DataTestUtil::createRandomSimpleMessage();
         messages.push_back(message);
     }
     return messages;
+}
+
+using SimpleRawDataProcessingScheduler = DataFlow::DataProcessingScheduler<SimpleRawData, SimpleRawDataSinkMock, 1>;
+
+SimpleRawDataList SensorCommunicatorTest::fetchRawDataProducedBySensorCommunicatorExecution(
+        SimpleRawDataList&& rawDataCycles, uint8_t numberOfRawDataToReceive) {
+    SimpleRawDataSinkMock sink(numberOfRawDataToReceive);
+    SimpleRawDataProcessingScheduler scheduler(&sink);
+
+    SensorCommunicatorTestMock::SensorCommunicationStrategy mockStrategy;
+    mockStrategy.returnThisRawDataCyclesSequenceWhenFetchRawDataCyclesIsCalled(
+            std::forward<SimpleRawDataList>(rawDataCycles));
+    SimpleMessageSensorCommunicator sensorCommunicator(&mockStrategy);
+    sensorCommunicator.linkConsumer(&scheduler);
+
+    sensorCommunicator.start();
+
+    sink.waitConsumptionToBeReached();
+
+    sensorCommunicator.terminateAndJoin();
+    scheduler.terminateAndJoin();
+
+    SimpleRawDataList producedRawData = sink.getConsumedData();
+
+    return producedRawData;
+}
+
+TEST_F(SensorCommunicatorTest, given_aSequenceOfOneIncomingRawData_when_start_then_willProduceThisData) {
+    auto numberOfRawData = 1u;
+    auto rawDataCycles = createASequenceOfDifferentRawDataCyclesOfSize(numberOfRawData);
+    auto expectedRawData = SimpleRawData(rawDataCycles.front());
+
+    auto resultingRawData = fetchRawDataProducedBySensorCommunicatorExecution(
+            std::move(rawDataCycles), numberOfRawData).front();
+
+    ASSERT_EQ(expectedRawData, resultingRawData);
+}
+
+TEST_F(SensorCommunicatorTest,
+       given_aSequenceOfSeveralIncomingRawDataCycles_when_start_then_willProduceTheseRawDataCyclesInTheSameOrderTheyAreRead) {
+    auto numberOfRawData = 5u;
+    auto rawDataCycles = createASequenceOfDifferentRawDataCyclesOfSize(numberOfRawData);
+    auto expectedRawDataCycles = rawDataCycles;
+
+    auto resultingRawDataCycles = fetchRawDataProducedBySensorCommunicatorExecution(
+            std::move(rawDataCycles), numberOfRawData);
+
+    for (auto t = 0; t < numberOfRawData; ++t) {
+        ASSERT_EQ(expectedRawDataCycles.front(), resultingRawDataCycles.front());
+        expectedRawDataCycles.pop_front();
+        resultingRawDataCycles.pop_front();
+    }
+}
+
+TEST_F(SensorCommunicatorTest,
+       given_aStrategyThatReturnsDefaultAndNonDefaultRawData_when_start_then_willNotProduceDefaultRawData) {
+    auto numberOfDefaultRawDataCycles = 5u;
+    auto numberOfRawDataCycles = 2u;
+    auto rawDataCycles = createASequenceOfDifferentRawDataCyclesOfSize(numberOfRawDataCycles);
+    SimpleRawDataList expectedRawDataCycles = rawDataCycles;
+    SimpleRawDataList messageToProduce;
+    for (auto defaultRawDataIndex = 0; defaultRawDataIndex < numberOfDefaultRawDataCycles; ++defaultRawDataIndex) {
+        messageToProduce.push_back(SimpleRawData::returnDefaultData());
+    }
+    for (auto realRawDataIndex = 0; realRawDataIndex < numberOfRawDataCycles; ++realRawDataIndex) {
+        messageToProduce.push_back(rawDataCycles.front());
+        rawDataCycles.pop_front();
+    }
+
+    auto resultedRawDataCycles = fetchRawDataProducedBySensorCommunicatorExecution(
+            std::move(messageToProduce), numberOfRawDataCycles);
+
+    for (auto t = 0; t < numberOfRawDataCycles; ++t) {
+        ASSERT_EQ(expectedRawDataCycles.front(), resultedRawDataCycles.front());
+        expectedRawDataCycles.pop_front();
+        resultedRawDataCycles.pop_front();
+    }
+}
+
+SimpleRawDataList SensorCommunicatorTest::createASequenceOfDifferentRawDataCyclesOfSize(
+        uint64_t numberOfRawDataCyclesToCreate) const noexcept {
+    SimpleRawDataList rawDataCycles;
+    for (auto i = 0; i < numberOfRawDataCyclesToCreate; ++i) {
+        auto rawData = TestFunctions::DataTestUtil::createRandomSimpleRawData();
+        rawDataCycles.push_back(rawData);
+    }
+    return rawDataCycles;
 }
 
 #endif //SENSORGATEWAY_SENSORCOMMUNICATORTEST_CPP

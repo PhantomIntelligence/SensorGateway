@@ -23,7 +23,9 @@ namespace SensorGateway {
 
     template<class I, class O>
     class SensorAccessLink {
+
     protected:
+
         typedef I INPUT_STRUCTURES;
         typedef O OUTPUT;
 
@@ -34,9 +36,9 @@ namespace SensorGateway {
         using ServerCommunicationStrategy = ServerCommunication::ServerCommunicationStrategy<OUTPUT>;
         using ServerCommunicatorScheduler = DataFlow::DataProcessingScheduler<OUTPUT, ServerCommunicator, 1>;
 
-        using MessageTranslator = SensorAccessLinkElement::MessageTranslator<SensorMessage, OUTPUT>;
-        using MessageTranslationStrategy = MessageTranslation::MessageTranslationStrategy<SensorMessage, OUTPUT>;
-        using TranslatorScheduler = DataFlow::DataProcessingScheduler<SensorMessage, MessageTranslator, 1>;
+        using DataTranslator = SensorAccessLinkElement::DataTranslator<SensorMessage, OUTPUT>;
+        using DataTranslationStrategy = DataTranslation::DataTranslationStrategy<SensorMessage, OUTPUT>;
+        using TranslatorScheduler = DataFlow::DataProcessingScheduler<SensorMessage, DataTranslator, 1>;
 
         using SensorCommunicator = SensorAccessLinkElement::SensorCommunicator<INPUT_STRUCTURES>;
         using SensorCommunicationStrategy = SensorCommunication::SensorCommunicationStrategy<INPUT_STRUCTURES>;
@@ -44,15 +46,15 @@ namespace SensorGateway {
 
     public:
         explicit SensorAccessLink(ServerCommunicationStrategy* serverCommunicationStrategy,
-                                  MessageTranslationStrategy* messageTranslationStrategy,
+                                  DataTranslationStrategy* dataTranslationStrategy,
                                   SensorCommunicationStrategy* sensorCommunicationStrategy) :
                 serverCommunicationStrategy(serverCommunicationStrategy),
-                messageTranslationStrategy(messageTranslationStrategy),
+                dataTranslationStrategy(dataTranslationStrategy),
                 sensorCommunicationStrategy(sensorCommunicationStrategy),
                 serverCommunicator(serverCommunicationStrategy),
-                messageTranslator(messageTranslationStrategy),
+                dataTranslator(dataTranslationStrategy),
                 sensorCommunicator(sensorCommunicationStrategy),
-                translatorScheduler(&messageTranslator),
+                translatorScheduler(&dataTranslator),
                 serverCommunicatorScheduler(&serverCommunicator) {
         }
 
@@ -73,7 +75,7 @@ namespace SensorGateway {
 
             // Yield and sleep to allow correct connection
             std::this_thread::yield();
-            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            std::this_thread::sleep_for(std::chrono::milliseconds(50));
 
             serverCommunicator.connect(serverAddress);
             sensorCommunicator.start();
@@ -89,15 +91,15 @@ namespace SensorGateway {
     private:
 
         void linkElements() {
-            messageTranslationStrategy->linkConsumer(&serverCommunicatorScheduler);
+            dataTranslationStrategy->linkConsumer(&serverCommunicatorScheduler);
             sensorCommunicator.linkConsumer(&translatorScheduler);
         }
 
         ServerCommunicationStrategy* serverCommunicationStrategy;
         ServerCommunicator serverCommunicator;
 
-        MessageTranslationStrategy* messageTranslationStrategy;
-        MessageTranslator messageTranslator;
+        DataTranslationStrategy* dataTranslationStrategy;
+        DataTranslator dataTranslator;
 
         SensorCommunicationStrategy* sensorCommunicationStrategy;
         SensorCommunicator sensorCommunicator;
