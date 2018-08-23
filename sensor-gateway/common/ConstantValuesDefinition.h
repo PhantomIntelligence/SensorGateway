@@ -65,7 +65,6 @@ namespace Sensor {
         size_t const SAMPLING_LENGTH = 100;
         size_t const ACQUISITION_BUFFER_SIZE = NUMBER_OF_CHANNEL * SAMPLING_LENGTH;
         size_t const DETECTIONS_SIZE = NUMBER_OF_CHANNEL * NUMBER_OF_DETECTION_PER_CHANNEL;
-        int const MAX_NUMBER_OF_BULK_FETCHABLE_MESSAGES = 32;
     }
     namespace AWL {
         using MessageID = uint64_t;

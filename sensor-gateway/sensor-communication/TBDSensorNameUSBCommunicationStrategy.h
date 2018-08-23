@@ -71,24 +71,37 @@ namespace SensorCommunication {
 
         void throwUsbClaimInterfaceErrorIfNeeded(int errorCode);
 
+        void setupCleanConnection() noexcept;
+
         int doUSBBulkTransferAndReturnNumberOfByteActuallyTransferred(
                 Byte endpoint,
                 Byte* data,
-                int length);
+                int32_t length);
 
-        void throwErrorOnLibUSBBulkTransfetErrorCode(int errorCode);
+        int doUSBBulkTransferAndReturnNumberOfByteActuallyTransferredWithTimeout(
+                Byte endpoint,
+                Byte* data,
+                int32_t length,
+                uint32_t timeout);
 
-        super::Messages fetchSensorMessages(uint8_t numberOfMessagesToFetch);
+        void throwErrorOnLibUSBBulkTransferErrorCode(int errorCode);
+
+        typedef uint32_t NumberOfDataToFetch;
 
         typedef struct {
             uint32_t id;
             uint32_t timestamp;
-            unsigned char flags;
-            unsigned char length;
+            uint8_t flags;
+            uint8_t length;
             Byte data[NUMBER_OF_DATA_BYTES];
+            uint16_t padding;
         } USBSensorMessage;
 
+        super::Messages fetchMessagesOnSensor(NumberOfDataToFetch numberOfMessagesToFetch);
+
         super::Message convertUSBSensorMessageToSensorMessage(USBSensorMessage* sensorMessage);
+
+        super::RawDataCycles fetchRawDataCyclesOnSensor(NumberOfDataToFetch numberOfRawDataCyclesToFetch);
 
         typedef struct {
             uint16_t vendorId;
@@ -97,6 +110,7 @@ namespace SensorCommunication {
             uint8_t endpointOut;
             uint16_t timeout;
         } USBConnectionParameters;
+
 
         enum VersionString {
             FIRMWARE_BUILD_DATE,
@@ -110,40 +124,12 @@ namespace SensorCommunication {
 
         enum USBCommandCode {
             DO_NOTHING,
-            GET_FIRMWARE_VERSION,
-            QUERY_FOR_SUPPORT,
-            QUERY_REPLY,
 
-            QUERY_ON_WHICH_USB_PORT_THE_CONNECTION_IS_MADE,
-
-            LOOPBACK,
-
-            MEMORY_READ,
-            MEMORY_WRITE,
-
-            LIDAR_QUERY,
-            LIDAR_GET_DATA,
-
-            USBIO_START,
-            USBIO_STOP,
-            USBIO_OPEN_FILE_ON_HOST,
-            USBIO_CLOSE_FILE_ON_HOST,
-            USBIO_READ_FILE_ON_HOST,
-            USBIO_READ_REPLY_FROM_HOST,
-            USBIO_WRITE_FILE_ON_HOST,
-            USBIO_WRITE_REPLY_TO_HOST,
-            USBIO_SEEK_FROM_CURRENT_POSITION_IN_FILE_ON_HOST,
-            USBIO_SEEK_FROM_END_OF_FILE_ON_HOST,
-            USBIO_SEEK_FROM_START_OF_FILE_ON_HOST,
-            USBIO_SEEK_REPLY_FROM_HOST,
-            USBIO_SEND_FILE_POINTER,
-
-            CUSTOM_COMMAND,
-
-            REPEAT_OUT = 100,
-            REPEAT_IN,
-
-            QUERY_NUMBER_OF_MESSAGES_AND_RAW_DATA_CYCLES_READY_TO_BE_FETCH = 88
+            USB_MESSAGE_LENGTH = 8,
+            SEND_COMMAND = 80,
+            FETCH_RAW_DATA_CYCLES = 87,
+            POLL_MESSAGES = 88,
+            LIDAR_QUERY = 89
         };
 
         typedef struct {
@@ -151,13 +137,6 @@ namespace SensorCommunication {
             uint32_t numberOfByteToTransfer;
             uint32_t data;
         } USBCommandBlock;
-
-        typedef struct {
-            uint32_t command;
-            uint32_t numberOfRawDataCyclesReady;
-            uint32_t numberOfMessageReady;
-            uint32_t nextMessageLength;
-        } ADIBulkLoopbackLidarQueryResponse;
 
         USBConnectionParameters usbConnectionParameters;
 
@@ -171,7 +150,8 @@ namespace SensorCommunication {
 
         AtomicFlag dataCanBeFetched;
 
-        ADIBulkLoopbackLidarQueryResponse quantityOfDataThatCanBeFetched;
+        NumberOfDataToFetch numberOfMessagesToFetch;
+        NumberOfDataToFetch numberOfRawDataCyclesToFetch;
     };
 
 }

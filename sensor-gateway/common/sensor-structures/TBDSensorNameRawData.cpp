@@ -18,8 +18,8 @@
 
 using DataFlow::TBDSensorNameRawData;
 
-TBDSensorNameRawData::TBDSensorNameRawData(Guardian::RawDataBuffer rawDataBuffer) :
-        rawDataBuffer(rawDataBuffer) {}
+TBDSensorNameRawData::TBDSensorNameRawData(RawDataContent rawDataContent) :
+        content(rawDataContent) {}
 
 TBDSensorNameRawData::TBDSensorNameRawData() :
         TBDSensorNameRawData(TBDSensorNameRawData::returnDefaultData()) {}
@@ -27,10 +27,10 @@ TBDSensorNameRawData::TBDSensorNameRawData() :
 TBDSensorNameRawData::~TBDSensorNameRawData() noexcept = default;
 
 TBDSensorNameRawData::TBDSensorNameRawData(TBDSensorNameRawData const& other) :
-        TBDSensorNameRawData(other.rawDataBuffer) {}
+        TBDSensorNameRawData(other.content) {}
 
 TBDSensorNameRawData::TBDSensorNameRawData(TBDSensorNameRawData&& other) noexcept :
-        rawDataBuffer(other.rawDataBuffer) {}
+        content(other.content) {}
 
 TBDSensorNameRawData&
 TBDSensorNameRawData::operator=(TBDSensorNameRawData const& other)& {
@@ -47,7 +47,7 @@ TBDSensorNameRawData::operator=(TBDSensorNameRawData&& other)& noexcept {
 
 void TBDSensorNameRawData::swap(TBDSensorNameRawData& current,
                                 TBDSensorNameRawData& other) noexcept {
-    std::swap(current.rawDataBuffer, other.rawDataBuffer);
+    std::swap(current.content, other.content);
 }
 
 TBDSensorNameRawData const& TBDSensorNameRawData::returnDefaultData() noexcept {
