@@ -176,7 +176,7 @@ namespace SensorAccessLinkTestMock {
         RawDataCyclesList createdRawDataCyclesCopies;
     };
 
-    using SimpleTranslationStrategy = MessageTranslation::MessageTranslationStrategy<DataModel::SimpleMessage, DataModel::SimpleMessage>;
+    using SimpleTranslationStrategy = DataTranslation::DataTranslationStrategy<DataModel::SimpleMessage, DataModel::SimpleMessage>;
 
     class MockTranslationStrategy final : public SimpleTranslationStrategy {
     protected:

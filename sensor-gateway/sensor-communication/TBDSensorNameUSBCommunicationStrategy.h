@@ -67,25 +67,6 @@ namespace SensorCommunication {
 
     private:
 
-        void throwDeviceNotFoundErrorIfNeeded();
-
-        void throwUsbClaimInterfaceErrorIfNeeded(int errorCode);
-
-        void setupCleanConnection() noexcept;
-
-        int doUSBBulkTransferAndReturnNumberOfByteActuallyTransferred(
-                Byte endpoint,
-                Byte* data,
-                int32_t length);
-
-        int doUSBBulkTransferAndReturnNumberOfByteActuallyTransferredWithTimeout(
-                Byte endpoint,
-                Byte* data,
-                int32_t length,
-                uint32_t timeout);
-
-        void throwErrorOnLibUSBBulkTransferErrorCode(int errorCode);
-
         typedef uint32_t NumberOfDataToFetch;
 
         typedef struct {
@@ -96,12 +77,6 @@ namespace SensorCommunication {
             Byte data[NUMBER_OF_DATA_BYTES];
             uint16_t padding;
         } USBSensorMessage;
-
-        super::Messages fetchMessagesOnSensor(NumberOfDataToFetch numberOfMessagesToFetch);
-
-        super::Message convertUSBSensorMessageToSensorMessage(USBSensorMessage* sensorMessage);
-
-        super::RawDataCycles fetchRawDataCyclesOnSensor(NumberOfDataToFetch numberOfRawDataCyclesToFetch);
 
         typedef struct {
             uint16_t vendorId;
@@ -131,6 +106,31 @@ namespace SensorCommunication {
             POLL_MESSAGES = 88,
             LIDAR_QUERY = 89
         };
+
+        void throwDeviceNotFoundErrorIfNeeded();
+
+        void throwUsbClaimInterfaceErrorIfNeeded(int errorCode);
+
+        void setupCleanConnection() noexcept;
+
+        int doUSBBulkTransferAndReturnNumberOfByteActuallyTransferred(
+                Byte endpoint,
+                Byte* data,
+                int32_t length);
+
+        int doUSBBulkTransferAndReturnNumberOfByteActuallyTransferredWithTimeout(
+                Byte endpoint,
+                Byte* data,
+                int32_t length,
+                uint32_t timeout);
+
+        void throwErrorOnLibUSBBulkTransferErrorCode(int errorCode);
+
+        super::Messages fetchMessagesOnSensor(NumberOfDataToFetch numberOfMessagesToFetch);
+
+        super::Message convertUSBSensorMessageToSensorMessage(USBSensorMessage* sensorMessage);
+
+        super::RawDataCycles fetchRawDataCyclesOnSensor(NumberOfDataToFetch numberOfRawDataCyclesToFetch);
 
         USBConnectionParameters usbConnectionParameters;
 

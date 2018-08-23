@@ -16,17 +16,17 @@
 
 #include "sensor-gateway/domain/Frame.h"
 #include "sensor-gateway/common/sensor-structures/AWLMessage.h"
-#include "MessageTranslationStrategy.hpp"
+#include "DataTranslationStrategy.hpp"
 
-namespace MessageTranslation {
+namespace DataTranslation {
 
     using DataFlow::AWLMessage;
     using DataFlow::Frame;
     using DataFlow::PixelID;
 
-    class AWLTranslationStrategy final : public MessageTranslationStrategy<AWLMessage, Frame> {
+    class AWLTranslationStrategy final : public DataTranslationStrategy<AWLMessage, Frame> {
     protected:
-        using super = MessageTranslationStrategy<AWLMessage, Frame>;
+        using super = DataTranslationStrategy<AWLMessage, Frame>;
         using super::INPUT;
         using super::OUTPUT;
     public:
