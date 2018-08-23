@@ -49,6 +49,10 @@ namespace DataFlow {
 
         void swap(TBDSensorNameRawData& current, TBDSensorNameRawData& other) noexcept;
 
+        bool operator==(TBDSensorNameRawData const&) const;
+
+        bool operator!=(TBDSensorNameRawData const&) const;
+
         static TBDSensorNameRawData const& returnDefaultData() noexcept;
 
         RawDataContent content;

@@ -20,10 +20,14 @@ using SensorCommunication::TBDSensorNameUSBCommunicationStrategy;
 using DataFlow::AWLMessage;
 
 TBDSensorNameUSBCommunicationStrategy::TBDSensorNameUSBCommunicationStrategy() :
-        usbConnectionParameters({0x064b, 0x7823,
+        usbConnectionParameters({0x1419, 0x80,
                                  (129),
-                                 (1),
+                                 (2),
                                  3000}),
+//        usbConnectionParameters({0x064b, 0x7823,
+//                                 (129),
+//                                 (1),
+//                                 3000}),
         usbContext(nullptr),
         usbDeviceHandle(nullptr),
         reconnectTime(SteadyClock::now()),

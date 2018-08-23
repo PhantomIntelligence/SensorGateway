@@ -50,6 +50,16 @@ void TBDSensorNameRawData::swap(TBDSensorNameRawData& current,
     std::swap(current.content, other.content);
 }
 
+bool DataFlow::TBDSensorNameRawData::operator==(TBDSensorNameRawData const& other) const {
+    auto sameContent = (content.acquisitionBuffer == other.content.acquisitionBuffer);
+    auto messagesAreEqual = (sameContent);
+    return messagesAreEqual;
+}
+
+bool DataFlow::TBDSensorNameRawData::operator!=(TBDSensorNameRawData const& other) const {
+    return !operator==(other);
+}
+
 TBDSensorNameRawData const& TBDSensorNameRawData::returnDefaultData() noexcept {
     return Defaults::DEFAULT_TBD_SENSOR_NAME_RAW_DATA;
 }
