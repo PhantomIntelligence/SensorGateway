@@ -20,14 +20,16 @@ using SensorCommunication::TBDSensorNameUSBCommunicationStrategy;
 using DataFlow::AWLMessage;
 
 TBDSensorNameUSBCommunicationStrategy::TBDSensorNameUSBCommunicationStrategy() :
-        usbConnectionParameters({0x058b, 0x0050,
-                                 (129),
-                                 (2),
-                                 3000}),
-//        usbConnectionParameters({0x064b, 0x7823,
+// Guardian
+//        usbConnectionParameters({0x058b, 0x0050,
 //                                 (129),
-//                                 (1),
+//                                 (2),
 //                                 3000}),
+// ADI
+        usbConnectionParameters({0x064b, 0x7823,
+                                 (129),
+                                 (1),
+                                 3000}),
         usbContext(nullptr),
         usbDeviceHandle(nullptr),
         reconnectTime(SteadyClock::now()),
@@ -76,6 +78,8 @@ TBDSensorNameUSBCommunicationStrategy::super::Messages TBDSensorNameUSBCommunica
 
         numberOfMessagesToFetch = *((NumberOfDataToFetch*) &quantityOfDataThatCanBeFetched.data[0]);
         numberOfRawDataCyclesToFetch = *((NumberOfDataToFetch*) &quantityOfDataThatCanBeFetched.data[4]);
+        std::cout << "numberOfMessagesToFetch : " << numberOfMessagesToFetch << std::endl;
+        std::cout << "numberOfRawDataCyclesToFetch : " << numberOfRawDataCyclesToFetch << std::endl;
 
         if (numberOfMessagesToFetch > 0) {
             messages = fetchMessagesOnSensor(numberOfMessagesToFetch);
