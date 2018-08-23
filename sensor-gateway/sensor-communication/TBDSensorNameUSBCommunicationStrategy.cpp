@@ -59,7 +59,9 @@ void TBDSensorNameUSBCommunicationStrategy::openConnection() {
 }
 
 TBDSensorNameUSBCommunicationStrategy::super::Messages TBDSensorNameUSBCommunicationStrategy::fetchMessages() {
-    USBCommandBlock lidarQueryCommandBlock{LIDAR_QUERY, 0, 0};
+    USBSensorMessage lidarQueryCommandBlock;
+    lidarQueryCommandBlock.id = LIDAR_QUERY;
+
     doUSBBulkTransferAndReturnNumberOfByteActuallyTransferred(
             usbConnectionParameters.endpointOut,
             (Byte*) &lidarQueryCommandBlock,
@@ -76,10 +78,8 @@ TBDSensorNameUSBCommunicationStrategy::super::Messages TBDSensorNameUSBCommunica
     TBDSensorNameUSBCommunicationStrategy::super::Messages messages;
     if (dataCanBeFetched.load()) {
 
-        numberOfMessagesToFetch = *((NumberOfDataToFetch*) &quantityOfDataThatCanBeFetched.data[0]);
-        numberOfRawDataCyclesToFetch = *((NumberOfDataToFetch*) &quantityOfDataThatCanBeFetched.data[4]);
-        std::cout << "numberOfMessagesToFetch : " << numberOfMessagesToFetch << std::endl;
-        std::cout << "numberOfRawDataCyclesToFetch : " << numberOfRawDataCyclesToFetch << std::endl;
+        numberOfRawDataCyclesToFetch = *((NumberOfDataToFetch*) &quantityOfDataThatCanBeFetched.data[0]);
+        numberOfMessagesToFetch = *((NumberOfDataToFetch*) &quantityOfDataThatCanBeFetched.data[4]);
 
         if (numberOfMessagesToFetch > 0) {
             messages = fetchMessagesOnSensor(numberOfMessagesToFetch);
@@ -128,9 +128,8 @@ int TBDSensorNameUSBCommunicationStrategy::doUSBBulkTransferAndReturnNumberOfByt
 }
 
 int TBDSensorNameUSBCommunicationStrategy::doUSBBulkTransferAndReturnNumberOfByteActuallyTransferredWithTimeout(
-        Byte endpoint, Byte* data, int32_t length, uint32_t) {
+        Byte endpoint, Byte* data, int32_t length, uint32_t timeout) {
     throwDeviceNotFoundErrorIfNeeded();
-    uint32_t timeout = 0;
     int numberOfByteActuallyTransferred = 0;
     auto errorCode = libusb_bulk_transfer(usbDeviceHandle, endpoint, data, length,
                                           &numberOfByteActuallyTransferred, timeout);
@@ -263,10 +262,6 @@ TBDSensorNameUSBCommunicationStrategy::fetchRawDataCyclesOnSensor(NumberOfDataTo
 
     for (auto rawDataIndex = 0u; rawDataIndex < numberOfRawDataCyclesToFetch; ++rawDataIndex) {
         auto rawDataContent = rawDataCyclesContent[rawDataIndex];
-        std::cout << "rawDataIndex : " << rawDataIndex << std::endl;
-        for (auto i = 0u; i < rawDataContent.acquisitionBuffer.size(); ++i) {
-            std::cout << " --> " << rawDataContent.acquisitionBuffer[i] << std::endl;
-        }
         fetchedRawDataCycles.at(rawDataIndex) = super::RawData(rawDataContent);
     }
 

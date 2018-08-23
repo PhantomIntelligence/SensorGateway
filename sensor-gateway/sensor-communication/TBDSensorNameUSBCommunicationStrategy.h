@@ -132,12 +132,6 @@ namespace SensorCommunication {
             LIDAR_QUERY = 89
         };
 
-        typedef struct {
-            uint32_t command;
-            uint32_t numberOfByteToTransfer;
-            uint32_t data;
-        } USBCommandBlock;
-
         USBConnectionParameters usbConnectionParameters;
 
         libusb_context* usbContext;
