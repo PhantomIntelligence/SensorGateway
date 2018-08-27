@@ -62,7 +62,7 @@ namespace Sensor {
     namespace Guardian {
         size_t const NUMBER_OF_CHANNEL = 16;
         size_t const NUMBER_OF_DETECTION_PER_CHANNEL = 16;
-        size_t const RAW_DATA_SAMPLING_LENGTH = 100;
+        static size_t const RAW_DATA_SAMPLING_LENGTH = 100;
         size_t const RAW_DATA_ACQUISITION_BUFFER_SIZE = NUMBER_OF_CHANNEL * RAW_DATA_SAMPLING_LENGTH;
         size_t const DETECTIONS_SIZE = NUMBER_OF_CHANNEL * NUMBER_OF_DETECTION_PER_CHANNEL;
     }
@@ -73,7 +73,7 @@ namespace Sensor {
         MessageID const DETECTION_VELOCITY = 0x0B;
         int const NUMBER_OF_DATA_BYTES = 8;
 
-        size_t const RAW_DATA_SAMPLING_LENGTH = 1024;
+        static size_t const RAW_DATA_SAMPLING_LENGTH = 1024;
 
         namespace _7 {
             SensorID const SENSOR_ID = 0x0010;

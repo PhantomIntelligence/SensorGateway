@@ -24,12 +24,12 @@
 
 namespace SensorGateway {
 
-    using SensorStructures = Sensor::TBDSensorName::Structures;
-    using SpiritStructures = Sensor::Spirit::Structures<SensorStructures::RawData::RawDataContent>;
+    using TBDSensorNameStructures = Sensor::TBDSensorName::Structures;
+    using TBDSensorNameSpiritStructures = Sensor::Spirit::Structures<TBDSensorNameStructures::RawData::RawDataContent>;
 
-class TBDSensorNameAccessLink final : public SensorAccessLink<SensorStructures, SpiritStructures> {
+class TBDSensorNameAccessLink final : public SensorAccessLink<TBDSensorNameStructures, TBDSensorNameSpiritStructures> {
     protected:
-        using super = SensorAccessLink<SensorStructures, SpiritStructures>;
+        using super = SensorAccessLink<TBDSensorNameStructures, TBDSensorNameSpiritStructures>;
 
         using super::ServerCommunicationStrategy;
 
