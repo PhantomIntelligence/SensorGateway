@@ -18,15 +18,22 @@
 
 namespace SensorAccessLinkElement {
 
-    template<class I, class O>
-    class DataTranslator : public DataFlow::DataSink<I> {
+    template<class SENSOR_STRUCTURES, class SERVER_STRUCTURES>
+    class DataTranslator : public DataFlow::DataSink<typename SENSOR_STRUCTURES::Message>,
+                           public DataFlow::DataSink<typename SENSOR_STRUCTURES::RawData> {
 
     protected:
-        typedef I INPUT;
-        typedef O OUTPUT;
+
+        using DataTranslationStrategy = DataTranslation::DataTranslationStrategy<SENSOR_STRUCTURES, SERVER_STRUCTURES>;
+
+        using SensorMessage = typename SENSOR_STRUCTURES::Message;
+        using SensorRawData = typename SENSOR_STRUCTURES::RawData;
+
+        using messageSink = DataFlow::DataSink<SensorMessage>;
+        using rawDataSink = DataFlow::DataSink<SensorRawData>;
 
     public:
-        explicit DataTranslator(DataTranslation::DataTranslationStrategy<INPUT, OUTPUT>* dataTranslationStrategy) :
+        explicit DataTranslator(DataTranslationStrategy* dataTranslationStrategy) :
                 dataTranslationStrategy(dataTranslationStrategy) {};
 
         ~DataTranslator() noexcept = default;
@@ -39,12 +46,16 @@ namespace SensorAccessLinkElement {
 
         DataTranslator& operator=(DataTranslator&& other)& noexcept = delete;
 
-        void consume(I&& inputMessage) override {
-            dataTranslationStrategy->translateMessage(std::forward<I>(inputMessage));
+        void consume(SensorMessage&& message) override {
+            dataTranslationStrategy->translateMessage(std::forward<SensorMessage>(message));
+        };
+
+        void consume(SensorRawData&& rawData) override {
+            dataTranslationStrategy->translateRawData(std::forward<SensorRawData>(rawData));
         };
 
     private:
-        DataTranslation::DataTranslationStrategy<INPUT, OUTPUT>* dataTranslationStrategy;
+        DataTranslationStrategy* dataTranslationStrategy;
 
     };
 }

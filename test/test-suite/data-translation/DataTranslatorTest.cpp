@@ -33,33 +33,56 @@ protected:
 
 namespace DataTranslatorTestMock {
 
-    class MockDataTranslationStrategy final
-            : public DataTranslationStrategy<Structures::Message, Structures::Message> {
+    class MockDataTranslationStrategy final :
+            public DataTranslationStrategy<Structures, Structures> {
 
     protected:
 
-        using super = DataTranslationStrategy<Structures::Message, Structures::Message>;
+        using super = DataTranslation::DataTranslationStrategy<Structures, Structures>;
+        using super::SensorMessage;
+        using super::SensorRawData;
+
+        using super::MessageSource;
+        using super::RawDataSource;
 
     public:
 
-        MockDataTranslationStrategy() : translateMessageCalled(false),
-                                           receivedInputMessage(Structures::Message::returnDefaultData()) {};
+        MockDataTranslationStrategy() :
+                translateMessageCalled(false),
+                translateRawDataCalled(false),
+                receivedSensorMessage(Structures::Message::returnDefaultData()),
+                receivedSensorRawData(Structures::RawData::returnDefaultData()) {};
 
-        void translateMessage(super::INPUT&& inputMessage) override {
-            receivedInputMessage = inputMessage;
+        ~MockDataTranslationStrategy() noexcept = default;
+
+        void translateMessage(super::SensorMessage&& sensorMessage) override {
+            receivedSensorMessage = sensorMessage;
             translateMessageCalled.store(true);
         };
 
-        bool hasTranslateMessageBeenCalledWithRightInputMessage(super::INPUT expectedInputMessage) const {
+        void translateRawData(super::SensorRawData&& sensorRawData) override {
+            receivedSensorRawData = sensorRawData;
+            translateRawDataCalled.store(true);
+        }
 
-            return (translateMessageCalled.load() && (expectedInputMessage == receivedInputMessage));
+        bool hasTranslateMessageBeenCalledWithRightSensorMessage(
+                super::SensorMessage const& expectedSensorMessage) const {
+            return (translateMessageCalled.load() && (expectedSensorMessage == receivedSensorMessage));
+        };
+
+        bool hasTranslateRawDataBeenCalledWithRightSensorRawData(
+                super::SensorRawData const& expectedSensorRawData) const {
+            return (translateRawDataCalled.load() && (expectedSensorRawData == receivedSensorRawData));
 
         };
 
     private:
 
         AtomicFlag translateMessageCalled;
-        super::INPUT receivedInputMessage;
+        AtomicFlag translateRawDataCalled;
+
+        super::SensorMessage receivedSensorMessage;
+        super::SensorRawData receivedSensorRawData;
 
     };
 }
@@ -70,24 +93,24 @@ TEST_F(DataTranslatorTest,
     auto copy = Structures::Message(message);
 
     DataTranslatorTestMock::MockDataTranslationStrategy mockStrategy;
-    DataTranslator<Structures::Message, Structures::Message> dataTranslator(&mockStrategy);
+    DataTranslator<Structures, Structures> dataTranslator(&mockStrategy);
 
     dataTranslator.consume(std::move(message));
-    auto strategyCalledWithTheRightMessage = mockStrategy.hasTranslateMessageBeenCalledWithRightInputMessage(copy);
+    auto strategyCalledWithTheRightMessage = mockStrategy.hasTranslateMessageBeenCalledWithRightSensorMessage(copy);
 
     ASSERT_TRUE(strategyCalledWithTheRightMessage);
 }
 
-//TEST_F(DataTranslatorTest,
-//       given_aTranslationStrategy_when_consumingRawData_then_callsTranslateRawDataInStrategyWithTheConsumedRawData) {
-//    auto data = DataTestUtil::createRandomSimpleRawData();
-//    auto copy = Structures::RawData(data);
-//
-//    DataTranslatorTestMock::MockDataTranslationStrategy mockStrategy;
-//    DataTranslator<Structures::RawData, Structures::RawData> dataTranslator(&mockStrategy);
-//
-//    dataTranslator.consume(std::move(data));
-//    auto strategyCalledWithTheRightMessage = mockStrategy.hasTranslateMessageBeenCalledWithRightInputMessage(copy);
-//
-//    ASSERT_TRUE(strategyCalledWithTheRightMessage);
-//}
+TEST_F(DataTranslatorTest,
+       given_aTranslationStrategy_when_consumingRawData_then_callsTranslateRawDataInStrategyWithTheConsumedRawData) {
+    auto data = DataTestUtil::createRandomSimpleRawData();
+    auto copy = Structures::RawData(data);
+
+    DataTranslatorTestMock::MockDataTranslationStrategy mockStrategy;
+    DataTranslator<Structures, Structures> dataTranslator(&mockStrategy);
+
+    dataTranslator.consume(std::move(data));
+    auto strategyCalledWithTheRightRawData = mockStrategy.hasTranslateRawDataBeenCalledWithRightSensorRawData(copy);
+
+    ASSERT_TRUE(strategyCalledWithTheRightRawData);
+}

@@ -51,12 +51,6 @@ namespace DataFlow {
 
     namespace RawData {
 
-        typedef int16_t AcquisitionData;
-        typedef struct {
-            float distance;
-            float intensity;
-        } DetectionType;
-
         using ReceiverID = int32_t;
         using ChannelID = int32_t;
         using Offset = size_t;

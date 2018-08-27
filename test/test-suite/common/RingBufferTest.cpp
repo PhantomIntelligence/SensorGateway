@@ -3,9 +3,6 @@
 
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
-#include <sensor-gateway/common/sensor-structures/AWLMessage.h>
-#include <sensor-gateway/sensor-communication/SensorCommunicator.hpp>
-#include <sensor-gateway/sensor-communication/KvaserCanCommunicationStrategy.h>
 
 #include "sensor-gateway/common/data-flow/RingBuffer.hpp"
 #include "test/utilities/data-model/DataModelFixture.h"

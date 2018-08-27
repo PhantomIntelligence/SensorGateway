@@ -15,7 +15,7 @@
 #define SENSORGATEWAY_FRAMEFILEMANAGER_H
 
 #include "FileManager.hpp"
-#include "sensor-gateway/domain/Frame.h"
+#include "sensor-gateway/common/data-structure/spirit/Frame.h"
 
 namespace TestUtilities {
 

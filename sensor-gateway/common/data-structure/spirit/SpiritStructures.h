@@ -14,19 +14,30 @@
 	limitations under the License.
 */
 
-#ifndef SENSORGATEWAY_TBDSENSORNAMESTRUCTURES_H
-#define SENSORGATEWAY_TBDSENSORNAMESTRUCTURES_H
+#ifndef SENSORGATEWAY_SPIRITSTRUCTURES_H
+#define SENSORGATEWAY_SPIRITSTRUCTURES_H
 
-#include "TBDSensorNameRawData.h"
-#include "AbstractStructures.h"
+#include "SpiritRawData.hpp"
+#include "Frame.h"
 
 namespace Sensor {
-    namespace TBDSensorName {
-        class Structures final : public Communication::AbstractStructures {
-        public :
+    namespace Spirit {
 
-            typedef typename DataFlow::AWLMessage Message;
-            typedef typename DataFlow::TBDSensorNameRawData RawData;
+        template<typename RawDataContent>
+        class Structures final : public Communication::DataStructures {
+        public :
+            enum DataType {
+//            [0, 499] -> reserved for SensorGateway messages
+
+
+//            [500, +] -> reserved for Sensor message
+
+                SENSOR_MESSAGE = 500,
+                SENSOR_RAW_DATA = 501
+            };
+
+            typedef typename DataFlow::Frame Message;
+            typedef typename DataFlow::SpiritRawData<RawDataContent> RawData;
 
             static size_t const MAX_NUMBER_OF_BULK_FETCHABLE_MESSAGES = 32;
             static size_t const MAX_NUMBER_OF_BULK_FETCHABLE_RAW_DATA_CYCLES = 8;
@@ -34,4 +45,4 @@ namespace Sensor {
     }
 }
 
-#endif //SENSORGATEWAY_TBDSENSORNAMESTRUCTURES_H
+#endif //SENSORGATEWAY_SPIRITSTRUCTURES_H

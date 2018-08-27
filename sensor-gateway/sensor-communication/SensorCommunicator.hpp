@@ -32,8 +32,8 @@ namespace SensorAccessLinkElement {
         using MESSAGE = typename T::Message;
         using RAW_DATA = typename T::RawData;
 
-        using superMessage = DataFlow::DataSource<MESSAGE>;
-        using superRawData = DataFlow::DataSource<RAW_DATA>;
+        using MessageSource = DataFlow::DataSource<MESSAGE>;
+        using RawDataSource = DataFlow::DataSource<RAW_DATA>;
 
         MESSAGE const DEFAULT_MESSAGE = T::Message::returnDefaultData();
         RAW_DATA const DEFAULT_RAW_DATA = T::RawData::returnDefaultData();
@@ -69,9 +69,9 @@ namespace SensorAccessLinkElement {
             communicatorThread.exitSafely();
         };
 
-        using superMessage::linkConsumer;//(DataFlow::ConsumerLink<MESSAGE>* consumer);
+        using MessageSource::linkConsumer;
 
-        using superRawData::linkConsumer;//(DataFlow::ConsumerLink<RAW_DATA>* consumer);
+        using RawDataSource::linkConsumer;
 
     private:
 
@@ -89,7 +89,7 @@ namespace SensorAccessLinkElement {
             for (auto messageIndex = 0; messageIndex < messages.size(); ++messageIndex) {
                 auto message = messages[messageIndex];
                 if (message != DEFAULT_MESSAGE) {
-                    superMessage::produce(std::move(message));
+                    MessageSource::produce(std::move(message));
                 }
             }
         }
@@ -99,7 +99,7 @@ namespace SensorAccessLinkElement {
             for (auto rawDataIndex = 0; rawDataIndex < rawDataCycles.size(); ++rawDataIndex) {
                 auto rawDataCycle = rawDataCycles[rawDataIndex];
                 if (rawDataCycle != DEFAULT_RAW_DATA) {
-                    superRawData::produce(std::move(rawDataCycle));
+                    RawDataSource::produce(std::move(rawDataCycle));
                 }
             }
         }

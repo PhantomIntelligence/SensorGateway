@@ -19,7 +19,6 @@
 
 #include "sensor-gateway/common/ConstantFunctionsDefinition.h"
 
-
 namespace AWL {
     using MessageID = int64_t;
     using MessageTimestamp = uint64_t;

@@ -3,7 +3,7 @@
 
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
-#include "sensor-gateway/domain/Frame.h"
+#include "sensor-gateway/common/data-structure/spirit/Frame.h"
 
 using DataFlow::Frame;
 using DataFlow::PixelID;

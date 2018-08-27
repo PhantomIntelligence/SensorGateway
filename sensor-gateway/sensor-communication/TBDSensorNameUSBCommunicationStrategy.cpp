@@ -253,11 +253,11 @@ TBDSensorNameUSBCommunicationStrategy::fetchRawDataCyclesOnSensor(NumberOfDataTo
             (Byte*) &sensorMessageRequest,
             sizeof(USBSensorMessage));
 
-    super::RawData::RawDataContent rawDataCyclesContent[MAX_FETCHABLE_SIZE];
+    super::RawData::Content rawDataCyclesContent[MAX_FETCHABLE_SIZE];
     doUSBBulkTransferAndReturnNumberOfByteActuallyTransferred(
             usbConnectionParameters.endpointIn,
             (Byte*) &rawDataCyclesContent,
-            numberOfRawDataCyclesToFetch * sizeof(super::RawData::RawDataContent));
+            numberOfRawDataCyclesToFetch * sizeof(super::RawData::Content));
 
 
     for (auto rawDataIndex = 0u; rawDataIndex < numberOfRawDataCyclesToFetch; ++rawDataIndex) {

@@ -15,6 +15,7 @@
 #include "UnknownMessageException.h"
 
 using DataTranslation::AWLTranslationStrategy;
+using DataFlow::PixelID;
 using DataFlow::FrameID;
 using DataFlow::SystemID;
 using DataFlow::TrackID;
@@ -31,41 +32,45 @@ using Sensor::AWL::_16::NUMBER_OF_PIXELS_IN_FRAME;
 using Sensor::AWL::_16::HORIZONTAL_FIELD_OF_VIEW;
 using Sensor::AWL::_16::ANGLE_RANGE;
 
-void AWLTranslationStrategy::translateMessage(AWLMessage&& inputMessage) {
-    switch (inputMessage.id) {
+void AWLTranslationStrategy::translateMessage(SensorMessage&& sensorMessage) {
+    switch (sensorMessage.id) {
         case END_OF_FRAME:
-            translateEndOfFrameMessage(std::move(inputMessage));
+            translateEndOfFrameMessage(std::move(sensorMessage));
             break;
         case DETECTION_TRACK :
-            translateDetectionTrackMessage(std::move(inputMessage));
+            translateDetectionTrackMessage(std::move(sensorMessage));
             break;
         case DETECTION_VELOCITY :
-            translateDetectionVelocityMessage(std::move(inputMessage));
+            translateDetectionVelocityMessage(std::move(sensorMessage));
             break;
         default:
-            auto message = UnknownMessageException(std::move(inputMessage));
+            auto message = UnknownMessageException(std::move(sensorMessage));
             throw std::runtime_error(message.getMessage());
     }
 }
 
-void AWLTranslationStrategy::translateEndOfFrameMessage(AWLMessage&& awlMessage) {
-    FrameID frameID = convertTwoBytesToUnsignedBigEndian(awlMessage.data[0], awlMessage.data[1]);
-    SystemID systemID = convertTwoBytesToUnsignedBigEndian(awlMessage.data[2], awlMessage.data[3]);
+void AWLTranslationStrategy::translateRawData(SensorRawData&& serverRawData) {
+
+}
+
+void AWLTranslationStrategy::translateEndOfFrameMessage(SensorMessage&& sensorMessage) {
+    FrameID frameID = convertTwoBytesToUnsignedBigEndian(sensorMessage.data[0], sensorMessage.data[1]);
+    SystemID systemID = convertTwoBytesToUnsignedBigEndian(sensorMessage.data[2], sensorMessage.data[3]);
     currentOutputMessage.systemID = systemID;
     currentOutputMessage.frameID = frameID;
-    produce(std::move(currentOutputMessage));
-    currentOutputMessage = Frame::returnDefaultData();
+    MessageSource::produce(std::move(currentOutputMessage));
+    currentOutputMessage = ServerMessage::returnDefaultData();
 }
 
-void AWLTranslationStrategy::translateDetectionTrackMessage(AWLMessage&& awlMessage) {
-    PixelID pixelID = convertTwoBytesToUnsignedBigEndian(awlMessage.data[3], awlMessage.data[4]);
-    addTrackInPixel(std::forward<INPUT>(awlMessage), pixelID);
+void AWLTranslationStrategy::translateDetectionTrackMessage(SensorMessage&& sensorMessage) {
+    PixelID pixelID = convertTwoBytesToUnsignedBigEndian(sensorMessage.data[3], sensorMessage.data[4]);
+    addTrackInPixel(std::move(sensorMessage), pixelID);
 }
 
-void AWLTranslationStrategy::addTrackInPixel(AWLMessage&& awlMessage, PixelID pixelID) {
-    TrackID trackID = convertTwoBytesToUnsignedBigEndian(awlMessage.data[0], awlMessage.data[1]);
-    ConfidenceLevel confidenceLevel = awlMessage.data[5];
-    Intensity intensity = convertTwoBytesToUnsignedBigEndian(awlMessage.data[6], awlMessage.data[7]);
+void AWLTranslationStrategy::addTrackInPixel(SensorMessage&& sensorMessage, PixelID pixelID) {
+    TrackID trackID = convertTwoBytesToUnsignedBigEndian(sensorMessage.data[0], sensorMessage.data[1]);
+    ConfidenceLevel confidenceLevel = sensorMessage.data[5];
+    Intensity intensity = convertTwoBytesToUnsignedBigEndian(sensorMessage.data[6], sensorMessage.data[7]);
     Track track;
     track.ID = trackID;
     track.confidenceLevel = confidenceLevel;
@@ -73,11 +78,11 @@ void AWLTranslationStrategy::addTrackInPixel(AWLMessage&& awlMessage, PixelID pi
     currentOutputMessage.addTrackToPixelWithID(pixelID, std::move(track));
 };
 
-void AWLTranslationStrategy::translateDetectionVelocityMessage(AWLMessage&& awlMessage) {
-    Distance distance = convertTwoBytesToUnsignedBigEndian(awlMessage.data[2], awlMessage.data[3]);
-    Speed speed = convertTwoBytesToSignedBigEndian(awlMessage.data[4], awlMessage.data[5]);
-    Acceleration acceleration = convertTwoBytesToSignedBigEndian(awlMessage.data[6], awlMessage.data[7]);
-    TrackID trackID = convertTwoBytesToUnsignedBigEndian(awlMessage.data[0], awlMessage.data[1]);
+void AWLTranslationStrategy::translateDetectionVelocityMessage(SensorMessage&& sensorMessage) {
+    Distance distance = convertTwoBytesToUnsignedBigEndian(sensorMessage.data[2], sensorMessage.data[3]);
+    Speed speed = convertTwoBytesToSignedBigEndian(sensorMessage.data[4], sensorMessage.data[5]);
+    Acceleration acceleration = convertTwoBytesToSignedBigEndian(sensorMessage.data[6], sensorMessage.data[7]);
+    TrackID trackID = convertTwoBytesToUnsignedBigEndian(sensorMessage.data[0], sensorMessage.data[1]);
     auto track = fetchTrack(trackID);
     track->distance = distance;
     track->speed = speed;

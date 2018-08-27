@@ -18,10 +18,10 @@
 
 using DataFlow::TBDSensorNameRawData;
 
-TBDSensorNameRawData::TBDSensorNameRawData(RawDataContent rawDataContent) :
-        content(rawDataContent) {}
+TBDSensorNameRawData::TBDSensorNameRawData(TBDSensorNameRawData::Content content) noexcept:
+        content(content) {}
 
-TBDSensorNameRawData::TBDSensorNameRawData() :
+TBDSensorNameRawData::TBDSensorNameRawData() noexcept :
         TBDSensorNameRawData(TBDSensorNameRawData::returnDefaultData()) {}
 
 TBDSensorNameRawData::~TBDSensorNameRawData() noexcept = default;
@@ -45,13 +45,12 @@ TBDSensorNameRawData::operator=(TBDSensorNameRawData&& other)& noexcept {
     return *this;
 }
 
-void TBDSensorNameRawData::swap(TBDSensorNameRawData& current,
-                                TBDSensorNameRawData& other) noexcept {
+void TBDSensorNameRawData::swap(TBDSensorNameRawData& current, TBDSensorNameRawData& other) noexcept {
     std::swap(current.content, other.content);
 }
 
 bool DataFlow::TBDSensorNameRawData::operator==(TBDSensorNameRawData const& other) const {
-    auto sameContent = (content.acquisitionBuffer == other.content.acquisitionBuffer);
+    auto sameContent = (content == other.content);
     auto messagesAreEqual = (sameContent);
     return messagesAreEqual;
 }

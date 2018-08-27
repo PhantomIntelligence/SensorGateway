@@ -17,25 +17,18 @@
 #ifndef SENSORGATEWAY_TBDSENSORNAMERAWDATA_H
 #define SENSORGATEWAY_TBDSENSORNAMERAWDATA_H
 
-#include "AWLMessage.h"
+#include "sensor-gateway/common/data-structure/DataStructures.h"
 
 namespace DataFlow {
 
-    namespace Guardian {
-        using AquisitionBuffer = std::array<int16_t, Sensor::Guardian::ACQUISITION_BUFFER_SIZE>;
-    }
-
     class TBDSensorNameRawData {
-    protected:
-
     public:
-        typedef struct {
-            Guardian::AquisitionBuffer acquisitionBuffer;
-        } RawDataContent;
 
-        explicit TBDSensorNameRawData(RawDataContent rawDataContent);
+        using Content = Sensor::RawDataContent<Sensor::RawDataTypes::GUARDIAN, Sensor::Guardian::RAW_DATA_ACQUISITION_BUFFER_SIZE>::Data;
 
-        explicit TBDSensorNameRawData();
+        explicit TBDSensorNameRawData(Content content) noexcept;
+
+        explicit TBDSensorNameRawData() noexcept;
 
         ~TBDSensorNameRawData() noexcept;
 
@@ -49,20 +42,19 @@ namespace DataFlow {
 
         void swap(TBDSensorNameRawData& current, TBDSensorNameRawData& other) noexcept;
 
-        bool operator==(TBDSensorNameRawData const&) const;
+        bool operator==(TBDSensorNameRawData const& other) const;
 
-        bool operator!=(TBDSensorNameRawData const&) const;
+        bool operator!=(TBDSensorNameRawData const& other) const;
 
         static TBDSensorNameRawData const& returnDefaultData() noexcept;
 
-        RawDataContent content;
+        Content content;
     };
 
     namespace Defaults {
         using DataFlow::TBDSensorNameRawData;
-        Guardian::AquisitionBuffer const DEFAULT_ACQUISITION_BUFFER = Guardian::AquisitionBuffer();
-        TBDSensorNameRawData::RawDataContent const DEFAULT_RAW_DATA_CONTENT{DEFAULT_ACQUISITION_BUFFER};
-        TBDSensorNameRawData const DEFAULT_TBD_SENSOR_NAME_RAW_DATA = TBDSensorNameRawData(DEFAULT_RAW_DATA_CONTENT);
+        TBDSensorNameRawData::Content const DEFAULT_TBD_SENSOR_NAME_RAW_DATA_CONTENT{};
+        TBDSensorNameRawData const DEFAULT_TBD_SENSOR_NAME_RAW_DATA = TBDSensorNameRawData(DEFAULT_TBD_SENSOR_NAME_RAW_DATA_CONTENT);
     }
 }
 

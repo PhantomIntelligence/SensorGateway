@@ -21,27 +21,27 @@
 
 namespace SensorGateway {
 
-    template<class I, class O>
+    template<class SENSOR_STRUCTURES, class SERVER_STRUCTURES>
     class SensorAccessLink {
 
     protected:
 
-        typedef I INPUT_STRUCTURES;
-        typedef O OUTPUT;
+        using SensorMessage = typename SENSOR_STRUCTURES::Message;
+        using SensorRawData = typename SENSOR_STRUCTURES::RawData;
 
-        using SensorMessage = typename INPUT_STRUCTURES::Message;
-        using SensorRawData = typename INPUT_STRUCTURES::RawData;
+        using ServerMessage = typename SERVER_STRUCTURES::Message;
+        using ServerRawData = typename SERVER_STRUCTURES::RawData;
 
-        using ServerCommunicator = SensorAccessLinkElement::ServerCommunicator<OUTPUT>;
-        using ServerCommunicationStrategy = ServerCommunication::ServerCommunicationStrategy<OUTPUT>;
-        using ServerCommunicatorScheduler = DataFlow::DataProcessingScheduler<OUTPUT, ServerCommunicator, 1>;
+        using ServerCommunicator = SensorAccessLinkElement::ServerCommunicator<ServerMessage>;
+        using ServerCommunicationStrategy = ServerCommunication::ServerCommunicationStrategy<ServerMessage>;
+        using ServerCommunicatorScheduler = DataFlow::DataProcessingScheduler<ServerMessage, ServerCommunicator, 1>;
 
-        using DataTranslator = SensorAccessLinkElement::DataTranslator<SensorMessage, OUTPUT>;
-        using DataTranslationStrategy = DataTranslation::DataTranslationStrategy<SensorMessage, OUTPUT>;
+        using DataTranslator = SensorAccessLinkElement::DataTranslator<SENSOR_STRUCTURES, SERVER_STRUCTURES>;
+        using DataTranslationStrategy = DataTranslation::DataTranslationStrategy<SENSOR_STRUCTURES, SERVER_STRUCTURES>;
         using TranslatorScheduler = DataFlow::DataProcessingScheduler<SensorMessage, DataTranslator, 1>;
 
-        using SensorCommunicator = SensorAccessLinkElement::SensorCommunicator<INPUT_STRUCTURES>;
-        using SensorCommunicationStrategy = SensorCommunication::SensorCommunicationStrategy<INPUT_STRUCTURES>;
+        using SensorCommunicator = SensorAccessLinkElement::SensorCommunicator<SENSOR_STRUCTURES>;
+        using SensorCommunicationStrategy = SensorCommunication::SensorCommunicationStrategy<SENSOR_STRUCTURES>;
 
 
     public:

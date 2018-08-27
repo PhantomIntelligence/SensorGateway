@@ -19,7 +19,7 @@
 
 #include <libusb-1.0/libusb.h>
 
-#include "sensor-gateway/common/sensor-structures/TBDSensorNameStructures.h"
+#include "sensor-gateway/common/data-structure/sensor/TBDSensorNameStructures.h"
 #include "SensorCommunicationStrategy.hpp"
 
 namespace SensorCommunication {

@@ -15,7 +15,7 @@
 #define SENSORGATEWAY_AWLMESSAGESFILEMANAGER_H
 
 #include "FileManager.hpp"
-#include "sensor-gateway/common/sensor-structures/AWLMessage.h"
+#include "sensor-gateway/common/data-structure/sensor/AWLMessage.h"
 
 namespace TestUtilities {
 

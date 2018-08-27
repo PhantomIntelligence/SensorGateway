@@ -17,16 +17,23 @@
 
 namespace DataTranslation {
 
-    template<class I, class O>
-    class DataTranslationStrategy : public DataFlow::DataSource<O> {
+    template<class SENSOR_STRUCTURES, class SERVER_STRUCTURES>
+    class DataTranslationStrategy : public DataFlow::DataSource<typename SERVER_STRUCTURES::Message>,
+                                    public DataFlow::DataSource<typename SERVER_STRUCTURES::RawData> {
 
     protected:
-        typedef I INPUT;
-        typedef O OUTPUT;
+        using SensorMessage = typename SENSOR_STRUCTURES::Message;
+        using SensorRawData = typename SENSOR_STRUCTURES::RawData;
+
+        using ServerMessage = typename SERVER_STRUCTURES::Message;
+        using ServerRawData = typename SERVER_STRUCTURES::RawData;
+
+        using MessageSource = DataFlow::DataSource<ServerMessage>;
+        using RawDataSource = DataFlow::DataSource<ServerRawData>;
 
     public:
         DataTranslationStrategy() :
-                currentOutputMessage(OUTPUT::returnDefaultData()) {}
+                currentOutputMessage(ServerMessage::returnDefaultData()) {}
 
         virtual ~DataTranslationStrategy() noexcept = default;
 
@@ -38,11 +45,17 @@ namespace DataTranslation {
 
         DataTranslationStrategy& operator=(DataTranslationStrategy&& other)& noexcept = delete;
 
-        virtual void translateMessage(INPUT&& inputMessage) = 0;
+        virtual void translateMessage(SensorMessage&& sensorMessage) = 0;
+
+        virtual void translateRawData(SensorRawData&& sensorRawData) = 0;
+
+        using MessageSource::linkConsumer;
+
+        using RawDataSource::linkConsumer;
 
     protected:
 
-        OUTPUT currentOutputMessage;
+        ServerMessage currentOutputMessage;
     };
 }
 

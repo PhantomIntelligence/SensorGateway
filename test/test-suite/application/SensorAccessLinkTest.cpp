@@ -25,7 +25,7 @@
 #include "test/utilities/data-model/DataModelFixture.h"
 
 using TestFunctions::DataTestUtil;
-using SensorAccessLink = SensorGateway::SensorAccessLink<Sensor::Test::Simple::Structures, DataModel::SimpleMessage>;
+using SensorAccessLink = SensorGateway::SensorAccessLink<Sensor::Test::Simple::Structures, Sensor::Test::Simple::Structures>;
 
 class SensorAccessLinkTest : public ::testing::Test {
 
@@ -176,19 +176,26 @@ namespace SensorAccessLinkTestMock {
         RawDataCyclesList createdRawDataCyclesCopies;
     };
 
-    using SimpleTranslationStrategy = DataTranslation::DataTranslationStrategy<DataModel::SimpleMessage, DataModel::SimpleMessage>;
+    using SimpleTranslationStrategy = DataTranslation::DataTranslationStrategy<Sensor::Test::Simple::Structures, Sensor::Test::Simple::Structures>;
 
     class MockTranslationStrategy final : public SimpleTranslationStrategy {
     protected:
-        using SimpleTranslationStrategy::INPUT;
-        using SimpleTranslationStrategy::OUTPUT;
+        using super = SimpleTranslationStrategy;
+        using super::SensorMessage;
+        using super::SensorRawData;
+
+        using super::MessageSource;
+        using super::RawDataSource;
 
     public:
         MockTranslationStrategy() = default;
 
-        void translateMessage(INPUT&& inputMessage) override {
-            inputMessage.inverseContent();
-            produce(std::move(inputMessage));
+        void translateMessage(super::SensorMessage&& sensorMessage) override {
+            sensorMessage.inverseContent();
+            super::MessageSource::produce(std::move(sensorMessage));
+        }
+
+        void translateRawData(super::SensorRawData&& sensorRawData) override {
         }
     };
 

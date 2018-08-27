@@ -14,42 +14,46 @@
 #ifndef SENSORGATEWAY_AWLTRANSLATIONSTRATEGY_H
 #define SENSORGATEWAY_AWLTRANSLATIONSTRATEGY_H
 
-#include "sensor-gateway/domain/Frame.h"
-#include "sensor-gateway/common/sensor-structures/AWLMessage.h"
+#include "sensor-gateway/common/data-structure/spirit/SpiritStructures.h"
+#include "sensor-gateway/common/data-structure/sensor/AWLStructures.h"
 #include "DataTranslationStrategy.hpp"
 
 namespace DataTranslation {
 
-    using DataFlow::AWLMessage;
-    using DataFlow::Frame;
-    using DataFlow::PixelID;
+    using AWLStructures = Sensor::AWL::Structures;
+    using SpiritStructures = Sensor::Spirit::Structures<Sensor::AWL::AWLRawDataContent>;
 
-    class AWLTranslationStrategy final : public DataTranslationStrategy<AWLMessage, Frame> {
+    class AWLTranslationStrategy final : public DataTranslationStrategy<AWLStructures, SpiritStructures> {
     protected:
-        using super = DataTranslationStrategy<AWLMessage, Frame>;
-        using super::INPUT;
-        using super::OUTPUT;
+        using super = DataTranslationStrategy<AWLStructures, SpiritStructures>;
+        using super::SensorMessage;
+        using super::SensorRawData;
+
+        using super::MessageSource;
+        using super::RawDataSource;
     public:
 
         explicit AWLTranslationStrategy() = default;
 
-        ~ AWLTranslationStrategy() = default;
+        ~AWLTranslationStrategy() = default;
 
-        void translateMessage(INPUT&& inputMessage) override;
+        void translateMessage(SensorMessage&& sensorMessage) override;
+
+        void translateRawData(SensorRawData&& serverRawData) override;
 
     private:
 
         using super::currentOutputMessage;
 
-        void addTrackInPixel(AWLMessage&& awlMessage, PixelID pixelID);
+        void addTrackInPixel(SensorMessage&& awlMessage, DataFlow::PixelID pixelID);
 
         Track* fetchTrack(DataFlow::TrackID const& trackID);
 
-        void translateDetectionTrackMessage(AWLMessage&& awlMessage);
+        void translateDetectionTrackMessage(SensorMessage&& awlMessage);
 
-        void translateDetectionVelocityMessage(AWLMessage&& awlMessage);
+        void translateDetectionVelocityMessage(SensorMessage&& awlMessage);
 
-        void translateEndOfFrameMessage(AWLMessage&& awlMessage);
+        void translateEndOfFrameMessage(SensorMessage&& awlMessage);
     };
 }
 #endif //SENSORGATEWAY_AWLTRANSLATIONSTRATEGY_H

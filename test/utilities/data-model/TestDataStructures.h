@@ -18,12 +18,12 @@
 #define SENSORGATEWAY_TESTDATASTRUCTURES_H
 
 #include "SimpleRawData.h"
-#include "sensor-gateway/common/sensor-structures/AbstractStructures.h"
+#include "sensor-gateway/common/data-structure/DataStructures.h"
 
 namespace Sensor {
     namespace Test {
         namespace Simple {
-            class Structures final : public Sensor::Communication::AbstractStructures {
+            class Structures final : public Sensor::Communication::DataStructures {
             public :
                 typedef typename DataModel::SimpleMessage Message;
                 typedef typename DataModel::SimpleRawData RawData;
