@@ -60,10 +60,10 @@ namespace Sensor {
     using SensorID = uint16_t;
 
     namespace Guardian {
-        size_t const NUMBER_OF_CHANNEL = 16;
-        size_t const NUMBER_OF_DETECTION_PER_CHANNEL = 16;
+        static size_t const NUMBER_OF_CHANNEL = 16;
+        static size_t const NUMBER_OF_DETECTION_PER_CHANNEL = 16;
         static size_t const RAW_DATA_SAMPLING_LENGTH = 100;
-        size_t const RAW_DATA_ACQUISITION_BUFFER_SIZE = NUMBER_OF_CHANNEL * RAW_DATA_SAMPLING_LENGTH;
+        static size_t const RAW_DATA_ACQUISITION_BUFFER_SIZE = NUMBER_OF_CHANNEL * RAW_DATA_SAMPLING_LENGTH;
         size_t const DETECTIONS_SIZE = NUMBER_OF_CHANNEL * NUMBER_OF_DETECTION_PER_CHANNEL;
     }
     namespace AWL {
