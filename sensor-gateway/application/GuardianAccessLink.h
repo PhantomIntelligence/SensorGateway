@@ -20,7 +20,7 @@
 #include "SensorAccessLink.hpp"
 
 #include "sensor-gateway/sensor-communication/GuardianUSBCommunicationStrategy.h"
-#include "sensor-gateway/data-translation/AWLTranslationStrategy.h"
+#include "sensor-gateway/data-translation/GuardianTranslationStrategy.h"
 
 namespace SensorGateway {
 
@@ -37,7 +37,7 @@ class GuardianAccessLink final : public SensorAccessLink<GuardianStructures, Gua
 
         explicit GuardianAccessLink(ServerCommunicationStrategy* serverCommunicationStrategy)
                 : super(serverCommunicationStrategy,
-                        &awlTranslationStrategy,
+                        &guardianTranslationStrategy,
                         &tbdSensorNameUSBCommunicationStrategy) {}
 
         ~GuardianAccessLink() noexcept = default;
@@ -52,7 +52,7 @@ class GuardianAccessLink final : public SensorAccessLink<GuardianStructures, Gua
 
     private:
 
-        DataTranslation::AWLTranslationStrategy awlTranslationStrategy;
+        DataTranslation::GuardianTranslationStrategy guardianTranslationStrategy;
         SensorCommunication::GuardianUSBCommunicationStrategy tbdSensorNameUSBCommunicationStrategy;
     };
 }
