@@ -11,21 +11,21 @@
 	limitations under the License.
 */
 
-#ifndef SENSORGATEWAY_AWLTRANSLATIONSTRATEGY_H
-#define SENSORGATEWAY_AWLTRANSLATIONSTRATEGY_H
+#ifndef SENSORGATEWAY_GUARDIANTRANSLATIONSTRATEGY_H
+#define SENSORGATEWAY_GUARDIANTRANSLATIONSTRATEGY_H
 
 #include "sensor-gateway/common/data-structure/spirit/SpiritStructures.h"
-#include "sensor-gateway/common/data-structure/sensor/AWLStructures.h"
+#include "sensor-gateway/common/data-structure/sensor/GuardianStructures.h"
 #include "DataTranslationStrategy.hpp"
 
 namespace DataTranslation {
 
-    using AWLStructures = Sensor::AWL::Structures;
-    using SpiritStructures = Sensor::Spirit::Structures<AWLStructures::RawData::RawDataContent>;
+    using GuardianStructures = Sensor::Guardian::Structures;
+    using SpiritStructures = Sensor::Spirit::Structures<GuardianStructures::RawData::RawDataContent>;
 
-    class AWLTranslationStrategy final : public DataTranslationStrategy<AWLStructures, SpiritStructures> {
+    class GuardianTranslationStrategy final : public DataTranslationStrategy<GuardianStructures, SpiritStructures> {
     protected:
-        using super = DataTranslationStrategy<AWLStructures, SpiritStructures>;
+        using super = DataTranslationStrategy<GuardianStructures, SpiritStructures>;
         using super::SensorMessage;
         using super::SensorRawData;
 
@@ -33,9 +33,9 @@ namespace DataTranslation {
         using super::RawDataSource;
     public:
 
-        explicit AWLTranslationStrategy() = default;
+        explicit GuardianTranslationStrategy() = default;
 
-        ~AWLTranslationStrategy() = default;
+        ~GuardianTranslationStrategy() = default;
 
         void translateMessage(SensorMessage&& sensorMessage) override;
 
@@ -56,4 +56,4 @@ namespace DataTranslation {
         void translateEndOfFrameMessage(SensorMessage&& sensorMessage);
     };
 }
-#endif //SENSORGATEWAY_AWLTRANSLATIONSTRATEGY_H
+#endif //SENSORGATEWAY_GUARDIANTRANSLATIONSTRATEGY_H

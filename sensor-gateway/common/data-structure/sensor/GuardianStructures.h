@@ -14,20 +14,20 @@
 	limitations under the License.
 */
 
-#ifndef SENSORGATEWAY_TBDSENSORNAMESTRUCTURES_H
-#define SENSORGATEWAY_TBDSENSORNAMESTRUCTURES_H
+#ifndef SENSORGATEWAY_GUARDIANSTRUCTURES_H
+#define SENSORGATEWAY_GUARDIANSTRUCTURES_H
 
-#include "TBDSensorNameRawData.h"
+#include "GuardianRawData.h"
 #include "AWLMessage.h"
 
 namespace Sensor {
-    namespace TBDSensorName {
+    namespace Guardian {
 
         class Structures final : public Communication::DataStructures {
         public :
 
             typedef typename DataFlow::AWLMessage Message;
-            typedef typename DataFlow::TBDSensorNameRawData RawData;
+            typedef typename DataFlow::GuardianRawData RawData;
 
             static size_t const MAX_NUMBER_OF_BULK_FETCHABLE_MESSAGES = 32;
             static size_t const MAX_NUMBER_OF_BULK_FETCHABLE_RAW_DATA_CYCLES = 8;
@@ -35,4 +35,4 @@ namespace Sensor {
     }
 }
 
-#endif //SENSORGATEWAY_TBDSENSORNAMESTRUCTURES_H
+#endif //SENSORGATEWAY_GUARDIANSTRUCTURES_H

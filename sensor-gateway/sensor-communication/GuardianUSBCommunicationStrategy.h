@@ -14,12 +14,12 @@
 	limitations under the License.
 */
 
-#ifndef SENSORGATEWAY_TBDSENSORNAMEUSBCOMMUNICATIONSTRATEGY_H
-#define SENSORGATEWAY_TBDSENSORNAMEUSBCOMMUNICATIONSTRATEGY_H
+#ifndef SENSORGATEWAY_GUARDIANUSBCOMMUNICATIONSTRATEGY_H
+#define SENSORGATEWAY_GUARDIANUSBCOMMUNICATIONSTRATEGY_H
 
 #include <libusb-1.0/libusb.h>
 
-#include "sensor-gateway/common/data-structure/sensor/TBDSensorNameStructures.h"
+#include "sensor-gateway/common/data-structure/sensor/GuardianStructures.h"
 #include "SensorCommunicationStrategy.hpp"
 
 namespace SensorCommunication {
@@ -30,32 +30,32 @@ namespace SensorCommunication {
      * @warning This class DOES NOT handle thread safety concerns.
      * It is meant to be called and used by a single thread from the SensorCommunicator.
      */
-    class TBDSensorNameUSBCommunicationStrategy final
-            : public SensorCommunicationStrategy<Sensor::TBDSensorName::Structures> {
+    class GuardianUSBCommunicationStrategy final
+            : public SensorCommunicationStrategy<Sensor::Guardian::Structures> {
     protected:
 
         using SteadyClock = std::chrono::steady_clock;
         using ReconnectTime = std::chrono::time_point<SteadyClock>;
 
-        using super = SensorCommunicationStrategy<Sensor::TBDSensorName::Structures>;
+        using super = SensorCommunicationStrategy<Sensor::Guardian::Structures>;
 
         const int INTERFACE_TO_CLAIM_FROM_DEVICE = 0;
         const int VERSION_STRING_MAX_LENGTH = 32;
 
     public:
 
-        explicit TBDSensorNameUSBCommunicationStrategy();
+        explicit GuardianUSBCommunicationStrategy();
 
-        ~TBDSensorNameUSBCommunicationStrategy() noexcept override;
+        ~GuardianUSBCommunicationStrategy() noexcept override;
 
-        TBDSensorNameUSBCommunicationStrategy(TBDSensorNameUSBCommunicationStrategy const& other) = delete;
+        GuardianUSBCommunicationStrategy(GuardianUSBCommunicationStrategy const& other) = delete;
 
-        TBDSensorNameUSBCommunicationStrategy(TBDSensorNameUSBCommunicationStrategy&& other) noexcept = delete;
+        GuardianUSBCommunicationStrategy(GuardianUSBCommunicationStrategy&& other) noexcept = delete;
 
-        TBDSensorNameUSBCommunicationStrategy& operator=(TBDSensorNameUSBCommunicationStrategy const& other)& = delete;
+        GuardianUSBCommunicationStrategy& operator=(GuardianUSBCommunicationStrategy const& other)& = delete;
 
-        TBDSensorNameUSBCommunicationStrategy&
-        operator=(TBDSensorNameUSBCommunicationStrategy&& other)& noexcept = delete;
+        GuardianUSBCommunicationStrategy&
+        operator=(GuardianUSBCommunicationStrategy&& other)& noexcept = delete;
 
         void openConnection() override;
 
@@ -150,4 +150,4 @@ namespace SensorCommunication {
 
 }
 
-#endif //SENSORGATEWAY_TBDSENSORNAMEUSBCOMMUNICATIONSTRATEGY_H
+#endif //SENSORGATEWAY_GUARDIANUSBCOMMUNICATIONSTRATEGY_H
