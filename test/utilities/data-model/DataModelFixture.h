@@ -58,15 +58,14 @@ namespace TestFunctions {
         }
 
         static const DataModel::SimpleRawData createRandomSimpleRawData() {
-            auto const numberOfDataToCreate = DataModel::TestSensor::NUMBER_OF_DATA_IN_RAW_DATA;
             auto const maximalValue = 9001;
 
             std::default_random_engine randomEngine(std::random_device{}());
             std::uniform_int_distribution<unsigned int> distribution(0, maximalValue);
 
-            DataModel::TestSensor::SimpleRawDataContent content;
-            auto numberOfStringToCreate = content.size();
-            for (auto i = 0u; i < numberOfStringToCreate; ++i) {
+            Sensor::Test::Simple::Structures::RawData::RawDataContent::Data content;
+            auto const numberOfDataToCreate = content.size();
+            for (auto i = 0u; i < numberOfDataToCreate; ++i) {
                 content.at(i) = distribution(randomEngine);
             }
             DataModel::SimpleRawData randomSimpleRawData(content);

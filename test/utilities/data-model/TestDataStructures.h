@@ -18,7 +18,6 @@
 #define SENSORGATEWAY_TESTDATASTRUCTURES_H
 
 #include "SimpleRawData.h"
-#include "sensor-gateway/common/data-structure/DataStructures.h"
 
 namespace Sensor {
     namespace Test {

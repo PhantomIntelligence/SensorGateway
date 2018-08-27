@@ -43,6 +43,7 @@ namespace SensorGateway {
         using SensorCommunicator = SensorAccessLinkElement::SensorCommunicator<SENSOR_STRUCTURES>;
         using SensorCommunicationStrategy = SensorCommunication::SensorCommunicationStrategy<SENSOR_STRUCTURES>;
 
+
     public:
         explicit SensorAccessLink(ServerCommunicationStrategy* serverCommunicationStrategy,
                                   DataTranslationStrategy* dataTranslationStrategy,

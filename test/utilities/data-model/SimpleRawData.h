@@ -17,24 +17,22 @@
 #ifndef SENSORGATEWAY_SIMPLERAWDATA_H
 #define SENSORGATEWAY_SIMPLERAWDATA_H
 
+#include "sensor-gateway/common/data-structure/DataStructures.h"
 #include "SimpleMessage.h"
 
 namespace DataModel {
 
-    namespace TestSensor {
-        size_t const NUMBER_OF_DATA_IN_RAW_DATA = 16;
-        typedef uint32_t Data;
-        typedef std::array<Data, NUMBER_OF_DATA_IN_RAW_DATA> SimpleRawDataContent;
-    }
-
     class SimpleRawData {
     protected:
+        static size_t const NUMBER_OF_DATA_IN_RAW_DATA = 16;
 
     public:
 
-        explicit SimpleRawData(TestSensor::SimpleRawDataContent content);
+        typedef typename Sensor::RawDataContent<uint32_t, NUMBER_OF_DATA_IN_RAW_DATA> RawDataContent;
 
-        explicit SimpleRawData();
+        explicit SimpleRawData(RawDataContent::Data content) noexcept;
+
+        explicit SimpleRawData() noexcept;
 
         ~SimpleRawData() noexcept;
 
@@ -62,14 +60,13 @@ namespace DataModel {
 
     private:
 
-        TestSensor::SimpleRawDataContent content;
+        RawDataContent::Data content;
     };
 
     namespace Defaults {
         using DataModel::SimpleRawData;
-        using DataModel::TestSensor::SimpleRawDataContent;
 
-        SimpleRawDataContent const DEFAULT_SIMPLE_RAW_DATA_CONTENT = SimpleRawDataContent();
+        SimpleRawData::RawDataContent::Data const DEFAULT_SIMPLE_RAW_DATA_CONTENT = SimpleRawData::RawDataContent::Data();
         SimpleRawData const DEFAULT_SIMPLE_RAW_DATA = SimpleRawData(DEFAULT_SIMPLE_RAW_DATA_CONTENT);
     }
 }

@@ -34,7 +34,7 @@ namespace Sensor {
     };
 
     namespace RawDataTypes {
-        typedef int16_t AWL;
+        typedef int32_t AWL;
         typedef int16_t GUARDIAN;
     }
 

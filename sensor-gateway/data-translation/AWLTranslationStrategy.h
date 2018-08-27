@@ -21,7 +21,7 @@
 namespace DataTranslation {
 
     using AWLStructures = Sensor::AWL::Structures;
-    using SpiritStructures = Sensor::Spirit::Structures<Sensor::AWL::AWLRawDataContent>;
+    using SpiritStructures = Sensor::Spirit::Structures<AWLStructures::RawData::RawDataContent>;
 
     class AWLTranslationStrategy final : public DataTranslationStrategy<AWLStructures, SpiritStructures> {
     protected:

@@ -17,13 +17,13 @@
 #include "SimpleRawData.h"
 
 using DataModel::SimpleRawData;
-using DataModel::TestSensor::SimpleRawDataContent;
 using DataModel::Defaults::DEFAULT_SIMPLE_RAW_DATA_CONTENT;
 
-SimpleRawData::SimpleRawData(DataModel::TestSensor::SimpleRawDataContent content) :
+SimpleRawData::SimpleRawData(RawDataContent::Data content) noexcept :
         content(content) {}
 
-SimpleRawData::SimpleRawData() : SimpleRawData(SimpleRawData::returnDefaultData()) {}
+SimpleRawData::SimpleRawData() noexcept: SimpleRawData(SimpleRawData::returnDefaultData()) {
+}
 
 SimpleRawData::~SimpleRawData() noexcept = default;
 
@@ -60,7 +60,7 @@ bool SimpleRawData::operator!=(SimpleRawData const& other) const {
 }
 
 void SimpleRawData::inverseContent() {
-    auto oldContent = SimpleRawDataContent(content);
+    auto oldContent = RawDataContent::Data(content);
     auto size = content.size();
     if (size < 2) {
         throw std::runtime_error("Warning! Some tests may misbehave. Content size needs to be more than 2.");

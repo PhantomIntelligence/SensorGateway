@@ -24,7 +24,7 @@ namespace DataFlow {
     class TBDSensorNameRawData {
     public:
 
-        typedef Sensor::RawDataContent<Sensor::RawDataTypes::GUARDIAN, Sensor::Guardian::RAW_DATA_ACQUISITION_BUFFER_SIZE> RawDataContent ;
+        typedef typename Sensor::RawDataContent<Sensor::RawDataTypes::GUARDIAN, Sensor::Guardian::RAW_DATA_ACQUISITION_BUFFER_SIZE> RawDataContent ;
 
         using Content = RawDataContent::Data;
 

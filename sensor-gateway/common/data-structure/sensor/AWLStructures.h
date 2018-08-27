@@ -17,18 +17,16 @@
 #ifndef SENSORGATEWAY_AWLSTRUCTURES_H
 #define SENSORGATEWAY_AWLSTRUCTURES_H
 
-#include "TBDSensorNameRawData.h"
+#include "AWLRawData.h"
 #include "AWLMessage.h"
 
 namespace Sensor {
     namespace AWL {
 
-        typedef Sensor::RawDataContent<Sensor::RawDataTypes::AWL, Sensor::AWL::RAW_DATA_SAMPLING_LENGTH> AWLRawDataContent;
-
         class Structures final : public Communication::DataStructures {
         public :
             typedef typename DataFlow::AWLMessage Message;
-            typedef typename DataFlow::TBDSensorNameRawData RawData;
+            typedef typename DataFlow::AWLRawData RawData;
 
             static size_t const MAX_NUMBER_OF_BULK_FETCHABLE_MESSAGES = 1;
             static size_t const MAX_NUMBER_OF_BULK_FETCHABLE_RAW_DATA_CYCLES = 1;
