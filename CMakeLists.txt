@@ -44,7 +44,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -lpthread -O3")
 
 add_subdirectory(sensor-gateway)
 
-option(ENABLE_CPP11 "Build ${PROJECT_NAME} with C++14 features enabled" TRUE)
+option(ENABLE_CPP14 "Build ${PROJECT_NAME} with C++14 features enabled" TRUE)
 
 # To build the test, run cmake with -DBUILD_TESTS=ON
 if(BUILD_TESTS)
