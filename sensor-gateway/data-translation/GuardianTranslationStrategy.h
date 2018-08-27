@@ -21,11 +21,11 @@
 namespace DataTranslation {
 
     using GuardianStructures = Sensor::Guardian::Structures;
-    using SpiritStructures = Sensor::Spirit::Structures<GuardianStructures::RawData::RawDataContent>;
+    using GuardianSpiritStructures = Sensor::Spirit::Structures<GuardianStructures::RawData::RawDataContent>;
 
-    class GuardianTranslationStrategy final : public DataTranslationStrategy<GuardianStructures, SpiritStructures> {
+    class GuardianTranslationStrategy final : public DataTranslationStrategy<GuardianStructures, GuardianSpiritStructures> {
     protected:
-        using super = DataTranslationStrategy<GuardianStructures, SpiritStructures>;
+        using super = DataTranslationStrategy<GuardianStructures, GuardianSpiritStructures>;
         using super::SensorMessage;
         using super::SensorRawData;
 
