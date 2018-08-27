@@ -18,14 +18,18 @@
 #define SENSORGATEWAY_TBDSENSORNAMEACCESSLINK_H
 
 #include "SensorAccessLink.hpp"
+
 #include "sensor-gateway/sensor-communication/TBDSensorNameUSBCommunicationStrategy.h"
-#include "sensor-gateway/message-translation/AWLTranslationStrategy.h"
+#include "sensor-gateway/data-translation/AWLTranslationStrategy.h"
 
 namespace SensorGateway {
 
-class TBDSensorNameAccessLink final : public SensorAccessLink<Sensor::TBDSensorName::Structures, DataFlow::Frame> {
+    using SensorStructures = Sensor::TBDSensorName::Structures;
+    using SpiritStructures = Sensor::Spirit::Structures<SensorStructures::RawData::RawDataContent>;
+
+class TBDSensorNameAccessLink final : public SensorAccessLink<SensorStructures, SpiritStructures> {
     protected:
-        using super = SensorAccessLink<Sensor::TBDSensorName::Structures, DataFlow::Frame>;
+        using super = SensorAccessLink<SensorStructures, SpiritStructures>;
 
         using super::ServerCommunicationStrategy;
 
@@ -48,7 +52,7 @@ class TBDSensorNameAccessLink final : public SensorAccessLink<Sensor::TBDSensorN
 
     private:
 
-        MessageTranslation::AWLTranslationStrategy awlTranslationStrategy;
+        DataTranslation::AWLTranslationStrategy awlTranslationStrategy;
         SensorCommunication::TBDSensorNameUSBCommunicationStrategy tbdSensorNameUSBCommunicationStrategy;
     };
 }
