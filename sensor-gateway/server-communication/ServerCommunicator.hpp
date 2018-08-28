@@ -54,10 +54,6 @@ namespace SensorAccessLinkElement {
             serverCommunicationStrategy->openConnection(serverAddress);
         };
 
-        void disconnect() {
-            serverCommunicationStrategy->closeConnection();
-        }
-
         void consume(Message&& message) override {
             serverCommunicationStrategy->sendMessage(std::forward<Message>(message));
         }
@@ -65,6 +61,8 @@ namespace SensorAccessLinkElement {
         void consume(RawData&& rawData) override {
             serverCommunicationStrategy->sendRawData(std::forward<RawData>(rawData));
         }
+
+        void disconnect() { serverCommunicationStrategy->closeConnection(); }
 
     private:
 

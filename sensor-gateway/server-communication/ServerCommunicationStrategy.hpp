@@ -14,8 +14,8 @@
 	limitations under the License.
 */
 
-#ifndef SENSORGATEWAY_SERVERCOMMUNICATIONPROTOCOLSTRATEGY_H
-#define SENSORGATEWAY_SERVERCOMMUNICATIONPROTOCOLSTRATEGY_H
+#ifndef SENSORGATEWAY_SERVERCOMMUNICATIONPROTOCOLSTRATEGY_HPP
+#define SENSORGATEWAY_SERVERCOMMUNICATIONPROTOCOLSTRATEGY_HPP
 
 #include "sensor-gateway/common/data-structure/spirit/Frame.h"
 
@@ -26,19 +26,19 @@ namespace ServerCommunication {
 
     public:
 
-        typedef typename T::Message Message;
-        typedef typename T::RawData RawData;
+        using Message = typename T::Message;
+        using RawData = typename T::RawData;
 
         virtual ~ServerCommunicationStrategy() noexcept = default;
+
+        virtual void openConnection(std::string const& serverAddress) = 0;
 
         virtual void sendMessage(Message&& message) = 0;
 
         virtual void sendRawData(RawData&& rawData) = 0;
 
-        virtual void openConnection(std::string const& serverAddress) = 0;
-
         virtual void closeConnection() = 0;
     };
 }
 
-#endif //SENSORGATEWAY_SERVERCOMMUNICATIONPROTOCOLSTRATEGY_H
+#endif //SENSORGATEWAY_SERVERCOMMUNICATIONPROTOCOLSTRATEGY_HPP
