@@ -24,7 +24,15 @@ namespace DataFlow {
     class GuardianRawData {
     public:
 
-        typedef typename Sensor::RawDataContent<Sensor::RawDataTypes::GUARDIAN, Sensor::Guardian::RAW_DATA_ACQUISITION_BUFFER_SIZE> RawDataContent ;
+        static uint8_t constexpr SENSOR_CHANNEL_INDEX_POSITION[16] = {
+                15, 0, 14, 1, 13, 2, 12, 3, 11, 4, 10, 5, 9, 6, 8, 7
+        };
+
+        static uint8_t constexpr GUARDIAN_INDEX_POSITION[16] = {
+                0, 1, 2, 3, 4, 5, 6, 7, 15, 14, 13, 12, 11, 10, 9, 8
+        };
+
+        typedef typename Sensor::RawDataContent<Sensor::RawDataTypes::GUARDIAN, Sensor::Guardian::RAW_DATA_ACQUISITION_BUFFER_SIZE> RawDataContent;
 
         using Content = RawDataContent::Data;
 
@@ -56,7 +64,8 @@ namespace DataFlow {
     namespace Defaults {
         using DataFlow::GuardianRawData;
         GuardianRawData::Content const DEFAULT_TBD_SENSOR_NAME_RAW_DATA_CONTENT{};
-        GuardianRawData const DEFAULT_TBD_SENSOR_NAME_RAW_DATA = GuardianRawData(DEFAULT_TBD_SENSOR_NAME_RAW_DATA_CONTENT);
+        GuardianRawData const DEFAULT_TBD_SENSOR_NAME_RAW_DATA = GuardianRawData(
+                DEFAULT_TBD_SENSOR_NAME_RAW_DATA_CONTENT);
     }
 }
 

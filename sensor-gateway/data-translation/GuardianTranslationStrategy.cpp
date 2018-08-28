@@ -49,8 +49,10 @@ void GuardianTranslationStrategy::translateMessage(SensorMessage&& sensorMessage
     }
 }
 
-void GuardianTranslationStrategy::translateRawData(SensorRawData&& serverRawData) {
-
+void GuardianTranslationStrategy::translateRawData(SensorRawData&& sensorRawData) {
+    auto rawDataContent = sensorRawData.content;
+    super::ServerRawData translatedRawData(rawDataContent);
+    RawDataSource::produce(std::move(translatedRawData));
 }
 
 void GuardianTranslationStrategy::translateEndOfFrameMessage(SensorMessage&& sensorMessage) {
@@ -88,7 +90,6 @@ void GuardianTranslationStrategy::translateDetectionVelocityMessage(SensorMessag
     track->speed = speed;
     track->acceleration = acceleration;
 }
-
 
 Track* GuardianTranslationStrategy::fetchTrack(TrackID const& trackID) {
     auto pixels = currentOutputMessage.getPixels();

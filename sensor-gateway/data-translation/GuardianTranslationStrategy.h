@@ -39,7 +39,7 @@ namespace DataTranslation {
 
         void translateMessage(SensorMessage&& sensorMessage) override;
 
-        void translateRawData(SensorRawData&& serverRawData) override;
+        void translateRawData(SensorRawData&& sensorRawData) override;
 
     private:
 

@@ -49,7 +49,7 @@ protected:
 };
 
 TEST_F(AWLTranslationStrategyTest,
-       given_someInputFileContainingValidAWLMessages_when_translatingAWLMessagesIntoFrames_then_returnCorrespondingSpriritFramesOutputFile) {
+       given_someInputFileContainingValidAWLMessages_when_translatingAWLMessagesIntoFrames_then_returnCorrespondingSpiritFramesOutputFile) {
     auto ACTUAL__FRAMES_OUTPUT_FILE_NAME = "ActualFramesOutputFile.txt";
     AWLTranslationStrategy awlMessageTranslator;
     FrameSinkMock frameSinkMock(1);

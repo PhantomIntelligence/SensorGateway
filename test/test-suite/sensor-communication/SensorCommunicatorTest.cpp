@@ -21,13 +21,13 @@
 #include <gtest/gtest.h>
 
 #include "sensor-gateway/sensor-communication/SensorCommunicator.hpp"
-#include "test/utilities/mock/SimpleStructuresSinkMock.h"
+#include "test/utilities/mock/ArbitraryDataSinkMock.hpp"
 
 using SimpleMessage = Sensor::Test::Simple::Structures::Message;
 using SimpleRawData = Sensor::Test::Simple::Structures::RawData;
 
-using SimpleMessageSinkMock = Mock::SimpleDataSinkMock<SimpleMessage>;
-using SimpleRawDataSinkMock = Mock::SimpleDataSinkMock<SimpleRawData>;
+using SimpleMessageSinkMock = Mock::ArbitraryDataSinkMock<SimpleMessage>;
+using SimpleRawDataSinkMock = Mock::ArbitraryDataSinkMock<SimpleRawData>;
 
 using SimpleMessageList = SimpleMessageSinkMock::DataList;
 using SimpleRawDataList = SimpleRawDataSinkMock::DataList;

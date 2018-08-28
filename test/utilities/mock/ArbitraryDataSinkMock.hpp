@@ -14,8 +14,8 @@
 	limitations under the License.
 */
 
-#ifndef SENSORGATEWAY_SIMPLESTRUCTURESSINKMOCK_H
-#define SENSORGATEWAY_SIMPLESTRUCTURESSINKMOCK_H
+#ifndef SENSORGATEWAY_ARBITRARYDATASINKMOCK_HPP
+#define SENSORGATEWAY_ARBITRARYDATASINKMOCK_HPP
 
 #include <list>
 
@@ -24,18 +24,19 @@
 
 namespace Mock {
     template<class T>
-    class SimpleDataSinkMock : public DataFlow::DataSink<T> {
+    class ArbitraryDataSinkMock final : public DataFlow::DataSink<T> {
 
     public:
         typedef T Data;
         typedef typename std::list<T> DataList;
 
-
-        explicit SimpleDataSinkMock(uint8_t numberOfDataToConsume) :
+        explicit ArbitraryDataSinkMock(uint8_t numberOfDataToConsume) :
                 actualNumberOfDataConsumed(0),
                 numberOfDataToConsume(numberOfDataToConsume) {
 
         }
+
+        ~ArbitraryDataSinkMock() noexcept = default;
 
         void consume(T&& data) override {
             ++actualNumberOfDataConsumed;
@@ -81,4 +82,4 @@ namespace Mock {
     };
 }
 
-#endif //SENSORGATEWAY_SIMPLESTRUCTURESSINKMOCK_H
+#endif //SENSORGATEWAY_ARBITRARYDATASINKMOCK_HPP
