@@ -29,8 +29,8 @@ namespace SensorAccessLinkElement {
         using SensorMessage = typename SENSOR_STRUCTURES::Message;
         using SensorRawData = typename SENSOR_STRUCTURES::RawData;
 
-        using messageSink = DataFlow::DataSink<SensorMessage>;
-        using rawDataSink = DataFlow::DataSink<SensorRawData>;
+        using MessageSink = DataFlow::DataSink<SensorMessage>;
+        using RawDataSink = DataFlow::DataSink<SensorRawData>;
 
     public:
         explicit DataTranslator(DataTranslationStrategy* dataTranslationStrategy) :

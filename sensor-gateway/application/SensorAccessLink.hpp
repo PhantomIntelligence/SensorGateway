@@ -32,13 +32,15 @@ namespace SensorGateway {
         using ServerMessage = typename SERVER_STRUCTURES::Message;
         using ServerRawData = typename SERVER_STRUCTURES::RawData;
 
-        using ServerCommunicator = SensorAccessLinkElement::ServerCommunicator<ServerMessage>;
-        using ServerCommunicationStrategy = ServerCommunication::ServerCommunicationStrategy<ServerMessage>;
-        using ServerCommunicatorScheduler = DataFlow::DataProcessingScheduler<ServerMessage, ServerCommunicator, 1>;
+        using ServerCommunicator = SensorAccessLinkElement::ServerCommunicator<SERVER_STRUCTURES>;
+        using ServerCommunicationStrategy = ServerCommunication::ServerCommunicationStrategy<SERVER_STRUCTURES>;
+        using ServerCommunicatorMessageScheduler = DataFlow::DataProcessingScheduler<ServerMessage, ServerCommunicator, 1>;
+        using ServerCommunicatorRawDataScheduler = DataFlow::DataProcessingScheduler<ServerRawData, ServerCommunicator, 1>;
 
         using DataTranslator = SensorAccessLinkElement::DataTranslator<SENSOR_STRUCTURES, SERVER_STRUCTURES>;
         using DataTranslationStrategy = DataTranslation::DataTranslationStrategy<SENSOR_STRUCTURES, SERVER_STRUCTURES>;
-        using TranslatorScheduler = DataFlow::DataProcessingScheduler<SensorMessage, DataTranslator, 1>;
+        using TranslatorMessageScheduler = DataFlow::DataProcessingScheduler<SensorMessage, DataTranslator, 1>;
+        using TranslatorRawDataScheduler = DataFlow::DataProcessingScheduler<SensorRawData, DataTranslator, 1>;
 
         using SensorCommunicator = SensorAccessLinkElement::SensorCommunicator<SENSOR_STRUCTURES>;
         using SensorCommunicationStrategy = SensorCommunication::SensorCommunicationStrategy<SENSOR_STRUCTURES>;
@@ -54,9 +56,10 @@ namespace SensorGateway {
                 serverCommunicator(serverCommunicationStrategy),
                 dataTranslator(dataTranslationStrategy),
                 sensorCommunicator(sensorCommunicationStrategy),
-                translatorScheduler(&dataTranslator),
-                serverCommunicatorScheduler(&serverCommunicator) {
-        }
+                translatorMessageScheduler(&dataTranslator),
+                translatorRawDataScheduler(&dataTranslator),
+                serverCommunicatorMessageScheduler(&serverCommunicator),
+                serverCommunicatorRawDataScheduler(&serverCommunicator) {}
 
         ~SensorAccessLink() noexcept {
             terminateAndJoin();
@@ -73,9 +76,11 @@ namespace SensorGateway {
         void start(std::string const& serverAddress) {
             linkElements();
 
+            // TODO: implement a while(!allUpAndRunning()) {...
             // Yield and sleep to allow correct connection
             std::this_thread::yield();
             std::this_thread::sleep_for(std::chrono::milliseconds(50));
+            // TODO: implement }
 
             serverCommunicator.connect(serverAddress);
             sensorCommunicator.start();
@@ -83,29 +88,35 @@ namespace SensorGateway {
 
         void terminateAndJoin() {
             sensorCommunicator.terminateAndJoin();
-            translatorScheduler.terminateAndJoin();
-            serverCommunicatorScheduler.terminateAndJoin();
+            translatorMessageScheduler.terminateAndJoin();
+            translatorRawDataScheduler.terminateAndJoin();
+            serverCommunicatorMessageScheduler.terminateAndJoin();
+            serverCommunicatorRawDataScheduler.terminateAndJoin();
             serverCommunicator.disconnect();
         }
 
     private:
 
         void linkElements() {
-            dataTranslationStrategy->linkConsumer(&serverCommunicatorScheduler);
-            sensorCommunicator.linkConsumer(&translatorScheduler);
+            dataTranslationStrategy->linkConsumer(&serverCommunicatorMessageScheduler);
+            dataTranslationStrategy->linkConsumer(&serverCommunicatorRawDataScheduler);
+            sensorCommunicator.linkConsumer(&translatorMessageScheduler);
+            sensorCommunicator.linkConsumer(&translatorRawDataScheduler);
         }
 
         ServerCommunicationStrategy* serverCommunicationStrategy;
         ServerCommunicator serverCommunicator;
+        ServerCommunicatorMessageScheduler serverCommunicatorMessageScheduler;
+        ServerCommunicatorRawDataScheduler serverCommunicatorRawDataScheduler;
 
         DataTranslationStrategy* dataTranslationStrategy;
         DataTranslator dataTranslator;
+        TranslatorMessageScheduler translatorMessageScheduler;
+        TranslatorRawDataScheduler translatorRawDataScheduler;
 
         SensorCommunicationStrategy* sensorCommunicationStrategy;
         SensorCommunicator sensorCommunicator;
 
-        ServerCommunicatorScheduler serverCommunicatorScheduler;
-        TranslatorScheduler translatorScheduler;
     };
 }
 

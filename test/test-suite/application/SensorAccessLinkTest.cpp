@@ -52,7 +52,8 @@ namespace SensorAccessLinkTestMock {
 
     public:
 
-        explicit MockSensorCommunicationStrategy(uint8_t minimumNumberOfMessageToCreate) :
+        explicit MockSensorCommunicationStrategy(uint8_t minimumNumberOfMessageToCreate,
+                                                 uint8_t minimumNumberOfRawDataToCreate) :
                 messagePromiseFulfilled(false),
                 rawDataPromiseFulfilled(false),
                 connectCalled(false),
@@ -60,7 +61,7 @@ namespace SensorAccessLinkTestMock {
                 numberOfMessageCreated(0),
                 numberOfRawDataCyclesCreated(0),
                 minimumNumberOfMessagesToCreate(minimumNumberOfMessageToCreate),
-                minimumNumberOfRawDataCyclesToCreate(minimumNumberOfMessageToCreate) {
+                minimumNumberOfRawDataCyclesToCreate(minimumNumberOfRawDataToCreate) {
         }
 
         void openConnection() override {
@@ -196,14 +197,19 @@ namespace SensorAccessLinkTestMock {
         }
 
         void translateRawData(super::SensorRawData&& sensorRawData) override {
+            sensorRawData.inverseContent();
+            super::RawDataSource::produce(std::move(sensorRawData));
         }
     };
 
-    using SimpleServerCommunicationStrategy = ServerCommunication::ServerCommunicationStrategy<DataModel::SimpleMessage>;
+    using SimpleServerCommunicationStrategy = ServerCommunication::ServerCommunicationStrategy<Sensor::Test::Simple::Structures>;
 
     class MockServerCommunicationStrategy final : public SimpleServerCommunicationStrategy {
     protected:
-        using SimpleServerCommunicationStrategy::MESSAGE;
+        using super = SimpleServerCommunicationStrategy;
+
+        using Messages = std::list<super::Message>;
+        using RawDataCycles = std::list<super::RawData>;
 
     public:
         MockServerCommunicationStrategy() :
@@ -228,16 +234,25 @@ namespace SensorAccessLinkTestMock {
             return disconnectCalled.load();
         }
 
-        void sendMessage(MESSAGE&& message) override {
-            receivedData.push_back(message);
+        void sendMessage(super::Message&& message) override {
+            receivedMessages.push_back(message);
         }
 
-        std::list<DataModel::SimpleMessage> const& getReceivedData() const {
-            return receivedData;
+        void sendRawData(super::RawData&& rawData) override {
+            receivedRawData.push_back(rawData);
+        }
+
+        Messages const& getReceivedMessages() const {
+            return receivedMessages;
+        }
+
+        RawDataCycles const& getReceivedRawData() const {
+            return receivedRawData;
         }
 
     private:
-        std::list<DataModel::SimpleMessage> receivedData;
+        Messages receivedMessages;
+        RawDataCycles receivedRawData;
         AtomicFlag connectCalled;
         AtomicFlag disconnectCalled;
     };
@@ -246,7 +261,8 @@ namespace SensorAccessLinkTestMock {
 TEST_F(SensorAccessLinkTest,
        given_strategies_when_connect_then_bothSensorAndServerStrategiesReceiveOpenConnectionCall) {
     uint8_t numberOfDataToProcess = 0;
-    SensorAccessLinkTestMock::MockSensorCommunicationStrategy mockSensorCommunicationStrategy(numberOfDataToProcess);
+    SensorAccessLinkTestMock::MockSensorCommunicationStrategy mockSensorCommunicationStrategy(
+            numberOfDataToProcess, numberOfDataToProcess);
     SensorAccessLinkTestMock::MockTranslationStrategy mockTranslationStrategy;
     SensorAccessLinkTestMock::MockServerCommunicationStrategy mockServerCommunicationStrategy;
     SensorAccessLink sensorAccessLink(&mockServerCommunicationStrategy,
@@ -267,7 +283,8 @@ TEST_F(SensorAccessLinkTest,
 TEST_F(SensorAccessLinkTest,
        given_strategies_when_disconnect_then_bothSensorAndServerStrategiesReceiveCloseConnectionCall) {
     uint8_t numberOfDataToProcess = 0;
-    SensorAccessLinkTestMock::MockSensorCommunicationStrategy mockSensorCommunicationStrategy(numberOfDataToProcess);
+    SensorAccessLinkTestMock::MockSensorCommunicationStrategy mockSensorCommunicationStrategy(
+            numberOfDataToProcess, numberOfDataToProcess);
     SensorAccessLinkTestMock::MockTranslationStrategy mockTranslationStrategy;
     SensorAccessLinkTestMock::MockServerCommunicationStrategy mockServerCommunicationStrategy;
     SensorAccessLink sensorAccessLink(&mockServerCommunicationStrategy,
@@ -284,13 +301,16 @@ TEST_F(SensorAccessLinkTest,
     ASSERT_TRUE(serverCloseConnectionHasBeenCalled);
     ASSERT_TRUE(sensorCloseConnectionHasBeenCalled);
 }
+
 /**
  * Medium test
  */
 TEST_F(SensorAccessLinkTest,
-       given_aNumberOfDataCreatedByTheSensorCommunicationStrategy_when_executing_then_theSameNumberOfDataEndsUpInTheServerCommunicationStrategy) {
-    uint8_t numberOfDataToProcess = 42;
-    SensorAccessLinkTestMock::MockSensorCommunicationStrategy mockSensorCommunicationStrategy(numberOfDataToProcess);
+       given_aSensorOutputingANumberOfMessages_when_executing_then_theSameNumberOfMessagesEndsUpInTheServerCommunicationStrategy) {
+    uint8_t numberOfMessagesToProcess = 42;
+    uint8_t numberOfRawDataToProcess = 0;
+    SensorAccessLinkTestMock::MockSensorCommunicationStrategy mockSensorCommunicationStrategy(
+            numberOfMessagesToProcess, numberOfRawDataToProcess);
     SensorAccessLinkTestMock::MockTranslationStrategy mockTranslationStrategy;
     SensorAccessLinkTestMock::MockServerCommunicationStrategy mockServerCommunicationStrategy;
     SensorAccessLink sensorAccessLink(&mockServerCommunicationStrategy,
@@ -305,7 +325,35 @@ TEST_F(SensorAccessLinkTest,
     sensorAccessLink.terminateAndJoin();
 
     auto createdDataList = mockSensorCommunicationStrategy.getCreatedMessageCopies();
-    auto receivedDataList = mockServerCommunicationStrategy.getReceivedData();
+    auto receivedDataList = mockServerCommunicationStrategy.getReceivedMessages();
+
+    ASSERT_EQ(createdDataList.size(), receivedDataList.size());
+}
+
+/**
+ * Medium test
+ */
+TEST_F(SensorAccessLinkTest,
+       given_aSensorOutputingANumberOfRawData_when_executing_then_theSameNumberOfRawDataCyclesEndsUpInTheServerCommunicationStrategy) {
+    uint8_t numberOfMessagesToProcess = 0;
+    uint8_t numberOfRawDataToProcess = 42;
+    SensorAccessLinkTestMock::MockSensorCommunicationStrategy mockSensorCommunicationStrategy(
+            numberOfMessagesToProcess, numberOfRawDataToProcess);
+    SensorAccessLinkTestMock::MockTranslationStrategy mockTranslationStrategy;
+    SensorAccessLinkTestMock::MockServerCommunicationStrategy mockServerCommunicationStrategy;
+    SensorAccessLink sensorAccessLink(&mockServerCommunicationStrategy,
+                                      &mockTranslationStrategy,
+                                      &mockSensorCommunicationStrategy);
+
+    sensorAccessLink.start(FAKE_SERVER_ADDRESS);
+
+    mockSensorCommunicationStrategy.waitUntilFetchMessagesHasBeenCalledEnough();
+    mockSensorCommunicationStrategy.waitUntilFetchRawDataCyclesHasBeenCalledEnough();
+
+    sensorAccessLink.terminateAndJoin();
+
+    auto createdDataList = mockSensorCommunicationStrategy.getCreatedRawDataCopies();
+    auto receivedDataList = mockServerCommunicationStrategy.getReceivedRawData();
 
     ASSERT_EQ(createdDataList.size(), receivedDataList.size());
 }
@@ -314,9 +362,11 @@ TEST_F(SensorAccessLinkTest,
  * Medium Test
  */
 TEST_F(SensorAccessLinkTest,
-       given_dataCreatedByTheSensorCommunicationStrategy_when_executing_then_dataGoesThroughTranslationStrategyBeforeEndingInTheServerCommunicationStrategy) {
-    uint8_t numberOfDataToProcess = 42;
-    SensorAccessLinkTestMock::MockSensorCommunicationStrategy mockSensorCommunicationStrategy(numberOfDataToProcess);
+       given_messagesCreatedByTheSensorCommunicationStrategy_when_executing_then_dataGoesThroughTranslationStrategyBeforeEndingInTheServerCommunicationStrategy) {
+    uint8_t numberOfMessagesToProcess = 42;
+    uint8_t numberOfRawDataToProcess = 0;
+    SensorAccessLinkTestMock::MockSensorCommunicationStrategy mockSensorCommunicationStrategy(
+            numberOfMessagesToProcess, numberOfRawDataToProcess);
     SensorAccessLinkTestMock::MockTranslationStrategy mockTranslationStrategy;
     SensorAccessLinkTestMock::MockServerCommunicationStrategy mockServerCommunicationStrategy;
     SensorAccessLink sensorAccessLink(&mockServerCommunicationStrategy,
@@ -344,7 +394,7 @@ TEST_F(SensorAccessLinkTest,
             flattenMessages.push_back(currentMessages.at(j));
         }
     }
-    auto receivedDataList = mockServerCommunicationStrategy.getReceivedData();
+    auto receivedDataList = mockServerCommunicationStrategy.getReceivedMessages();
 
     bool dataHasPassedThroughCorrectly = true;
     for (uint32_t messageIndex = 0;

@@ -23,15 +23,17 @@ namespace ServerCommunication {
 
     template<class T>
     class ServerCommunicationStrategy {
-    protected:
-
-        typedef T MESSAGE;
 
     public:
 
+        typedef typename T::Message Message;
+        typedef typename T::RawData RawData;
+
         virtual ~ServerCommunicationStrategy() noexcept = default;
 
-        virtual void sendMessage(MESSAGE&& message) = 0;
+        virtual void sendMessage(Message&& message) = 0;
+
+        virtual void sendRawData(RawData&& rawData) = 0;
 
         virtual void openConnection(std::string const& serverAddress) = 0;
 
