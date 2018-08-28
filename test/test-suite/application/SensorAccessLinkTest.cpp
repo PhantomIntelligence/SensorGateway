@@ -408,6 +408,55 @@ TEST_F(SensorAccessLinkTest,
     ASSERT_TRUE(dataHasPassedThroughCorrectly);
 }
 
+/**
+ * Medium Test
+ */
+TEST_F(SensorAccessLinkTest,
+       given_rawDataCyclesCreatedByTheSensorCommunicationStrategy_when_executing_then_dataGoesThroughTranslationStrategyBeforeEndingInTheServerCommunicationStrategy) {
+    uint8_t numberOfMessagesToProcess = 0;
+    uint8_t numberOfRawDataToProcess = 42;
+    SensorAccessLinkTestMock::MockSensorCommunicationStrategy mockSensorCommunicationStrategy(
+            numberOfMessagesToProcess, numberOfRawDataToProcess);
+    SensorAccessLinkTestMock::MockTranslationStrategy mockTranslationStrategy;
+    SensorAccessLinkTestMock::MockServerCommunicationStrategy mockServerCommunicationStrategy;
+    SensorAccessLink sensorAccessLink(&mockServerCommunicationStrategy,
+                                      &mockTranslationStrategy,
+                                      &mockSensorCommunicationStrategy);
+
+    sensorAccessLink.start(FAKE_SERVER_ADDRESS);
+
+    mockSensorCommunicationStrategy.waitUntilFetchMessagesHasBeenCalledEnough();
+    mockSensorCommunicationStrategy.waitUntilFetchRawDataCyclesHasBeenCalledEnough();
+
+    sensorAccessLink.terminateAndJoin();
+
+    auto createdRawDataList = mockSensorCommunicationStrategy.getCreatedRawDataCopies();
+    std::vector<SensorAccessLinkTestMock::SimpleSensorCommunicationStrategy::RawData> flattenRawDataCycles;
+    auto const numberOfBulkRawDataCycles = createdRawDataList.size();
+    auto const numberOfRawDataCyclesPerBulk = Sensor::Test::Simple::Structures::MAX_NUMBER_OF_BULK_FETCHABLE_RAW_DATA_CYCLES;
+    auto const totalNumberOfRawDataCycles = numberOfBulkRawDataCycles * numberOfRawDataCyclesPerBulk;
+    flattenRawDataCycles.reserve(totalNumberOfRawDataCycles);
+    for (uint32_t i = 0; i < numberOfBulkRawDataCycles; ++i) {
+        auto currentRawDataCycles = createdRawDataList.front();
+        createdRawDataList.pop_front();
+        for (uint32_t j = 0; j < numberOfRawDataCyclesPerBulk; ++j) {
+            flattenRawDataCycles.push_back(currentRawDataCycles.at(j));
+        }
+    }
+    auto receivedRawDataList = mockServerCommunicationStrategy.getReceivedRawData();
+
+    bool dataHasPassedThroughCorrectly = true;
+    for (uint32_t rawDataIndex = 0;
+         rawDataIndex < totalNumberOfRawDataCycles && dataHasPassedThroughCorrectly; ++rawDataIndex) {
+        auto createdRawData = flattenRawDataCycles.at(rawDataIndex);
+        auto receivedRawData = receivedRawDataList.front();
+        receivedRawDataList.pop_front();
+        dataHasPassedThroughCorrectly = createdRawData.isTheInverseOf(receivedRawData);
+    }
+
+    ASSERT_TRUE(dataHasPassedThroughCorrectly);
+}
+
 #endif //SPIRITSENSORGATEWAY_SENSORCOMMUNICATORTEST_CPP
 
 
