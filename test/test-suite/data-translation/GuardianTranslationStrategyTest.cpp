@@ -62,6 +62,16 @@ protected:
                                                                             {211, 55, 106, 0, 0, 0, 0, 1});
     GuardianMessage const SOME_END_FRAME_AWL_MESSAGE = GuardianMessage(9, 2188170, 8, {61, 253, 16, 0, 0, 0, 0, 0});
 
+    GuardianRawData createIdenticalNonNullValuedGuardianRawData() const {
+        auto const arbitraryNonNullValue = 42;
+        GuardianRawData orderedRawData = GuardianRawData::returnDefaultData();
+        auto const NUMBER_OF_DATA = GuardianRawData::RawDataContent::SIZE;
+        for (auto dataIndex = 0u; dataIndex < NUMBER_OF_DATA; ++dataIndex) {
+            orderedRawData.content[dataIndex] = static_cast<GuardianRawData::RawDataContent::ValueType>(arbitraryNonNullValue);
+        }
+        return orderedRawData;
+    }
+
     GuardianRawData createOrderedGuardianRawData() const {
         GuardianRawData orderedRawData = GuardianRawData::returnDefaultData();
         auto const NUMBER_OF_DATA = GuardianRawData::RawDataContent::SIZE;
@@ -69,6 +79,15 @@ protected:
             orderedRawData.content[dataIndex] = static_cast<GuardianRawData::RawDataContent::ValueType>(dataIndex);
         }
         return orderedRawData;
+    }
+
+    auto reverseContentEndianness(GuardianRawData::RawDataContent::Data content) const {
+        GuardianRawData::RawDataContent::Data reversedContent;
+        auto const NUMBER_OF_DATA = GuardianRawData::RawDataContent::SIZE;
+        for (auto contentIndex = 0u; contentIndex < NUMBER_OF_DATA; ++contentIndex) {
+            reversedContent[contentIndex] = reverseEndiannessOfInt16(content[contentIndex]);
+        }
+        return reversedContent;
     }
 
 private:
@@ -152,18 +171,39 @@ TEST_F(GuardianTranslationStrategyTest,
 }
 
 TEST_F(GuardianTranslationStrategyTest,
-       given_aRawData_when_translateRawData_then_theTranslatedDataIsProduced) {
-    auto numberOfData = 1u;
+       given_aRawData_when_translateRawData_then_translatedDataIsProduced) {
+    auto numberOfDataToProduce = 1u;
     auto orderedGuardianRawData = createOrderedGuardianRawData();
-    auto contentCopy = GuardianRawData::RawDataContent::Data(orderedGuardianRawData.content);
-    auto expectedSpiritRawData = SpiritRawData(contentCopy);
+
+    GuardianTranslationStrategy translationStrategy;
+    SpiritRawDataSinkMock spiritRawDataSink(numberOfDataToProduce);
+    SpiritRawDataProcessingScheduler scheduler(&spiritRawDataSink);
+    translationStrategy.linkConsumer(&scheduler);
+
+    translationStrategy.translateRawData(std::move(orderedGuardianRawData));
+
+    spiritRawDataSink.waitConsumptionToBeReached();
+    scheduler.terminateAndJoin();
+
+    auto numberOfProducedData = spiritRawDataSink.getNumberOfConsumptions();
+    ASSERT_EQ(numberOfProducedData, numberOfDataToProduce);
+}
+
+TEST_F(GuardianTranslationStrategyTest,
+       given_aRawData_when_translateRawData_then_theEndiannessOfTheDataUnitsIsFlipped) {
+    auto numberOfData = 1u;
+    auto guardianRawData = createIdenticalNonNullValuedGuardianRawData();
+    auto contentCopy = GuardianRawData::RawDataContent::Data(guardianRawData.content);
 
     GuardianTranslationStrategy translationStrategy;
     SpiritRawDataSinkMock spiritRawDataSink(numberOfData);
     SpiritRawDataProcessingScheduler scheduler(&spiritRawDataSink);
     translationStrategy.linkConsumer(&scheduler);
 
-    translationStrategy.translateRawData(std::move(orderedGuardianRawData));
+    translationStrategy.translateRawData(std::move(guardianRawData));
+
+    auto reversedContent =  reverseContentEndianness(contentCopy);
+    auto expectedSpiritRawData = SpiritRawData(reversedContent);
 
     spiritRawDataSink.waitConsumptionToBeReached();
     scheduler.terminateAndJoin();

@@ -31,6 +31,7 @@ namespace DataTranslation {
 
         using super::MessageSource;
         using super::RawDataSource;
+
     public:
 
         explicit GuardianTranslationStrategy() = default;
@@ -54,6 +55,9 @@ namespace DataTranslation {
         void translateDetectionVelocityMessage(SensorMessage&& sensorMessage);
 
         void translateEndOfFrameMessage(SensorMessage&& sensorMessage);
+
+        static SensorRawData::Content reverseContentEndianness(SensorRawData::Content&& content);
+
     };
 }
 #endif //SENSORGATEWAY_GUARDIANTRANSLATIONSTRATEGY_H

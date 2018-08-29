@@ -58,6 +58,10 @@ namespace Mock {
             return actualNumberOfDataConsumed.load() == numberOfDataToConsume.load();
         };
 
+        int getNumberOfConsumptions() const {
+            return actualNumberOfDataConsumed.load();
+        }
+
         void waitConsumptionToBeReached() {
             LockGuard guard(goalReachedMutex);
             if (!hasBeenCalledExpectedNumberOfTimes()) {

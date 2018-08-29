@@ -51,8 +51,20 @@ void GuardianTranslationStrategy::translateMessage(SensorMessage&& sensorMessage
 
 void GuardianTranslationStrategy::translateRawData(SensorRawData&& sensorRawData) {
     auto rawDataContent = sensorRawData.content;
-    super::ServerRawData translatedRawData(rawDataContent);
+    auto reversedRawDataContent = reverseContentEndianness(std::forward<SensorRawData::Content>(rawDataContent));
+
+    super::ServerRawData translatedRawData(reversedRawDataContent);
     RawDataSource::produce(std::move(translatedRawData));
+}
+
+GuardianTranslationStrategy::SensorRawData::Content
+GuardianTranslationStrategy::reverseContentEndianness(SensorRawData::Content&& content) {
+    SensorRawData::Content reversedContent;
+    auto const NUMBER_OF_DATA = SensorRawData::RawDataContent::SIZE;
+    for (auto contentIndex = 0u; contentIndex < NUMBER_OF_DATA; ++contentIndex) {
+        reversedContent[contentIndex] = reverseEndiannessOfInt16(content[contentIndex]);
+    }
+    return reversedContent;
 }
 
 void GuardianTranslationStrategy::translateEndOfFrameMessage(SensorMessage&& sensorMessage) {
