@@ -22,13 +22,13 @@
 namespace Sensor {
 
     /**
-     * @brief This RawDataContent struct serves to declare types used by <SensorName>RawData classes
+     * @brief This RawDataDefinition struct serves to declare types used by <SensorName>RawData classes
      * @tparam T the type of an individual data
      * @tparam C the number of channel of raw data
      * @tparam N the number of sample of raw data per channel
      */
     template<typename T, std::size_t C, std::size_t N>
-    struct RawDataContent {
+    struct RawDataDefinition {
         static std::size_t const NUMBER_OF_CHANNELS = C;
         static std::size_t const NUMBER_OF_SAMPLES_PER_CHANNEL = N;
         static std::size_t const SIZE = NUMBER_OF_CHANNELS * NUMBER_OF_SAMPLES_PER_CHANNEL;

@@ -21,7 +21,7 @@
 namespace DataTranslation {
 
     using GuardianStructures = Sensor::Guardian::Structures;
-    using GuardianSpiritStructures = Sensor::Spirit::Structures<GuardianStructures::RawData::RawDataContent>;
+    using GuardianSpiritStructures = Sensor::Spirit::Structures<GuardianStructures::RawData::RawDataDefinition>;
 
     class GuardianTranslationStrategy final
             : public DataTranslationStrategy<GuardianStructures, GuardianSpiritStructures> {
@@ -59,7 +59,7 @@ namespace DataTranslation {
 
         void translateEndOfFrameMessage(SensorMessage&& sensorMessage);
 
-        static void reverseRawDataContentEndianness(SensorRawData* sensorRawData);
+        static void reverseRawDataDefinitionEndianness(SensorRawData* sensorRawData);
 
         static void orderRawData(SensorRawData* rawData);
 

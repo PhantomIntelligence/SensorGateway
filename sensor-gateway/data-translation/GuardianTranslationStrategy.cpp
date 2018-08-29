@@ -53,7 +53,7 @@ void GuardianTranslationStrategy::translateRawData(SensorRawData&& sensorRawData
     orderRawData(&sensorRawData);
 
     // Guardian sends little-endian raw data. They should become big-endian for Spirit
-    reverseRawDataContentEndianness(&sensorRawData);
+    reverseRawDataDefinitionEndianness(&sensorRawData);
 
     super::ServerRawData translatedRawData(sensorRawData.content);
     RawDataSource::produce(std::move(translatedRawData));
@@ -106,17 +106,17 @@ Track* GuardianTranslationStrategy::fetchTrack(TrackID const& trackID) {
     return nullptr;
 }
 
-void GuardianTranslationStrategy::reverseRawDataContentEndianness(SensorRawData* sensorRawData) {
+void GuardianTranslationStrategy::reverseRawDataDefinitionEndianness(SensorRawData* sensorRawData) {
     auto originalContent = ServerRawData::Content(sensorRawData->content);
-    auto const NUMBER_OF_DATA = SensorRawData::RawDataContent::SIZE;
+    auto const NUMBER_OF_DATA = SensorRawData::RawDataDefinition::SIZE;
     for (auto contentIndex = 0u; contentIndex < NUMBER_OF_DATA; ++contentIndex) {
         sensorRawData->content[contentIndex] = reverseEndiannessOfInt16(originalContent[contentIndex]);
     }
 }
 
 void GuardianTranslationStrategy::orderRawData(SensorRawData* sensorRawData) {
-    auto const NUMBER_OF_SAMPLES_PER_CHANNEL = SensorRawData::RawDataContent::NUMBER_OF_SAMPLES_PER_CHANNEL;
-    auto const NUMBER_OF_CHANNELS = SensorRawData::RawDataContent::NUMBER_OF_CHANNELS;
+    auto const NUMBER_OF_SAMPLES_PER_CHANNEL = SensorRawData::RawDataDefinition::NUMBER_OF_SAMPLES_PER_CHANNEL;
+    auto const NUMBER_OF_CHANNELS = SensorRawData::RawDataDefinition::NUMBER_OF_CHANNELS;
     auto unorderedContent = ServerRawData::Content(sensorRawData->content);
     for (auto ordinalChannelIndex = 0u; ordinalChannelIndex < NUMBER_OF_CHANNELS; ++ordinalChannelIndex) {
         auto channelPositionIndex = sensorRawData->CHANNEL_POSITIONS[ordinalChannelIndex];

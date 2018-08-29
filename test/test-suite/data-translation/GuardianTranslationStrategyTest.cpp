@@ -69,7 +69,7 @@ protected:
     GuardianRawData createIdenticalNonNullValuedGuardianRawData() const {
         auto const arbitraryNonNullValue = 42;
         GuardianRawData rawData = GuardianRawData::returnDefaultData();
-        auto const NUMBER_OF_DATA = GuardianRawData::RawDataContent::SIZE;
+        auto const NUMBER_OF_DATA = GuardianRawData::RawDataDefinition::SIZE;
         rawData.content.fill(arbitraryNonNullValue);
         return rawData;
     }
@@ -80,20 +80,20 @@ protected:
         return ordinalRawData;
     }
 
-    auto reverseRawDataContentEndianness(GuardianRawData::RawDataContent::Data&& content) const {
-        GuardianRawData::RawDataContent::Data reversedContent;
-        auto const NUMBER_OF_DATA = GuardianRawData::RawDataContent::SIZE;
+    auto reverseRawDataDefinitionEndianness(GuardianRawData::RawDataDefinition::Data&& content) const {
+        GuardianRawData::RawDataDefinition::Data reversedContent;
+        auto const NUMBER_OF_DATA = GuardianRawData::RawDataDefinition::SIZE;
         for (auto contentIndex = 0u; contentIndex < NUMBER_OF_DATA; ++contentIndex) {
             reversedContent[contentIndex] = reverseEndiannessOfInt16(content[contentIndex]);
         }
         return reversedContent;
     }
 
-    auto orderRawDataAccordingToGuardianChannelPositions(GuardianRawData::RawDataContent::Data&& content) const {
-        auto const NUMBER_OF_SAMPLES_PER_CHANNEL = GuardianRawData::RawDataContent::NUMBER_OF_SAMPLES_PER_CHANNEL;
-        auto const NUMBER_OF_CHANNELS = GuardianRawData::RawDataContent::NUMBER_OF_CHANNELS;
+    auto orderRawDataAccordingToGuardianChannelPositions(GuardianRawData::RawDataDefinition::Data&& content) const {
+        auto const NUMBER_OF_SAMPLES_PER_CHANNEL = GuardianRawData::RawDataDefinition::NUMBER_OF_SAMPLES_PER_CHANNEL;
+        auto const NUMBER_OF_CHANNELS = GuardianRawData::RawDataDefinition::NUMBER_OF_CHANNELS;
         GuardianRawData orderedRawData;
-        GuardianRawData::RawDataContent::Data orderedContent = orderedRawData.content;
+        GuardianRawData::RawDataDefinition::Data orderedContent = orderedRawData.content;
         for (auto ordinalChannelIndex = 0u; ordinalChannelIndex < NUMBER_OF_CHANNELS; ++ordinalChannelIndex) {
             auto channelPositionIndex = orderedRawData.CHANNEL_POSITIONS[ordinalChannelIndex];
             auto originStartPosition = content.begin() + channelPositionIndex * NUMBER_OF_SAMPLES_PER_CHANNEL;
@@ -208,7 +208,7 @@ TEST_F(GuardianTranslationStrategyTest,
        given_aRawData_when_translateRawData_then_theEndiannessOfTheDataUnitsIsFlipped) {
     auto numberOfData = 1u;
     auto guardianRawData = createIdenticalNonNullValuedGuardianRawData();
-    auto contentCopy = GuardianRawData::RawDataContent::Data(guardianRawData.content);
+    auto contentCopy = GuardianRawData::RawDataDefinition::Data(guardianRawData.content);
 
     GuardianTranslationStrategy translationStrategy;
     SpiritRawDataSinkMock spiritRawDataSink(numberOfData);
@@ -217,7 +217,7 @@ TEST_F(GuardianTranslationStrategyTest,
 
     translationStrategy.translateRawData(std::move(guardianRawData));
 
-    auto reversedContent = reverseRawDataContentEndianness(std::move(contentCopy));
+    auto reversedContent = reverseRawDataDefinitionEndianness(std::move(contentCopy));
     auto expectedSpiritRawData = SpiritRawData(reversedContent);
 
     spiritRawDataSink.waitConsumptionToBeReached();
@@ -231,7 +231,7 @@ TEST_F(GuardianTranslationStrategyTest,
        given_aRawData_when_translateRawData_then_theDataIsOrderedAccordingToTheGuardianChannelPositions) {
     auto numberOfData = 1u;
     auto ordinalRawData = createOrdinalGuardianRawData();
-    auto contentCopy = GuardianRawData::RawDataContent::Data(ordinalRawData.content);
+    auto contentCopy = GuardianRawData::RawDataDefinition::Data(ordinalRawData.content);
 
     GuardianTranslationStrategy translationStrategy;
     SpiritRawDataSinkMock spiritRawDataSink(numberOfData);
@@ -240,7 +240,7 @@ TEST_F(GuardianTranslationStrategyTest,
 
     translationStrategy.translateRawData(std::move(ordinalRawData));
 
-    auto reversedContent = reverseRawDataContentEndianness(std::move(contentCopy));
+    auto reversedContent = reverseRawDataDefinitionEndianness(std::move(contentCopy));
     auto orderedContent = orderRawDataAccordingToGuardianChannelPositions(std::move(reversedContent));
     auto expectedSpiritRawData = SpiritRawData(orderedContent);
 

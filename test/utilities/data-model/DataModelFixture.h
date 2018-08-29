@@ -63,7 +63,7 @@ namespace TestFunctions {
             std::default_random_engine randomEngine(std::random_device{}());
             std::uniform_int_distribution<unsigned int> distribution(0, maximalValue);
 
-            Sensor::Test::Simple::Structures::RawData::RawDataContent::Data content;
+            Sensor::Test::Simple::Structures::RawData::RawDataDefinition::Data content;
             auto const numberOfDataToCreate = content.size();
             for (auto i = 0u; i < numberOfDataToCreate; ++i) {
                 content.at(i) = distribution(randomEngine);

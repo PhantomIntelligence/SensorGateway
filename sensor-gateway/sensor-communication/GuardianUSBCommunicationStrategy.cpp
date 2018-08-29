@@ -261,8 +261,8 @@ GuardianUSBCommunicationStrategy::fetchRawDataCyclesOnSensor(NumberOfDataToFetch
 
 
     for (auto rawDataIndex = 0u; rawDataIndex < numberOfRawDataCyclesToFetch; ++rawDataIndex) {
-        auto rawDataContent = rawDataCyclesContent[rawDataIndex];
-        fetchedRawDataCycles.at(rawDataIndex) = super::RawData(rawDataContent);
+        auto RawDataDefinition = rawDataCyclesContent[rawDataIndex];
+        fetchedRawDataCycles.at(rawDataIndex) = super::RawData(RawDataDefinition);
     }
 
     return fetchedRawDataCycles;

@@ -19,7 +19,7 @@
 using DataModel::SimpleRawData;
 using DataModel::Defaults::DEFAULT_SIMPLE_RAW_DATA_CONTENT;
 
-SimpleRawData::SimpleRawData(RawDataContent::Data content) noexcept :
+SimpleRawData::SimpleRawData(RawDataDefinition::Data content) noexcept :
         content(content) {}
 
 SimpleRawData::SimpleRawData() noexcept: SimpleRawData(SimpleRawData::returnDefaultData()) {
@@ -60,7 +60,7 @@ bool SimpleRawData::operator!=(SimpleRawData const& other) const {
 }
 
 void SimpleRawData::inverseContent() {
-    auto oldContent = RawDataContent::Data(content);
+    auto oldContent = RawDataDefinition::Data(content);
     auto size = content.size();
     if (size < 2) {
         throw std::runtime_error("Warning! Some tests may misbehave. Content size needs to be more than 2.");

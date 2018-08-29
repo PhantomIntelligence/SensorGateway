@@ -23,7 +23,7 @@
 namespace Sensor {
     namespace Spirit {
 
-        template<typename RawDataContent>
+        template<typename RawDataDefinition>
         class Structures final : public Communication::DataStructures {
         public :
             enum DataType {
@@ -37,7 +37,7 @@ namespace Sensor {
             };
 
             typedef typename DataFlow::Frame Message;
-            typedef typename DataFlow::SpiritRawData<RawDataContent> RawData;
+            typedef typename DataFlow::SpiritRawData<RawDataDefinition> RawData;
 
             static size_t const MAX_NUMBER_OF_BULK_FETCHABLE_MESSAGES = 32;
             static size_t const MAX_NUMBER_OF_BULK_FETCHABLE_RAW_DATA_CYCLES = 8;

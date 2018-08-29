@@ -21,10 +21,10 @@
 
 namespace DataFlow {
 
-    template<typename RawDataContent>
+    template<typename RawDataDefinition>
     class SpiritRawData {
     public:
-        using Content = typename RawDataContent::Data;
+        using Content = typename RawDataDefinition::Data;
 
         explicit SpiritRawData(Content content) :
                 content(std::move(content)) {}
@@ -74,17 +74,17 @@ namespace DataFlow {
     namespace Defaults {
         using DataFlow::SpiritRawData;
 
-        template<typename RawDataContent>
-        typename RawDataContent::Data const DEFAULT_SPIRIT_RAW_DATA_CONTENT{};
+        template<typename RawDataDefinition>
+        typename RawDataDefinition::Data const DEFAULT_SPIRIT_RAW_DATA_CONTENT{};
 
-        template<typename RawDataContent>
-        SpiritRawData<RawDataContent> const DEFAULT_SPIRIT_RAW_DATA = SpiritRawData<RawDataContent>(
-                DEFAULT_SPIRIT_RAW_DATA_CONTENT<RawDataContent>);
+        template<typename RawDataDefinition>
+        SpiritRawData<RawDataDefinition> const DEFAULT_SPIRIT_RAW_DATA = SpiritRawData<RawDataDefinition>(
+                DEFAULT_SPIRIT_RAW_DATA_CONTENT<RawDataDefinition>);
     }
 
-    template<typename RawDataContent>
-    SpiritRawData<RawDataContent> const& SpiritRawData<RawDataContent>::returnDefaultData() noexcept {
-        return Defaults::DEFAULT_SPIRIT_RAW_DATA<RawDataContent>;
+    template<typename RawDataDefinition>
+    SpiritRawData<RawDataDefinition> const& SpiritRawData<RawDataDefinition>::returnDefaultData() noexcept {
+        return Defaults::DEFAULT_SPIRIT_RAW_DATA<RawDataDefinition>;
     }
 }
 

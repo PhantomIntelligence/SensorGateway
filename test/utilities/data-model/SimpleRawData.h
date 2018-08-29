@@ -28,13 +28,13 @@ namespace DataModel {
         static size_t const NUMBER_OF_DATA_IN_RAW_DATA = 16;
     public:
 
-        typedef typename Sensor::RawDataContent<
+        typedef typename Sensor::RawDataDefinition<
                 uint32_t,
                 NUMBER_OF_CHANNELS,
                 NUMBER_OF_DATA_IN_RAW_DATA
-        > RawDataContent;
+        > RawDataDefinition;
 
-        explicit SimpleRawData(RawDataContent::Data content) noexcept;
+        explicit SimpleRawData(RawDataDefinition::Data content) noexcept;
 
         explicit SimpleRawData() noexcept;
 
@@ -64,13 +64,13 @@ namespace DataModel {
 
     private:
 
-        RawDataContent::Data content;
+        RawDataDefinition::Data content;
     };
 
     namespace Defaults {
         using DataModel::SimpleRawData;
 
-        SimpleRawData::RawDataContent::Data const DEFAULT_SIMPLE_RAW_DATA_CONTENT = SimpleRawData::RawDataContent::Data();
+        SimpleRawData::RawDataDefinition::Data const DEFAULT_SIMPLE_RAW_DATA_CONTENT = SimpleRawData::RawDataDefinition::Data();
         SimpleRawData const DEFAULT_SIMPLE_RAW_DATA = SimpleRawData(DEFAULT_SIMPLE_RAW_DATA_CONTENT);
     }
 }

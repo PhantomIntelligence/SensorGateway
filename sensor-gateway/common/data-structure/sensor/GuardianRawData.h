@@ -29,13 +29,13 @@ namespace DataFlow {
         };
 
         typedef typename
-        Sensor::RawDataContent<
+        Sensor::RawDataDefinition<
                 Sensor::RawDataTypes::GUARDIAN,
                 Sensor::Guardian::NUMBER_OF_CHANNELS,
                 Sensor::Guardian::RAW_DATA_SAMPLING_LENGTH
-        > RawDataContent;
+        > RawDataDefinition;
 
-        using Content = RawDataContent::Data;
+        using Content = RawDataDefinition::Data;
 
         explicit GuardianRawData(Content content) noexcept;
 
