@@ -24,11 +24,15 @@ namespace DataModel {
 
     class SimpleRawData {
     protected:
+        static size_t const NUMBER_OF_CHANNELS = 1;
         static size_t const NUMBER_OF_DATA_IN_RAW_DATA = 16;
-
     public:
 
-        typedef typename Sensor::RawDataContent<uint32_t, NUMBER_OF_DATA_IN_RAW_DATA> RawDataContent;
+        typedef typename Sensor::RawDataContent<
+                uint32_t,
+                NUMBER_OF_CHANNELS,
+                NUMBER_OF_DATA_IN_RAW_DATA
+        > RawDataContent;
 
         explicit SimpleRawData(RawDataContent::Data content) noexcept;
 

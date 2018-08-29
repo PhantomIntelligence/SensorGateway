@@ -24,11 +24,14 @@ namespace Sensor {
     /**
      * @brief This RawDataContent struct serves to declare types used by <SensorName>RawData classes
      * @tparam T the type of an individual data
-     * @tparam N the number of data per raw data cycle
+     * @tparam C the number of channel of raw data
+     * @tparam N the number of sample of raw data per channel
      */
-    template<typename T, std::size_t N>
+    template<typename T, std::size_t C, std::size_t N>
     struct RawDataContent {
-        static std::size_t const SIZE = N;
+        static std::size_t const NUMBER_OF_CHANNELS = C;
+        static std::size_t const NUMBER_OF_SAMPLES_PER_CHANNEL = N;
+        static std::size_t const SIZE = NUMBER_OF_CHANNELS * NUMBER_OF_SAMPLES_PER_CHANNEL;
         using ValueType = T;
         using Data = std::array<ValueType, SIZE>;
     };

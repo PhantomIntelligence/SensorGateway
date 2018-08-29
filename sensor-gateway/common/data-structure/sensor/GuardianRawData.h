@@ -24,15 +24,16 @@ namespace DataFlow {
     class GuardianRawData {
     public:
 
-        static uint8_t constexpr SENSOR_CHANNEL_INDEX_POSITION[16] = {
-                15, 0, 14, 1, 13, 2, 12, 3, 11, 4, 10, 5, 9, 6, 8, 7
+        std::array<uint8_t, 16> const CHANNEL_POSITIONS = {
+                8, 0, 9, 1, 10, 2, 11, 3, 12, 4, 13, 5, 14, 6, 15, 7
         };
 
-        static uint8_t constexpr GUARDIAN_INDEX_POSITION[16] = {
-                0, 1, 2, 3, 4, 5, 6, 7, 15, 14, 13, 12, 11, 10, 9, 8
-        };
-
-        typedef typename Sensor::RawDataContent<Sensor::RawDataTypes::GUARDIAN, Sensor::Guardian::RAW_DATA_ACQUISITION_BUFFER_SIZE> RawDataContent;
+        typedef typename
+        Sensor::RawDataContent<
+                Sensor::RawDataTypes::GUARDIAN,
+                Sensor::Guardian::NUMBER_OF_CHANNELS,
+                Sensor::Guardian::RAW_DATA_SAMPLING_LENGTH
+        > RawDataContent;
 
         using Content = RawDataContent::Data;
 

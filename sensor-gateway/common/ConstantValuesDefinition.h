@@ -60,11 +60,10 @@ namespace Sensor {
     using SensorID = uint16_t;
 
     namespace Guardian {
-        static size_t const NUMBER_OF_CHANNEL = 16;
+        static size_t const NUMBER_OF_CHANNELS = 16;
         static size_t const NUMBER_OF_DETECTION_PER_CHANNEL = 16;
         static size_t const RAW_DATA_SAMPLING_LENGTH = 100;
-        static size_t const RAW_DATA_ACQUISITION_BUFFER_SIZE = NUMBER_OF_CHANNEL * RAW_DATA_SAMPLING_LENGTH;
-        size_t const DETECTIONS_SIZE = NUMBER_OF_CHANNEL * NUMBER_OF_DETECTION_PER_CHANNEL;
+        size_t const DETECTIONS_SIZE = NUMBER_OF_CHANNELS * NUMBER_OF_DETECTION_PER_CHANNEL;
     }
     namespace AWL {
         using MessageID = uint64_t;
@@ -79,6 +78,7 @@ namespace Sensor {
             SensorID const SENSOR_ID = 0x0010;
         }
         namespace _16 {
+            static size_t const NUMBER_OF_CHANNELS = 16;
             size_t const MAX_RAW_BUFFER_SIZE = 16384;
             int const MULTIPLICATIVE_CONSTANT = 10;  // Because all values are multiple with 1 decimal, 10 is sufficient to work with non-floating point representation
             int const HORIZONTAL_FIELD_OF_VIEW = static_cast<int>(30.4 * MULTIPLICATIVE_CONSTANT);

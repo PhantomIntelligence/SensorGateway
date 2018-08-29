@@ -50,21 +50,13 @@ void GuardianTranslationStrategy::translateMessage(SensorMessage&& sensorMessage
 }
 
 void GuardianTranslationStrategy::translateRawData(SensorRawData&& sensorRawData) {
-    auto rawDataContent = sensorRawData.content;
-    auto reversedRawDataContent = reverseContentEndianness(std::forward<SensorRawData::Content>(rawDataContent));
+    orderRawData(&sensorRawData);
 
-    super::ServerRawData translatedRawData(reversedRawDataContent);
+    // Guardian sends little-endian raw data. They should become big-endian for Spirit
+    reverseRawDataContentEndianness(&sensorRawData);
+
+    super::ServerRawData translatedRawData(sensorRawData.content);
     RawDataSource::produce(std::move(translatedRawData));
-}
-
-GuardianTranslationStrategy::SensorRawData::Content
-GuardianTranslationStrategy::reverseContentEndianness(SensorRawData::Content&& content) {
-    SensorRawData::Content reversedContent;
-    auto const NUMBER_OF_DATA = SensorRawData::RawDataContent::SIZE;
-    for (auto contentIndex = 0u; contentIndex < NUMBER_OF_DATA; ++contentIndex) {
-        reversedContent[contentIndex] = reverseEndiannessOfInt16(content[contentIndex]);
-    }
-    return reversedContent;
 }
 
 void GuardianTranslationStrategy::translateEndOfFrameMessage(SensorMessage&& sensorMessage) {
@@ -113,3 +105,25 @@ Track* GuardianTranslationStrategy::fetchTrack(TrackID const& trackID) {
     }
     return nullptr;
 }
+
+void GuardianTranslationStrategy::reverseRawDataContentEndianness(SensorRawData* sensorRawData) {
+    auto originalContent = ServerRawData::Content(sensorRawData->content);
+    auto const NUMBER_OF_DATA = SensorRawData::RawDataContent::SIZE;
+    for (auto contentIndex = 0u; contentIndex < NUMBER_OF_DATA; ++contentIndex) {
+        sensorRawData->content[contentIndex] = reverseEndiannessOfInt16(originalContent[contentIndex]);
+    }
+}
+
+void GuardianTranslationStrategy::orderRawData(SensorRawData* sensorRawData) {
+    auto const NUMBER_OF_SAMPLES_PER_CHANNEL = SensorRawData::RawDataContent::NUMBER_OF_SAMPLES_PER_CHANNEL;
+    auto const NUMBER_OF_CHANNELS = SensorRawData::RawDataContent::NUMBER_OF_CHANNELS;
+    auto unorderedContent = ServerRawData::Content(sensorRawData->content);
+    for (auto ordinalChannelIndex = 0u; ordinalChannelIndex < NUMBER_OF_CHANNELS; ++ordinalChannelIndex) {
+        auto channelPositionIndex = sensorRawData->CHANNEL_POSITIONS[ordinalChannelIndex];
+        auto originStartPosition = unorderedContent.begin() + channelPositionIndex * NUMBER_OF_SAMPLES_PER_CHANNEL;
+        auto destinationStartPosition =
+                sensorRawData->content.begin() + ordinalChannelIndex * NUMBER_OF_SAMPLES_PER_CHANNEL;
+        std::copy_n(originStartPosition, NUMBER_OF_SAMPLES_PER_CHANNEL, destinationStartPosition);
+    }
+}
+

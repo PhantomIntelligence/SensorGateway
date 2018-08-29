@@ -23,11 +23,14 @@ namespace DataTranslation {
     using GuardianStructures = Sensor::Guardian::Structures;
     using GuardianSpiritStructures = Sensor::Spirit::Structures<GuardianStructures::RawData::RawDataContent>;
 
-    class GuardianTranslationStrategy final : public DataTranslationStrategy<GuardianStructures, GuardianSpiritStructures> {
+    class GuardianTranslationStrategy final
+            : public DataTranslationStrategy<GuardianStructures, GuardianSpiritStructures> {
     protected:
         using super = DataTranslationStrategy<GuardianStructures, GuardianSpiritStructures>;
         using super::SensorMessage;
         using super::SensorRawData;
+
+        using super::ServerRawData;
 
         using super::MessageSource;
         using super::RawDataSource;
@@ -56,7 +59,9 @@ namespace DataTranslation {
 
         void translateEndOfFrameMessage(SensorMessage&& sensorMessage);
 
-        static SensorRawData::Content reverseContentEndianness(SensorRawData::Content&& content);
+        static void reverseRawDataContentEndianness(SensorRawData* sensorRawData);
+
+        static void orderRawData(SensorRawData* rawData);
 
     };
 }

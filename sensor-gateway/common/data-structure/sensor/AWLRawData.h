@@ -24,7 +24,12 @@ namespace DataFlow {
     class AWLRawData {
     public:
 
-        typedef typename Sensor::RawDataContent<Sensor::RawDataTypes::AWL, Sensor::AWL::RAW_DATA_SAMPLING_LENGTH> RawDataContent;
+        typedef typename
+        Sensor::RawDataContent<
+                Sensor::RawDataTypes::AWL,
+                Sensor::AWL::_16::NUMBER_OF_CHANNELS,
+                Sensor::AWL::RAW_DATA_SAMPLING_LENGTH
+        > RawDataContent;
 
         using Content = typename RawDataContent::Data;
 

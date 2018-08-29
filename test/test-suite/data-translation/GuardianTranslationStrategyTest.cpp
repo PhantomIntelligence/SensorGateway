@@ -21,6 +21,8 @@
 #include "test/utilities/mock/ArbitraryDataSinkMock.hpp"
 #include "sensor-gateway/data-translation/GuardianTranslationStrategy.h"
 
+#include "sensor-gateway/common/data-structure/sensor/GuardianRawData.h"
+
 using Defaults::Track::DEFAULT_ACCELERATION;
 using Defaults::Track::DEFAULT_DISTANCE;
 using Defaults::Track::DEFAULT_SPEED;
@@ -51,10 +53,12 @@ protected:
     SpiritMessage const BASE_FRAME = SpiritMessage(64829, 16, PixelsArray());
     SpiritMessage const FRAME_AFTER_END_OF_FRAME_MESSAGE_TRANSLATION = BASE_FRAME;
     SpiritMessage const FRAME_AFTER_DETECTION_TRACK_AND_END_OF_FRAME_MESSAGES_TRANSLATION =
-            addTrackToSpiritMessage(BASE_FRAME, Track(14291, 96, 379, DEFAULT_ACCELERATION, DEFAULT_DISTANCE,
-                                                      DEFAULT_SPEED));
+            addTrackToSpiritMessage(BASE_FRAME,
+                                    Track(14291, 96, 379, DEFAULT_ACCELERATION, DEFAULT_DISTANCE,
+                                          DEFAULT_SPEED));
     SpiritMessage const FRAME_AFTER_DETECTION_TRACK_AND_VELOCITY_TRACK_AND_END_OF_FRAME_MESSAGES_TRANSLATION =
-            addTrackToSpiritMessage(BASE_FRAME, Track(14291, 96, 379, 256, 106, 0));
+            addTrackToSpiritMessage(BASE_FRAME,
+                                    Track(14291, 96, 379, 256, 106, 0));
 
     GuardianMessage const SOME_DETECTION_TRACK_AWL_MESSAGE = GuardianMessage(10, 2188169, 8,
                                                                              {211, 55, 0, 11, 0, 96, 123, 1});
@@ -64,24 +68,19 @@ protected:
 
     GuardianRawData createIdenticalNonNullValuedGuardianRawData() const {
         auto const arbitraryNonNullValue = 42;
-        GuardianRawData orderedRawData = GuardianRawData::returnDefaultData();
+        GuardianRawData rawData = GuardianRawData::returnDefaultData();
         auto const NUMBER_OF_DATA = GuardianRawData::RawDataContent::SIZE;
-        for (auto dataIndex = 0u; dataIndex < NUMBER_OF_DATA; ++dataIndex) {
-            orderedRawData.content[dataIndex] = static_cast<GuardianRawData::RawDataContent::ValueType>(arbitraryNonNullValue);
-        }
-        return orderedRawData;
+        rawData.content.fill(arbitraryNonNullValue);
+        return rawData;
     }
 
-    GuardianRawData createOrderedGuardianRawData() const {
-        GuardianRawData orderedRawData = GuardianRawData::returnDefaultData();
-        auto const NUMBER_OF_DATA = GuardianRawData::RawDataContent::SIZE;
-        for (auto dataIndex = 0u; dataIndex < NUMBER_OF_DATA; ++dataIndex) {
-            orderedRawData.content[dataIndex] = static_cast<GuardianRawData::RawDataContent::ValueType>(dataIndex);
-        }
-        return orderedRawData;
+    GuardianRawData createOrdinalGuardianRawData() const {
+        GuardianRawData ordinalRawData = GuardianRawData::returnDefaultData();
+        std::iota(ordinalRawData.content.begin(), ordinalRawData.content.end(), 0);
+        return ordinalRawData;
     }
 
-    auto reverseContentEndianness(GuardianRawData::RawDataContent::Data content) const {
+    auto reverseRawDataContentEndianness(GuardianRawData::RawDataContent::Data&& content) const {
         GuardianRawData::RawDataContent::Data reversedContent;
         auto const NUMBER_OF_DATA = GuardianRawData::RawDataContent::SIZE;
         for (auto contentIndex = 0u; contentIndex < NUMBER_OF_DATA; ++contentIndex) {
@@ -90,9 +89,25 @@ protected:
         return reversedContent;
     }
 
+    auto orderRawDataAccordingToGuardianChannelPositions(GuardianRawData::RawDataContent::Data&& content) const {
+        auto const NUMBER_OF_SAMPLES_PER_CHANNEL = GuardianRawData::RawDataContent::NUMBER_OF_SAMPLES_PER_CHANNEL;
+        auto const NUMBER_OF_CHANNELS = GuardianRawData::RawDataContent::NUMBER_OF_CHANNELS;
+        GuardianRawData orderedRawData;
+        GuardianRawData::RawDataContent::Data orderedContent = orderedRawData.content;
+        for (auto ordinalChannelIndex = 0u; ordinalChannelIndex < NUMBER_OF_CHANNELS; ++ordinalChannelIndex) {
+            auto channelPositionIndex = orderedRawData.CHANNEL_POSITIONS[ordinalChannelIndex];
+            auto originStartPosition = content.begin() + channelPositionIndex * NUMBER_OF_SAMPLES_PER_CHANNEL;
+            auto destinationStartPosition =
+                    orderedContent.begin() + ordinalChannelIndex * NUMBER_OF_SAMPLES_PER_CHANNEL;
+            std::copy_n(originStartPosition, NUMBER_OF_SAMPLES_PER_CHANNEL, destinationStartPosition);
+        }
+
+        return orderedContent;
+    }
+
 private:
     SpiritMessage const addTrackToSpiritMessage(SpiritMessage frame, Track track) const {
-        SpiritMessage frameCopy = SpiritMessage(frame);
+        SpiritMessage frameCopy = SpiritMessage(std::move(frame));
         frameCopy.addTrackToPixelWithID(SOME_PIXEL_ID, std::move(track));
         return frameCopy;
     }
@@ -173,14 +188,14 @@ TEST_F(GuardianTranslationStrategyTest,
 TEST_F(GuardianTranslationStrategyTest,
        given_aRawData_when_translateRawData_then_translatedDataIsProduced) {
     auto numberOfDataToProduce = 1u;
-    auto orderedGuardianRawData = createOrderedGuardianRawData();
+    auto rawData = createOrdinalGuardianRawData();
 
     GuardianTranslationStrategy translationStrategy;
     SpiritRawDataSinkMock spiritRawDataSink(numberOfDataToProduce);
     SpiritRawDataProcessingScheduler scheduler(&spiritRawDataSink);
     translationStrategy.linkConsumer(&scheduler);
 
-    translationStrategy.translateRawData(std::move(orderedGuardianRawData));
+    translationStrategy.translateRawData(std::move(rawData));
 
     spiritRawDataSink.waitConsumptionToBeReached();
     scheduler.terminateAndJoin();
@@ -202,8 +217,32 @@ TEST_F(GuardianTranslationStrategyTest,
 
     translationStrategy.translateRawData(std::move(guardianRawData));
 
-    auto reversedContent =  reverseContentEndianness(contentCopy);
+    auto reversedContent = reverseRawDataContentEndianness(std::move(contentCopy));
     auto expectedSpiritRawData = SpiritRawData(reversedContent);
+
+    spiritRawDataSink.waitConsumptionToBeReached();
+    scheduler.terminateAndJoin();
+
+    auto translatedRawData = spiritRawDataSink.getConsumedData().back();
+    ASSERT_EQ(translatedRawData, expectedSpiritRawData);
+}
+
+TEST_F(GuardianTranslationStrategyTest,
+       given_aRawData_when_translateRawData_then_theDataIsOrderedAccordingToTheGuardianChannelPositions) {
+    auto numberOfData = 1u;
+    auto ordinalRawData = createOrdinalGuardianRawData();
+    auto contentCopy = GuardianRawData::RawDataContent::Data(ordinalRawData.content);
+
+    GuardianTranslationStrategy translationStrategy;
+    SpiritRawDataSinkMock spiritRawDataSink(numberOfData);
+    SpiritRawDataProcessingScheduler scheduler(&spiritRawDataSink);
+    translationStrategy.linkConsumer(&scheduler);
+
+    translationStrategy.translateRawData(std::move(ordinalRawData));
+
+    auto reversedContent = reverseRawDataContentEndianness(std::move(contentCopy));
+    auto orderedContent = orderRawDataAccordingToGuardianChannelPositions(std::move(reversedContent));
+    auto expectedSpiritRawData = SpiritRawData(orderedContent);
 
     spiritRawDataSink.waitConsumptionToBeReached();
     scheduler.terminateAndJoin();
