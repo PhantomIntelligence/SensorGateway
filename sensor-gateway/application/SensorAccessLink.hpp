@@ -21,6 +21,7 @@
 
 namespace SensorGateway {
 
+    // TODO: Using things like `enable_if<>, handle different sensors when there is or not RawData or fetching in bulk`
     template<class SENSOR_STRUCTURES, class SERVER_STRUCTURES>
     class SensorAccessLink {
 

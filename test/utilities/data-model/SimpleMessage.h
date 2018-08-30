@@ -22,16 +22,16 @@
 namespace DataModel {
 
     namespace TestSensor {
-        int const NUMBER_OF_SIMPLE_MESSAGE_CONTENT = 2;
-        // Allows to populate SimpleMessage with a "complex", non-primitive, element
-        typedef std::array<std::string, NUMBER_OF_SIMPLE_MESSAGE_CONTENT> SimpleMessageContent;
     }
 
     class SimpleMessage {
 
     public:
+        static int const NUMBER_OF_SIMPLE_MESSAGE_CONTENT = 2;
+        // Allows to populate SimpleMessage with a "complex", non-primitive, element
+        typedef std::array<std::string, NUMBER_OF_SIMPLE_MESSAGE_CONTENT> Content;
 
-        explicit SimpleMessage(TestSensor::SimpleMessageContent simpleDataContent);
+        explicit SimpleMessage(Content simpleDataContent);
 
         explicit SimpleMessage();
 
@@ -61,16 +61,15 @@ namespace DataModel {
 
     private:
 
-        TestSensor::SimpleMessageContent content;
+        Content content;
     };
 
     namespace Defaults {
         using DataModel::SimpleMessage;
-        using DataModel::TestSensor::SimpleMessageContent;
 
         std::string const DEFAULT_FIRST_SIMPLE_MESSAGE_CONTENT = "Some first simple data content";
         std::string const DEFAULT_SECOND_SIMPLE_MESSAGE_CONTENT = "Some second simple data content.";
-        SimpleMessageContent const DEFAULT_SIMPLE_MESSAGE_CONTENT = SimpleMessageContent({DEFAULT_FIRST_SIMPLE_MESSAGE_CONTENT,
+        SimpleMessage::Content const DEFAULT_SIMPLE_MESSAGE_CONTENT = SimpleMessage::Content({DEFAULT_FIRST_SIMPLE_MESSAGE_CONTENT,
                                                                                           DEFAULT_SECOND_SIMPLE_MESSAGE_CONTENT});
         SimpleMessage const DEFAULT_SIMPLE_MESSAGE = SimpleMessage(DEFAULT_SIMPLE_MESSAGE_CONTENT);
     }

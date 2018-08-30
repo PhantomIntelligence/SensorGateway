@@ -17,10 +17,9 @@
 #include "SimpleMessage.h"
 
 using DataModel::SimpleMessage;
-using DataModel::TestSensor::SimpleMessageContent;
 using DataModel::Defaults::DEFAULT_SIMPLE_MESSAGE_CONTENT;
 
-SimpleMessage::SimpleMessage(SimpleMessageContent simpleDataContent) :
+SimpleMessage::SimpleMessage(Content simpleDataContent) :
         content(std::move(simpleDataContent)) {}
 
 SimpleMessage::SimpleMessage() : SimpleMessage(SimpleMessage::returnDefaultData()) {}
@@ -58,7 +57,7 @@ bool SimpleMessage::operator!=(SimpleMessage const& other) const {
 }
 
 void SimpleMessage::inverseContent() {
-    auto oldContent = SimpleMessageContent(content);
+    auto oldContent = Content(content);
     auto size = content.size();
     if (size < 2) {
         throw std::runtime_error("Warning! Some tests may misbehave. Content size needs to be more than 2.");

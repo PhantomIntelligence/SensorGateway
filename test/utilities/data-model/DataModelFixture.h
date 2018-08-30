@@ -47,7 +47,7 @@ namespace TestFunctions {
                 return charSet[distribution(randomEngine)];
             };
 
-            DataModel::TestSensor::SimpleMessageContent content;
+            DataModel::SimpleMessage::Content content;
             auto numberOfStringToCreate = content.size();
             for (unsigned long i = 0; i < numberOfStringToCreate; ++i) {
                 content.at(i) = createRandomStringOfLength(lengthOfDataToCreate, randomCharFunction);
