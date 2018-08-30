@@ -53,7 +53,7 @@ void GuardianTranslationStrategy::translateRawData(SensorRawData&& sensorRawData
     orderRawData(&sensorRawData);
 
     // Guardian sends little-endian raw data. They should become big-endian for Spirit
-//    reverseRawDataDefinitionEndianness(&sensorRawData);
+    reverseRawDataDefinitionEndianness(&sensorRawData);
 
     super::ServerRawData translatedRawData(sensorRawData.content);
     RawDataSource::produce(std::move(translatedRawData));
