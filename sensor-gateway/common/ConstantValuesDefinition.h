@@ -72,7 +72,13 @@ namespace Sensor {
         MessageID const DETECTION_VELOCITY = 0x0B;
         int const NUMBER_OF_DATA_BYTES = 8;
 
-        static size_t const RAW_DATA_SAMPLING_LENGTH = 1024;
+        /**
+         * @note: The AWL raw data is currently not supported. This is why the RAW_DATA_SAMPLING_LENGTH
+         * real value (1024) is commented out. Nontheless, the templates for DataStructures still require
+         * one to be defined, this is why the value is set to 1, which minimizes the memory usage for an AWLAccessLink
+         */
+//        static size_t const RAW_DATA_SAMPLING_LENGTH = 1024;
+        static size_t const RAW_DATA_SAMPLING_LENGTH = 1;
 
         namespace _7 {
             SensorID const SENSOR_ID = 0x0010;
