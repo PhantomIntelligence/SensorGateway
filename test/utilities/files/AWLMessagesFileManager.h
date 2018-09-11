@@ -22,11 +22,13 @@ namespace TestUtilities {
     class AWLMessagesFileManager : public FileManager<DataFlow::AWLMessage> {
 
     public:
+
         AWLMessagesFileManager() = default;
 
         ~AWLMessagesFileManager() override = default;
 
     private:
+
         DataFlow::AWLMessage readMessageFromFileBlock(std::string const& fileBlock) override;
 
         void writeFileBlockWithMessage(DataFlow::AWLMessage message, std::FILE* file) override;

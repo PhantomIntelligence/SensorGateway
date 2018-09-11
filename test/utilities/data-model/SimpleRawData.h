@@ -23,9 +23,12 @@
 namespace DataModel {
 
     class SimpleRawData {
+
     protected:
+
         static size_t const NUMBER_OF_CHANNELS = 1;
         static size_t const NUMBER_OF_DATA_IN_RAW_DATA = 16;
+
     public:
 
         typedef typename Sensor::RawDataDefinition<

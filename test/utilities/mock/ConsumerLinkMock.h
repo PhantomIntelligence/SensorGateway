@@ -24,9 +24,12 @@ namespace Mock {
     template<class DATA>
     class ConsumerLinkMock : public DataFlow::ConsumerLink<DATA> {
 
+    protected:
+
         using Buffer = DataFlow::RingBuffer<DATA>;
 
     public:
+
         ConsumerLinkMock() : active(false) {}
 
         void linkWith(Buffer* buffer) {
@@ -46,6 +49,7 @@ namespace Mock {
         }
 
     private:
+
         bool active;
     };
 }

@@ -21,16 +21,22 @@
 namespace DataTranslation {
 
     using AWLStructures = Sensor::AWL::Structures;
-    using AWLSpiritStructures = Sensor::Spirit::Structures<AWLStructures::RawData::RawDataDefinition>;
+    using AWLSpiritStructures = Sensor::Spirit::Structures<
+            AWLStructures::AWLRawDataDefinition,
+            AWLStructures::AWLCommandDefinition
+            >;
 
     class AWLTranslationStrategy final : public DataTranslationStrategy<AWLStructures, AWLSpiritStructures> {
+
     protected:
+
         using super = DataTranslationStrategy<AWLStructures, AWLSpiritStructures>;
         using super::SensorMessage;
         using super::SensorRawData;
 
         using super::MessageSource;
         using super::RawDataSource;
+
     public:
 
         explicit AWLTranslationStrategy() = default;

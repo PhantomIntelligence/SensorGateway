@@ -23,7 +23,9 @@ namespace Sensor {
     namespace Test {
         namespace Simple {
             class Structures final : public Sensor::Communication::DataStructures {
+
             public :
+
                 typedef typename DataModel::SimpleMessage Message;
                 typedef typename DataModel::SimpleRawData RawData;
 

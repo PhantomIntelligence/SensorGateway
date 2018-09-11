@@ -25,10 +25,14 @@
 namespace SensorGateway {
 
     using GuardianStructures = Sensor::Guardian::Structures;
-    using GuardianSpiritStructures = Sensor::Spirit::Structures<GuardianStructures::RawData::RawDataDefinition>;
+    using GuardianSpiritStructures = Sensor::Spirit::Structures<
+            GuardianStructures::GuardianRawDataDefinition,
+            GuardianStructures::GuardianCommandDefinition>;
 
-class GuardianAccessLink final : public SensorAccessLink<GuardianStructures, GuardianSpiritStructures> {
+    class GuardianAccessLink final : public SensorAccessLink<GuardianStructures, GuardianSpiritStructures> {
+
     protected:
+
         using super = SensorAccessLink<GuardianStructures, GuardianSpiritStructures>;
 
         using super::ServerCommunicationStrategy;
@@ -38,7 +42,7 @@ class GuardianAccessLink final : public SensorAccessLink<GuardianStructures, Gua
         explicit GuardianAccessLink(ServerCommunicationStrategy* serverCommunicationStrategy)
                 : super(serverCommunicationStrategy,
                         &guardianTranslationStrategy,
-                        &tbdSensorNameUSBCommunicationStrategy) {}
+                        &guardianUSBCommunicationStrategy) {}
 
         ~GuardianAccessLink() noexcept = default;
 
@@ -53,7 +57,7 @@ class GuardianAccessLink final : public SensorAccessLink<GuardianStructures, Gua
     private:
 
         DataTranslation::GuardianTranslationStrategy guardianTranslationStrategy;
-        SensorCommunication::GuardianUSBCommunicationStrategy tbdSensorNameUSBCommunicationStrategy;
+        SensorCommunication::GuardianUSBCommunicationStrategy guardianUSBCommunicationStrategy;
     };
 }
 

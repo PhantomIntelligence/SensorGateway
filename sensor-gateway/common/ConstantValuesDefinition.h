@@ -64,7 +64,10 @@ namespace Sensor {
         static size_t const NUMBER_OF_DETECTION_PER_CHANNEL = 16;
         static size_t const RAW_DATA_SAMPLING_LENGTH = 100;
         size_t const DETECTIONS_SIZE = NUMBER_OF_CHANNELS * NUMBER_OF_DETECTION_PER_CHANNEL;
+
+        static size_t const MAX_COMMAND_PAYLOAD_SIZE = 4096; // 1024 * floats == 1024 * 4 Bytes
     }
+
     namespace AWL {
         using MessageID = uint64_t;
         MessageID const END_OF_FRAME = 0x09;
@@ -79,6 +82,8 @@ namespace Sensor {
          */
 //        static size_t const RAW_DATA_SAMPLING_LENGTH = 1024;
         static size_t const RAW_DATA_SAMPLING_LENGTH = 1;
+
+        static size_t const MAX_COMMAND_PAYLOAD_SIZE = 4; // 4 Bytes
 
         namespace _7 {
             SensorID const SENSOR_ID = 0x0010;

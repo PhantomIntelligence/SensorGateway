@@ -25,8 +25,8 @@ namespace Mock {
     using TestUtilities::Structures::Frames;
 
     class FrameSinkMock : public DataSink<Frame> {
-    protected:
 
+    protected:
 
     public:
 
@@ -50,6 +50,7 @@ namespace Mock {
         }
 
     private:
+
         AtomicCounter actualNumberOfDataConsumed;
         AtomicCounter numberOfDataToConsume;
         Frames consumedData;

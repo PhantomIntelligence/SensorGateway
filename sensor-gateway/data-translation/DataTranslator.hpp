@@ -33,6 +33,7 @@ namespace SensorAccessLinkElement {
         using RawDataSink = DataFlow::DataSink<SensorRawData>;
 
     public:
+
         explicit DataTranslator(DataTranslationStrategy* dataTranslationStrategy) :
                 dataTranslationStrategy(dataTranslationStrategy) {};
 
@@ -55,6 +56,7 @@ namespace SensorAccessLinkElement {
         };
 
     private:
+
         DataTranslationStrategy* dataTranslationStrategy;
 
     };

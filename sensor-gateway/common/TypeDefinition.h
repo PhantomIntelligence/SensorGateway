@@ -49,7 +49,7 @@ namespace {
 
 namespace DataFlow {
 
-    namespace RawData {
+    namespace RawDataTypes {
 
         using ReceiverID = int32_t;
         using ChannelID = int32_t;

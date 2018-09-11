@@ -27,6 +27,7 @@ namespace Mock {
     class ArbitraryDataSinkMock final : public DataFlow::DataSink<T> {
 
     public:
+
         typedef T Data;
         typedef typename std::list<T> DataList;
 

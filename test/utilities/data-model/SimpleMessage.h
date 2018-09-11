@@ -27,6 +27,7 @@ namespace DataModel {
     class SimpleMessage {
 
     public:
+
         static int const NUMBER_OF_SIMPLE_MESSAGE_CONTENT = 2;
         // Allows to populate SimpleMessage with a "complex", non-primitive, element
         typedef std::array<std::string, NUMBER_OF_SIMPLE_MESSAGE_CONTENT> Content;

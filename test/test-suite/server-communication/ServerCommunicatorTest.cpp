@@ -56,6 +56,7 @@ namespace ServerCommunicatorTestMock {
         using super::RawData;
 
     public:
+
         MockServerCommunicatorStrategy() :
                 openConnectionCalled(false),
                 sendMessageCalled(false),
@@ -110,6 +111,7 @@ namespace ServerCommunicatorTestMock {
         }
 
     private:
+
         AtomicFlag openConnectionCalled;
         AtomicFlag sendMessageCalled;
         AtomicFlag sendRawDataCalled;

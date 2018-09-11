@@ -22,7 +22,6 @@
 #include "sensor-gateway/common/data-structure/sensor/AWLStructures.h"
 #include "SensorCommunicationStrategy.hpp"
 
-
 namespace SensorCommunication {
 
     using Sensor::AWL::NUMBER_OF_DATA_BYTES;

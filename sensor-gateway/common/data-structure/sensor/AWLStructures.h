@@ -17,16 +17,32 @@
 #ifndef SENSORGATEWAY_AWLSTRUCTURES_H
 #define SENSORGATEWAY_AWLSTRUCTURES_H
 
-#include "AWLRawData.h"
+#include "sensor-gateway/common/data-structure/DataStructures.h"
 #include "AWLMessage.h"
 
 namespace Sensor {
     namespace AWL {
 
         class Structures final : public Communication::DataStructures {
+
         public :
+
+            typedef typename
+            Sensor::RawDataDefinition<
+                    Sensor::RawDataTypes::AWL,
+                    Sensor::AWL::_16::NUMBER_OF_CHANNELS,
+                    Sensor::AWL::RAW_DATA_SAMPLING_LENGTH
+            > AWLRawDataDefinition;
+
+            typedef typename
+            Sensor::CommandDefinition<
+                    Sensor::CommandPayloadTypes::AWL,
+                    Sensor::AWL::MAX_COMMAND_PAYLOAD_SIZE
+            > AWLCommandDefinition;
+
             typedef typename DataFlow::AWLMessage Message;
-            typedef typename DataFlow::AWLRawData RawData;
+            typedef typename DataFlow::RawData<AWLRawDataDefinition> RawData;
+            typedef typename DataFlow::Command<AWLCommandDefinition> Command;
 
             static size_t const MAX_NUMBER_OF_BULK_FETCHABLE_MESSAGES = 1;
             static size_t const MAX_NUMBER_OF_BULK_FETCHABLE_RAW_DATA_CYCLES = 1;

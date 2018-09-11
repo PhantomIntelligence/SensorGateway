@@ -108,18 +108,18 @@ Track* GuardianTranslationStrategy::fetchTrack(TrackID const& trackID) {
 
 void GuardianTranslationStrategy::reverseRawDataDefinitionEndianness(SensorRawData* sensorRawData) {
     auto originalContent = ServerRawData::Content(sensorRawData->content);
-    auto const NUMBER_OF_DATA = SensorRawData::RawDataDefinition::SIZE;
+    auto const NUMBER_OF_DATA = SensorRawData::Definitions::SIZE;
     for (auto contentIndex = 0u; contentIndex < NUMBER_OF_DATA; ++contentIndex) {
         sensorRawData->content[contentIndex] = reverseEndiannessOfInt16(originalContent[contentIndex]);
     }
 }
 
 void GuardianTranslationStrategy::orderRawData(SensorRawData* sensorRawData) {
-    auto const NUMBER_OF_SAMPLES_PER_CHANNEL = SensorRawData::RawDataDefinition::NUMBER_OF_SAMPLES_PER_CHANNEL;
-    auto const NUMBER_OF_CHANNELS = SensorRawData::RawDataDefinition::NUMBER_OF_CHANNELS;
+    auto const NUMBER_OF_SAMPLES_PER_CHANNEL = SensorRawData::Definitions::NUMBER_OF_SAMPLES_PER_CHANNEL;
+    auto const NUMBER_OF_CHANNELS = SensorRawData::Definitions::NUMBER_OF_CHANNELS;
     auto unorderedContent = ServerRawData::Content(sensorRawData->content);
     for (auto ordinalChannelIndex = 0u; ordinalChannelIndex < NUMBER_OF_CHANNELS; ++ordinalChannelIndex) {
-        auto channelPositionIndex = sensorRawData->CHANNEL_POSITIONS[ordinalChannelIndex];
+        auto channelPositionIndex = SensorStructures::CHANNEL_POSITIONS[ordinalChannelIndex];
         auto originStartPosition = unorderedContent.begin() + channelPositionIndex * NUMBER_OF_SAMPLES_PER_CHANNEL;
         auto destinationStartPosition =
                 sensorRawData->content.begin() + ordinalChannelIndex * NUMBER_OF_SAMPLES_PER_CHANNEL;
