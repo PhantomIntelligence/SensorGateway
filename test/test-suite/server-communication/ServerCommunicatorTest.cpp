@@ -23,19 +23,19 @@
 
 #include "sensor-gateway/server-communication/ServerCommunicator.hpp"
 #include "test/utilities/data-model/DataModelFixture.h"
-#include "test/utilities/stub/FrameStub.h"
 
-using DataFlow::Frame;
-using Frames = std::list<Frame>;
-using ServerCommunicator = SensorAccessLinkElement::ServerCommunicator<Frame>;
-using ServerCommunication::ServerCommunicationStrategy;
 using TestFunctions::DataTestUtil;
-using Stub::createArbitraryFrame;
 
 class ServerCommunicatorTest : public ::testing::Test {
 
 protected:
+
+    using ServerCommunicator = SensorAccessLinkElement::ServerCommunicator<Sensor::Test::Simple::Structures>;
+    using Message = Sensor::Test::Simple::Structures::Message;
+    using RawData = Sensor::Test::Simple::Structures::RawData;
+
     std::string const SERVER_ADRESS = "I like pears";
+
     ServerCommunicatorTest() = default;
 
     virtual ~ServerCommunicatorTest() = default;
@@ -44,21 +44,39 @@ protected:
 
 namespace ServerCommunicatorTestMock {
 
-    class MockServerCommunicatorStrategy final : public ServerCommunicationStrategy<Frame> {
+    using ServerCommunication::ServerCommunicationStrategy;
+
+    class MockServerCommunicatorStrategy final : public ServerCommunicationStrategy<Sensor::Test::Simple::Structures> {
+
+    protected:
+
+        using super = ServerCommunicationStrategy<Sensor::Test::Simple::Structures>;
+
+        using super::Message;
+        using super::RawData;
+
     public:
+
         MockServerCommunicatorStrategy() :
                 openConnectionCalled(false),
                 sendMessageCalled(false),
+                sendRawDataCalled(false),
                 closeConnectionCalled(false),
-                sentMessage(Frame::returnDefaultData()) {
+                sentMessage(Message::returnDefaultData()),
+                sentRawData(RawData::returnDefaultData()){
 
         }
 
         ~MockServerCommunicatorStrategy() noexcept = default;
 
-        void sendMessage(MESSAGE&& message) {
+        void sendMessage(Message&& message) override {
             sendMessageCalled.store(true);
             sentMessage = message;
+        }
+
+        void sendRawData(RawData&& rawData) override {
+            sendRawDataCalled.store(true);
+            sentRawData = rawData;
         }
 
         void openConnection(std::string const& serverAddress) override {
@@ -77,22 +95,33 @@ namespace ServerCommunicatorTestMock {
             return closeConnectionCalled.load();
         }
 
-        bool hasReadMessageBeenCalled() const {
+        bool hasSendMessageBeenCalled() const {
             return sendMessageCalled.load();
         }
 
-        Frame getSentMessage() const {
+        bool hasSendRawDataBeenCalled() const {
+            return sendRawDataCalled.load();
+        }
+        Message getSentMessage() const {
             return sentMessage;
         }
 
+        RawData getSentRawData() const {
+            return sentRawData;
+        }
+
     private:
+
         AtomicFlag openConnectionCalled;
         AtomicFlag sendMessageCalled;
+        AtomicFlag sendRawDataCalled;
         AtomicFlag closeConnectionCalled;
 
-        Frame sentMessage;
+        Message sentMessage;
+        RawData sentRawData;
     };
 }
+
 
 TEST_F(ServerCommunicatorTest, given__when_connect_then_callsOpenConnectionInStrategy) {
     ServerCommunicatorTestMock::MockServerCommunicatorStrategy mockStrategy;
@@ -107,24 +136,47 @@ TEST_F(ServerCommunicatorTest, given__when_connect_then_callsOpenConnectionInStr
 TEST_F(ServerCommunicatorTest, given_aMessageToSend_when_consume_then_callsSendMessageInStrategy) {
     ServerCommunicatorTestMock::MockServerCommunicatorStrategy mockStrategy;
     ServerCommunicator serverCommunicator(&mockStrategy);
-    auto frame = createArbitraryFrame();
+    auto message = DataTestUtil::createRandomSimpleMessage();
 
-    serverCommunicator.consume(std::move(frame));
+    serverCommunicator.consume(std::move(message));
 
-    auto strategyHasBeenCalled = mockStrategy.hasReadMessageBeenCalled();
+    auto strategyHasBeenCalled = mockStrategy.hasSendMessageBeenCalled();
     ASSERT_TRUE(strategyHasBeenCalled);
 }
 
 TEST_F(ServerCommunicatorTest, given_aMessageToSend_when_consume_then_callsSendMessageInStrategyWithTheMessage) {
     ServerCommunicatorTestMock::MockServerCommunicatorStrategy mockStrategy;
     ServerCommunicator serverCommunicator(&mockStrategy);
-    auto frame = createArbitraryFrame();
-    auto frameCopy = Frame(frame);
+    auto message = DataTestUtil::createRandomSimpleMessage();
+    auto copy = Message(message);
 
-    serverCommunicator.consume(std::move(frame));
+    serverCommunicator.consume(std::move(message));
 
-    auto receivedFrame = mockStrategy.getSentMessage();
-    ASSERT_EQ(frameCopy, receivedFrame);
+    auto receivedMessage = mockStrategy.getSentMessage();
+    ASSERT_EQ(copy, receivedMessage);
+}
+
+TEST_F(ServerCommunicatorTest, given_aRawDataCycleToSend_when_consume_then_callsSendRawDataInStrategy) {
+    ServerCommunicatorTestMock::MockServerCommunicatorStrategy mockStrategy;
+    ServerCommunicator serverCommunicator(&mockStrategy);
+    auto rawData = DataTestUtil::createRandomSimpleRawData();
+
+    serverCommunicator.consume(std::move(rawData));
+
+    auto strategyHasBeenCalled = mockStrategy.hasSendRawDataBeenCalled();
+    ASSERT_TRUE(strategyHasBeenCalled);
+}
+
+TEST_F(ServerCommunicatorTest, given_aRawDataCycleToSend_when_consume_then_callsSendRawDataInStrategyWithTheRawData) {
+    ServerCommunicatorTestMock::MockServerCommunicatorStrategy mockStrategy;
+    ServerCommunicator serverCommunicator(&mockStrategy);
+    auto rawData = DataTestUtil::createRandomSimpleRawData();
+    auto copy = RawData(rawData);
+
+    serverCommunicator.consume(std::move(rawData));
+
+    auto receivedRawData = mockStrategy.getSentRawData();
+    ASSERT_EQ(copy, receivedRawData);
 }
 
 TEST_F(ServerCommunicatorTest, given__when_disconnect_then_callsCloseConnectionInStrategy) {

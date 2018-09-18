@@ -14,19 +14,24 @@
 #ifndef SENSORGATEWAY_SERVERCOMMUNICATOR_H
 #define SENSORGATEWAY_SERVERCOMMUNICATOR_H
 
-#include "sensor-gateway/message-translation/MessageTranslator.hpp"
+#include "sensor-gateway/data-translation/DataTranslator.hpp"
 #include "ServerCommunicationStrategy.hpp"
 
 namespace SensorAccessLinkElement {
 
-
     template<class T>
-    class ServerCommunicator : public DataFlow::DataSink<T> {
+    class ServerCommunicator : public DataFlow::DataSink<typename T::Message>,
+                               public DataFlow::DataSink<typename T::RawData> {
 
     protected:
 
-        typedef T MESSAGE;
-        using ServerCommunicationStrategy = ServerCommunication::ServerCommunicationStrategy<MESSAGE>;
+        using ServerCommunicationStrategy = ServerCommunication::ServerCommunicationStrategy<T>;
+
+        using Message = typename T::Message;
+        using RawData = typename T::RawData;
+
+        using MessageSink = DataFlow::DataSink<Message>;
+        using RawDataSink = DataFlow::DataSink<RawData>;
 
     public:
 
@@ -48,14 +53,15 @@ namespace SensorAccessLinkElement {
             serverCommunicationStrategy->openConnection(serverAddress);
         };
 
-        void disconnect() {
-            serverCommunicationStrategy->closeConnection();
+        void consume(Message&& message) override {
+            serverCommunicationStrategy->sendMessage(std::forward<Message>(message));
         }
 
-        void consume(MESSAGE&& message) override {
-            serverCommunicationStrategy->sendMessage(std::forward<MESSAGE>(message));
+        void consume(RawData&& rawData) override {
+            serverCommunicationStrategy->sendRawData(std::forward<RawData>(rawData));
         }
 
+        void disconnect() { serverCommunicationStrategy->closeConnection(); }
 
     private:
 

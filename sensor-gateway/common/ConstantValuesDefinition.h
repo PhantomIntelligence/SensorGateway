@@ -59,21 +59,40 @@ namespace CommandType {
 namespace Sensor {
     using SensorID = uint16_t;
 
-    namespace Wagner {
-        const int MAX_NUMBER_OF_BULK_FETCHABLE_MESSAGES = 32;
+    namespace Guardian {
+        static size_t const NUMBER_OF_CHANNELS = 16;
+        static size_t const NUMBER_OF_DETECTION_PER_CHANNEL = 16;
+        static size_t const RAW_DATA_SAMPLING_LENGTH = 100;
+        size_t const DETECTIONS_SIZE = NUMBER_OF_CHANNELS * NUMBER_OF_DETECTION_PER_CHANNEL;
+
+        static size_t const MAX_COMMAND_PAYLOAD_SIZE = 4096; // 1024 * floats == 1024 * 4 Bytes
     }
+
     namespace AWL {
         using MessageID = uint64_t;
         MessageID const END_OF_FRAME = 0x09;
         MessageID const DETECTION_TRACK = 0x0A;
         MessageID const DETECTION_VELOCITY = 0x0B;
         int const NUMBER_OF_DATA_BYTES = 8;
+
+        /**
+         * @note: The AWL raw data is currently not supported. This is why the RAW_DATA_SAMPLING_LENGTH
+         * real value (1024) is commented out. Nontheless, the templates for DataStructures still require
+         * one to be defined, this is why the value is set to 1, which minimizes the memory usage for an AWLAccessLink
+         */
+//        static size_t const RAW_DATA_SAMPLING_LENGTH = 1024;
+        static size_t const RAW_DATA_SAMPLING_LENGTH = 1;
+
+        static size_t const MAX_COMMAND_PAYLOAD_SIZE = 4; // 4 Bytes
+
         namespace _7 {
             SensorID const SENSOR_ID = 0x0010;
         }
         namespace _16 {
+            static size_t const NUMBER_OF_CHANNELS = 16;
+            size_t const MAX_RAW_BUFFER_SIZE = 16384;
             int const MULTIPLICATIVE_CONSTANT = 10;  // Because all values are multiple with 1 decimal, 10 is sufficient to work with non-floating point representation
-            int const HORIZONTAL_FIELD_OF_VIEW = static_cast<int>(30.4*MULTIPLICATIVE_CONSTANT);
+            int const HORIZONTAL_FIELD_OF_VIEW = static_cast<int>(30.4 * MULTIPLICATIVE_CONSTANT);
             int const NUMBER_OF_LAYER = 2;
             int const NUMBER_OF_PIXELS_IN_LAYER = 8;
             int const NUMBER_OF_PIXELS_IN_FRAME = 16;
@@ -83,7 +102,6 @@ namespace Sensor {
         }
     }
 }
-
 
 
 #endif //SENSORGATEWAY_CONSTANTVALUESDEFINITION_H

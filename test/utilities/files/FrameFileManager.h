@@ -15,7 +15,7 @@
 #define SENSORGATEWAY_FRAMEFILEMANAGER_H
 
 #include "FileManager.hpp"
-#include "sensor-gateway/domain/Frame.h"
+#include "sensor-gateway/common/data-structure/spirit/Frame.h"
 
 namespace TestUtilities {
 
@@ -27,7 +27,7 @@ namespace TestUtilities {
     class FrameFileManager : public FileManager<DataFlow::Frame> {
 
     public:
-        FrameFileManager()  = default;
+        FrameFileManager() = default;
 
         ~FrameFileManager() override = default;
 
@@ -43,27 +43,27 @@ namespace TestUtilities {
         void writeFileLineWithContentLabelAndValue(std::FILE* file, unsigned int numberOfTabulator,
                                                    char const* contentLabel, unsigned int contentValue);
 
-        std::string const  FRAME_ID_LABEL = "Frame ID";
+        std::string const FRAME_ID_LABEL = "Frame ID";
 
-        std::string const  SYSTEM_ID_LABEL = "System ID";
+        std::string const SYSTEM_ID_LABEL = "System ID";
 
-        std::string const  PIXELS_LABEL = "Pixels";
+        std::string const PIXELS_LABEL = "Pixels";
 
-        std::string const  PIXEL_ID_LABEL = "Pixel ID";
+        std::string const PIXEL_ID_LABEL = "Pixel ID";
 
-        std::string const  TRACKS_LABEL = "Tracks";
+        std::string const TRACKS_LABEL = "Tracks";
 
-        std::string const  TRACK_ID_LABEL = "Track ID";
+        std::string const TRACK_ID_LABEL = "Track ID";
 
-        std::string const  INTENSITY_LABEL = "Ìntensity";
+        std::string const INTENSITY_LABEL = "Ìntensity";
 
-        std::string const  CONFIDENCE_LEVEL_LABEL = "Confidence Level";
+        std::string const CONFIDENCE_LEVEL_LABEL = "Confidence Level";
 
-        std::string const  DISTANCE_LABEL = "Distance";
+        std::string const DISTANCE_LABEL = "Distance";
 
-        std::string const  ACCELERATION_LABEL = "Acceleration";
+        std::string const ACCELERATION_LABEL = "Acceleration";
 
-        std::string const  SPEED_LABEL = "Speed";
+        std::string const SPEED_LABEL = "Speed";
     };
 }
 

@@ -61,7 +61,7 @@ KvaserCanCommunicationStrategy::super::RawDataCycles KvaserCanCommunicationStrat
 
 KvaserCanCommunicationStrategy::super::Message
 KvaserCanCommunicationStrategy::convertCanMessageToSensorMessage(CanMessage canMessage) {
-    AWL::DataArray data;
+    AWL::MessageDataArray data;
     for (auto dataNumber = 0; dataNumber < canMessage.length; ++dataNumber) {
         data[dataNumber] = canMessage.data[dataNumber];
     }

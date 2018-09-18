@@ -19,9 +19,8 @@
 
 #include <canlib.h>
 
-#include "sensor-gateway/common/sensor-structures/AWLStructures.h"
+#include "sensor-gateway/common/data-structure/sensor/AWLStructures.h"
 #include "SensorCommunicationStrategy.hpp"
-
 
 namespace SensorCommunication {
 

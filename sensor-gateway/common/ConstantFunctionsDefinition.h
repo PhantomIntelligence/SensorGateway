@@ -33,6 +33,12 @@ namespace {
         return signedBigEndianNumber;
     }
 
+    int16_t reverseEndiannessOfInt16(int16_t value) {
+        int16_t reverseValue = (static_cast<int16_t>(value & 0xFF00) >> 8) |
+                               (static_cast<int16_t>(value & 0x00FF) << 8);
+        return reverseValue;
+    }
+
     /**
       * @warning Allows to start the various JoinableThreads in the constructors without blocking anything
       */

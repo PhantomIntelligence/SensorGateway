@@ -23,13 +23,20 @@
 namespace SensorAccessLinkElement {
 
     template<class T>
-    class SensorCommunicator : public DataFlow::DataSource<typename T::Message> {
+    class SensorCommunicator : public DataFlow::DataSource<typename T::Message>,
+                               public DataFlow::DataSource<typename T::RawData> {
 
     protected:
         typedef SensorCommunication::SensorCommunicationStrategy<T> SensorCommunicationStrategy;
 
-        using super = DataFlow::DataSource<typename T::Message>;
-        using super::produce;
+        using MESSAGE = typename T::Message;
+        using RAW_DATA = typename T::RawData;
+
+        using MessageSource = DataFlow::DataSource<MESSAGE>;
+        using RawDataSource = DataFlow::DataSource<RAW_DATA>;
+
+        MESSAGE const DEFAULT_MESSAGE = T::Message::returnDefaultData();
+        RAW_DATA const DEFAULT_RAW_DATA = T::RawData::returnDefaultData();
 
     public:
         explicit SensorCommunicator(SensorCommunicationStrategy* sensorCommunicationStrategy) :
@@ -49,34 +56,50 @@ namespace SensorAccessLinkElement {
 
         SensorCommunicator& operator=(SensorCommunicator&& other)& noexcept = delete;
 
-        void connect() {
+        void start() {
             sensorCommunicationStrategy->openConnection();
             communicatorThread = JoinableThread(&SensorCommunicator::run, this);
         };
 
-        void disconnect() {
+        void terminateAndJoin() {
             sensorCommunicationStrategy->closeConnection();
-
             if (!terminateOrderHasBeenReceived()) {
                 terminateOrderReceived.store(true);
             }
-
             communicatorThread.exitSafely();
         };
 
+        using MessageSource::linkConsumer;
+
+        using RawDataSource::linkConsumer;
 
     private:
 
         void run() {
-            auto const DEFAULT_MESSAGE = T::Message::returnDefaultData();
             while (!terminateOrderHasBeenReceived()) {
-                auto messages = sensorCommunicationStrategy->fetchMessages();
+                handleIncomingMessages();
+                handleIncomingRawData();
+                // TODO : investigate the avantages of sleep and/or yield here.
+                std::this_thread::yield();
+            }
+        }
 
-                for (auto messageIndex = 0; messageIndex < messages.size(); ++messageIndex) {
-                    auto message = messages[messageIndex];
-                    if (message != DEFAULT_MESSAGE) {
-                        produce(std::move(message));
-                    }
+        void handleIncomingMessages() {
+            auto messages = sensorCommunicationStrategy->fetchMessages();
+            for (auto messageIndex = 0; messageIndex < messages.size(); ++messageIndex) {
+                auto message = messages[messageIndex];
+                if (message != DEFAULT_MESSAGE) {
+                    MessageSource::produce(std::move(message));
+                }
+            }
+        }
+
+        void handleIncomingRawData() {
+            auto rawDataCycles = sensorCommunicationStrategy->fetchRawDataCycles();
+            for (auto rawDataIndex = 0; rawDataIndex < rawDataCycles.size(); ++rawDataIndex) {
+                auto rawDataCycle = rawDataCycles[rawDataIndex];
+                if (rawDataCycle != DEFAULT_RAW_DATA) {
+                    RawDataSource::produce(std::move(rawDataCycle));
                 }
             }
         }

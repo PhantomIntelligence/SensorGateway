@@ -19,13 +19,21 @@
 
 #include "SensorAccessLink.hpp"
 #include "sensor-gateway/sensor-communication/KvaserCanCommunicationStrategy.h"
-#include "sensor-gateway/message-translation/AWLTranslationStrategy.h"
+#include "sensor-gateway/data-translation/AWLTranslationStrategy.h"
 
 namespace SensorGateway {
 
-    class AWL16AccessLink final : public SensorAccessLink<Sensor::AWL::Structures, DataFlow::Frame> {
+    using AWL16Structures = Sensor::AWL::Structures;
+    using AWL16SpiritStructures = Sensor::Spirit::Structures<
+            AWL16Structures::AWLRawDataDefinition,
+            AWL16Structures::AWLCommandDefinition
+            >;
+
+    class AWL16AccessLink final : public SensorAccessLink<AWL16Structures, AWL16SpiritStructures> {
+
     protected:
-        using super = SensorAccessLink<Sensor::AWL::Structures, DataFlow::Frame>;
+
+        using super = SensorAccessLink<AWL16Structures, AWL16SpiritStructures>;
 
         using super::ServerCommunicationStrategy;
 
@@ -48,7 +56,7 @@ namespace SensorGateway {
 
     private:
 
-        MessageTranslation::AWLTranslationStrategy awlTranslationStrategy;
+        DataTranslation::AWLTranslationStrategy awlTranslationStrategy;
         SensorCommunication::KvaserCanCommunicationStrategy kvaserCanCommunicationStrategy;
     };
 }

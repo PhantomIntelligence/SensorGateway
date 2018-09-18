@@ -48,6 +48,18 @@ namespace {
 };
 
 namespace DataFlow {
+
+    namespace RawDataTypes {
+
+        using ReceiverID = int32_t;
+        using ChannelID = int32_t;
+        using Offset = size_t;
+        using Drop = size_t;
+        using Count = size_t;
+        using Size = size_t;
+        using Signed = bool;
+    }
+
     typedef int16_t Acceleration;
     typedef uint8_t ConfidenceLevel;
     typedef uint16_t Distance;

@@ -25,7 +25,7 @@ AWLMessage AWLMessagesFileManager::readMessageFromFileBlock(std::string const& f
             fetchSubstringBetweenDelimiters(fileBlock, LENGTH_LABEL + MESSAGE_LABEL_VALUE_ASSOCIATOR, "\n")));
     auto timestamp = static_cast<AWL::MessageTimestamp> (std::stoi(
             fetchSubstringBetweenDelimiters(fileBlock, TIMESTAMP_LABEL + MESSAGE_LABEL_VALUE_ASSOCIATOR, "\n")));
-    AWL::DataArray data;
+    AWL::MessageDataArray data;
     for (auto dataPosition = 0; dataPosition < NUMBER_OF_DATA_BYTES; dataPosition++) {
         auto dataValue = std::stoi(fetchSubstringBetweenDelimiters(fileBlock, DATA_POSITION_LABEL + " " +
                                                                               std::to_string(dataPosition + 1) +

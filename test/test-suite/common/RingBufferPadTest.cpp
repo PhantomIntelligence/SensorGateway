@@ -25,7 +25,7 @@
 using DataFlow::RingBufferPad;
 using TestFunctions::DataTestUtil;
 
-typedef RingBufferPad<DataModel::SimpleData> Pad;
+typedef RingBufferPad<DataModel::SimpleMessage> Pad;
 
 /**
  * @brief Test Fixture meant to ensure correct behavior of RingBufferPad.
@@ -76,7 +76,7 @@ TEST_F(RingBufferPadTest, given_aNextPad_when_attemptingToSetANewNextPad_then_th
 
 TEST_F(RingBufferPadTest, given_data_when_read_then_returnsData) {
     auto testedPad = Pad();
-    auto data = DataTestUtil::createRandomSimpleData();
+    auto data = DataTestUtil::createRandomSimpleMessage();
     testedPad.write(std::move(data));
 
     auto readData = testedPad.read();
