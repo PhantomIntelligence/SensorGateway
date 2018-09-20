@@ -21,6 +21,8 @@
 
 #include "sensor-gateway/common/data-structure/sensor/AWLStructures.h"
 #include "SensorCommunicationStrategy.hpp"
+#include "sensor-gateway/common/exception/SensorAccessLinkExceptions.h"
+
 
 namespace SensorCommunication {
 
@@ -53,6 +55,7 @@ namespace SensorCommunication {
 
         void closeConnection() final;
 
+
     private:
 
         typedef struct {
@@ -66,6 +69,8 @@ namespace SensorCommunication {
         super::Message convertCanMessageToSensorMessage(CanMessage canMessage);
 
         canHandle communicationChannel;
+
+        void throwErrorOnLibKvaserCanErrorCode(int errorCode);
     };
 }
 #endif //SENSORGATEWAY_KVASERCANCOMMUNICATIONSTRATEGY_H
