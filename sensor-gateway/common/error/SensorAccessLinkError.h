@@ -21,20 +21,25 @@
 
 namespace ErrorHandling {
 
-    class SensorAccessLinkError {
+    class SensorAccessLinkError : public std::runtime_error {
     protected:
 
     public:
 
-        explicit SensorAccessLinkError();
+        typedef int64_t ErrorCode;
 
-        ~SensorAccessLinkError() noexcept;
+        explicit SensorAccessLinkError(std::string const& origin,
+                                       Category const& category,
+                                       Severity const& severity,
+                                       ErrorCode const& code,
+                                       std::string const& message,
+                                       HighResolutionTimePoint timestamp = HighResolutionClock::now());
+
+        ~SensorAccessLinkError() noexcept override;
 
         SensorAccessLinkError(SensorAccessLinkError const& other);
 
         SensorAccessLinkError(SensorAccessLinkError&& other) noexcept;
-
-        SensorAccessLinkError(std::string const& origin);
 
         SensorAccessLinkError& operator=(SensorAccessLinkError const& other)&;
 
@@ -42,9 +47,30 @@ namespace ErrorHandling {
 
         void swap(SensorAccessLinkError& current, SensorAccessLinkError& other) noexcept;
 
+        bool operator==(SensorAccessLinkError const& other) const;
+
+        bool operator!=(SensorAccessLinkError const& other) const;
+
+        std::string fetchDetailedMessage() const noexcept;
+
     private:
 
-        std::string const origin;
+        static std::string buildDetailedMessage(HighResolutionTimePoint const& timestamp,
+                                                std::string const& origin,
+                                                Category const& category,
+                                                Severity const& severity,
+                                                ErrorCode const& code,
+                                                std::string const& message) noexcept;
+
+        static std::string formatTimestamp(HighResolutionTimePoint const& timestamp) noexcept;
+
+        HighResolutionTimePoint timestamp;
+        std::string origin;
+        Category category;
+        Severity severity;
+        ErrorCode code;
+        std::string message;
+
     };
 
 }

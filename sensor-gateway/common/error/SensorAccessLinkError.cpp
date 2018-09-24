@@ -15,3 +15,107 @@
 */
 
 #include "SensorAccessLinkError.h"
+
+using ErrorHandling::SensorAccessLinkError;
+using ErrorHandling::Severity;
+using ErrorHandling::Category;
+
+SensorAccessLinkError::SensorAccessLinkError(std::string const& origin,
+                                             Category const& category,
+                                             Severity const& severity,
+                                             ErrorCode const& code,
+                                             std::string const& message,
+                                             HighResolutionTimePoint timestamp) :
+        runtime_error(buildDetailedMessage(timestamp, origin, category, severity, code, message)),
+        timestamp(timestamp),
+        origin(origin),
+        category(category),
+        severity(severity),
+        code(code),
+        message(message) {}
+
+SensorAccessLinkError::~SensorAccessLinkError() noexcept = default;
+
+SensorAccessLinkError::SensorAccessLinkError(SensorAccessLinkError const& other) :
+        SensorAccessLinkError(other.origin, other.category, other.severity, other.code, other.message,
+                              other.timestamp) {
+}
+
+SensorAccessLinkError::SensorAccessLinkError(SensorAccessLinkError&& other) noexcept :
+        SensorAccessLinkError(std::move(other.origin), other.category, other.severity, other.code,
+                              std::move(other.message), std::move(other.timestamp)) {
+}
+
+SensorAccessLinkError& SensorAccessLinkError::operator=(SensorAccessLinkError const& other)& {
+    SensorAccessLinkError temporary(other);
+    swap(*this, temporary);
+    return *this;
+}
+
+SensorAccessLinkError& SensorAccessLinkError::operator=(SensorAccessLinkError&& other)& noexcept {
+    swap(*this, other);
+    return *this;
+}
+
+void SensorAccessLinkError::swap(SensorAccessLinkError& current, SensorAccessLinkError& other) noexcept {
+    std::swap(current.origin, other.origin);
+    std::swap(current.category, other.category);
+    std::swap(current.severity, other.severity);
+    std::swap(current.code, other.code);
+    std::swap(current.message, other.message);
+    std::swap(current.timestamp, other.timestamp);
+}
+
+bool SensorAccessLinkError::operator==(SensorAccessLinkError const& other) const {
+    auto sameOrigin = (origin == other.origin);
+    auto sameCategory = (category == other.category);
+    auto sameSeverity = (severity == other.severity);
+    auto sameCode = (code == other.code);
+    auto sameMessage = (message == other.message);
+    auto messagesAreEqual = (sameOrigin &&
+                             sameCategory &&
+                             sameSeverity &&
+                             sameCode &&
+                             sameMessage
+    );
+    return messagesAreEqual;
+}
+
+bool SensorAccessLinkError::operator!=(SensorAccessLinkError const& other) const {
+    return !operator==(other);
+}
+
+std::string SensorAccessLinkError::fetchDetailedMessage() const noexcept {
+    std::string detailedMessage = buildDetailedMessage(timestamp, origin, category, severity, code, message);
+    return detailedMessage;
+}
+
+std::string SensorAccessLinkError::buildDetailedMessage(HighResolutionTimePoint const& timestamp,
+                                                        std::string const& origin,
+                                                        Category const& category,
+                                                        Severity const& severity,
+                                                        SensorAccessLinkError::ErrorCode const& code,
+                                                        std::string const& message) noexcept {
+    auto formattedTimestamp = formatTimestamp(timestamp);
+    std::ostringstream detailedMessageStream(formattedTimestamp, std::ios_base::ate);
+    detailedMessageStream
+            << " -- <" << severity
+            << "> " << category
+            << " - " << origin
+            << ": " << code
+            << " ->  " << message
+            << "\n";
+    std::string detailedMessage = detailedMessageStream.str();
+    return detailedMessage;
+}
+
+std::string SensorAccessLinkError::formatTimestamp(HighResolutionTimePoint const& timestamp) noexcept {
+    std::size_t const ARBITRARY_BIG_ENOUGH_SIZE = 128;
+    auto time_tTimestamp = std::chrono::_V2::system_clock::to_time_t(timestamp);
+    auto gmTime = gmtime(&time_tTimestamp);
+    char charArrayTime[ARBITRARY_BIG_ENOUGH_SIZE];
+    auto numberOfCharacterWritten = strftime(charArrayTime, sizeof(charArrayTime), "%D %T", gmTime);
+    std::string formattedTime(std::begin(charArrayTime), std::begin(charArrayTime) + numberOfCharacterWritten);
+    return formattedTime;
+}
+
