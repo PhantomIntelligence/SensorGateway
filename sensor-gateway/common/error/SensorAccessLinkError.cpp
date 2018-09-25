@@ -34,7 +34,7 @@ SensorAccessLinkError::SensorAccessLinkError(std::string const& origin,
         code(code),
         message(message) {}
 
-SensorAccessLinkError::~SensorAccessLinkError() noexcept = default;
+SensorAccessLinkError::~SensorAccessLinkError() noexcept {}
 
 SensorAccessLinkError::SensorAccessLinkError(SensorAccessLinkError const& other) :
         SensorAccessLinkError(other.origin, other.category, other.severity, other.code, other.message,
@@ -46,16 +46,6 @@ SensorAccessLinkError::SensorAccessLinkError(SensorAccessLinkError&& other) noex
                               std::move(other.message), std::move(other.timestamp)) {
 }
 
-SensorAccessLinkError& SensorAccessLinkError::operator=(SensorAccessLinkError const& other)& {
-    SensorAccessLinkError temporary(other);
-    swap(*this, temporary);
-    return *this;
-}
-
-SensorAccessLinkError& SensorAccessLinkError::operator=(SensorAccessLinkError&& other)& noexcept {
-    swap(*this, other);
-    return *this;
-}
 
 void SensorAccessLinkError::swap(SensorAccessLinkError& current, SensorAccessLinkError& other) noexcept {
     std::swap(current.origin, other.origin);

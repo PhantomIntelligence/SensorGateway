@@ -12,6 +12,7 @@ file(GLOB DATA_MODEL_FILES "${DOT}/utilities/data-model/*")
 file(GLOB APPLICATION_TEST_FILES "${DOT}/test-suite/application/*")
 file(GLOB COMMON_TEST_FILES "${DOT}/test-suite/common/*")
 file(GLOB DATA_STRUCTURE_TEST_FILES "${DOT}/test-suite/common/data-structure/*")
+file(GLOB ERROR_TEST_FILES "${DOT}/test-suite/common/error/*")
 file(GLOB SENSOR_COMM_TEST_FILES "${DOT}/test-suite/sensor-communication/*")
 file(GLOB TRANSLATOR_TEST_FILES "${DOT}/test-suite/data-translation/*")
 file(GLOB SERVER_COMM_TEST_FILES "${DOT}/test-suite/server-communication/*")
@@ -31,6 +32,7 @@ add_executable(${RUNTEST}
         ${APPLICATION_TEST_FILES}
         ${COMMON_TEST_FILES}
         ${DATA_STRUCTURE_TEST_FILES}
+        ${ERROR_TEST_FILES}
         ${SENSOR_COMM_TEST_FILES}
         ${TRANSLATOR_TEST_FILES}
         ${SERVER_COMM_TEST_FILES}

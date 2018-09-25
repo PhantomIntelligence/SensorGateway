@@ -41,9 +41,9 @@ namespace ErrorHandling {
 
         SensorAccessLinkError(SensorAccessLinkError&& other) noexcept;
 
-        SensorAccessLinkError& operator=(SensorAccessLinkError const& other)&;
+        SensorAccessLinkError& operator=(SensorAccessLinkError const& other)& = delete;
 
-        SensorAccessLinkError& operator=(SensorAccessLinkError&& other)& noexcept;
+        SensorAccessLinkError& operator=(SensorAccessLinkError&& other)& noexcept = delete;
 
         void swap(SensorAccessLinkError& current, SensorAccessLinkError& other) noexcept;
 
@@ -63,6 +63,8 @@ namespace ErrorHandling {
                                                 std::string const& message) noexcept;
 
         static std::string formatTimestamp(HighResolutionTimePoint const& timestamp) noexcept;
+
+    protected:
 
         HighResolutionTimePoint timestamp;
         std::string origin;
