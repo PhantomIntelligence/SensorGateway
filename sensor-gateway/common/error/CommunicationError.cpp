@@ -58,6 +58,15 @@ bool CommunicationError::isFatal() const noexcept {
     return isFatal;
 }
 
+bool CommunicationError::isOpenConnectionRequired() const noexcept {
+    bool isCloseConnectionRequired = true;
+    if (category == COMMUNICATION_ERROR ||
+        severity == EMERGENCY) {
+        isCloseConnectionRequired = false;
+    }
+    return isCloseConnectionRequired;
+}
+
 bool CommunicationError::isCloseConnectionRequired() const noexcept {
     bool isCloseConnectionRequired = true;
     if (category == COMMUNICATION_ERROR) {
@@ -65,3 +74,14 @@ bool CommunicationError::isCloseConnectionRequired() const noexcept {
     }
     return isCloseConnectionRequired;
 }
+
+bool CommunicationError::isResumeCommunicationRequired() const noexcept {
+    bool isResumeCommunicationRequired = false;
+    if(category == COMMUNICATION_ERROR){
+        isResumeCommunicationRequired = true;
+    }
+    return isResumeCommunicationRequired;
+}
+
+
+

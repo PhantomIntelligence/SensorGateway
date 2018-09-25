@@ -49,7 +49,11 @@ namespace ErrorHandling {
 
         bool isFatal() const noexcept;
 
+        bool isOpenConnectionRequired() const noexcept;
+
         bool isCloseConnectionRequired() const noexcept;
+
+        bool isResumeCommunicationRequired() const noexcept;
     };
 
 }
