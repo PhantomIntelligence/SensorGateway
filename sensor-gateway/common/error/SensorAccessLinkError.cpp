@@ -46,6 +46,16 @@ SensorAccessLinkError::SensorAccessLinkError(SensorAccessLinkError&& other) noex
                               std::move(other.message), std::move(other.timestamp)) {
 }
 
+SensorAccessLinkError& SensorAccessLinkError::operator=(SensorAccessLinkError const& other)& {
+    SensorAccessLinkError temporary(other);
+    swap(*this, temporary);
+    return *this;
+}
+
+SensorAccessLinkError& SensorAccessLinkError::operator=(SensorAccessLinkError&& other)& noexcept {
+    swap(*this, other);
+    return *this;
+}
 
 void SensorAccessLinkError::swap(SensorAccessLinkError& current, SensorAccessLinkError& other) noexcept {
     std::swap(current.origin, other.origin);
@@ -73,6 +83,43 @@ bool SensorAccessLinkError::operator==(SensorAccessLinkError const& other) const
 
 bool SensorAccessLinkError::operator!=(SensorAccessLinkError const& other) const {
     return !operator==(other);
+}
+
+SensorAccessLinkError const SensorAccessLinkError::returnDefaultData() noexcept {
+    return Defaults::DEFAULT_SENSOR_ACCESS_LINK_ERROR;
+}
+
+bool SensorAccessLinkError::isFatal() const noexcept {
+    bool isFatal = false;
+    if (severity == EMERGENCY) {
+        isFatal = true;
+    }
+    return isFatal;
+}
+
+bool SensorAccessLinkError::isOpenConnectionRequired() const noexcept {
+    bool isCloseConnectionRequired = true;
+    if (category == COMMUNICATION_ERROR ||
+        severity == EMERGENCY) {
+        isCloseConnectionRequired = false;
+    }
+    return isCloseConnectionRequired;
+}
+
+bool SensorAccessLinkError::isCloseConnectionRequired() const noexcept {
+    bool isCloseConnectionRequired = true;
+    if (category == COMMUNICATION_ERROR) {
+        isCloseConnectionRequired = false;
+    }
+    return isCloseConnectionRequired;
+}
+
+bool SensorAccessLinkError::isResumeCommunicationRequired() const noexcept {
+    bool isResumeCommunicationRequired = false;
+    if (category == COMMUNICATION_ERROR) {
+        isResumeCommunicationRequired = true;
+    }
+    return isResumeCommunicationRequired;
 }
 
 std::string SensorAccessLinkError::fetchDetailedMessage() const noexcept {

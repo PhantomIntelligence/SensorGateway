@@ -30,6 +30,11 @@ namespace ErrorHandling {
         NOTICE = 5,
         INFO = 6,
         DEBUG = 7,
+
+        /**
+         * @brief This SHOULD NEVER be used for any application, for empty initialization purposes only
+         */
+        EMPTY = 42,
     };
 
     enum Category : int32_t {
@@ -38,6 +43,11 @@ namespace ErrorHandling {
         UNHANDLED_ERROR = 102,
         EXTERNAL_ERROR = 103,
         UNRECOGNIZED_ERROR = 104,
+
+        /**
+         * @brief This SHOULD NEVER be used for any application, for empty initialization purposes only
+         */
+        EMPTY_ERROR = 142,
     };
 
 }

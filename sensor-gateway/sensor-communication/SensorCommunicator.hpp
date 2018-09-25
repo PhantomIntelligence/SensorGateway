@@ -24,7 +24,8 @@ namespace SensorAccessLinkElement {
 
     template<class T>
     class SensorCommunicator : public DataFlow::DataSource<typename T::Message>,
-                               public DataFlow::DataSource<typename T::RawData> {
+                               public DataFlow::DataSource<typename T::RawData>,
+                               public DataFlow::DataSource<ErrorHandling::SensorAccessLinkError>  {
 
     protected:
         typedef SensorCommunication::SensorCommunicationStrategy<T> SensorCommunicationStrategy;

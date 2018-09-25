@@ -21,7 +21,8 @@ namespace SensorAccessLinkElement {
 
     template<class T>
     class ServerCommunicator : public DataFlow::DataSink<typename T::Message>,
-                               public DataFlow::DataSink<typename T::RawData> {
+                               public DataFlow::DataSink<typename T::RawData>,
+                               public DataFlow::DataSource<ErrorHandling::SensorAccessLinkError> {
 
     protected:
 

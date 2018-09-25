@@ -41,9 +41,9 @@ namespace ErrorHandling {
 
         SensorAccessLinkError(SensorAccessLinkError&& other) noexcept;
 
-        SensorAccessLinkError& operator=(SensorAccessLinkError const& other)& = delete;
+        SensorAccessLinkError& operator=(SensorAccessLinkError const& other)&;
 
-        SensorAccessLinkError& operator=(SensorAccessLinkError&& other)& noexcept = delete;
+        SensorAccessLinkError& operator=(SensorAccessLinkError&& other)& noexcept;
 
         void swap(SensorAccessLinkError& current, SensorAccessLinkError& other) noexcept;
 
@@ -51,7 +51,18 @@ namespace ErrorHandling {
 
         bool operator!=(SensorAccessLinkError const& other) const;
 
+        SensorAccessLinkError static const returnDefaultData() noexcept;
+
+        bool isFatal() const noexcept;
+
+        bool isOpenConnectionRequired() const noexcept;
+
+        bool isCloseConnectionRequired() const noexcept;
+
+        bool isResumeCommunicationRequired() const noexcept;
+
         std::string fetchDetailedMessage() const noexcept;
+
 
     private:
 
@@ -74,7 +85,22 @@ namespace ErrorHandling {
         std::string message;
 
     };
+}
 
+namespace Defaults {
+    using ErrorHandling::SensorAccessLinkError;
+    using ErrorHandling::Severity;
+    using ErrorHandling::Category;
+    using ErrorCode = typename SensorAccessLinkError::ErrorCode;
+
+    std::string const DEFAULT_ORIGIN = "Initialization origin, should not appear in production.";
+    Category const DEFAULT_CATEGORY = Category::EMPTY_ERROR;
+    Severity const DEFAULT_SEVERITY = Severity::EMPTY;
+    ErrorCode const DEFAULT_ERROR_CODE = -1;
+    std::string const DEFAULT_MESSAGE = "This message is a placeholder for initialization purpose.";
+    SensorAccessLinkError const DEFAULT_SENSOR_ACCESS_LINK_ERROR = SensorAccessLinkError(
+            DEFAULT_ORIGIN, DEFAULT_CATEGORY, DEFAULT_SEVERITY, DEFAULT_ERROR_CODE, DEFAULT_MESSAGE
+    );
 }
 
 #endif //SENSORGATEWAY_SENSORACCESSLINKERROR_H

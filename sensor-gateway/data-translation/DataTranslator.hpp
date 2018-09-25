@@ -20,7 +20,8 @@ namespace SensorAccessLinkElement {
 
     template<class SENSOR_STRUCTURES, class SERVER_STRUCTURES>
     class DataTranslator : public DataFlow::DataSink<typename SENSOR_STRUCTURES::Message>,
-                           public DataFlow::DataSink<typename SENSOR_STRUCTURES::RawData> {
+                           public DataFlow::DataSink<typename SENSOR_STRUCTURES::RawData>,
+                           public DataFlow::DataSource<ErrorHandling::SensorAccessLinkError> {
 
     protected:
 
