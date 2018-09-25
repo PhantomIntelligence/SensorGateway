@@ -37,7 +37,7 @@ namespace ErrorHandling {
 
         ~SensorAccessLinkError() noexcept override;
 
-        SensorAccessLinkError(SensorAccessLinkError const& other);
+        SensorAccessLinkError(SensorAccessLinkError const& other) noexcept;
 
         SensorAccessLinkError(SensorAccessLinkError&& other) noexcept;
 
@@ -58,8 +58,6 @@ namespace ErrorHandling {
         bool isOpenConnectionRequired() const noexcept;
 
         bool isCloseConnectionRequired() const noexcept;
-
-        bool isResumeCommunicationRequired() const noexcept;
 
         std::string fetchDetailedMessage() const noexcept;
 

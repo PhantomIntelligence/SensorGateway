@@ -56,11 +56,13 @@ protected:
 };
 
 namespace SensorCommunicatorTestMock {
-    class SensorCommunicationStrategy final
+    class SensorCommunicationStrategy
             : public SensorCommunication::SensorCommunicationStrategy<Sensor::Test::Simple::Structures> {
+
     protected:
 
         using super = SensorCommunication::SensorCommunicationStrategy<Sensor::Test::Simple::Structures>;
+
     public:
 
         SensorCommunicationStrategy() :
@@ -75,7 +77,7 @@ namespace SensorCommunicatorTestMock {
                 hasToReturnSpecificRawDataCycles(false) {
         }
 
-        ~SensorCommunicationStrategy() noexcept final = default;
+        ~SensorCommunicationStrategy() noexcept override = default;
 
         SensorCommunicationStrategy(SensorCommunicationStrategy const& other) = delete;
 
@@ -173,6 +175,10 @@ namespace SensorCommunicatorTestMock {
             }
         }
 
+    protected:
+        AtomicFlag openConnectionCalled;
+        AtomicFlag closeConnectionCalled;
+
     private:
 
         void acknowledgeFetchMessagesHasBeenCalled() {
@@ -200,8 +206,6 @@ namespace SensorCommunicatorTestMock {
             return fetchMessagesCalledBeforeFetchRawDataCycles.load();
         }
 
-        AtomicFlag openConnectionCalled;
-        AtomicFlag closeConnectionCalled;
 
         AtomicFlag fetchMessagesCalled;
         AtomicFlag fetchRawDataCyclesCalled;
@@ -455,5 +459,171 @@ SimpleRawDataList SensorCommunicatorTest::createASequenceOfDifferentRawDataCycle
     }
     return rawDataCycles;
 }
+
+using Error = ErrorHandling::SensorAccessLinkError;
+namespace SensorCommunicatorTestMock {
+    class ThrowingSensorCommunicationStrategy : public SensorCommunicationStrategy {
+
+    protected:
+
+        using super = SensorCommunicationStrategy;
+
+    public:
+
+        ThrowingSensorCommunicationStrategy() :
+                super(),
+                errorToThrow(Error::returnDefaultData()),
+                errorThrown(false) {
+        }
+
+        ~ThrowingSensorCommunicationStrategy() noexcept final = default;
+
+        ThrowingSensorCommunicationStrategy(ThrowingSensorCommunicationStrategy const& other) = delete;
+
+        ThrowingSensorCommunicationStrategy(ThrowingSensorCommunicationStrategy&& other) noexcept = delete;
+
+        ThrowingSensorCommunicationStrategy& operator=(ThrowingSensorCommunicationStrategy const& other)& = delete;
+
+        ThrowingSensorCommunicationStrategy&
+        operator=(ThrowingSensorCommunicationStrategy&& other)& noexcept = delete;
+
+        void throwOpenConnectionRequiredErrorWhenAnyFunctionIsCalled() noexcept {
+            errorToThrow = Error(ORIGIN,
+                                 ErrorHandling::Category::CONNECTION_ERROR,
+                                 ErrorHandling::Severity::WARNING,
+                                 ERROR_CODE,
+                                 MESSAGE);
+
+        }
+
+        void throwCloseConnectionRequiredErrorWhenAnyFunctionIsCalled() noexcept {
+            errorToThrow = Error(ORIGIN,
+                                 ErrorHandling::Category::CONNECTION_ERROR,
+                                 ErrorHandling::Severity::EMERGENCY, // Will not require openConnection
+                                 ERROR_CODE,
+                                 MESSAGE);
+        }
+
+        super::Messages fetchMessages() override {
+            openConnectionCalled.store(false);
+            closeConnectionCalled.store(false);
+            errorThrown.store(true);
+            throw errorToThrow;
+        }
+
+        super::RawDataCycles fetchRawDataCycles() override {
+            openConnectionCalled.store(false);
+            closeConnectionCalled.store(false);
+            errorThrown.store(true);
+            throw errorToThrow;
+        }
+
+        using super::openConnection;
+
+        using super::closeConnection;
+
+        bool hasCloseConnectionBeenCalledAfterThrowingFunction() const noexcept {
+            return super::hasCloseConnectionBeenCalled() && hasErrorBeenThrown();
+        }
+
+        bool hasOpenConnectionBeenCalledAfterThrowingFunction() const noexcept {
+            return super::hasOpenConnectionBeenCalled() && hasErrorBeenThrown();
+        }
+
+        using super::hasOpenConnectionBeenCalled;
+
+        using super::hasCloseConnectionBeenCalled;
+
+        void waitUntilAnyCallIsMadeAfterErrorIsThrown() {
+            while (!hasCloseConnectionBeenCalledAfterThrowingFunction() &&
+                   !hasOpenConnectionBeenCalledAfterThrowingFunction()) {
+                std::this_thread::yield();
+            }
+        }
+
+    private:
+
+        bool hasErrorBeenThrown() const noexcept {
+            return errorThrown.load();
+        }
+
+        Error errorToThrow;
+
+        AtomicFlag errorThrown;
+
+        std::string const ORIGIN = "SensorCommunicatorTest ThrowingSensorCommunicationStrategyMock";
+        Error::ErrorCode const ERROR_CODE = 42;
+        std::string const MESSAGE = "Help! Not just anybody!! ";
+    };
+}
+
+TEST_F(SensorCommunicatorTest,
+       given_aFunctionStrategyThrowingAnError_when_itIsRequiredToClose_then_callCloseConnectionInStrategy) {
+    SensorCommunicatorTestMock::ThrowingSensorCommunicationStrategy throwingMockStrategy;
+    throwingMockStrategy.throwCloseConnectionRequiredErrorWhenAnyFunctionIsCalled();
+    SimpleMessageSensorCommunicator sensorCommunicator(&throwingMockStrategy);
+
+    sensorCommunicator.start();
+    throwingMockStrategy.waitUntilAnyCallIsMadeAfterErrorIsThrown();
+
+    auto strategyHasBeenCalled = throwingMockStrategy.hasCloseConnectionBeenCalled();
+
+    sensorCommunicator.terminateAndJoin();
+    ASSERT_TRUE(strategyHasBeenCalled);
+}
+
+TEST_F(SensorCommunicatorTest,
+       given_aFunctionStrategyThrowingAnError_when_itIsRequiredToOpen_then_callOpenConnectionInStrategy) {
+    SensorCommunicatorTestMock::ThrowingSensorCommunicationStrategy throwingMockStrategy;
+    throwingMockStrategy.throwOpenConnectionRequiredErrorWhenAnyFunctionIsCalled();
+    SimpleMessageSensorCommunicator sensorCommunicator(&throwingMockStrategy);
+
+    sensorCommunicator.start();
+    throwingMockStrategy.waitUntilAnyCallIsMadeAfterErrorIsThrown();
+
+    auto strategyHasBeenCalled = throwingMockStrategy.hasOpenConnectionBeenCalled();
+
+    sensorCommunicator.terminateAndJoin();
+    ASSERT_TRUE(strategyHasBeenCalled);
+}
+
+using ErrorSinkMock = Mock::ArbitraryDataSinkMock<Error>;
+using ErrorProcessingScheduler = DataFlow::DataProcessingScheduler<Error, ErrorSinkMock, 1>;
+
+TEST_F(SensorCommunicatorTest,
+       given_aStrategyThrowingError_when_executing_then_producesTheCaughtError) {
+    auto numberOfErrorToReceive = 1;
+    ErrorSinkMock sink(numberOfErrorToReceive);
+    ErrorProcessingScheduler scheduler(&sink);
+
+    SensorCommunicatorTestMock::ThrowingSensorCommunicationStrategy throwingMockStrategy;
+    throwingMockStrategy.throwOpenConnectionRequiredErrorWhenAnyFunctionIsCalled();
+    SimpleMessageSensorCommunicator sensorCommunicator(&throwingMockStrategy);
+
+    Error expectedError = Error::returnDefaultData();
+    try {
+        throwingMockStrategy.fetchMessages();
+    } catch (Error& error) {
+        expectedError = error;
+    }
+
+    sensorCommunicator.linkConsumer(&scheduler);
+
+
+    sensorCommunicator.start();
+
+    sink.waitConsumptionToBeReached();
+
+    sensorCommunicator.terminateAndJoin();
+    scheduler.terminateAndJoin();
+
+    auto producedErrors = sink.getConsumedData();
+
+    for (auto t = 0; t < numberOfErrorToReceive; ++t) {
+        ASSERT_EQ(producedErrors.front(), expectedError);
+        producedErrors.pop_front();
+    }
+}
+
 
 #endif //SENSORGATEWAY_SENSORCOMMUNICATORTEST_CPP

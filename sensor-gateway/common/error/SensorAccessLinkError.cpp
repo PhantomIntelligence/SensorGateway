@@ -36,7 +36,7 @@ SensorAccessLinkError::SensorAccessLinkError(std::string const& origin,
 
 SensorAccessLinkError::~SensorAccessLinkError() noexcept {}
 
-SensorAccessLinkError::SensorAccessLinkError(SensorAccessLinkError const& other) :
+SensorAccessLinkError::SensorAccessLinkError(SensorAccessLinkError const& other) noexcept :
         SensorAccessLinkError(other.origin, other.category, other.severity, other.code, other.message,
                               other.timestamp) {
 }
@@ -112,14 +112,6 @@ bool SensorAccessLinkError::isCloseConnectionRequired() const noexcept {
         isCloseConnectionRequired = false;
     }
     return isCloseConnectionRequired;
-}
-
-bool SensorAccessLinkError::isResumeCommunicationRequired() const noexcept {
-    bool isResumeCommunicationRequired = false;
-    if (category == COMMUNICATION_ERROR) {
-        isResumeCommunicationRequired = true;
-    }
-    return isResumeCommunicationRequired;
 }
 
 std::string SensorAccessLinkError::fetchDetailedMessage() const noexcept {

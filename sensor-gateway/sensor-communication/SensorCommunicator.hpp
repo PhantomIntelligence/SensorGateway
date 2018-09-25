@@ -25,9 +25,10 @@ namespace SensorAccessLinkElement {
     template<class T>
     class SensorCommunicator : public DataFlow::DataSource<typename T::Message>,
                                public DataFlow::DataSource<typename T::RawData>,
-                               public DataFlow::DataSource<ErrorHandling::SensorAccessLinkError>  {
+                               public DataFlow::DataSource<ErrorHandling::SensorAccessLinkError> {
 
     protected:
+
         typedef SensorCommunication::SensorCommunicationStrategy<T> SensorCommunicationStrategy;
 
         using MESSAGE = typename T::Message;
@@ -35,6 +36,7 @@ namespace SensorAccessLinkElement {
 
         using MessageSource = DataFlow::DataSource<MESSAGE>;
         using RawDataSource = DataFlow::DataSource<RAW_DATA>;
+        using ErrorSource = DataFlow::DataSource<ErrorHandling::SensorAccessLinkError>;
 
         MESSAGE const DEFAULT_MESSAGE = T::Message::returnDefaultData();
         RAW_DATA const DEFAULT_RAW_DATA = T::RawData::returnDefaultData();
@@ -74,14 +76,26 @@ namespace SensorAccessLinkElement {
 
         using RawDataSource::linkConsumer;
 
+        using ErrorSource::linkConsumer;
+
     private:
 
         void run() {
             while (!terminateOrderHasBeenReceived()) {
-                handleIncomingMessages();
-                handleIncomingRawData();
-                // TODO : investigate the avantages of sleep and/or yield here.
-                std::this_thread::yield();
+                try {
+                    handleIncomingMessages();
+                    handleIncomingRawData();
+                    // TODO : investigate the avantages of sleep and/or yield here.
+                    std::this_thread::yield();
+                } catch (ErrorHandling::SensorAccessLinkError& error) {
+                    if (error.isCloseConnectionRequired()) {
+                        sensorCommunicationStrategy->closeConnection();
+                    }
+                    if (error.isOpenConnectionRequired()) {
+                        sensorCommunicationStrategy->openConnection();
+                    }
+                    ErrorSource::produce(std::move(error));
+                }
             }
         }
 
