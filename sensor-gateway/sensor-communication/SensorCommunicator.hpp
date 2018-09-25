@@ -85,7 +85,7 @@ namespace SensorAccessLinkElement {
                 try {
                     handleIncomingMessages();
                     handleIncomingRawData();
-                    // TODO : investigate the avantages of sleep and/or yield here.
+                    // TODO : investigate the advantages of sleep and/or yield here.
                     std::this_thread::yield();
                 } catch (ErrorHandling::SensorAccessLinkError& error) {
                     if (error.isCloseConnectionRequired()) {
