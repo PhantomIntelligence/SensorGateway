@@ -140,7 +140,6 @@ namespace DataTranslatorTestMock {
         ~ThrowingDataTranslationStrategy() noexcept = default;
 
         void translateMessage(super::SensorMessage&& sensorMessage) override {
-            std::cout << "sensorMessage.toString() : " << sensorMessage.toString() << std::endl;
             throw ErrorHandling::SensorAccessLinkError(ORIGIN,
                                                        ErrorHandling::Category::EMPTY_CATEGORY,
                                                        ErrorHandling::Severity::EMPTY_SEVERITY,

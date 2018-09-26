@@ -22,6 +22,8 @@
 namespace ErrorHandling {
 
     namespace Origin {
+        std::string const SENSOR_COMMUNICATION_OPEN_CONNECTION = "open connection";
+        std::string const SENSOR_COMMUNICATION_CLOSE_CONNECTION = "close connection";
         std::string const SENSOR_COMMUNICATION_HANDLE_MESSAGE = "handle incoming sensor message";
         std::string const SENSOR_COMMUNICATION_HANDLE_RAWDATA = "handle incoming sensor rawdata";
 
