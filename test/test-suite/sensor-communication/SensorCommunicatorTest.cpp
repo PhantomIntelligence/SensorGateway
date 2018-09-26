@@ -39,6 +39,7 @@ using TestFunctions::DataTestUtil;
 class SensorCommunicatorTest : public ::testing::Test {
 
 protected:
+
     SensorCommunicatorTest() = default;
 
     virtual ~SensorCommunicatorTest() = default;
@@ -53,6 +54,12 @@ protected:
 
     SimpleRawDataList fetchRawDataProducedBySensorCommunicatorExecution(
             SimpleRawDataList&& rawDataCycles, uint8_t numberOfRawDataToReceive);
+
+public:
+
+    using Error = ErrorHandling::SensorAccessLinkError;
+    using ErrorSinkMock = Mock::ArbitraryDataSinkMock<Error>;
+    using ErrorProcessingScheduler = DataFlow::DataProcessingScheduler<Error, ErrorSinkMock, 1>;
 };
 
 namespace SensorCommunicatorTestMock {
@@ -460,8 +467,8 @@ SimpleRawDataList SensorCommunicatorTest::createASequenceOfDifferentRawDataCycle
     return rawDataCycles;
 }
 
-using Error = ErrorHandling::SensorAccessLinkError;
 namespace SensorCommunicatorTestMock {
+
     class ThrowingSensorCommunicationStrategy : public SensorCommunicationStrategy {
 
     protected:
@@ -472,7 +479,7 @@ namespace SensorCommunicatorTestMock {
 
         ThrowingSensorCommunicationStrategy() :
                 super(),
-                errorToThrow(Error::returnDefaultData()),
+                errorToThrow(SensorCommunicatorTest::Error::returnDefaultData()),
                 errorThrown(false) {
         }
 
@@ -488,7 +495,7 @@ namespace SensorCommunicatorTestMock {
         operator=(ThrowingSensorCommunicationStrategy&& other)& noexcept = delete;
 
         void throwOpenConnectionRequiredErrorWhenAnyFunctionIsCalled() noexcept {
-            errorToThrow = Error(ORIGIN,
+            errorToThrow = SensorCommunicatorTest::Error(ORIGIN,
                                  ErrorHandling::Category::CONNECTION_ERROR,
                                  ErrorHandling::Severity::WARNING,
                                  ERROR_CODE,
@@ -497,7 +504,7 @@ namespace SensorCommunicatorTestMock {
         }
 
         void throwCloseConnectionRequiredErrorWhenAnyFunctionIsCalled() noexcept {
-            errorToThrow = Error(ORIGIN,
+            errorToThrow = SensorCommunicatorTest::Error(ORIGIN,
                                  ErrorHandling::Category::CONNECTION_ERROR,
                                  ErrorHandling::Severity::EMERGENCY, // Will not require openConnection
                                  ERROR_CODE,
@@ -547,12 +554,12 @@ namespace SensorCommunicatorTestMock {
             return errorThrown.load();
         }
 
-        Error errorToThrow;
+        SensorCommunicatorTest::Error errorToThrow;
 
         AtomicFlag errorThrown;
 
         std::string const ORIGIN = "SensorCommunicatorTest ThrowingSensorCommunicationStrategyMock";
-        Error::ErrorCode const ERROR_CODE = 42;
+        ErrorHandling::ErrorCode const ERROR_CODE = ErrorHandling::GatewayErrorCode::EMPTY_CODE;
         std::string const MESSAGE = "Help! Not just anybody!! ";
     };
 }
@@ -586,9 +593,6 @@ TEST_F(SensorCommunicatorTest,
     sensorCommunicator.terminateAndJoin();
     ASSERT_TRUE(strategyHasBeenCalled);
 }
-
-using ErrorSinkMock = Mock::ArbitraryDataSinkMock<Error>;
-using ErrorProcessingScheduler = DataFlow::DataProcessingScheduler<Error, ErrorSinkMock, 1>;
 
 TEST_F(SensorCommunicatorTest,
        given_aStrategyThrowingError_when_executing_then_producesTheCaughtError) {

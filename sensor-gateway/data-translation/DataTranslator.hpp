@@ -32,6 +32,7 @@ namespace SensorAccessLinkElement {
 
         using MessageSink = DataFlow::DataSink<SensorMessage>;
         using RawDataSink = DataFlow::DataSink<SensorRawData>;
+        using ErrorSource = DataFlow::DataSource<ErrorHandling::SensorAccessLinkError>;
 
     public:
 
@@ -49,11 +50,33 @@ namespace SensorAccessLinkElement {
         DataTranslator& operator=(DataTranslator&& other)& noexcept = delete;
 
         void consume(SensorMessage&& message) override {
-            dataTranslationStrategy->translateMessage(std::forward<SensorMessage>(message));
+            try {
+                dataTranslationStrategy->translateMessage(std::forward<SensorMessage>(message));
+            } catch (ErrorHandling::SensorAccessLinkError& translationError) {
+                auto error = ErrorHandling::SensorAccessLinkError(ErrorHandling::Origin::TRANSLATE_MESSAGE
+                                                                  + ErrorHandling::Message::SEPARATOR +
+                                                                  translationError.getOrigin(),
+                                                                  ErrorHandling::Category::TRANSLATION_ERROR,
+                                                                  ErrorHandling::Severity::ERROR,
+                                                                  translationError.getErrorCode(),
+                                                                  translationError.getMessage());
+                ErrorSource::produce(std::move(error));
+            }
         };
 
         void consume(SensorRawData&& rawData) override {
-            dataTranslationStrategy->translateRawData(std::forward<SensorRawData>(rawData));
+            try {
+                dataTranslationStrategy->translateRawData(std::forward<SensorRawData>(rawData));
+            } catch (ErrorHandling::SensorAccessLinkError& translationError) {
+                auto error = ErrorHandling::SensorAccessLinkError(ErrorHandling::Origin::TRANSLATE_RAWDATA
+                                                                  + ErrorHandling::Message::SEPARATOR +
+                                                                  translationError.getOrigin(),
+                                                                  ErrorHandling::Category::TRANSLATION_ERROR,
+                                                                  ErrorHandling::Severity::ERROR,
+                                                                  translationError.getErrorCode(),
+                                                                  translationError.getMessage());
+                ErrorSource::produce(std::move(error));
+            }
         };
 
     private:

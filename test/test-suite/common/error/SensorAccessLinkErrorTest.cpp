@@ -38,7 +38,7 @@ protected:
     }
 
     std::string const ARBITRARY_ORIGIN = "Origin";
-    SensorAccessLinkError::ErrorCode const ARBITRARY_ERROR_CODE = -1;
+    ErrorHandling::ErrorCode const ARBITRARY_ERROR_CODE = ErrorHandling::GatewayErrorCode::EMPTY_CODE;
     std::string const ARBITRARY_ERROR_MESSAGE = "Help! I need somebody!";
     Category const ARBITRARY_CATEGORY = Category::UNRECOGNIZED_ERROR;
     Severity const ARBITRARY_SEVERITY = Severity::DEBUG;

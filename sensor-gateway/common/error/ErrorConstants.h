@@ -21,6 +21,16 @@
 
 namespace ErrorHandling {
 
+    namespace Origin {
+        std::string const TRANSLATE_MESSAGE = "translate message";
+        std::string const TRANSLATE_RAWDATA = "translate rawdata";
+    }
+
+    namespace Message {
+        std::string const SEPARATOR = " - ";
+        std::string const EMPTY_MESSAGE = "";
+    }
+
     enum Severity : int32_t {
         EMERGENCY = 0,
         ALERT = 1,
@@ -34,7 +44,7 @@ namespace ErrorHandling {
         /**
          * @brief This SHOULD NEVER be used for any application, for empty initialization purposes only
          */
-        EMPTY = 42,
+                EMPTY_SEVERITY = 42,
     };
 
     enum Category : int32_t {
@@ -47,9 +57,21 @@ namespace ErrorHandling {
         /**
          * @brief This SHOULD NEVER be used for any application, for empty initialization purposes only
          */
-        EMPTY_ERROR = 142,
+                EMPTY_CATEGORY = 142,
+
+        TRANSLATION_ERROR = 200,
     };
 
+    typedef int64_t ErrorCode;
+
+    enum GatewayErrorCode : ErrorCode {
+        DATA_NOT_RECOGNIZED = 10000,
+
+        /**
+         * @brief This SHOULD NEVER be used for any application, for empty initialization purposes only
+         */
+                EMPTY_CODE = 10042,
+    };
 }
 
 #endif //SENSORGATEWAY_ERRORCONSTANTS_H

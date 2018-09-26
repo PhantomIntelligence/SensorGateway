@@ -26,8 +26,6 @@ namespace ErrorHandling {
 
     public:
 
-        typedef int64_t ErrorCode;
-
         explicit SensorAccessLinkError(std::string const& origin,
                                        Category const& category,
                                        Severity const& severity,
@@ -61,6 +59,17 @@ namespace ErrorHandling {
 
         std::string fetchDetailedMessage() const noexcept;
 
+        inline std::string const& getOrigin() const noexcept {
+            return origin;
+        }
+
+        inline ErrorCode const& getErrorCode() const noexcept {
+            return code;
+        }
+
+        inline std::string const& getMessage() const noexcept {
+            return message;
+        }
 
     private:
 
@@ -89,12 +98,13 @@ namespace Defaults {
     using ErrorHandling::SensorAccessLinkError;
     using ErrorHandling::Severity;
     using ErrorHandling::Category;
-    using ErrorCode = typename SensorAccessLinkError::ErrorCode;
+    using ErrorHandling::GatewayErrorCode;
+    using ErrorHandling::ErrorCode;
 
     std::string const DEFAULT_ORIGIN = "Initialization origin, should not appear in production.";
-    Category const DEFAULT_CATEGORY = Category::EMPTY_ERROR;
-    Severity const DEFAULT_SEVERITY = Severity::EMPTY;
-    ErrorCode const DEFAULT_ERROR_CODE = -1;
+    Category const DEFAULT_CATEGORY = Category::EMPTY_CATEGORY;
+    Severity const DEFAULT_SEVERITY = Severity::EMPTY_SEVERITY;
+    ErrorCode const DEFAULT_ERROR_CODE = GatewayErrorCode::EMPTY_CODE;
     std::string const DEFAULT_MESSAGE = "This message is a placeholder for initialization purpose.";
     SensorAccessLinkError const DEFAULT_SENSOR_ACCESS_LINK_ERROR = SensorAccessLinkError(
             DEFAULT_ORIGIN, DEFAULT_CATEGORY, DEFAULT_SEVERITY, DEFAULT_ERROR_CODE, DEFAULT_MESSAGE

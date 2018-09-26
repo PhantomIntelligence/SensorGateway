@@ -19,6 +19,7 @@
 using ErrorHandling::SensorAccessLinkError;
 using ErrorHandling::Severity;
 using ErrorHandling::Category;
+using ErrorHandling::ErrorCode;
 
 SensorAccessLinkError::SensorAccessLinkError(std::string const& origin,
                                              Category const& category,
@@ -98,12 +99,12 @@ bool SensorAccessLinkError::isFatal() const noexcept {
 }
 
 bool SensorAccessLinkError::isOpenConnectionRequired() const noexcept {
-    bool isCloseConnectionRequired = true;
+    bool isOpenConnectionRequired = true;
     if (category == COMMUNICATION_ERROR ||
         severity == EMERGENCY) {
-        isCloseConnectionRequired = false;
+        isOpenConnectionRequired = false;
     }
-    return isCloseConnectionRequired;
+    return isOpenConnectionRequired;
 }
 
 bool SensorAccessLinkError::isCloseConnectionRequired() const noexcept {
@@ -123,7 +124,7 @@ std::string SensorAccessLinkError::buildDetailedMessage(HighResolutionTimePoint 
                                                         std::string const& origin,
                                                         Category const& category,
                                                         Severity const& severity,
-                                                        SensorAccessLinkError::ErrorCode const& code,
+                                                        ErrorCode const& code,
                                                         std::string const& message) noexcept {
     auto formattedTimestamp = formatTimestamp(timestamp);
     std::ostringstream detailedMessageStream(formattedTimestamp, std::ios_base::ate);

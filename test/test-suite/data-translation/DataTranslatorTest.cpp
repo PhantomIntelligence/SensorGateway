@@ -16,6 +16,7 @@
 #include "sensor-gateway/data-translation/DataTranslator.hpp"
 #include "test/utilities/data-model/DataModelFixture.h"
 
+#include "test/utilities/mock/ArbitraryDataSinkMock.hpp"
 
 using TestFunctions::DataTestUtil;
 using Sensor::Test::Simple::Structures;
@@ -25,6 +26,9 @@ using SensorAccessLinkElement::DataTranslator;
 class DataTranslatorTest : public ::testing::Test {
 
 protected:
+
+    using Error = ErrorHandling::SensorAccessLinkError;
+    using ErrorSinkMock = Mock::ArbitraryDataSinkMock<Error>;
 
     DataTranslatorTest() = default;
 
@@ -113,4 +117,110 @@ TEST_F(DataTranslatorTest,
     auto strategyCalledWithTheRightRawData = mockStrategy.hasTranslateRawDataBeenCalledWithRightSensorRawData(copy);
 
     ASSERT_TRUE(strategyCalledWithTheRightRawData);
+}
+
+namespace DataTranslatorTestMock {
+
+    class ThrowingDataTranslationStrategy final :
+            public DataTranslationStrategy<Structures, Structures> {
+
+    protected:
+
+        using super = DataTranslation::DataTranslationStrategy<Structures, Structures>;
+        using super::SensorMessage;
+        using super::SensorRawData;
+
+        using super::MessageSource;
+        using super::RawDataSource;
+
+    public:
+
+        ThrowingDataTranslationStrategy() = default;
+
+        ~ThrowingDataTranslationStrategy() noexcept = default;
+
+        void translateMessage(super::SensorMessage&& sensorMessage) override {
+            throw ErrorHandling::SensorAccessLinkError(origin,
+                                                       ErrorHandling::Category::EMPTY_CATEGORY,
+                                                       ErrorHandling::Severity::EMPTY_SEVERITY,
+                                                       errorCode,
+                                                       messageErrorMessage);
+        };
+
+        void translateRawData(super::SensorRawData&& sensorRawData) override {
+            throw ErrorHandling::SensorAccessLinkError(origin,
+                                                       ErrorHandling::Category::EMPTY_CATEGORY,
+                                                       ErrorHandling::Severity::EMPTY_SEVERITY,
+                                                       errorCode,
+                                                       rawDataErrorMessage);
+        }
+
+        std::string const origin = "from the throwing strategy";
+        ErrorHandling::ErrorCode const errorCode = ErrorHandling::GatewayErrorCode::DATA_NOT_RECOGNIZED;
+        std::string const messageErrorMessage = "Error message from the message consumption strategy";
+        std::string const rawDataErrorMessage = "Error message from the rawdata consumption strategy";
+    };
+}
+
+TEST_F(DataTranslatorTest,
+       given_aThrowingTranslationStrategy_when_consumingMessage_then_producesTheThrownError) {
+    auto numberOfErrorToReceive = 1;
+    Mock::ArbitraryDataSinkMock<Error> sink(numberOfErrorToReceive);
+    DataFlow::DataProcessingScheduler<Error, ErrorSinkMock, 1> scheduler(&sink);
+
+    DataTranslatorTestMock::ThrowingDataTranslationStrategy throwingMockStrategy;
+    DataTranslator<Structures, Structures> dataTranslator(&throwingMockStrategy);
+
+    dataTranslator.linkConsumer(&scheduler);
+    auto data = DataTestUtil::createRandomSimpleMessage();
+    dataTranslator.consume(std::move(data));
+    sink.waitConsumptionToBeReached();
+
+    scheduler.terminateAndJoin();
+
+    auto producedErrors = sink.getConsumedData();
+
+    Error expectedError = ErrorHandling::SensorAccessLinkError(
+            ErrorHandling::Origin::TRANSLATE_MESSAGE + ErrorHandling::Message::SEPARATOR + throwingMockStrategy.origin,
+            ErrorHandling::Category::TRANSLATION_ERROR,
+            ErrorHandling::Severity::ERROR,
+            throwingMockStrategy.errorCode,
+            throwingMockStrategy.messageErrorMessage);
+    for (auto t = 0; t < numberOfErrorToReceive; ++t) {
+        ASSERT_EQ(producedErrors.front(), expectedError);
+        producedErrors.pop_front();
+    }
+}
+
+TEST_F(DataTranslatorTest,
+       given_aThrowingTranslationStrategy_when_consumingRawData_then_producesAnErrorCorrectlyFormatted) {
+    auto numberOfErrorToReceive = 1;
+    Mock::ArbitraryDataSinkMock<Error> sink(numberOfErrorToReceive);
+    DataFlow::DataProcessingScheduler<Error, ErrorSinkMock, 1> scheduler(&sink);
+
+    DataTranslatorTestMock::ThrowingDataTranslationStrategy throwingMockStrategy;
+    DataTranslator<Structures, Structures> dataTranslator(&throwingMockStrategy);
+
+    Error expectedError = ErrorHandling::SensorAccessLinkError(
+            ErrorHandling::Origin::TRANSLATE_RAWDATA + ErrorHandling::Message::SEPARATOR + throwingMockStrategy.origin,
+            ErrorHandling::Category::TRANSLATION_ERROR,
+            ErrorHandling::Severity::ERROR,
+            throwingMockStrategy.errorCode,
+            throwingMockStrategy.rawDataErrorMessage);
+
+    auto data = DataTestUtil::createRandomSimpleRawData();
+
+    dataTranslator.linkConsumer(&scheduler);
+    data = DataTestUtil::createRandomSimpleRawData();
+    dataTranslator.consume(std::move(data));
+    sink.waitConsumptionToBeReached();
+
+    scheduler.terminateAndJoin();
+
+    auto producedErrors = sink.getConsumedData();
+
+    for (auto t = 0; t < numberOfErrorToReceive; ++t) {
+        ASSERT_EQ(producedErrors.front(), expectedError);
+        producedErrors.pop_front();
+    }
 }
