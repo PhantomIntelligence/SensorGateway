@@ -242,8 +242,8 @@ TEST_F(SensorCommunicatorTest, given__when_start_then_callsOpenConnectionInStrat
     sensorCommunicator.start();
 
     sensorCommunicator.terminateAndJoin();
-    auto strategyHasBeenCalled = mockStrategy.hasOpenConnectionBeenCalled();
-    ASSERT_TRUE(strategyHasBeenCalled);
+    auto openConnectionCalled = mockStrategy.hasOpenConnectionBeenCalled();
+    ASSERT_TRUE(openConnectionCalled);
 }
 
 TEST_F(SensorCommunicatorTest, given__when_terminateAndJoin_then_callsCloseConnectionInStrategy) {
@@ -252,8 +252,8 @@ TEST_F(SensorCommunicatorTest, given__when_terminateAndJoin_then_callsCloseConne
 
     sensorCommunicator.terminateAndJoin();
 
-    auto strategyHasBeenCalled = mockStrategy.hasCloseConnectionBeenCalled();
-    ASSERT_TRUE(strategyHasBeenCalled);
+    auto closeConnectionCalled = mockStrategy.hasCloseConnectionBeenCalled();
+    ASSERT_TRUE(closeConnectionCalled);
 }
 
 TEST_F(SensorCommunicatorTest, given__when_start_then_callsFetchMessagesInStrategy) {
@@ -264,9 +264,9 @@ TEST_F(SensorCommunicatorTest, given__when_start_then_callsFetchMessagesInStrate
 
     mockStrategy.waitUntilFetchMessagesIsCalled();
 
-    auto strategyHasBeenCalled = mockStrategy.hasFetchMessagesBeenCalled();
+    auto fetchMessagesCalled = mockStrategy.hasFetchMessagesBeenCalled();
     sensorCommunicator.terminateAndJoin();
-    ASSERT_TRUE(strategyHasBeenCalled);
+    ASSERT_TRUE(fetchMessagesCalled);
 }
 
 TEST_F(SensorCommunicatorTest, given__when_start_then_callsFetchRawDataCyclesInStrategy) {
@@ -277,9 +277,9 @@ TEST_F(SensorCommunicatorTest, given__when_start_then_callsFetchRawDataCyclesInS
 
     mockStrategy.waitUntilFetchRawDataCyclesIsCalled();
 
-    auto strategyHasBeenCalled = mockStrategy.hasFetchRawDataCyclesBeenCalled();
+    auto fetchRawDataCyclesCalled = mockStrategy.hasFetchRawDataCyclesBeenCalled();
     sensorCommunicator.terminateAndJoin();
-    ASSERT_TRUE(strategyHasBeenCalled);
+    ASSERT_TRUE(fetchRawDataCyclesCalled);
 }
 
 TEST_F(SensorCommunicatorTest, given__when_start_then_callsFetchMessagesBeforeFetchRawData) {
@@ -496,19 +496,19 @@ namespace SensorCommunicatorTestMock {
 
         void throwOpenConnectionRequiredErrorWhenAnyFunctionIsCalled() noexcept {
             errorToThrow = SensorCommunicatorTest::Error(ORIGIN,
-                                 ErrorHandling::Category::CONNECTION_ERROR,
-                                 ErrorHandling::Severity::WARNING,
-                                 ERROR_CODE,
-                                 MESSAGE);
+                                                         ErrorHandling::Category::CONNECTION_ERROR,
+                                                         ErrorHandling::Severity::WARNING,
+                                                         ERROR_CODE,
+                                                         MESSAGE);
 
         }
 
         void throwCloseConnectionRequiredErrorWhenAnyFunctionIsCalled() noexcept {
             errorToThrow = SensorCommunicatorTest::Error(ORIGIN,
-                                 ErrorHandling::Category::CONNECTION_ERROR,
-                                 ErrorHandling::Severity::EMERGENCY, // Will not require openConnection
-                                 ERROR_CODE,
-                                 MESSAGE);
+                                                         ErrorHandling::Category::CONNECTION_ERROR,
+                                                         ErrorHandling::Severity::EMERGENCY, // Will not require openConnection
+                                                         ERROR_CODE,
+                                                         MESSAGE);
         }
 
         super::Messages fetchMessages() override {
@@ -565,7 +565,7 @@ namespace SensorCommunicatorTestMock {
 }
 
 TEST_F(SensorCommunicatorTest,
-       given_aFunctionStrategyThrowingAnError_when_itIsRequiredToClose_then_callCloseConnectionInStrategy) {
+       given_aThrowingStrategy_when_itIsRequiredToClose_then_callsCloseConnectionInStrategy) {
     SensorCommunicatorTestMock::ThrowingSensorCommunicationStrategy throwingMockStrategy;
     throwingMockStrategy.throwCloseConnectionRequiredErrorWhenAnyFunctionIsCalled();
     SimpleMessageSensorCommunicator sensorCommunicator(&throwingMockStrategy);
@@ -573,14 +573,14 @@ TEST_F(SensorCommunicatorTest,
     sensorCommunicator.start();
     throwingMockStrategy.waitUntilAnyCallIsMadeAfterErrorIsThrown();
 
-    auto strategyHasBeenCalled = throwingMockStrategy.hasCloseConnectionBeenCalled();
+    auto closeConnectionCalled = throwingMockStrategy.hasCloseConnectionBeenCalled();
 
     sensorCommunicator.terminateAndJoin();
-    ASSERT_TRUE(strategyHasBeenCalled);
+    ASSERT_TRUE(closeConnectionCalled);
 }
 
 TEST_F(SensorCommunicatorTest,
-       given_aFunctionStrategyThrowingAnError_when_itIsRequiredToOpen_then_callOpenConnectionInStrategy) {
+       given_aThrowingStrategy_when_itIsRequiredToOpen_then_callsOpenConnectionInStrategy) {
     SensorCommunicatorTestMock::ThrowingSensorCommunicationStrategy throwingMockStrategy;
     throwingMockStrategy.throwOpenConnectionRequiredErrorWhenAnyFunctionIsCalled();
     SimpleMessageSensorCommunicator sensorCommunicator(&throwingMockStrategy);
@@ -588,10 +588,10 @@ TEST_F(SensorCommunicatorTest,
     sensorCommunicator.start();
     throwingMockStrategy.waitUntilAnyCallIsMadeAfterErrorIsThrown();
 
-    auto strategyHasBeenCalled = throwingMockStrategy.hasOpenConnectionBeenCalled();
+    auto openConnectionCalled = throwingMockStrategy.hasOpenConnectionBeenCalled();
 
     sensorCommunicator.terminateAndJoin();
-    ASSERT_TRUE(strategyHasBeenCalled);
+    ASSERT_TRUE(openConnectionCalled);
 }
 
 TEST_F(SensorCommunicatorTest,
