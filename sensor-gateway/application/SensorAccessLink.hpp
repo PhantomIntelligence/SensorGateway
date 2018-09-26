@@ -101,6 +101,7 @@ namespace SensorGateway {
 
         void consume(Error&& error) override {
             // TODO: if (error.isFatal) {terminateAndJoin();} else {sendErrorMessageToServer();}
+            std::cout << error.fetchDetailedMessage() << std::endl;
         }
 
     private:
