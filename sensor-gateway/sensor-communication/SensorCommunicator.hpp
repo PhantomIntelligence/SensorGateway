@@ -33,6 +33,8 @@ namespace SensorAccessLinkElement {
 
         using MESSAGE = typename T::Message;
         using RAW_DATA = typename T::RawData;
+        using MESSAGES = typename SensorCommunicationStrategy::Messages;
+        using RAW_DATA_CYCLES = typename SensorCommunicationStrategy::RawDataCycles;
 
         using MessageSource = DataFlow::DataSource<MESSAGE>;
         using RawDataSource = DataFlow::DataSource<RAW_DATA>;
@@ -82,25 +84,28 @@ namespace SensorAccessLinkElement {
 
         void run() {
             while (!terminateOrderHasBeenReceived()) {
-                try {
-                    handleIncomingMessages();
-                    handleIncomingRawData();
-                    // TODO : investigate the advantages of sleep and/or yield here.
-                    std::this_thread::yield();
-                } catch (ErrorHandling::SensorAccessLinkError& error) {
-                    if (error.isCloseConnectionRequired()) {
-                        sensorCommunicationStrategy->closeConnection();
-                    }
-                    if (error.isOpenConnectionRequired()) {
-                        sensorCommunicationStrategy->openConnection();
-                    }
-                    ErrorSource::produce(std::move(error));
-                }
+                handleIncomingMessages();
+                handleIncomingRawData();
+                // TODO : investigate the advantages of sleep and/or yield here.
+                std::this_thread::yield();
             }
         }
 
         void handleIncomingMessages() {
-            auto messages = sensorCommunicationStrategy->fetchMessages();
+            MESSAGES messages;
+            try {
+                messages = sensorCommunicationStrategy->fetchMessages();
+            } catch (ErrorHandling::SensorAccessLinkError& strategyError) {
+                auto error = ErrorHandling::SensorAccessLinkError(
+                        ErrorHandling::Origin::SENSOR_COMMUNICATION_HANDLE_MESSAGE +
+                        ErrorHandling::Message::SEPARATOR + strategyError.getOrigin(),
+                        strategyError.getCategory(),
+                        strategyError.getSeverity(),
+                        strategyError.getErrorCode(),
+                        strategyError.getMessage());
+                handleCaughtError(error);
+            }
+
             for (auto messageIndex = 0; messageIndex < messages.size(); ++messageIndex) {
                 auto message = messages[messageIndex];
                 if (message != DEFAULT_MESSAGE) {
@@ -110,13 +115,36 @@ namespace SensorAccessLinkElement {
         }
 
         void handleIncomingRawData() {
-            auto rawDataCycles = sensorCommunicationStrategy->fetchRawDataCycles();
+            RAW_DATA_CYCLES rawDataCycles;
+            try {
+                rawDataCycles = sensorCommunicationStrategy->fetchRawDataCycles();
+            } catch (ErrorHandling::SensorAccessLinkError& strategyError) {
+                auto error = ErrorHandling::SensorAccessLinkError(
+                        ErrorHandling::Origin::SENSOR_COMMUNICATION_HANDLE_RAWDATA +
+                        ErrorHandling::Message::SEPARATOR + strategyError.getOrigin(),
+                        strategyError.getCategory(),
+                        strategyError.getSeverity(),
+                        strategyError.getErrorCode(),
+                        strategyError.getMessage());
+                handleCaughtError(error);
+            }
+
             for (auto rawDataIndex = 0; rawDataIndex < rawDataCycles.size(); ++rawDataIndex) {
                 auto rawDataCycle = rawDataCycles[rawDataIndex];
                 if (rawDataCycle != DEFAULT_RAW_DATA) {
                     RawDataSource::produce(std::move(rawDataCycle));
                 }
             }
+        }
+
+        void handleCaughtError(ErrorHandling::SensorAccessLinkError& error) {
+            if (error.isCloseConnectionRequired()) {
+                sensorCommunicationStrategy->closeConnection();
+            }
+            if (error.isOpenConnectionRequired()) {
+                sensorCommunicationStrategy->openConnection();
+            }
+            ErrorSource::produce(std::move(error));
         }
 
         bool terminateOrderHasBeenReceived() const {

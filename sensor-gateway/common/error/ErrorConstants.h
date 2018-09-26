@@ -22,8 +22,14 @@
 namespace ErrorHandling {
 
     namespace Origin {
+        std::string const SENSOR_COMMUNICATION_HANDLE_MESSAGE = "handle incoming sensor message";
+        std::string const SENSOR_COMMUNICATION_HANDLE_RAWDATA = "handle incoming sensor rawdata";
+
         std::string const TRANSLATE_MESSAGE = "translate message";
         std::string const TRANSLATE_RAWDATA = "translate rawdata";
+
+        std::string const SERVER_COMMUNICATION_SEND_MESSAGE = "send server message";
+        std::string const SERVER_COMMUNICATION_SEND_RAWDATA = "send server rawdata";
     }
 
     namespace Message {

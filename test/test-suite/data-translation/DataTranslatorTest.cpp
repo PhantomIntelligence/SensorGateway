@@ -141,25 +141,25 @@ namespace DataTranslatorTestMock {
 
         void translateMessage(super::SensorMessage&& sensorMessage) override {
             std::cout << "sensorMessage.toString() : " << sensorMessage.toString() << std::endl;
-            throw ErrorHandling::SensorAccessLinkError(origin,
+            throw ErrorHandling::SensorAccessLinkError(ORIGIN,
                                                        ErrorHandling::Category::EMPTY_CATEGORY,
                                                        ErrorHandling::Severity::EMPTY_SEVERITY,
-                                                       errorCode,
-                                                       messageErrorMessage);
+                                                       ERROR_CODE,
+                                                       MESSAGE_ERROR_MESSAGE);
         };
 
         void translateRawData(super::SensorRawData&& sensorRawData) override {
-            throw ErrorHandling::SensorAccessLinkError(origin,
+            throw ErrorHandling::SensorAccessLinkError(ORIGIN,
                                                        ErrorHandling::Category::EMPTY_CATEGORY,
                                                        ErrorHandling::Severity::EMPTY_SEVERITY,
-                                                       errorCode,
-                                                       rawDataErrorMessage);
+                                                       ERROR_CODE,
+                                                       RAW_DATA_ERROR_MESSAGE);
         }
 
-        std::string const origin = "from the throwing strategy";
-        ErrorHandling::ErrorCode const errorCode = ErrorHandling::GatewayErrorCode::DATA_NOT_RECOGNIZED;
-        std::string const messageErrorMessage = "Error message from the message consumption strategy";
-        std::string const rawDataErrorMessage = "Error message from the rawdata consumption strategy";
+        std::string const ORIGIN = "from the throwing strategy";
+        ErrorHandling::ErrorCode const ERROR_CODE = ErrorHandling::GatewayErrorCode::DATA_NOT_RECOGNIZED;
+        std::string const MESSAGE_ERROR_MESSAGE = "Error message from the message consumption strategy";
+        std::string const RAW_DATA_ERROR_MESSAGE = "Error message from the rawdata consumption strategy";
     };
 }
 
@@ -182,11 +182,11 @@ TEST_F(DataTranslatorTest,
     auto producedErrors = sink.getConsumedData();
 
     Error expectedError = ErrorHandling::SensorAccessLinkError(
-            ErrorHandling::Origin::TRANSLATE_MESSAGE + ErrorHandling::Message::SEPARATOR + throwingMockStrategy.origin,
+            ErrorHandling::Origin::TRANSLATE_MESSAGE + ErrorHandling::Message::SEPARATOR + throwingMockStrategy.ORIGIN,
             ErrorHandling::Category::TRANSLATION_ERROR,
             ErrorHandling::Severity::ERROR,
-            throwingMockStrategy.errorCode,
-            throwingMockStrategy.messageErrorMessage);
+            throwingMockStrategy.ERROR_CODE,
+            throwingMockStrategy.MESSAGE_ERROR_MESSAGE);
     for (auto t = 0; t < numberOfErrorToReceive; ++t) {
         ASSERT_EQ(producedErrors.front(), expectedError);
         producedErrors.pop_front();
@@ -203,11 +203,11 @@ TEST_F(DataTranslatorTest,
     DataTranslator<Structures, Structures> dataTranslator(&throwingMockStrategy);
 
     Error expectedError = ErrorHandling::SensorAccessLinkError(
-            ErrorHandling::Origin::TRANSLATE_RAWDATA + ErrorHandling::Message::SEPARATOR + throwingMockStrategy.origin,
+            ErrorHandling::Origin::TRANSLATE_RAWDATA + ErrorHandling::Message::SEPARATOR + throwingMockStrategy.ORIGIN,
             ErrorHandling::Category::TRANSLATION_ERROR,
             ErrorHandling::Severity::ERROR,
-            throwingMockStrategy.errorCode,
-            throwingMockStrategy.rawDataErrorMessage);
+            throwingMockStrategy.ERROR_CODE,
+            throwingMockStrategy.RAW_DATA_ERROR_MESSAGE);
 
     auto data = DataTestUtil::createRandomSimpleRawData();
 

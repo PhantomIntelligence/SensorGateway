@@ -63,6 +63,14 @@ namespace ErrorHandling {
             return origin;
         }
 
+        inline Category const& getCategory() const noexcept {
+            return category;
+        }
+
+        inline Severity const& getSeverity() const noexcept {
+            return severity;
+        }
+
         inline ErrorCode const& getErrorCode() const noexcept {
             return code;
         }

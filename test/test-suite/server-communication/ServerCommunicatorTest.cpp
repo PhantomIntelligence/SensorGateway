@@ -34,7 +34,7 @@ protected:
     using Message = Sensor::Test::Simple::Structures::Message;
     using RawData = Sensor::Test::Simple::Structures::RawData;
 
-    std::string const SERVER_ADRESS = "I like pears";
+    std::string const SERVER_ADDRESS = "I like trains";
 
     ServerCommunicatorTest() = default;
 
@@ -127,7 +127,7 @@ TEST_F(ServerCommunicatorTest, given__when_connect_then_callsOpenConnectionInStr
     ServerCommunicatorTestMock::MockServerCommunicatorStrategy mockStrategy;
     ServerCommunicator serverCommunicator(&mockStrategy);
 
-    serverCommunicator.connect(SERVER_ADRESS);
+    serverCommunicator.connect(SERVER_ADDRESS);
 
     auto strategyHasBeenCalled = mockStrategy.hasOpenConnectionBeenCalled();
     ASSERT_TRUE(strategyHasBeenCalled);

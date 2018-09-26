@@ -38,6 +38,12 @@ using TestFunctions::DataTestUtil;
 
 class SensorCommunicatorTest : public ::testing::Test {
 
+public:
+
+    using Error = ErrorHandling::SensorAccessLinkError;
+    using ErrorSinkMock = Mock::ArbitraryDataSinkMock<Error>;
+    using ErrorProcessingScheduler = DataFlow::DataProcessingScheduler<Error, ErrorSinkMock, 1>;
+
 protected:
 
     SensorCommunicatorTest() = default;
@@ -55,11 +61,14 @@ protected:
     SimpleRawDataList fetchRawDataProducedBySensorCommunicatorExecution(
             SimpleRawDataList&& rawDataCycles, uint8_t numberOfRawDataToReceive);
 
-public:
-
-    using Error = ErrorHandling::SensorAccessLinkError;
-    using ErrorSinkMock = Mock::ArbitraryDataSinkMock<Error>;
-    using ErrorProcessingScheduler = DataFlow::DataProcessingScheduler<Error, ErrorSinkMock, 1>;
+    Error formatStrategyErrorWithCorrectOrigin(Error strategyIssuedError, std::string origin) const noexcept {
+        Error formattedError(origin + ErrorHandling::Message::SEPARATOR + strategyIssuedError.getOrigin(),
+                             strategyIssuedError.getCategory(),
+                             strategyIssuedError.getSeverity(),
+                             strategyIssuedError.getErrorCode(),
+                             strategyIssuedError.getMessage());
+        return formattedError;
+    }
 };
 
 namespace SensorCommunicatorTestMock {
@@ -480,7 +489,9 @@ namespace SensorCommunicatorTestMock {
         ThrowingSensorCommunicationStrategy() :
                 super(),
                 errorToThrow(SensorCommunicatorTest::Error::returnDefaultData()),
-                errorThrown(false) {
+                errorThrown(false),
+                throwOnFetchMessages(false),
+                throwOnFetchRawDataCycles(false) {
         }
 
         ~ThrowingSensorCommunicationStrategy() noexcept final = default;
@@ -495,6 +506,8 @@ namespace SensorCommunicatorTestMock {
         operator=(ThrowingSensorCommunicationStrategy&& other)& noexcept = delete;
 
         void throwOpenConnectionRequiredErrorWhenAnyFunctionIsCalled() noexcept {
+            throwOnFetchMessages.store(true);
+            throwOnFetchRawDataCycles.store(true);
             errorToThrow = SensorCommunicatorTest::Error(ORIGIN,
                                                          ErrorHandling::Category::CONNECTION_ERROR,
                                                          ErrorHandling::Severity::WARNING,
@@ -504,6 +517,8 @@ namespace SensorCommunicatorTestMock {
         }
 
         void throwCloseConnectionRequiredErrorWhenAnyFunctionIsCalled() noexcept {
+            throwOnFetchMessages.store(true);
+            throwOnFetchRawDataCycles.store(true);
             errorToThrow = SensorCommunicatorTest::Error(ORIGIN,
                                                          ErrorHandling::Category::CONNECTION_ERROR,
                                                          ErrorHandling::Severity::EMERGENCY, // Will not require openConnection
@@ -511,18 +526,55 @@ namespace SensorCommunicatorTestMock {
                                                          MESSAGE);
         }
 
+        SensorCommunicatorTest::Error expectedErrorWhenFetchMessagesIsCalled() noexcept {
+            return SensorCommunicatorTest::Error(ORIGIN,
+                                                 ErrorHandling::Category::COMMUNICATION_ERROR,
+                                                 ErrorHandling::Severity::ERROR,
+                                                 ERROR_CODE,
+                                                 MESSAGE_ERROR_MESSAGE);
+
+        }
+
+        void throwErrorWhenFetchMessagesIsCalled() noexcept {
+            throwOnFetchMessages.store(true);
+            errorToThrow = expectedErrorWhenFetchMessagesIsCalled();
+        }
+
+        SensorCommunicatorTest::Error expectedErrorWhenFetchRawDataCyclesIsCalled() noexcept {
+            return SensorCommunicatorTest::Error(ORIGIN,
+                                                 ErrorHandling::Category::COMMUNICATION_ERROR,
+                                                 ErrorHandling::Severity::ERROR,
+                                                 ERROR_CODE,
+                                                 RAW_DATA_ERROR_MESSAGE);
+        }
+
+        void throwErrorWhenFetchRawDataCyclesIsCalled() noexcept {
+            throwOnFetchRawDataCycles.store(true);
+            errorToThrow = expectedErrorWhenFetchRawDataCyclesIsCalled();
+        }
+
         super::Messages fetchMessages() override {
             openConnectionCalled.store(false);
             closeConnectionCalled.store(false);
-            errorThrown.store(true);
-            throw errorToThrow;
+            if (throwOnFetchMessages.load()) {
+                errorThrown.store(true);
+                throw errorToThrow;
+            }
+            auto message = super::Message::returnDefaultData();
+            super::Messages messages = {message};
+            return messages;
         }
 
         super::RawDataCycles fetchRawDataCycles() override {
             openConnectionCalled.store(false);
             closeConnectionCalled.store(false);
-            errorThrown.store(true);
-            throw errorToThrow;
+            if (throwOnFetchRawDataCycles.load()) {
+                errorThrown.store(true);
+                throw errorToThrow;
+            }
+            auto rawData = super::RawData::returnDefaultData();
+            super::RawDataCycles rawDataCycles = {rawData};
+            return rawDataCycles;
         }
 
         using super::openConnection;
@@ -548,6 +600,12 @@ namespace SensorCommunicatorTestMock {
             }
         }
 
+        std::string const ORIGIN = "SensorCommunicatorTest ThrowingSensorCommunicationStrategyMock";
+        ErrorHandling::ErrorCode const ERROR_CODE = ErrorHandling::GatewayErrorCode::EMPTY_CODE;
+        std::string const MESSAGE_ERROR_MESSAGE = "Help! I need somebody!! ";
+        std::string const RAW_DATA_ERROR_MESSAGE = "Help! Not just anybody!! ";
+        std::string const MESSAGE = "Help! You know I need someone!! ";
+
     private:
 
         bool hasErrorBeenThrown() const noexcept {
@@ -557,10 +615,9 @@ namespace SensorCommunicatorTestMock {
         SensorCommunicatorTest::Error errorToThrow;
 
         AtomicFlag errorThrown;
+        AtomicFlag throwOnFetchMessages;
+        AtomicFlag throwOnFetchRawDataCycles;
 
-        std::string const ORIGIN = "SensorCommunicatorTest ThrowingSensorCommunicationStrategyMock";
-        ErrorHandling::ErrorCode const ERROR_CODE = ErrorHandling::GatewayErrorCode::EMPTY_CODE;
-        std::string const MESSAGE = "Help! Not just anybody!! ";
     };
 }
 
@@ -595,27 +652,48 @@ TEST_F(SensorCommunicatorTest,
 }
 
 TEST_F(SensorCommunicatorTest,
-       given_aStrategyThrowingError_when_executing_then_producesTheCaughtError) {
+       given_aStrategyThrowingErrorOnFetchMessagesCall_when_errorIsCaught_then_producesTheErrorWithCorrectOrigin) {
     auto numberOfErrorToReceive = 1;
     ErrorSinkMock sink(numberOfErrorToReceive);
     ErrorProcessingScheduler scheduler(&sink);
 
     SensorCommunicatorTestMock::ThrowingSensorCommunicationStrategy throwingMockStrategy;
-    throwingMockStrategy.throwOpenConnectionRequiredErrorWhenAnyFunctionIsCalled();
+    throwingMockStrategy.throwErrorWhenFetchMessagesIsCalled();
     SimpleMessageSensorCommunicator sensorCommunicator(&throwingMockStrategy);
 
-    Error expectedError = Error::returnDefaultData();
-    try {
-        throwingMockStrategy.fetchMessages();
-    } catch (Error& error) {
-        expectedError = error;
-    }
+    Error expectedError = throwingMockStrategy.expectedErrorWhenFetchMessagesIsCalled();
+    expectedError = formatStrategyErrorWithCorrectOrigin(expectedError, ErrorHandling::Origin::SENSOR_COMMUNICATION_HANDLE_MESSAGE);
 
     sensorCommunicator.linkConsumer(&scheduler);
-
-
     sensorCommunicator.start();
+    sink.waitConsumptionToBeReached();
 
+    sensorCommunicator.terminateAndJoin();
+    scheduler.terminateAndJoin();
+
+    auto producedErrors = sink.getConsumedData();
+
+    for (auto t = 0; t < numberOfErrorToReceive; ++t) {
+        ASSERT_EQ(producedErrors.front(), expectedError);
+        producedErrors.pop_front();
+    }
+}
+
+TEST_F(SensorCommunicatorTest,
+       given_aStrategyThrowingErrorOnFetchRawDataCyclesCall_when_errorIsCaught_then_producesTheErrorWithCorrectOrigin) {
+    auto numberOfErrorToReceive = 1;
+    ErrorSinkMock sink(numberOfErrorToReceive);
+    ErrorProcessingScheduler scheduler(&sink);
+
+    SensorCommunicatorTestMock::ThrowingSensorCommunicationStrategy throwingMockStrategy;
+    throwingMockStrategy.throwErrorWhenFetchRawDataCyclesIsCalled();
+    SimpleMessageSensorCommunicator sensorCommunicator(&throwingMockStrategy);
+
+    Error expectedError = throwingMockStrategy.expectedErrorWhenFetchRawDataCyclesIsCalled();
+    expectedError = formatStrategyErrorWithCorrectOrigin(expectedError, ErrorHandling::Origin::SENSOR_COMMUNICATION_HANDLE_RAWDATA);
+
+    sensorCommunicator.linkConsumer(&scheduler);
+    sensorCommunicator.start();
     sink.waitConsumptionToBeReached();
 
     sensorCommunicator.terminateAndJoin();
