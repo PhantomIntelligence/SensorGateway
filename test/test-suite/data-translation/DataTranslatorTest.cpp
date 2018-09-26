@@ -140,6 +140,7 @@ namespace DataTranslatorTestMock {
         ~ThrowingDataTranslationStrategy() noexcept = default;
 
         void translateMessage(super::SensorMessage&& sensorMessage) override {
+            std::cout << "sensorMessage.toString() : " << sensorMessage.toString() << std::endl;
             throw ErrorHandling::SensorAccessLinkError(origin,
                                                        ErrorHandling::Category::EMPTY_CATEGORY,
                                                        ErrorHandling::Severity::EMPTY_SEVERITY,
@@ -163,7 +164,7 @@ namespace DataTranslatorTestMock {
 }
 
 TEST_F(DataTranslatorTest,
-       given_aThrowingTranslationStrategy_when_consumingMessage_then_producesTheThrownError) {
+       given_aThrowingTranslationStrategy_when_consumingMessage_then_producesAnErrorCorrectlyFormatted) {
     auto numberOfErrorToReceive = 1;
     Mock::ArbitraryDataSinkMock<Error> sink(numberOfErrorToReceive);
     DataFlow::DataProcessingScheduler<Error, ErrorSinkMock, 1> scheduler(&sink);
