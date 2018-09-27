@@ -22,16 +22,18 @@
 namespace ErrorHandling {
 
     namespace Origin {
-        std::string const SENSOR_COMMUNICATION_OPEN_CONNECTION = "open connection";
-        std::string const SENSOR_COMMUNICATION_CLOSE_CONNECTION = "close connection";
-        std::string const SENSOR_COMMUNICATION_HANDLE_MESSAGE = "handle incoming sensor message";
-        std::string const SENSOR_COMMUNICATION_HANDLE_RAWDATA = "handle incoming sensor rawdata";
+        std::string const SENSOR_COMMUNICATOR_OPEN_CONNECTION = "open sensor connection";
+        std::string const SENSOR_COMMUNICATOR_CLOSE_CONNECTION = "close sensor connection";
+        std::string const SENSOR_COMMUNICATOR_HANDLE_MESSAGE = "handle incoming message";
+        std::string const SENSOR_COMMUNICATOR_HANDLE_RAWDATA = "handle incoming rawdata";
 
         std::string const TRANSLATE_MESSAGE = "translate message";
         std::string const TRANSLATE_RAWDATA = "translate rawdata";
 
-        std::string const SERVER_COMMUNICATION_SEND_MESSAGE = "send server message";
-        std::string const SERVER_COMMUNICATION_SEND_RAWDATA = "send server rawdata";
+        std::string const SERVER_COMMUNICATOR_OPEN_CONNECTION = "open server connection";
+        std::string const SERVER_COMMUNICATOR_CLOSE_CONNECTION = "close server connection";
+        std::string const SERVER_COMMUNICATOR_SEND_MESSAGE = "send message";
+        std::string const SERVER_COMMUNICATOR_SEND_RAWDATA = "send rawdata";
     }
 
     namespace Message {

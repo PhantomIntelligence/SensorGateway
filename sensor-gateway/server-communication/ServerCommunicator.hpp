@@ -50,23 +50,52 @@ namespace SensorAccessLinkElement {
 
         ServerCommunicator& operator=(ServerCommunicator&& other)& noexcept = delete;
 
-        void connect(std::string const& serverAddress) {
-            serverCommunicationStrategy->openConnection(serverAddress);
+        void openConnection(std::string const& serverAddress) {
+            this->serverAddress = serverAddress;
+            try {
+                serverCommunicationStrategy->openConnection(serverAddress);
+            } catch (ErrorHandling::SensorAccessLinkError& strategyError) {
+                handleError(std::move(strategyError));
+            }
         };
 
         void consume(Message&& message) override {
-            serverCommunicationStrategy->sendMessage(std::forward<Message>(message));
+            try {
+                serverCommunicationStrategy->sendMessage(std::forward<Message>(message));
+            } catch (ErrorHandling::SensorAccessLinkError& strategyError) {
+                handleError(std::move(strategyError));
+            }
         }
 
         void consume(RawData&& rawData) override {
-            serverCommunicationStrategy->sendRawData(std::forward<RawData>(rawData));
+            try {
+                serverCommunicationStrategy->sendRawData(std::forward<RawData>(rawData));
+            } catch (ErrorHandling::SensorAccessLinkError& strategyError) {
+                handleError(std::move(strategyError));
+            }
         }
 
-        void disconnect() { serverCommunicationStrategy->closeConnection(); }
+        void closeConnection() {
+            try {
+                serverCommunicationStrategy->closeConnection();
+            } catch (ErrorHandling::SensorAccessLinkError& strategyError) {
+                handleError(std::move(strategyError));
+            }
+        }
 
     private:
 
+        void handleError(ErrorHandling::SensorAccessLinkError&& error) noexcept {
+            if (error.isCloseConnectionRequired()) {
+                serverCommunicationStrategy->closeConnection();
+            }
+            if (error.isOpenConnectionRequired()) {
+                serverCommunicationStrategy->openConnection(serverAddress);
+            }
+        }
+
         ServerCommunicationStrategy* serverCommunicationStrategy;
+        std::string serverAddress;
     };
 }
 

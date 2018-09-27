@@ -88,7 +88,7 @@ namespace SensorAccessLinkElement {
                 sensorCommunicationStrategy->openConnection();
             } catch (ErrorHandling::SensorAccessLinkError& strategyError) {
                 addOriginAndHandleError(std::move(strategyError),
-                                        ErrorHandling::Origin::SENSOR_COMMUNICATION_OPEN_CONNECTION);
+                                        ErrorHandling::Origin::SENSOR_COMMUNICATOR_OPEN_CONNECTION);
             }
         }
 
@@ -97,7 +97,7 @@ namespace SensorAccessLinkElement {
                 sensorCommunicationStrategy->closeConnection();
             } catch (ErrorHandling::SensorAccessLinkError& strategyError) {
                 addOriginAndHandleError(std::move(strategyError),
-                                        ErrorHandling::Origin::SENSOR_COMMUNICATION_CLOSE_CONNECTION);
+                                        ErrorHandling::Origin::SENSOR_COMMUNICATOR_CLOSE_CONNECTION);
             }
         }
 
@@ -116,7 +116,7 @@ namespace SensorAccessLinkElement {
                 messages = sensorCommunicationStrategy->fetchMessages();
             } catch (ErrorHandling::SensorAccessLinkError& strategyError) {
                 addOriginAndHandleError(std::move(strategyError),
-                                        ErrorHandling::Origin::SENSOR_COMMUNICATION_HANDLE_MESSAGE);
+                                        ErrorHandling::Origin::SENSOR_COMMUNICATOR_HANDLE_MESSAGE);
             }
 
             for (auto messageIndex = 0; messageIndex < messages.size(); ++messageIndex) {
@@ -133,7 +133,7 @@ namespace SensorAccessLinkElement {
                 rawDataCycles = sensorCommunicationStrategy->fetchRawDataCycles();
             } catch (ErrorHandling::SensorAccessLinkError& strategyError) {
                 addOriginAndHandleError(std::move(strategyError),
-                                        ErrorHandling::Origin::SENSOR_COMMUNICATION_HANDLE_RAWDATA);
+                                        ErrorHandling::Origin::SENSOR_COMMUNICATOR_HANDLE_RAWDATA);
             }
 
             for (auto rawDataIndex = 0; rawDataIndex < rawDataCycles.size(); ++rawDataIndex) {

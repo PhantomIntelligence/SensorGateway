@@ -863,68 +863,68 @@ SimpleRawDataList SensorCommunicatorTest::createASequenceOfDifferentRawDataCycle
 }
 
 TEST_F(SensorCommunicatorTest,
-       given_aStrategyThrowingOnOpenConnectionCall_when_itIsRequiredToClose_then_callsCloseConnectionInStrategy) {
+       given_anErrorThatRequiresToCloseThrownOnOpenConnectionCall_when_isCaught_then_callsCloseConnectionInStrategy) {
     SensorCommunicatorTestMock::ThrowingSensorCommunicationStrategy throwingMockStrategy;
     throwingMockStrategy.throwCloseConnectionRequiredErrorWhenOpenConnectionIsCalled();
     ASSERT_TRUE(closeConnectionIsCalledAfterStrategyHasThrown(&throwingMockStrategy));
 }
 
 TEST_F(SensorCommunicatorTest,
-       given_aStrategyThrowingOnOpenConnectionCall_when_itIsRequiredToOpen_then_callsOpenConnectionInStrategy) {
+       given_anErrorThatRequiresToOpenThrownOnOpenConnectionCall_when_isCaught_then_callsOpenConnectionInStrategy) {
     SensorCommunicatorTestMock::ThrowingSensorCommunicationStrategy throwingMockStrategy;
     throwingMockStrategy.throwOpenConnectionRequiredErrorWhenOpenConnectionIsCalled();
     ASSERT_TRUE(openConnectionIsCalledAfterStrategyHasThrown(&throwingMockStrategy));
 }
 
 TEST_F(SensorCommunicatorTest,
-       given_aStrategyThrowingOnCloseConnectionCall_when_itIsRequiredToClose_then_callsCloseConnectionInStrategy) {
+       given_anErrorThatRequiresToCloseThrownOnCloseConnectionCall_when_isCaught_then_callsCloseConnectionInStrategy) {
     SensorCommunicatorTestMock::ThrowingSensorCommunicationStrategy throwingMockStrategy;
     throwingMockStrategy.throwCloseConnectionRequiredErrorWhenCloseConnectionIsCalled();
     ASSERT_TRUE(closeConnectionIsCalledAfterStrategyHasThrownAfterClose(&throwingMockStrategy));
 }
 
 TEST_F(SensorCommunicatorTest,
-       given_aStrategyThrowingOnCloseConnectionCall_when_itIsRequiredToOpen_then_callsOpenConnectionInStrategy) {
+       given_anErrorThatRequiresToOpenThrownOnCloseConnectionCall_when_isCaught_then_callsOpenConnectionInStrategy) {
     SensorCommunicatorTestMock::ThrowingSensorCommunicationStrategy throwingMockStrategy;
     throwingMockStrategy.throwOpenConnectionRequiredErrorWhenCloseConnectionIsCalled();
     ASSERT_TRUE(openConnectionIsCalledAfterStrategyHasThrownAfterClose(&throwingMockStrategy));
 }
 
 TEST_F(SensorCommunicatorTest,
-       given_aStrategyThrowingOnFetchMessagesCall_when_itIsRequiredToClose_then_callsCloseConnectionInStrategy) {
+       given_anErrorThatRequiresToCloseThrownOnFetchMessagesCall_when_isCaught_then_callsCloseConnectionInStrategy) {
     SensorCommunicatorTestMock::ThrowingSensorCommunicationStrategy throwingMockStrategy;
     throwingMockStrategy.throwCloseConnectionRequiredErrorWhenFetchMessagesIsCalled();
     ASSERT_TRUE(closeConnectionIsCalledAfterStrategyHasThrown(&throwingMockStrategy));
 }
 
 TEST_F(SensorCommunicatorTest,
-       given_aStrategyThrowingOnFetchMessagesCall_when_itIsRequiredToOpen_then_callsOpenConnectionInStrategy) {
+       given_anErrorThatRequiresToOpenThrownOnFetchMessagesCall_when_isCaught_then_callsOpenConnectionInStrategy) {
     SensorCommunicatorTestMock::ThrowingSensorCommunicationStrategy throwingMockStrategy;
     throwingMockStrategy.throwOpenConnectionRequiredErrorWhenFetchMessagesIsCalled();
     ASSERT_TRUE(openConnectionIsCalledAfterStrategyHasThrown(&throwingMockStrategy));
 }
 
 TEST_F(SensorCommunicatorTest,
-       given_aStrategyThrowingOnFetchRawDataCyclesCall_when_itIsRequiredToClose_then_callsCloseConnectionInStrategy) {
+       given_anErrorThatRequiresToCloseThrownOnFetchRawDataCyclesCall_when_isCaught_then_callsCloseConnectionInStrategy) {
     SensorCommunicatorTestMock::ThrowingSensorCommunicationStrategy throwingMockStrategy;
     throwingMockStrategy.throwCloseConnectionRequiredErrorWhenFetchRawDataCyclesIsCalled();
     ASSERT_TRUE(closeConnectionIsCalledAfterStrategyHasThrown(&throwingMockStrategy));
 }
 
 TEST_F(SensorCommunicatorTest,
-       given_aStrategyThrowingOnFetchRawDataCyclesCall_when_itIsRequiredToOpen_then_callsOpenConnectionInStrategy) {
+       given_anErrorThatRequiresToOpenThrownOnFetchRawDataCyclesCall_when_isCaught_then_callsOpenConnectionInStrategy) {
     SensorCommunicatorTestMock::ThrowingSensorCommunicationStrategy throwingMockStrategy;
     throwingMockStrategy.throwOpenConnectionRequiredErrorWhenFetchRawDataCyclesIsCalled();
     ASSERT_TRUE(openConnectionIsCalledAfterStrategyHasThrown(&throwingMockStrategy));
 }
 
 TEST_F(SensorCommunicatorTest,
-       given_aStrategyThrowingErrorOnOpenConnectionCall_when_errorIsCaught_then_producesTheErrorWithCorrectOrigin) {
+       given_anStrategyThrowingErrorOnOpenConnectionCall_when_errorIsCaught_then_producesTheErrorWithCorrectOrigin) {
     SensorCommunicatorTestMock::ThrowingSensorCommunicationStrategy throwingMockStrategy;
     throwingMockStrategy.throwErrorWhenOpenConnectionIsCalled();
     Error expectedError = throwingMockStrategy.expectedErrorWhenOpenConnectionIsCalled();
     expectedError = formatStrategyErrorWithCorrectOrigin(expectedError,
-                                                         ErrorHandling::Origin::SENSOR_COMMUNICATION_OPEN_CONNECTION);
+                                                         ErrorHandling::Origin::SENSOR_COMMUNICATOR_OPEN_CONNECTION);
     ASSERT_TRUE(expectedErrorGetsPublishedAfterThrow(&throwingMockStrategy, std::move(expectedError)));
 }
 
@@ -934,7 +934,7 @@ TEST_F(SensorCommunicatorTest,
     throwingMockStrategy.throwErrorWhenCloseConnectionIsCalled();
     Error expectedError = throwingMockStrategy.expectedErrorWhenCloseConnectionIsCalled();
     expectedError = formatStrategyErrorWithCorrectOrigin(expectedError,
-                                                         ErrorHandling::Origin::SENSOR_COMMUNICATION_CLOSE_CONNECTION);
+                                                         ErrorHandling::Origin::SENSOR_COMMUNICATOR_CLOSE_CONNECTION);
     ASSERT_TRUE(expectedErrorGetsPublishedAfterThrowAtClose(&throwingMockStrategy, std::move(expectedError)));
 }
 
@@ -944,7 +944,7 @@ TEST_F(SensorCommunicatorTest,
     throwingMockStrategy.throwErrorWhenFetchMessagesIsCalled();
     Error expectedError = throwingMockStrategy.expectedErrorWhenFetchMessagesIsCalled();
     expectedError = formatStrategyErrorWithCorrectOrigin(expectedError,
-                                                         ErrorHandling::Origin::SENSOR_COMMUNICATION_HANDLE_MESSAGE);
+                                                         ErrorHandling::Origin::SENSOR_COMMUNICATOR_HANDLE_MESSAGE);
     ASSERT_TRUE(expectedErrorGetsPublishedAfterThrow(&throwingMockStrategy, std::move(expectedError)));
 }
 
@@ -954,7 +954,7 @@ TEST_F(SensorCommunicatorTest,
     throwingMockStrategy.throwErrorWhenFetchRawDataCyclesIsCalled();
     Error expectedError = throwingMockStrategy.expectedErrorWhenFetchRawDataCyclesIsCalled();
     expectedError = formatStrategyErrorWithCorrectOrigin(expectedError,
-                                                         ErrorHandling::Origin::SENSOR_COMMUNICATION_HANDLE_RAWDATA);
+                                                         ErrorHandling::Origin::SENSOR_COMMUNICATOR_HANDLE_RAWDATA);
     ASSERT_TRUE(expectedErrorGetsPublishedAfterThrow(&throwingMockStrategy, std::move(expectedError)));
 }
 
