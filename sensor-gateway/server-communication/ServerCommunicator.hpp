@@ -21,7 +21,8 @@ namespace SensorAccessLinkElement {
 
     template<class T>
     class ServerCommunicator : public DataFlow::DataSink<typename T::Message>,
-                               public DataFlow::DataSink<typename T::RawData> {
+                               public DataFlow::DataSink<typename T::RawData>,
+                               public DataFlow::DataSource<ErrorHandling::SensorAccessLinkError> {
 
     protected:
 
@@ -32,6 +33,7 @@ namespace SensorAccessLinkElement {
 
         using MessageSink = DataFlow::DataSink<Message>;
         using RawDataSink = DataFlow::DataSink<RawData>;
+        using ErrorSource = DataFlow::DataSource<ErrorHandling::SensorAccessLinkError>;
 
     public:
 
@@ -49,23 +51,68 @@ namespace SensorAccessLinkElement {
 
         ServerCommunicator& operator=(ServerCommunicator&& other)& noexcept = delete;
 
-        void connect(std::string const& serverAddress) {
-            serverCommunicationStrategy->openConnection(serverAddress);
+        void openConnection(std::string const& serverAddress) {
+            this->serverAddress = serverAddress;
+            try {
+                serverCommunicationStrategy->openConnection(serverAddress);
+            } catch (ErrorHandling::SensorAccessLinkError& strategyError) {
+                addOriginAndHandleError(std::move(strategyError),
+                                        ErrorHandling::Origin::SERVER_COMMUNICATOR_OPEN_CONNECTION);
+            }
         };
 
         void consume(Message&& message) override {
-            serverCommunicationStrategy->sendMessage(std::forward<Message>(message));
+            try {
+                serverCommunicationStrategy->sendMessage(std::forward<Message>(message));
+            } catch (ErrorHandling::SensorAccessLinkError& strategyError) {
+                addOriginAndHandleError(std::move(strategyError),
+                                        ErrorHandling::Origin::SERVER_COMMUNICATOR_SEND_MESSAGE);
+            }
         }
 
         void consume(RawData&& rawData) override {
-            serverCommunicationStrategy->sendRawData(std::forward<RawData>(rawData));
+            try {
+                serverCommunicationStrategy->sendRawData(std::forward<RawData>(rawData));
+            } catch (ErrorHandling::SensorAccessLinkError& strategyError) {
+                addOriginAndHandleError(std::move(strategyError),
+                                        ErrorHandling::Origin::SERVER_COMMUNICATOR_SEND_RAWDATA);
+            }
         }
 
-        void disconnect() { serverCommunicationStrategy->closeConnection(); }
+        void closeConnection() {
+            try {
+                serverCommunicationStrategy->closeConnection();
+            } catch (ErrorHandling::SensorAccessLinkError& strategyError) {
+                addOriginAndHandleError(std::move(strategyError),
+                                        ErrorHandling::Origin::SERVER_COMMUNICATOR_CLOSE_CONNECTION);
+            }
+        }
 
     private:
 
+        void addOriginAndHandleError(ErrorHandling::SensorAccessLinkError&& error, std::string const& originToAdd) {
+            auto originAddedError = ErrorHandling::SensorAccessLinkError(
+                    originToAdd + ErrorHandling::Message::SEPARATOR + error.getOrigin(),
+                    error.getCategory(),
+                    error.getSeverity(),
+                    error.getErrorCode(),
+                    error.getMessage());
+            handleError(std::move(originAddedError));
+        }
+
+        void handleError(ErrorHandling::SensorAccessLinkError&& error) noexcept {
+            auto errorCopy = ErrorHandling::SensorAccessLinkError(error);
+            ErrorSource::produce(std::move(errorCopy));
+            if (error.isCloseConnectionRequired()) {
+                serverCommunicationStrategy->closeConnection();
+            }
+            if (error.isOpenConnectionRequired()) {
+                serverCommunicationStrategy->openConnection(serverAddress);
+            }
+        }
+
         ServerCommunicationStrategy* serverCommunicationStrategy;
+        std::string serverAddress;
     };
 }
 

@@ -26,8 +26,6 @@ namespace ErrorHandling {
 
     public:
 
-        typedef int64_t ErrorCode;
-
         explicit SensorAccessLinkError(std::string const& origin,
                                        Category const& category,
                                        Severity const& severity,
@@ -37,13 +35,13 @@ namespace ErrorHandling {
 
         ~SensorAccessLinkError() noexcept override;
 
-        SensorAccessLinkError(SensorAccessLinkError const& other);
+        SensorAccessLinkError(SensorAccessLinkError const& other) noexcept;
 
         SensorAccessLinkError(SensorAccessLinkError&& other) noexcept;
 
-        SensorAccessLinkError& operator=(SensorAccessLinkError const& other)& = delete;
+        SensorAccessLinkError& operator=(SensorAccessLinkError const& other)&;
 
-        SensorAccessLinkError& operator=(SensorAccessLinkError&& other)& noexcept = delete;
+        SensorAccessLinkError& operator=(SensorAccessLinkError&& other)& noexcept;
 
         void swap(SensorAccessLinkError& current, SensorAccessLinkError& other) noexcept;
 
@@ -51,7 +49,35 @@ namespace ErrorHandling {
 
         bool operator!=(SensorAccessLinkError const& other) const;
 
+        SensorAccessLinkError static const returnDefaultData() noexcept;
+
+        bool isFatal() const noexcept;
+
+        bool isOpenConnectionRequired() const noexcept;
+
+        bool isCloseConnectionRequired() const noexcept;
+
         std::string fetchDetailedMessage() const noexcept;
+
+        inline std::string const& getOrigin() const noexcept {
+            return origin;
+        }
+
+        inline Category const& getCategory() const noexcept {
+            return category;
+        }
+
+        inline Severity const& getSeverity() const noexcept {
+            return severity;
+        }
+
+        inline ErrorCode const& getErrorCode() const noexcept {
+            return code;
+        }
+
+        inline std::string const& getMessage() const noexcept {
+            return message;
+        }
 
     private:
 
@@ -74,7 +100,23 @@ namespace ErrorHandling {
         std::string message;
 
     };
+}
 
+namespace Defaults {
+    using ErrorHandling::SensorAccessLinkError;
+    using ErrorHandling::Severity;
+    using ErrorHandling::Category;
+    using ErrorHandling::GatewayErrorCode;
+    using ErrorHandling::ErrorCode;
+
+    std::string const DEFAULT_ORIGIN = "Initialization origin, should not appear in production.";
+    Category const DEFAULT_CATEGORY = Category::EMPTY_CATEGORY;
+    Severity const DEFAULT_SEVERITY = Severity::EMPTY_SEVERITY;
+    ErrorCode const DEFAULT_ERROR_CODE = GatewayErrorCode::EMPTY_CODE;
+    std::string const DEFAULT_MESSAGE = "This message is a placeholder for initialization purpose.";
+    SensorAccessLinkError const DEFAULT_SENSOR_ACCESS_LINK_ERROR = SensorAccessLinkError(
+            DEFAULT_ORIGIN, DEFAULT_CATEGORY, DEFAULT_SEVERITY, DEFAULT_ERROR_CODE, DEFAULT_MESSAGE
+    );
 }
 
 #endif //SENSORGATEWAY_SENSORACCESSLINKERROR_H

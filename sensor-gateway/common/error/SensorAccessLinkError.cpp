@@ -19,6 +19,7 @@
 using ErrorHandling::SensorAccessLinkError;
 using ErrorHandling::Severity;
 using ErrorHandling::Category;
+using ErrorHandling::ErrorCode;
 
 SensorAccessLinkError::SensorAccessLinkError(std::string const& origin,
                                              Category const& category,
@@ -36,7 +37,7 @@ SensorAccessLinkError::SensorAccessLinkError(std::string const& origin,
 
 SensorAccessLinkError::~SensorAccessLinkError() noexcept {}
 
-SensorAccessLinkError::SensorAccessLinkError(SensorAccessLinkError const& other) :
+SensorAccessLinkError::SensorAccessLinkError(SensorAccessLinkError const& other) noexcept :
         SensorAccessLinkError(other.origin, other.category, other.severity, other.code, other.message,
                               other.timestamp) {
 }
@@ -46,6 +47,16 @@ SensorAccessLinkError::SensorAccessLinkError(SensorAccessLinkError&& other) noex
                               std::move(other.message), std::move(other.timestamp)) {
 }
 
+SensorAccessLinkError& SensorAccessLinkError::operator=(SensorAccessLinkError const& other)& {
+    SensorAccessLinkError temporary(other);
+    swap(*this, temporary);
+    return *this;
+}
+
+SensorAccessLinkError& SensorAccessLinkError::operator=(SensorAccessLinkError&& other)& noexcept {
+    swap(*this, other);
+    return *this;
+}
 
 void SensorAccessLinkError::swap(SensorAccessLinkError& current, SensorAccessLinkError& other) noexcept {
     std::swap(current.origin, other.origin);
@@ -75,6 +86,35 @@ bool SensorAccessLinkError::operator!=(SensorAccessLinkError const& other) const
     return !operator==(other);
 }
 
+SensorAccessLinkError const SensorAccessLinkError::returnDefaultData() noexcept {
+    return Defaults::DEFAULT_SENSOR_ACCESS_LINK_ERROR;
+}
+
+bool SensorAccessLinkError::isFatal() const noexcept {
+    bool isFatal = false;
+    if (severity == EMERGENCY) {
+        isFatal = true;
+    }
+    return isFatal;
+}
+
+bool SensorAccessLinkError::isOpenConnectionRequired() const noexcept {
+    bool isOpenConnectionRequired = true;
+    if (category == COMMUNICATION_ERROR ||
+        severity == EMERGENCY) {
+        isOpenConnectionRequired = false;
+    }
+    return isOpenConnectionRequired;
+}
+
+bool SensorAccessLinkError::isCloseConnectionRequired() const noexcept {
+    bool isCloseConnectionRequired = true;
+    if (category == COMMUNICATION_ERROR) {
+        isCloseConnectionRequired = false;
+    }
+    return isCloseConnectionRequired;
+}
+
 std::string SensorAccessLinkError::fetchDetailedMessage() const noexcept {
     std::string detailedMessage = buildDetailedMessage(timestamp, origin, category, severity, code, message);
     return detailedMessage;
@@ -84,7 +124,7 @@ std::string SensorAccessLinkError::buildDetailedMessage(HighResolutionTimePoint 
                                                         std::string const& origin,
                                                         Category const& category,
                                                         Severity const& severity,
-                                                        SensorAccessLinkError::ErrorCode const& code,
+                                                        ErrorCode const& code,
                                                         std::string const& message) noexcept {
     auto formattedTimestamp = formatTimestamp(timestamp);
     std::ostringstream detailedMessageStream(formattedTimestamp, std::ios_base::ate);
