@@ -21,6 +21,26 @@
 
 namespace ErrorHandling {
 
+    namespace Origin {
+        std::string const SENSOR_COMMUNICATOR_OPEN_CONNECTION = "open sensor connection";
+        std::string const SENSOR_COMMUNICATOR_CLOSE_CONNECTION = "close sensor connection";
+        std::string const SENSOR_COMMUNICATOR_HANDLE_MESSAGE = "handle incoming message";
+        std::string const SENSOR_COMMUNICATOR_HANDLE_RAWDATA = "handle incoming rawdata";
+
+        std::string const TRANSLATE_MESSAGE = "translate message";
+        std::string const TRANSLATE_RAWDATA = "translate rawdata";
+
+        std::string const SERVER_COMMUNICATOR_OPEN_CONNECTION = "open server connection";
+        std::string const SERVER_COMMUNICATOR_CLOSE_CONNECTION = "close server connection";
+        std::string const SERVER_COMMUNICATOR_SEND_MESSAGE = "send message";
+        std::string const SERVER_COMMUNICATOR_SEND_RAWDATA = "send rawdata";
+    }
+
+    namespace Message {
+        std::string const SEPARATOR = " - ";
+        std::string const EMPTY_MESSAGE = "";
+    }
+
     enum Severity : int32_t {
         EMERGENCY = 0,
         ALERT = 1,
@@ -30,6 +50,11 @@ namespace ErrorHandling {
         NOTICE = 5,
         INFO = 6,
         DEBUG = 7,
+
+        /**
+         * @brief This SHOULD NEVER be used for any application, for empty initialization purposes only
+         */
+                EMPTY_SEVERITY = 42,
     };
 
     enum Category : int32_t {
@@ -38,8 +63,25 @@ namespace ErrorHandling {
         UNHANDLED_ERROR = 102,
         EXTERNAL_ERROR = 103,
         UNRECOGNIZED_ERROR = 104,
+
+        /**
+         * @brief This SHOULD NEVER be used for any application, for empty initialization purposes only
+         */
+                EMPTY_CATEGORY = 142,
+
+        TRANSLATION_ERROR = 200,
     };
 
+    typedef int64_t ErrorCode;
+
+    enum GatewayErrorCode : ErrorCode {
+        DATA_NOT_RECOGNIZED = 10000,
+
+        /**
+         * @brief This SHOULD NEVER be used for any application, for empty initialization purposes only
+         */
+                EMPTY_CODE = 10042,
+    };
 }
 
 #endif //SENSORGATEWAY_ERRORCONSTANTS_H

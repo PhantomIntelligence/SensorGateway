@@ -23,7 +23,7 @@ namespace SensorGateway {
 
     // TODO: Using things like `enable_if<>, handle different sensors when there is or not RawData or fetching in bulk`
     template<class SENSOR_STRUCTURES, class SERVER_STRUCTURES>
-    class SensorAccessLink {
+    class SensorAccessLink : public DataFlow::DataSink<ErrorHandling::SensorAccessLinkError> {
 
     protected:
 
@@ -46,6 +46,9 @@ namespace SensorGateway {
         using SensorCommunicator = SensorAccessLinkElement::SensorCommunicator<SENSOR_STRUCTURES>;
         using SensorCommunicationStrategy = SensorCommunication::SensorCommunicationStrategy<SENSOR_STRUCTURES>;
 
+        using Error = ErrorHandling::SensorAccessLinkError;
+        using ThisClass = SensorAccessLink<SENSOR_STRUCTURES, SERVER_STRUCTURES>;
+        using ErrorScheduler = DataFlow::DataProcessingScheduler<Error, ThisClass, 3>;
 
     public:
         explicit SensorAccessLink(ServerCommunicationStrategy* serverCommunicationStrategy,
@@ -83,7 +86,7 @@ namespace SensorGateway {
             std::this_thread::sleep_for(std::chrono::milliseconds(50));
             // TODO: implement }
 
-            serverCommunicator.connect(serverAddress);
+            serverCommunicator.openConnection(serverAddress);
             sensorCommunicator.start();
         };
 
@@ -93,7 +96,12 @@ namespace SensorGateway {
             translatorRawDataScheduler.terminateAndJoin();
             serverCommunicatorMessageScheduler.terminateAndJoin();
             serverCommunicatorRawDataScheduler.terminateAndJoin();
-            serverCommunicator.disconnect();
+            serverCommunicator.closeConnection();
+        }
+
+        void consume(Error&& error) override {
+            // TODO: if (error.isFatal) {terminateAndJoin();} else {sendErrorMessageToServer();}
+            std::cout << error.fetchDetailedMessage() << std::endl;
         }
 
     private:
