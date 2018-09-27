@@ -44,7 +44,11 @@ namespace {
       */
     void doNothing() {}
 
-    [[deprecated("std::runtime_error should be replaced with SensorAccessLinkError")]] [[noreturn]] void throwRuntimeError(char const* message) {
+
+    // TODO : ERROR
+    // TODO: uncomment this to have a warning pop everywhere a std::runtime_error is thrown and should be replaced by some other error
+//    [[deprecated("std::runtime_error should be replaced with SensorAccessLinkError")]] [[noreturn]] void throwRuntimeError(char const* message) {
+        [[noreturn]] void throwRuntimeError(char const* message) {
         throw std::runtime_error(message);
     }
 
