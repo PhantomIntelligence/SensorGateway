@@ -65,7 +65,7 @@ namespace ErrorHandling {
     std::string const canERR__RESERVED_MESSAGE = "The last entry - a dummy so we know where NOT to place a comma";
 
     [[noreturn]] static void
-     throwKvaserCommunicationError(ErrorHandling::SensorAccessLinkError::ErrorCode const& errorCode, std::string const& callOrigin) {
+     throwKvaserCommunicationError(ErrorHandling::ErrorCode const& errorCode, std::string const& callOrigin) {
         std::string origin = "Kvaser " + callOrigin;
         ErrorHandling::Category category;
         ErrorHandling::Severity severity;
