@@ -19,7 +19,7 @@
 #include "ConstantErrorCodeKvaser.h"
 
 namespace ErrorHandling {
-
+x
     class KvaserCommunicationError : public CommunicationError {
 
     protected:
