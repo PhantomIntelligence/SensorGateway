@@ -17,6 +17,7 @@
 #include "test/utilities/data-model/DataModelFixture.h"
 
 #include "test/utilities/mock/ArbitraryDataSinkMock.hpp"
+#include "test/utilities/mock/ErrorThrowingDataTranslationStrategyMock.hpp"
 
 using TestFunctions::DataTestUtil;
 using Sensor::Test::Simple::Structures;
@@ -29,6 +30,7 @@ protected:
 
     using Error = ErrorHandling::SensorAccessLinkError;
     using ErrorSinkMock = Mock::ArbitraryDataSinkMock<Error>;
+    using ThrowingDataTranslationStrategy = Mock::ErrorThrowingDataTranslationStrategyMock<Sensor::Test::Simple::Structures>;
 
     DataTranslatorTest() = default;
 
@@ -119,56 +121,13 @@ TEST_F(DataTranslatorTest,
     ASSERT_TRUE(strategyCalledWithTheRightRawData);
 }
 
-namespace DataTranslatorTestMock {
-
-    class ThrowingDataTranslationStrategy final :
-            public DataTranslationStrategy<Structures, Structures> {
-
-    protected:
-
-        using super = DataTranslation::DataTranslationStrategy<Structures, Structures>;
-        using super::SensorMessage;
-        using super::SensorRawData;
-
-        using super::MessageSource;
-        using super::RawDataSource;
-
-    public:
-
-        ThrowingDataTranslationStrategy() = default;
-
-        ~ThrowingDataTranslationStrategy() noexcept = default;
-
-        void translateMessage(super::SensorMessage&& sensorMessage) override {
-            throw ErrorHandling::SensorAccessLinkError(ORIGIN,
-                                                       ErrorHandling::Category::EMPTY_CATEGORY,
-                                                       ErrorHandling::Severity::EMPTY_SEVERITY,
-                                                       ERROR_CODE,
-                                                       MESSAGE_ERROR_MESSAGE);
-        };
-
-        void translateRawData(super::SensorRawData&& sensorRawData) override {
-            throw ErrorHandling::SensorAccessLinkError(ORIGIN,
-                                                       ErrorHandling::Category::EMPTY_CATEGORY,
-                                                       ErrorHandling::Severity::EMPTY_SEVERITY,
-                                                       ERROR_CODE,
-                                                       RAW_DATA_ERROR_MESSAGE);
-        }
-
-        std::string const ORIGIN = "from the throwing strategy";
-        ErrorHandling::ErrorCode const ERROR_CODE = ErrorHandling::GatewayErrorCode::DATA_NOT_RECOGNIZED;
-        std::string const MESSAGE_ERROR_MESSAGE = "Error message from the message consumption strategy";
-        std::string const RAW_DATA_ERROR_MESSAGE = "Error message from the rawdata consumption strategy";
-    };
-}
-
 TEST_F(DataTranslatorTest,
        given_aThrowingTranslationStrategy_when_consumingMessage_then_producesAnErrorCorrectlyFormatted) {
     auto numberOfErrorToReceive = 1;
     Mock::ArbitraryDataSinkMock<Error> sink(numberOfErrorToReceive);
     DataFlow::DataProcessingScheduler<Error, ErrorSinkMock, 1> scheduler(&sink);
 
-    DataTranslatorTestMock::ThrowingDataTranslationStrategy throwingMockStrategy;
+    ThrowingDataTranslationStrategy throwingMockStrategy;
     DataTranslator<Structures, Structures> dataTranslator(&throwingMockStrategy);
 
     dataTranslator.linkConsumer(&scheduler);
@@ -198,7 +157,7 @@ TEST_F(DataTranslatorTest,
     Mock::ArbitraryDataSinkMock<Error> sink(numberOfErrorToReceive);
     DataFlow::DataProcessingScheduler<Error, ErrorSinkMock, 1> scheduler(&sink);
 
-    DataTranslatorTestMock::ThrowingDataTranslationStrategy throwingMockStrategy;
+    ThrowingDataTranslationStrategy throwingMockStrategy;
     DataTranslator<Structures, Structures> dataTranslator(&throwingMockStrategy);
 
     Error expectedError = ErrorHandling::SensorAccessLinkError(

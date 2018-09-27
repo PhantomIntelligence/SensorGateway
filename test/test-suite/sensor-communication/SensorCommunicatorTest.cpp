@@ -22,6 +22,7 @@
 
 #include "sensor-gateway/sensor-communication/SensorCommunicator.hpp"
 #include "test/utilities/mock/ArbitraryDataSinkMock.hpp"
+#include "test/utilities/mock/ErrorThrowingSensorCommunicationStrategyMock.hpp"
 
 using SimpleMessage = Sensor::Test::Simple::Structures::Message;
 using SimpleRawData = Sensor::Test::Simple::Structures::RawData;
@@ -120,7 +121,6 @@ namespace SensorCommunicatorTestMock {
             closeConnectionCalled.store(true);
         }
 
-
         bool hasOpenConnectionBeenCalled() const {
             return openConnectionCalled.load();
         }
@@ -209,244 +209,6 @@ namespace SensorCommunicatorTestMock {
         SimpleRawDataList rawDataCyclesToReturn;
     };
 
-    class ThrowingSensorCommunicationStrategy : public SensorCommunicationStrategy {
-
-    protected:
-
-        using super = SensorCommunicationStrategy;
-
-    public:
-
-        ThrowingSensorCommunicationStrategy() :
-                super(),
-                errorToThrow(ErrorHandling::SensorAccessLinkError::returnDefaultData()),
-                errorThrown(false),
-                throwOnOpen(false),
-                throwOnClose(false),
-                throwOnFetchMessages(false),
-                throwOnFetchRawDataCycles(false) {
-        }
-
-        ~ThrowingSensorCommunicationStrategy() noexcept final = default;
-
-        ThrowingSensorCommunicationStrategy(ThrowingSensorCommunicationStrategy const& other) = delete;
-
-        ThrowingSensorCommunicationStrategy(ThrowingSensorCommunicationStrategy&& other) noexcept = delete;
-
-        ThrowingSensorCommunicationStrategy& operator=(ThrowingSensorCommunicationStrategy const& other)& = delete;
-
-        ThrowingSensorCommunicationStrategy&
-        operator=(ThrowingSensorCommunicationStrategy&& other)& noexcept = delete;
-
-        ErrorHandling::SensorAccessLinkError expectedErrorRequiringOpenConnection() noexcept {
-            return ErrorHandling::SensorAccessLinkError(ORIGIN,
-                                                        ErrorHandling::Category::CONNECTION_ERROR,
-                                                        ErrorHandling::Severity::WARNING,
-                                                        ERROR_CODE,
-                                                        MESSAGE);
-        }
-
-        ErrorHandling::SensorAccessLinkError expectedErrorRequiringCloseConnection() noexcept {
-            return ErrorHandling::SensorAccessLinkError(ORIGIN,
-                                                        ErrorHandling::Category::CONNECTION_ERROR,
-                                                        ErrorHandling::Severity::EMERGENCY, // Will not require openConnection
-                                                        ERROR_CODE,
-                                                        MESSAGE);
-        }
-
-        void throwOpenConnectionRequiredErrorWhenOpenConnectionIsCalled() noexcept {
-            throwOnOpen.store(true);
-            errorToThrow = expectedErrorRequiringOpenConnection();
-
-        }
-
-        void throwOpenConnectionRequiredErrorWhenCloseConnectionIsCalled() noexcept {
-            throwOnClose.store(true);
-            errorToThrow = expectedErrorRequiringOpenConnection();
-
-        }
-
-        void throwOpenConnectionRequiredErrorWhenFetchMessagesIsCalled() noexcept {
-            throwOnFetchMessages.store(true);
-            errorToThrow = expectedErrorRequiringOpenConnection();
-
-        }
-
-        void throwOpenConnectionRequiredErrorWhenFetchRawDataCyclesIsCalled() noexcept {
-            throwOnFetchRawDataCycles.store(true);
-            errorToThrow = expectedErrorRequiringOpenConnection();
-
-        }
-
-        void throwCloseConnectionRequiredErrorWhenOpenConnectionIsCalled() noexcept {
-            throwOnOpen.store(true);
-            errorToThrow = expectedErrorRequiringCloseConnection();
-        }
-
-        void throwCloseConnectionRequiredErrorWhenCloseConnectionIsCalled() noexcept {
-            throwOnClose.store(true);
-            errorToThrow = expectedErrorRequiringCloseConnection();
-        }
-
-        void throwCloseConnectionRequiredErrorWhenFetchMessagesIsCalled() noexcept {
-            throwOnFetchMessages.store(true);
-            errorToThrow = expectedErrorRequiringCloseConnection();
-        }
-
-        void throwCloseConnectionRequiredErrorWhenFetchRawDataCyclesIsCalled() noexcept {
-            throwOnFetchRawDataCycles.store(true);
-            errorToThrow = expectedErrorRequiringCloseConnection();
-        }
-
-        ErrorHandling::SensorAccessLinkError expectedErrorWhenOpenConnectionIsCalled() noexcept {
-            return ErrorHandling::SensorAccessLinkError(ORIGIN,
-                                                        ErrorHandling::Category::COMMUNICATION_ERROR,
-                                                        ErrorHandling::Severity::ERROR,
-                                                        ERROR_CODE,
-                                                        OPEN_ERROR_MESSAGE);
-        }
-
-        void throwErrorWhenOpenConnectionIsCalled() noexcept {
-            throwOnOpen.store(true);
-            errorToThrow = expectedErrorWhenOpenConnectionIsCalled();
-        }
-
-        ErrorHandling::SensorAccessLinkError expectedErrorWhenCloseConnectionIsCalled() noexcept {
-            return ErrorHandling::SensorAccessLinkError(ORIGIN,
-                                                        ErrorHandling::Category::COMMUNICATION_ERROR,
-                                                        ErrorHandling::Severity::ERROR,
-                                                        ERROR_CODE,
-                                                        CLOSE_ERROR_MESSAGE);
-        }
-
-        void throwErrorWhenCloseConnectionIsCalled() noexcept {
-            throwOnClose.store(true);
-            errorToThrow = expectedErrorWhenCloseConnectionIsCalled();
-        }
-
-
-        ErrorHandling::SensorAccessLinkError expectedErrorWhenFetchMessagesIsCalled() noexcept {
-            return ErrorHandling::SensorAccessLinkError(ORIGIN,
-                                                        ErrorHandling::Category::COMMUNICATION_ERROR,
-                                                        ErrorHandling::Severity::ERROR,
-                                                        ERROR_CODE,
-                                                        MESSAGE_ERROR_MESSAGE);
-        }
-
-        void throwErrorWhenFetchMessagesIsCalled() noexcept {
-            throwOnFetchMessages.store(true);
-            errorToThrow = expectedErrorWhenFetchMessagesIsCalled();
-        }
-
-        ErrorHandling::SensorAccessLinkError expectedErrorWhenFetchRawDataCyclesIsCalled() noexcept {
-            return ErrorHandling::SensorAccessLinkError(ORIGIN,
-                                                        ErrorHandling::Category::COMMUNICATION_ERROR,
-                                                        ErrorHandling::Severity::ERROR,
-                                                        ERROR_CODE,
-                                                        RAW_DATA_ERROR_MESSAGE);
-        }
-
-        void throwErrorWhenFetchRawDataCyclesIsCalled() noexcept {
-            throwOnFetchRawDataCycles.store(true);
-            errorToThrow = expectedErrorWhenFetchRawDataCyclesIsCalled();
-        }
-
-        void openConnection() override {
-            if (throwOnOpen.load()) {
-                throwOnOpen.store(false); // We only throw once to allow the test to pass
-                errorThrown.store(true);
-                throw errorToThrow;
-            }
-            openConnectionCalled.store(true);
-        }
-
-        void closeConnection() override {
-            if (throwOnClose.load()) {
-                throwOnClose.store(false); // We only throw once to allow the test to pass
-                errorThrown.store(true);
-                throw errorToThrow;
-            }
-            closeConnectionCalled.store(true);
-        }
-
-        super::Messages fetchMessages() override {
-            if (!errorThrown.load()) {
-                if (throwOnFetchMessages.load()) {
-                    throwOnFetchMessages.store(false); // We only throw once to allow the test to pass
-                    openConnectionCalled.store(false);
-                    closeConnectionCalled.store(false);
-                    errorThrown.store(true);
-                    throw errorToThrow;
-                }
-            }
-
-            auto message = super::Message::returnDefaultData();
-            super::Messages messages = {message};
-            return messages;
-        }
-
-        super::RawDataCycles fetchRawDataCycles() override {
-            if (!errorThrown.load()) {
-                if (throwOnFetchRawDataCycles.load()) {
-                    throwOnFetchRawDataCycles.store(false); // We only throw once to allow the test to pass
-                    openConnectionCalled.store(false);
-                    closeConnectionCalled.store(false);
-                    errorThrown.store(true);
-                    throw errorToThrow;
-                }
-            }
-            auto rawData = super::RawData::returnDefaultData();
-            super::RawDataCycles rawDataCycles = {rawData};
-            return rawDataCycles;
-        }
-
-        bool hasCloseConnectionBeenCalledAfterThrowingFunction() const noexcept {
-            return super::hasCloseConnectionBeenCalled() && hasErrorBeenThrown();
-        }
-
-        bool hasOpenConnectionBeenCalledAfterThrowingFunction() const noexcept {
-            return super::hasOpenConnectionBeenCalled() && hasErrorBeenThrown();
-        }
-
-        using super::hasOpenConnectionBeenCalled;
-
-        using super::hasCloseConnectionBeenCalled;
-
-        void waitUntilOpenConnectionCallIsMadeAfterErrorIsThrown() {
-            while (!hasOpenConnectionBeenCalledAfterThrowingFunction()) {
-                std::this_thread::yield();
-            }
-        }
-
-        void waitUntilCloseConnectionCallIsMadeAfterErrorIsThrown() {
-            while (!hasCloseConnectionBeenCalledAfterThrowingFunction()) {
-                std::this_thread::yield();
-            }
-        }
-
-        std::string const ORIGIN = "SensorCommunicatorTest ThrowingSensorCommunicationStrategyMock";
-        ErrorHandling::ErrorCode const ERROR_CODE = ErrorHandling::GatewayErrorCode::EMPTY_CODE;
-        std::string const OPEN_ERROR_MESSAGE = "Help!";
-        std::string const CLOSE_ERROR_MESSAGE = "By The Beatles";
-        std::string const MESSAGE_ERROR_MESSAGE = "Help! I need somebody!!";
-        std::string const RAW_DATA_ERROR_MESSAGE = "Help! Not just anybody!!";
-        std::string const MESSAGE = "Help! You know I need someone!!";
-
-    private:
-
-        bool hasErrorBeenThrown() const noexcept {
-            return errorThrown.load();
-        }
-
-        ErrorHandling::SensorAccessLinkError errorToThrow;
-
-        AtomicFlag errorThrown;
-        AtomicFlag throwOnOpen;
-        AtomicFlag throwOnClose;
-        AtomicFlag throwOnFetchMessages;
-        AtomicFlag throwOnFetchRawDataCycles;
-
-    };
 }
 
 class SensorCommunicatorTest : public ::testing::Test {
@@ -456,7 +218,7 @@ public:
     using Error = ErrorHandling::SensorAccessLinkError;
     using ErrorSinkMock = Mock::ArbitraryDataSinkMock<Error>;
     using ErrorProcessingScheduler = DataFlow::DataProcessingScheduler<Error, ErrorSinkMock, 1>;
-
+    using ThrowingSensorCommunicationStrategyMock = Mock::ErrorThrowingSensorCommunicationStrategyMock<Sensor::Test::Simple::Structures>;
 protected:
 
     SensorCommunicatorTest() = default;
@@ -484,7 +246,7 @@ protected:
     }
 
     ::testing::AssertionResult openConnectionIsCalledAfterStrategyHasThrown(
-            SensorCommunicatorTestMock::ThrowingSensorCommunicationStrategy* throwingStrategy) {
+            ThrowingSensorCommunicationStrategyMock* throwingStrategy) {
         SimpleMessageSensorCommunicator sensorCommunicator(throwingStrategy);
 
         sensorCommunicator.start();
@@ -502,7 +264,7 @@ protected:
     }
 
     ::testing::AssertionResult openConnectionIsCalledAfterStrategyHasThrownAfterClose(
-            SensorCommunicatorTestMock::ThrowingSensorCommunicationStrategy* throwingStrategy) {
+            ThrowingSensorCommunicationStrategyMock* throwingStrategy) {
         SimpleMessageSensorCommunicator sensorCommunicator(throwingStrategy);
 
         sensorCommunicator.terminateAndJoin();
@@ -519,7 +281,7 @@ protected:
     }
 
     ::testing::AssertionResult closeConnectionIsCalledAfterStrategyHasThrown(
-            SensorCommunicatorTestMock::ThrowingSensorCommunicationStrategy* throwingStrategy) {
+            ThrowingSensorCommunicationStrategyMock* throwingStrategy) {
         SimpleMessageSensorCommunicator sensorCommunicator(throwingStrategy);
 
         sensorCommunicator.start();
@@ -537,7 +299,7 @@ protected:
     }
 
     ::testing::AssertionResult closeConnectionIsCalledAfterStrategyHasThrownAfterClose(
-            SensorCommunicatorTestMock::ThrowingSensorCommunicationStrategy* throwingStrategy) {
+            ThrowingSensorCommunicationStrategyMock* throwingStrategy) {
         SimpleMessageSensorCommunicator sensorCommunicator(throwingStrategy);
 
         sensorCommunicator.terminateAndJoin();
@@ -554,7 +316,7 @@ protected:
     }
 
     ::testing::AssertionResult expectedErrorGetsPublishedAfterThrow(
-            SensorCommunicatorTestMock::ThrowingSensorCommunicationStrategy* throwingStrategy,
+            ThrowingSensorCommunicationStrategyMock* throwingStrategy,
             ErrorHandling::SensorAccessLinkError&& expectedError) {
         auto numberOfErrorToReceive = 1;
         ErrorSinkMock sink(numberOfErrorToReceive);
@@ -591,7 +353,7 @@ protected:
     }
 
     ::testing::AssertionResult expectedErrorGetsPublishedAfterThrowAtClose(
-            SensorCommunicatorTestMock::ThrowingSensorCommunicationStrategy* throwingStrategy,
+            ThrowingSensorCommunicationStrategyMock* throwingStrategy,
             ErrorHandling::SensorAccessLinkError&& expectedError) {
         auto numberOfErrorToReceive = 1;
         ErrorSinkMock sink(numberOfErrorToReceive);
@@ -864,63 +626,63 @@ SimpleRawDataList SensorCommunicatorTest::createASequenceOfDifferentRawDataCycle
 
 TEST_F(SensorCommunicatorTest,
        given_anErrorThatRequiresToCloseThrownOnOpenConnectionCall_when_isCaught_then_callsCloseConnectionInStrategy) {
-    SensorCommunicatorTestMock::ThrowingSensorCommunicationStrategy throwingMockStrategy;
+    ThrowingSensorCommunicationStrategyMock throwingMockStrategy;
     throwingMockStrategy.throwCloseConnectionRequiredErrorWhenOpenConnectionIsCalled();
     ASSERT_TRUE(closeConnectionIsCalledAfterStrategyHasThrown(&throwingMockStrategy));
 }
 
 TEST_F(SensorCommunicatorTest,
        given_anErrorThatRequiresToOpenThrownOnOpenConnectionCall_when_isCaught_then_callsOpenConnectionInStrategy) {
-    SensorCommunicatorTestMock::ThrowingSensorCommunicationStrategy throwingMockStrategy;
+    ThrowingSensorCommunicationStrategyMock throwingMockStrategy;
     throwingMockStrategy.throwOpenConnectionRequiredErrorWhenOpenConnectionIsCalled();
     ASSERT_TRUE(openConnectionIsCalledAfterStrategyHasThrown(&throwingMockStrategy));
 }
 
 TEST_F(SensorCommunicatorTest,
        given_anErrorThatRequiresToCloseThrownOnCloseConnectionCall_when_isCaught_then_callsCloseConnectionInStrategy) {
-    SensorCommunicatorTestMock::ThrowingSensorCommunicationStrategy throwingMockStrategy;
+    ThrowingSensorCommunicationStrategyMock throwingMockStrategy;
     throwingMockStrategy.throwCloseConnectionRequiredErrorWhenCloseConnectionIsCalled();
     ASSERT_TRUE(closeConnectionIsCalledAfterStrategyHasThrownAfterClose(&throwingMockStrategy));
 }
 
 TEST_F(SensorCommunicatorTest,
        given_anErrorThatRequiresToOpenThrownOnCloseConnectionCall_when_isCaught_then_callsOpenConnectionInStrategy) {
-    SensorCommunicatorTestMock::ThrowingSensorCommunicationStrategy throwingMockStrategy;
+    ThrowingSensorCommunicationStrategyMock throwingMockStrategy;
     throwingMockStrategy.throwOpenConnectionRequiredErrorWhenCloseConnectionIsCalled();
     ASSERT_TRUE(openConnectionIsCalledAfterStrategyHasThrownAfterClose(&throwingMockStrategy));
 }
 
 TEST_F(SensorCommunicatorTest,
        given_anErrorThatRequiresToCloseThrownOnFetchMessagesCall_when_isCaught_then_callsCloseConnectionInStrategy) {
-    SensorCommunicatorTestMock::ThrowingSensorCommunicationStrategy throwingMockStrategy;
+    ThrowingSensorCommunicationStrategyMock throwingMockStrategy;
     throwingMockStrategy.throwCloseConnectionRequiredErrorWhenFetchMessagesIsCalled();
     ASSERT_TRUE(closeConnectionIsCalledAfterStrategyHasThrown(&throwingMockStrategy));
 }
 
 TEST_F(SensorCommunicatorTest,
        given_anErrorThatRequiresToOpenThrownOnFetchMessagesCall_when_isCaught_then_callsOpenConnectionInStrategy) {
-    SensorCommunicatorTestMock::ThrowingSensorCommunicationStrategy throwingMockStrategy;
+    ThrowingSensorCommunicationStrategyMock throwingMockStrategy;
     throwingMockStrategy.throwOpenConnectionRequiredErrorWhenFetchMessagesIsCalled();
     ASSERT_TRUE(openConnectionIsCalledAfterStrategyHasThrown(&throwingMockStrategy));
 }
 
 TEST_F(SensorCommunicatorTest,
        given_anErrorThatRequiresToCloseThrownOnFetchRawDataCyclesCall_when_isCaught_then_callsCloseConnectionInStrategy) {
-    SensorCommunicatorTestMock::ThrowingSensorCommunicationStrategy throwingMockStrategy;
+    ThrowingSensorCommunicationStrategyMock throwingMockStrategy;
     throwingMockStrategy.throwCloseConnectionRequiredErrorWhenFetchRawDataCyclesIsCalled();
     ASSERT_TRUE(closeConnectionIsCalledAfterStrategyHasThrown(&throwingMockStrategy));
 }
 
 TEST_F(SensorCommunicatorTest,
        given_anErrorThatRequiresToOpenThrownOnFetchRawDataCyclesCall_when_isCaught_then_callsOpenConnectionInStrategy) {
-    SensorCommunicatorTestMock::ThrowingSensorCommunicationStrategy throwingMockStrategy;
+    ThrowingSensorCommunicationStrategyMock throwingMockStrategy;
     throwingMockStrategy.throwOpenConnectionRequiredErrorWhenFetchRawDataCyclesIsCalled();
     ASSERT_TRUE(openConnectionIsCalledAfterStrategyHasThrown(&throwingMockStrategy));
 }
 
 TEST_F(SensorCommunicatorTest,
        given_anStrategyThrowingErrorOnOpenConnectionCall_when_errorIsCaught_then_producesTheErrorWithCorrectOrigin) {
-    SensorCommunicatorTestMock::ThrowingSensorCommunicationStrategy throwingMockStrategy;
+    ThrowingSensorCommunicationStrategyMock throwingMockStrategy;
     throwingMockStrategy.throwErrorWhenOpenConnectionIsCalled();
     Error expectedError = throwingMockStrategy.expectedErrorWhenOpenConnectionIsCalled();
     expectedError = formatStrategyErrorWithCorrectOrigin(expectedError,
@@ -930,7 +692,7 @@ TEST_F(SensorCommunicatorTest,
 
 TEST_F(SensorCommunicatorTest,
        given_aStrategyThrowingErrorOnCloseConnectionCall_when_errorIsCaught_then_producesTheErrorWithCorrectOrigin) {
-    SensorCommunicatorTestMock::ThrowingSensorCommunicationStrategy throwingMockStrategy;
+    ThrowingSensorCommunicationStrategyMock throwingMockStrategy;
     throwingMockStrategy.throwErrorWhenCloseConnectionIsCalled();
     Error expectedError = throwingMockStrategy.expectedErrorWhenCloseConnectionIsCalled();
     expectedError = formatStrategyErrorWithCorrectOrigin(expectedError,
@@ -940,7 +702,7 @@ TEST_F(SensorCommunicatorTest,
 
 TEST_F(SensorCommunicatorTest,
        given_aStrategyThrowingErrorOnFetchMessagesCall_when_errorIsCaught_then_producesTheErrorWithCorrectOrigin) {
-    SensorCommunicatorTestMock::ThrowingSensorCommunicationStrategy throwingMockStrategy;
+    ThrowingSensorCommunicationStrategyMock throwingMockStrategy;
     throwingMockStrategy.throwErrorWhenFetchMessagesIsCalled();
     Error expectedError = throwingMockStrategy.expectedErrorWhenFetchMessagesIsCalled();
     expectedError = formatStrategyErrorWithCorrectOrigin(expectedError,
@@ -950,7 +712,7 @@ TEST_F(SensorCommunicatorTest,
 
 TEST_F(SensorCommunicatorTest,
        given_aStrategyThrowingErrorOnFetchRawDataCyclesCall_when_errorIsCaught_then_producesTheErrorWithCorrectOrigin) {
-    SensorCommunicatorTestMock::ThrowingSensorCommunicationStrategy throwingMockStrategy;
+    ThrowingSensorCommunicationStrategyMock throwingMockStrategy;
     throwingMockStrategy.throwErrorWhenFetchRawDataCyclesIsCalled();
     Error expectedError = throwingMockStrategy.expectedErrorWhenFetchRawDataCyclesIsCalled();
     expectedError = formatStrategyErrorWithCorrectOrigin(expectedError,

@@ -24,6 +24,7 @@
 #include "sensor-gateway/server-communication/ServerCommunicator.hpp"
 #include "test/utilities/data-model/DataModelFixture.h"
 #include "test/utilities/mock/ArbitraryDataSinkMock.hpp"
+#include "test/utilities/mock/ErrorThrowingServerCommunicationStrategyMock.hpp"
 
 using TestFunctions::DataTestUtil;
 
@@ -107,238 +108,6 @@ namespace ServerCommunicatorTestMock {
         Message sentMessage;
         RawData sentRawData;
     };
-
-    class ThrowingServerCommunicationStrategy : public MockServerCommunicatorStrategy {
-
-    protected:
-
-        using super = MockServerCommunicatorStrategy;
-
-    public:
-
-        ThrowingServerCommunicationStrategy() :
-                super(),
-                errorToThrow(ErrorHandling::SensorAccessLinkError::returnDefaultData()),
-                errorThrown(false),
-                throwOnOpen(false),
-                throwOnClose(false),
-                throwOnSendMessage(false),
-                throwOnSendRawData(false) {
-        }
-
-        ~ThrowingServerCommunicationStrategy() noexcept final = default;
-
-        ThrowingServerCommunicationStrategy(ThrowingServerCommunicationStrategy const& other) = delete;
-
-        ThrowingServerCommunicationStrategy(ThrowingServerCommunicationStrategy&& other) noexcept = delete;
-
-        ThrowingServerCommunicationStrategy& operator=(ThrowingServerCommunicationStrategy const& other)& = delete;
-
-        ThrowingServerCommunicationStrategy&
-        operator=(ThrowingServerCommunicationStrategy&& other)& noexcept = delete;
-
-        ErrorHandling::SensorAccessLinkError expectedErrorRequiringOpenConnection() noexcept {
-            return ErrorHandling::SensorAccessLinkError(ORIGIN,
-                                                        ErrorHandling::Category::CONNECTION_ERROR,
-                                                        ErrorHandling::Severity::WARNING,
-                                                        ERROR_CODE,
-                                                        MESSAGE);
-        }
-
-        ErrorHandling::SensorAccessLinkError expectedErrorRequiringCloseConnection() noexcept {
-            return ErrorHandling::SensorAccessLinkError(ORIGIN,
-                                                        ErrorHandling::Category::CONNECTION_ERROR,
-                                                        ErrorHandling::Severity::EMERGENCY, // Will not require openConnection
-                                                        ERROR_CODE,
-                                                        MESSAGE);
-        }
-
-        void throwOpenConnectionRequiredErrorWhenOpenConnectionIsCalled() noexcept {
-            throwOnOpen.store(true);
-            errorToThrow = expectedErrorRequiringOpenConnection();
-
-        }
-
-        void throwOpenConnectionRequiredErrorWhenCloseConnectionIsCalled() noexcept {
-            throwOnClose.store(true);
-            errorToThrow = expectedErrorRequiringOpenConnection();
-
-        }
-
-        void throwOpenConnectionRequiredErrorWhenSendMessageIsCalled() noexcept {
-            throwOnSendMessage.store(true);
-            errorToThrow = expectedErrorRequiringOpenConnection();
-
-        }
-
-        void throwOpenConnectionRequiredErrorWhenSendRawDataIsCalled() noexcept {
-            throwOnSendRawData.store(true);
-            errorToThrow = expectedErrorRequiringOpenConnection();
-
-        }
-
-        void throwCloseConnectionRequiredErrorWhenOpenConnectionIsCalled() noexcept {
-            throwOnOpen.store(true);
-            errorToThrow = expectedErrorRequiringCloseConnection();
-        }
-
-        void throwCloseConnectionRequiredErrorWhenCloseConnectionIsCalled() noexcept {
-            throwOnClose.store(true);
-            errorToThrow = expectedErrorRequiringCloseConnection();
-        }
-
-        void throwCloseConnectionRequiredErrorWhenSendMessageIsCalled() noexcept {
-            throwOnSendMessage.store(true);
-            errorToThrow = expectedErrorRequiringCloseConnection();
-        }
-
-        void throwCloseConnectionRequiredErrorWhenSendRawDataIsCalled() noexcept {
-            throwOnSendRawData.store(true);
-            errorToThrow = expectedErrorRequiringCloseConnection();
-        }
-
-        ErrorHandling::SensorAccessLinkError expectedErrorWhenOpenConnectionIsCalled() noexcept {
-            return ErrorHandling::SensorAccessLinkError(ORIGIN,
-                                                        ErrorHandling::Category::COMMUNICATION_ERROR,
-                                                        ErrorHandling::Severity::ERROR,
-                                                        ERROR_CODE,
-                                                        OPEN_ERROR_MESSAGE);
-        }
-
-        void throwErrorWhenOpenConnectionIsCalled() noexcept {
-            throwOnOpen.store(true);
-            errorToThrow = expectedErrorWhenOpenConnectionIsCalled();
-        }
-
-        ErrorHandling::SensorAccessLinkError expectedErrorWhenCloseConnectionIsCalled() noexcept {
-            return ErrorHandling::SensorAccessLinkError(ORIGIN,
-                                                        ErrorHandling::Category::COMMUNICATION_ERROR,
-                                                        ErrorHandling::Severity::ERROR,
-                                                        ERROR_CODE,
-                                                        CLOSE_ERROR_MESSAGE);
-        }
-
-        void throwErrorWhenCloseConnectionIsCalled() noexcept {
-            throwOnClose.store(true);
-            errorToThrow = expectedErrorWhenCloseConnectionIsCalled();
-        }
-
-
-        ErrorHandling::SensorAccessLinkError expectedErrorWhenSendMessageIsCalled() noexcept {
-            return ErrorHandling::SensorAccessLinkError(ORIGIN,
-                                                        ErrorHandling::Category::COMMUNICATION_ERROR,
-                                                        ErrorHandling::Severity::ERROR,
-                                                        ERROR_CODE,
-                                                        MESSAGE_ERROR_MESSAGE);
-        }
-
-        void throwErrorWhenSendMessageIsCalled() noexcept {
-            throwOnSendMessage.store(true);
-            errorToThrow = expectedErrorWhenSendMessageIsCalled();
-        }
-
-        ErrorHandling::SensorAccessLinkError expectedErrorWhenSendRawDataIsCalled() noexcept {
-            return ErrorHandling::SensorAccessLinkError(ORIGIN,
-                                                        ErrorHandling::Category::COMMUNICATION_ERROR,
-                                                        ErrorHandling::Severity::ERROR,
-                                                        ERROR_CODE,
-                                                        RAW_DATA_ERROR_MESSAGE);
-        }
-
-        void throwErrorWhenSendRawDataIsCalled() noexcept {
-            throwOnSendRawData.store(true);
-            errorToThrow = expectedErrorWhenSendRawDataIsCalled();
-        }
-
-        void openConnection(std::string const& serverAddress) override {
-            if (throwOnOpen.load()) {
-                throwOnOpen.store(false); // We only throw once to allow the test to pass
-                errorThrown.store(true);
-                throw errorToThrow;
-            }
-            openConnectionCalled.store(true);
-        }
-
-        void closeConnection() override {
-            if (throwOnClose.load()) {
-                throwOnClose.store(false); // We only throw once to allow the test to pass
-                errorThrown.store(true);
-                throw errorToThrow;
-            }
-            closeConnectionCalled.store(true);
-        }
-
-        void sendMessage(Message&& message) override {
-            if (!errorThrown.load()) {
-                if (throwOnSendMessage.load()) {
-                    throwOnSendMessage.store(false); // We only throw once to allow the test to pass
-                    openConnectionCalled.store(false);
-                    closeConnectionCalled.store(false);
-                    errorThrown.store(true);
-                    throw errorToThrow;
-                }
-            }
-        }
-
-        void sendRawData(RawData&& rawData) override {
-            if (!errorThrown.load()) {
-                if (throwOnSendRawData.load()) {
-                    throwOnSendRawData.store(false); // We only throw once to allow the test to pass
-                    openConnectionCalled.store(false);
-                    closeConnectionCalled.store(false);
-                    errorThrown.store(true);
-                    throw errorToThrow;
-                }
-            }
-        }
-
-        bool hasCloseConnectionBeenCalledAfterThrowingFunction() const noexcept {
-            return super::hasCloseConnectionBeenCalled() && hasErrorBeenThrown();
-        }
-
-        bool hasOpenConnectionBeenCalledAfterThrowingFunction() const noexcept {
-            return super::hasOpenConnectionBeenCalled() && hasErrorBeenThrown();
-        }
-
-        using super::hasOpenConnectionBeenCalled;
-
-        using super::hasCloseConnectionBeenCalled;
-
-        void waitUntilOpenConnectionCallIsMadeAfterErrorIsThrown() {
-            while (!hasOpenConnectionBeenCalledAfterThrowingFunction()) {
-                std::this_thread::yield();
-            }
-        }
-
-        void waitUntilCloseConnectionCallIsMadeAfterErrorIsThrown() {
-            while (!hasCloseConnectionBeenCalledAfterThrowingFunction()) {
-                std::this_thread::yield();
-            }
-        }
-
-        std::string const ORIGIN = "ServerCommunicatorTest ThrowingServerCommunicationStrategyMock";
-        ErrorHandling::ErrorCode const ERROR_CODE = ErrorHandling::GatewayErrorCode::EMPTY_CODE;
-        std::string const OPEN_ERROR_MESSAGE = "Dust in the Wind";
-        std::string const CLOSE_ERROR_MESSAGE = "By Kansas";
-        std::string const MESSAGE_ERROR_MESSAGE = "I close my eyes, only for a moment, and the moment's gone";
-        std::string const RAW_DATA_ERROR_MESSAGE = "All my dreams pass before my eyes, a curiosity";
-        std::string const MESSAGE = "Dust in the wind; All they are is dust in the wind.";
-
-    private:
-
-        bool hasErrorBeenThrown() const noexcept {
-            return errorThrown.load();
-        }
-
-        ErrorHandling::SensorAccessLinkError errorToThrow;
-
-        AtomicFlag errorThrown;
-        AtomicFlag throwOnOpen;
-        AtomicFlag throwOnClose;
-        AtomicFlag throwOnSendMessage;
-        AtomicFlag throwOnSendRawData;
-
-    };
 }
 
 class ServerCommunicatorTest : public ::testing::Test {
@@ -346,6 +115,7 @@ public:
     using Error = ErrorHandling::SensorAccessLinkError;
     using ErrorSinkMock = Mock::ArbitraryDataSinkMock<Error>;
     using ErrorProcessingScheduler = DataFlow::DataProcessingScheduler<Error, ErrorSinkMock, 1>;
+    using ThrowingServerCommunicationStrategy = Mock::ErrorThrowingServerCommunicationStrategyMock<Sensor::Test::Simple::Structures>;
 
 protected:
 
@@ -390,7 +160,6 @@ protected:
         }
     }
 };
-
 
 TEST_F(ServerCommunicatorTest, given__when_connect_then_callsOpenConnectionInStrategy) {
     ServerCommunicatorTestMock::MockServerCommunicatorStrategy mockStrategy;
@@ -460,7 +229,7 @@ TEST_F(ServerCommunicatorTest, given__when_disconnect_then_callsCloseConnectionI
 
 TEST_F(ServerCommunicatorTest,
        given_anErrorThatRequiresToCloseThrownOnOpenConnectionCall_when_isCaught_then_callsCloseConnectionInStrategy) {
-    ServerCommunicatorTestMock::ThrowingServerCommunicationStrategy throwingMockStrategy;
+    ThrowingServerCommunicationStrategy throwingMockStrategy;
     throwingMockStrategy.throwCloseConnectionRequiredErrorWhenOpenConnectionIsCalled();
 
     ServerCommunicator serverCommunicator(&throwingMockStrategy);
@@ -474,7 +243,7 @@ TEST_F(ServerCommunicatorTest,
 
 TEST_F(ServerCommunicatorTest,
        given_anErrorThatRequiresToOpenThrownOnOpenConnectionCall_when_isCaught_then_callsOpenConnectionInStrategy) {
-    ServerCommunicatorTestMock::ThrowingServerCommunicationStrategy throwingMockStrategy;
+    ThrowingServerCommunicationStrategy throwingMockStrategy;
     throwingMockStrategy.throwOpenConnectionRequiredErrorWhenOpenConnectionIsCalled();
 
     ServerCommunicator serverCommunicator(&throwingMockStrategy);
@@ -488,7 +257,7 @@ TEST_F(ServerCommunicatorTest,
 
 TEST_F(ServerCommunicatorTest,
        given_anErrorThatRequiresToCloseThrownOnCloseConnectionCall_when_isCaught_then_callsCloseConnectionInStrategy) {
-    ServerCommunicatorTestMock::ThrowingServerCommunicationStrategy throwingMockStrategy;
+    ThrowingServerCommunicationStrategy throwingMockStrategy;
     throwingMockStrategy.throwCloseConnectionRequiredErrorWhenCloseConnectionIsCalled();
 
     ServerCommunicator serverCommunicator(&throwingMockStrategy);
@@ -502,7 +271,7 @@ TEST_F(ServerCommunicatorTest,
 
 TEST_F(ServerCommunicatorTest,
        given_anErrorThatRequiresToOpenThrownOnCloseConnectionCall_when_isCaught_then_callsOpenConnectionInStrategy) {
-    ServerCommunicatorTestMock::ThrowingServerCommunicationStrategy throwingMockStrategy;
+    ThrowingServerCommunicationStrategy throwingMockStrategy;
     throwingMockStrategy.throwOpenConnectionRequiredErrorWhenCloseConnectionIsCalled();
 
     ServerCommunicator serverCommunicator(&throwingMockStrategy);
@@ -516,7 +285,7 @@ TEST_F(ServerCommunicatorTest,
 
 TEST_F(ServerCommunicatorTest,
        given_anErrorThatRequiresToCloseThrownOnSendMessageCall_when_isCaught_then_callsCloseConnectionInStrategy) {
-    ServerCommunicatorTestMock::ThrowingServerCommunicationStrategy throwingMockStrategy;
+    ThrowingServerCommunicationStrategy throwingMockStrategy;
     throwingMockStrategy.throwCloseConnectionRequiredErrorWhenSendMessageIsCalled();
 
     ServerCommunicator serverCommunicator(&throwingMockStrategy);
@@ -531,7 +300,7 @@ TEST_F(ServerCommunicatorTest,
 
 TEST_F(ServerCommunicatorTest,
        given_anErrorThatRequiresToOpenThrownOnSendMessageCall_when_isCaught_then_callsOpenConnectionInStrategy) {
-    ServerCommunicatorTestMock::ThrowingServerCommunicationStrategy throwingMockStrategy;
+    ThrowingServerCommunicationStrategy throwingMockStrategy;
     throwingMockStrategy.throwOpenConnectionRequiredErrorWhenSendMessageIsCalled();
 
     ServerCommunicator serverCommunicator(&throwingMockStrategy);
@@ -546,7 +315,7 @@ TEST_F(ServerCommunicatorTest,
 
 TEST_F(ServerCommunicatorTest,
        given_anErrorThatRequiresToCloseThrownOnSendRawDataCall_when_isCaught_then_callsCloseConnectionInStrategy) {
-    ServerCommunicatorTestMock::ThrowingServerCommunicationStrategy throwingMockStrategy;
+    ThrowingServerCommunicationStrategy throwingMockStrategy;
     throwingMockStrategy.throwCloseConnectionRequiredErrorWhenSendRawDataIsCalled();
 
     ServerCommunicator serverCommunicator(&throwingMockStrategy);
@@ -561,7 +330,7 @@ TEST_F(ServerCommunicatorTest,
 
 TEST_F(ServerCommunicatorTest,
        given_anErrorThatRequiresToOpenThrownOnSendRawDataCall_when_isCaught_then_callsOpenConnectionInStrategy) {
-    ServerCommunicatorTestMock::ThrowingServerCommunicationStrategy throwingMockStrategy;
+    ThrowingServerCommunicationStrategy throwingMockStrategy;
     throwingMockStrategy.throwOpenConnectionRequiredErrorWhenSendRawDataIsCalled();
 
     ServerCommunicator serverCommunicator(&throwingMockStrategy);
@@ -576,7 +345,7 @@ TEST_F(ServerCommunicatorTest,
 
 TEST_F(ServerCommunicatorTest,
        given_aStrategyThrowingErrorOnOpenConnectionCall_when_errorIsCaught_then_producesTheErrorWithCorrectOrigin) {
-    ServerCommunicatorTestMock::ThrowingServerCommunicationStrategy throwingMockStrategy;
+    ThrowingServerCommunicationStrategy throwingMockStrategy;
     throwingMockStrategy.throwErrorWhenOpenConnectionIsCalled();
     Error expectedError = throwingMockStrategy.expectedErrorWhenOpenConnectionIsCalled();
     expectedError = formatStrategyErrorWithCorrectOrigin(expectedError,
@@ -599,7 +368,7 @@ TEST_F(ServerCommunicatorTest,
 
 TEST_F(ServerCommunicatorTest,
        given_aStrategyThrowingErrorOnCloseConnectionCall_when_errorIsCaught_then_producesTheErrorWithCorrectOrigin) {
-    ServerCommunicatorTestMock::ThrowingServerCommunicationStrategy throwingMockStrategy;
+    ThrowingServerCommunicationStrategy throwingMockStrategy;
     throwingMockStrategy.throwErrorWhenCloseConnectionIsCalled();
     Error expectedError = throwingMockStrategy.expectedErrorWhenCloseConnectionIsCalled();
     expectedError = formatStrategyErrorWithCorrectOrigin(expectedError,
@@ -621,7 +390,7 @@ TEST_F(ServerCommunicatorTest,
 
 TEST_F(ServerCommunicatorTest,
        given_aStrategyThrowingErrorOnFetchMessagesCall_when_errorIsCaught_then_producesTheErrorWithCorrectOrigin) {
-    ServerCommunicatorTestMock::ThrowingServerCommunicationStrategy throwingMockStrategy;
+    ThrowingServerCommunicationStrategy throwingMockStrategy;
     throwingMockStrategy.throwErrorWhenSendMessageIsCalled();
     Error expectedError = throwingMockStrategy.expectedErrorWhenSendMessageIsCalled();
     expectedError = formatStrategyErrorWithCorrectOrigin(expectedError,
@@ -644,7 +413,7 @@ TEST_F(ServerCommunicatorTest,
 
 TEST_F(ServerCommunicatorTest,
        given_aStrategyThrowingErrorOnFetchRawDataCyclesCall_when_errorIsCaught_then_producesTheErrorWithCorrectOrigin) {
-    ServerCommunicatorTestMock::ThrowingServerCommunicationStrategy throwingMockStrategy;
+    ThrowingServerCommunicationStrategy throwingMockStrategy;
     throwingMockStrategy.throwErrorWhenSendRawDataIsCalled();
     Error expectedError = throwingMockStrategy.expectedErrorWhenSendRawDataIsCalled();
     expectedError = formatStrategyErrorWithCorrectOrigin(expectedError,
