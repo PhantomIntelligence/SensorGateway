@@ -151,10 +151,10 @@ namespace SensorAccessLinkElement {
                     error.getSeverity(),
                     error.getErrorCode(),
                     error.getMessage());
-            handleCaughtError(originAddedError);
+            handleCaughtError(std::move(originAddedError));
         }
 
-        void handleCaughtError(ErrorHandling::SensorAccessLinkError& error) {
+        void handleCaughtError(ErrorHandling::SensorAccessLinkError&& error) {
             auto errorCopy = ErrorHandling::SensorAccessLinkError(error);
             ErrorSource::produce(std::move(errorCopy));
             if (error.isCloseConnectionRequired()) {

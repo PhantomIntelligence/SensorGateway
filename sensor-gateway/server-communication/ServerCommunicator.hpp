@@ -33,6 +33,7 @@ namespace SensorAccessLinkElement {
 
         using MessageSink = DataFlow::DataSink<Message>;
         using RawDataSink = DataFlow::DataSink<RawData>;
+        using ErrorSource = DataFlow::DataSource<ErrorHandling::SensorAccessLinkError>;
 
     public:
 
@@ -55,7 +56,8 @@ namespace SensorAccessLinkElement {
             try {
                 serverCommunicationStrategy->openConnection(serverAddress);
             } catch (ErrorHandling::SensorAccessLinkError& strategyError) {
-                handleError(std::move(strategyError));
+                addOriginAndHandleError(std::move(strategyError),
+                                        ErrorHandling::Origin::SERVER_COMMUNICATOR_OPEN_CONNECTION);
             }
         };
 
@@ -63,7 +65,8 @@ namespace SensorAccessLinkElement {
             try {
                 serverCommunicationStrategy->sendMessage(std::forward<Message>(message));
             } catch (ErrorHandling::SensorAccessLinkError& strategyError) {
-                handleError(std::move(strategyError));
+                addOriginAndHandleError(std::move(strategyError),
+                                        ErrorHandling::Origin::SERVER_COMMUNICATOR_SEND_MESSAGE);
             }
         }
 
@@ -71,7 +74,8 @@ namespace SensorAccessLinkElement {
             try {
                 serverCommunicationStrategy->sendRawData(std::forward<RawData>(rawData));
             } catch (ErrorHandling::SensorAccessLinkError& strategyError) {
-                handleError(std::move(strategyError));
+                addOriginAndHandleError(std::move(strategyError),
+                                        ErrorHandling::Origin::SERVER_COMMUNICATOR_SEND_RAWDATA);
             }
         }
 
@@ -79,13 +83,26 @@ namespace SensorAccessLinkElement {
             try {
                 serverCommunicationStrategy->closeConnection();
             } catch (ErrorHandling::SensorAccessLinkError& strategyError) {
-                handleError(std::move(strategyError));
+                addOriginAndHandleError(std::move(strategyError),
+                                        ErrorHandling::Origin::SERVER_COMMUNICATOR_CLOSE_CONNECTION);
             }
         }
 
     private:
 
+        void addOriginAndHandleError(ErrorHandling::SensorAccessLinkError&& error, std::string const& originToAdd) {
+            auto originAddedError = ErrorHandling::SensorAccessLinkError(
+                    originToAdd + ErrorHandling::Message::SEPARATOR + error.getOrigin(),
+                    error.getCategory(),
+                    error.getSeverity(),
+                    error.getErrorCode(),
+                    error.getMessage());
+            handleError(std::move(originAddedError));
+        }
+
         void handleError(ErrorHandling::SensorAccessLinkError&& error) noexcept {
+            auto errorCopy = ErrorHandling::SensorAccessLinkError(error);
+            ErrorSource::produce(std::move(errorCopy));
             if (error.isCloseConnectionRequired()) {
                 serverCommunicationStrategy->closeConnection();
             }
