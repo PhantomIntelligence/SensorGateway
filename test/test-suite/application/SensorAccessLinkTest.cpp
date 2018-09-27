@@ -20,21 +20,29 @@
 
 #include <gtest/gtest.h>
 #include <list>
+#include <test/utilities/mock/ErrorThrowingSensorCommunicationStrategyMock.hpp>
 
 #include "sensor-gateway/application/SensorAccessLink.hpp"
-#include "test/utilities/data-model/DataModelFixture.h"
+#include "test/utilities/mock/ErrorThrowingServerCommunicationStrategyMock.hpp"
+#include "test/utilities/mock/ErrorThrowingDataTranslationStrategyMock.hpp"
+#include "test/utilities/mock/ErrorThrowingSensorCommunicationStrategyMock.hpp"
 
 using TestFunctions::DataTestUtil;
 using SensorAccessLink = SensorGateway::SensorAccessLink<Sensor::Test::Simple::Structures, Sensor::Test::Simple::Structures>;
 
 class SensorAccessLinkTest : public ::testing::Test {
+public:
+
+    using ErrorThrowingSensorCommunicationStrategyMock = Mock::ErrorThrowingSensorCommunicationStrategyMock<Sensor::Test::Simple::Structures>;
 
 protected:
+
     SensorAccessLinkTest() = default;
 
     virtual ~SensorAccessLinkTest() = default;
 
 public:
+
     std::string const FAKE_SERVER_ADDRESS = "5150 Elm's Way";
 
 };
@@ -56,8 +64,8 @@ namespace SensorAccessLinkTestMock {
                                                  uint8_t minimumNumberOfRawDataToCreate) :
                 messagePromiseFulfilled(false),
                 rawDataPromiseFulfilled(false),
-                connectCalled(false),
-                disconnectCalled(false),
+                openConnectionCalled(false),
+                closeConnectionCalled(false),
                 numberOfMessageCreated(0),
                 numberOfRawDataCyclesCreated(0),
                 minimumNumberOfMessagesToCreate(minimumNumberOfMessageToCreate),
@@ -65,19 +73,19 @@ namespace SensorAccessLinkTestMock {
         }
 
         void openConnection() override {
-            connectCalled.store(true);
+            openConnectionCalled.store(true);
         }
 
         bool hasOpenConnectionBeenCalled() const {
-            return connectCalled.load();
+            return openConnectionCalled.load();
         }
 
         void closeConnection() override {
-            disconnectCalled.store(true);
+            closeConnectionCalled.store(true);
         }
 
         bool hasCloseConnectionBeenCalled() const {
-            return disconnectCalled.load();
+            return closeConnectionCalled.load();
         }
 
         super::Messages fetchMessages() override {
@@ -164,8 +172,8 @@ namespace SensorAccessLinkTestMock {
 
         AtomicFlag messagePromiseFulfilled;
         AtomicFlag rawDataPromiseFulfilled;
-        AtomicFlag connectCalled;
-        AtomicFlag disconnectCalled;
+        AtomicFlag openConnectionCalled;
+        AtomicFlag closeConnectionCalled;
 
         Mutex numberOfMessageCreatedVerificationMutex;
         Mutex numberOfRawDataCyclesCreatedVerificationMutex;
@@ -213,25 +221,25 @@ namespace SensorAccessLinkTestMock {
 
     public:
         MockServerCommunicationStrategy() :
-                connectCalled(false),
-                disconnectCalled(false) {}
+                openConnectionCalled(false),
+                closeConnectionCalled(false) {}
 
         ~MockServerCommunicationStrategy() noexcept override = default;
 
         void openConnection(std::string const& serverAddress) override {
-            connectCalled.store(true);
+            openConnectionCalled.store(true);
         }
 
         bool hasOpenConnectionBeenCalled() const {
-            return connectCalled.load();
+            return openConnectionCalled.load();
         }
 
         void closeConnection() override {
-            disconnectCalled.store(true);
+            closeConnectionCalled.store(true);
         }
 
         bool hasCloseConnectionBeenCalled() const {
-            return disconnectCalled.load();
+            return closeConnectionCalled.load();
         }
 
         void sendMessage(super::Message&& message) override {
@@ -253,13 +261,13 @@ namespace SensorAccessLinkTestMock {
     private:
         Messages receivedMessages;
         RawDataCycles receivedRawData;
-        AtomicFlag connectCalled;
-        AtomicFlag disconnectCalled;
+        AtomicFlag openConnectionCalled;
+        AtomicFlag closeConnectionCalled;
     };
 }
 
 TEST_F(SensorAccessLinkTest,
-       given_strategies_when_connect_then_bothSensorAndServerStrategiesReceiveOpenConnectionCall) {
+       given_strategies_when_start_then_bothSensorAndServerStrategiesReceiveOpenConnectionCall) {
     uint8_t numberOfDataToProcess = 0;
     SensorAccessLinkTestMock::MockSensorCommunicationStrategy mockSensorCommunicationStrategy(
             numberOfDataToProcess, numberOfDataToProcess);
@@ -281,7 +289,7 @@ TEST_F(SensorAccessLinkTest,
 }
 
 TEST_F(SensorAccessLinkTest,
-       given_strategies_when_disconnect_then_bothSensorAndServerStrategiesReceiveCloseConnectionCall) {
+       given_strategies_when_terminateAndJoin_then_bothSensorAndServerStrategiesReceiveCloseConnectionCall) {
     uint8_t numberOfDataToProcess = 0;
     SensorAccessLinkTestMock::MockSensorCommunicationStrategy mockSensorCommunicationStrategy(
             numberOfDataToProcess, numberOfDataToProcess);
@@ -456,6 +464,9 @@ TEST_F(SensorAccessLinkTest,
 
     ASSERT_TRUE(dataHasPassedThroughCorrectly);
 }
+
+
+// TODO: add *MEDIUM* test to check the integration of the SensorAccessLinkErrorHandler;
 
 #endif //SPIRITSENSORGATEWAY_SENSORCOMMUNICATORTEST_CPP
 

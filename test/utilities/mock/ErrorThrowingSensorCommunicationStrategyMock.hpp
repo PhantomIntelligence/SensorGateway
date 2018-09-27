@@ -185,6 +185,11 @@ namespace Mock {
         }
 
         typename super::Messages fetchMessages() override {
+            if(hasCloseConnectionBeenCalled()) {
+                // WARNING! This mock implementation of readMessage needs to be slowed down because the way gtest works. DO NOT REMOVE.
+                std::this_thread::sleep_for(std::chrono::milliseconds(5));
+                std::this_thread::yield();
+            }
             if (!errorThrown.load()) {
                 if (throwOnFetchMessages.load()) {
                     throwOnFetchMessages.store(false); // We only throw once to allow the test to pass
@@ -201,6 +206,11 @@ namespace Mock {
         }
 
         typename super::RawDataCycles fetchRawDataCycles() override {
+            if(hasCloseConnectionBeenCalled()) {
+                // WARNING! This mock implementation of readMessage needs to be slowed down because the way gtest works. DO NOT REMOVE.
+                std::this_thread::sleep_for(std::chrono::milliseconds(5));
+                std::this_thread::yield();
+            }
             if (!errorThrown.load()) {
                 if (throwOnFetchRawDataCycles.load()) {
                     throwOnFetchRawDataCycles.store(false); // We only throw once to allow the test to pass
