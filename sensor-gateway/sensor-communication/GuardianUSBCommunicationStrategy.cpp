@@ -108,6 +108,7 @@ void GuardianUSBCommunicationStrategy::closeConnection() {
 
 void GuardianUSBCommunicationStrategy::throwDeviceNotFoundErrorIfNeeded() {
     if (!usbDeviceHandle) {
+        // TODO : ERROR
         throwRuntimeError("Guardian device not found!");
     }
 }
@@ -116,6 +117,7 @@ void GuardianUSBCommunicationStrategy::throwUsbClaimInterfaceErrorIfNeeded(int e
     if (errorCode < 0) {
         std::ostringstream errorMessage("usb_claim_interface returned an error: ", std::ios_base::ate);
         errorMessage << errorCode;
+        // TODO : ERROR
         throwRuntimeError(errorMessage.str().c_str());
     }
 }
@@ -163,7 +165,6 @@ void GuardianUSBCommunicationStrategy::setupCleanConnection() noexcept {
         } catch (std::runtime_error& error) {
             hasNotThrownError = false;
         }
-
     }
 }
 
@@ -185,7 +186,9 @@ void GuardianUSBCommunicationStrategy::throwErrorOnLibUSBBulkTransferErrorCode(i
     } else {
         errorMessage << "... something went wrong.\n";
     }
-    throwRuntimeError(errorMessage.str().c_str());
+    std::string message = errorMessage.str();
+    // TODO : ERROR
+    throwRuntimeError(message.c_str());
 }
 
 GuardianUSBCommunicationStrategy::super::Messages

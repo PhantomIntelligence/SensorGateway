@@ -77,10 +77,17 @@ namespace ErrorHandling {
     enum GatewayErrorCode : ErrorCode {
         DATA_NOT_RECOGNIZED = 10000,
 
+
         /**
          * @brief This SHOULD NEVER be used for any application, for empty initialization purposes only
          */
                 EMPTY_CODE = 10042,
+
+        PIXEL_ALREADY_HAS_MAXIMUM_TRACK = 10110, // 10100-10199 Spirit Protocol error code
+
+        UNRECOGNIZED_AWL_MESSAGE_ID = 10200, // 10200-10299 AWL INTERNAL error code
+
+        UNRECOGNIZED_GUARDIAN_MESSAGE_ID = 10300, // 10300-10399 Guardian INTERNAL error code
     };
 }
 

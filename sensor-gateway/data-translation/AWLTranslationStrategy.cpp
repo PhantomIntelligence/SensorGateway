@@ -45,12 +45,18 @@ void AWLTranslationStrategy::translateMessage(SensorMessage&& sensorMessage) {
             break;
         default:
             auto message = UnknownMessageException(std::move(sensorMessage));
-            throw std::runtime_error(message.getMessage());
+            // TODO : ERROR
+            throw ErrorHandling::SensorAccessLinkError(
+                    "AWLTranslationStrategy::translateMessage",
+                    ErrorHandling::Category::TRANSLATION_ERROR,
+                    ErrorHandling::Severity::ERROR,
+                    ErrorHandling::GatewayErrorCode::UNRECOGNIZED_AWL_MESSAGE_ID,
+                    message.getMessage() );
     }
 }
 
 void AWLTranslationStrategy::translateRawData(SensorRawData&& serverRawData) {
-
+    // TODO
 }
 
 void AWLTranslationStrategy::translateEndOfFrameMessage(SensorMessage&& sensorMessage) {

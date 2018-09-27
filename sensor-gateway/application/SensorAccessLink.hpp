@@ -65,7 +65,7 @@ namespace SensorGateway {
                 serverCommunicatorMessageScheduler(&serverCommunicator),
                 serverCommunicatorRawDataScheduler(&serverCommunicator),
                 errorScheduler(this) // TODO : Change "this" for the SensorAccessLinkErrorHandler
-                {}
+        {}
 
         ~SensorAccessLink() noexcept {
             terminateAndJoin();
@@ -111,7 +111,8 @@ namespace SensorGateway {
 
             std::cout << error.fetchDetailedMessage() << std::endl;
             if (error.isFatal()) {
-                DetachableThread(&SensorAccessLink::terminateAndJoin, this); // Avoid deadlock in errorScheduler::terminateAndJoin
+                DetachableThread(&SensorAccessLink::terminateAndJoin,
+                                 this); // Avoid deadlock in errorScheduler::terminateAndJoin
             } else {
                 // TODO : sendErrorMessageToServer();
             }

@@ -45,7 +45,13 @@ void GuardianTranslationStrategy::translateMessage(SensorMessage&& sensorMessage
             break;
         default:
             auto message = UnknownMessageException(std::move(sensorMessage));
-            std::cout << "Unknown message : " << message.getMessage() << std::endl;
+            // TODO : ERROR
+            throw ErrorHandling::SensorAccessLinkError(
+                    "GuardianTranslationStrategy::translateMessage",
+                    ErrorHandling::Category::TRANSLATION_ERROR,
+                    ErrorHandling::Severity::ERROR,
+                    ErrorHandling::GatewayErrorCode::UNRECOGNIZED_GUARDIAN_MESSAGE_ID,
+                    message.getMessage() );
     }
 }
 
