@@ -21,7 +21,6 @@
 
 #include "sensor-gateway/common/data-structure/sensor/AWLStructures.h"
 #include "SensorCommunicationStrategy.hpp"
-#include "KvaserCommunicationError.h"
 
 namespace SensorCommunication {
 

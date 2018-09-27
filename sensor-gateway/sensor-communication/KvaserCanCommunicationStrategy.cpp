@@ -16,9 +16,9 @@
 */
 
 #include "KvaserCanCommunicationStrategy.h"
+#include "KvaserCommunicationErrorFactory.h"
 
 using SensorCommunication::KvaserCanCommunicationStrategy;
-using ErrorHandling::KvaserCommunicationError;
 
 int32_t const CANLIB_KVASER_CAN_BIT_RATE = canBITRATE_1M;
 uint32_t const CANLIB_TIME_SEGMENT_1 = 0;
@@ -45,7 +45,7 @@ void KvaserCanCommunicationStrategy::openConnection() {
                                CANLIB_SYNCHRONIZATION_JUMP_WIDTH, CANLIB_NUMBER_OF_SAMPLING_POINTS, CANLIB_SYNCMODE);
 
     if (ret != 0) {
-        KvaserCommunicationError::throwKvaserCommunicationError(ret, "canSetBusParams");
+        ErrorHandling::throwKvaserCommunicationError(ret, "canSetBusParams");
     }
     canSetBusOutputControl(communicationChannel, CANLIB_CAN_DRIVER_TYPE);
     canBusOn(communicationChannel);
