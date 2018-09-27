@@ -109,7 +109,12 @@ void GuardianUSBCommunicationStrategy::closeConnection() {
 void GuardianUSBCommunicationStrategy::throwDeviceNotFoundErrorIfNeeded() {
     if (!usbDeviceHandle) {
         // TODO : ERROR
-        throwRuntimeError("Guardian device not found!");
+        throw ErrorHandling::SensorAccessLinkError(
+                "LibUSB",
+                ErrorHandling::Category::CONNECTION_ERROR,
+                ErrorHandling::Severity::ERROR,
+                ErrorHandling::GatewayErrorCode::CANNOT_FIND_GUARDIAN_LIBUSB_DEVICE,
+                "Guardian device not found!");
     }
 }
 
@@ -118,7 +123,12 @@ void GuardianUSBCommunicationStrategy::throwUsbClaimInterfaceErrorIfNeeded(int e
         std::ostringstream errorMessage("usb_claim_interface returned an error: ", std::ios_base::ate);
         errorMessage << errorCode;
         // TODO : ERROR
-        throwRuntimeError(errorMessage.str().c_str());
+        throw ErrorHandling::SensorAccessLinkError(
+                "LibUSB",
+                ErrorHandling::Category::CONNECTION_ERROR,
+                ErrorHandling::Severity::EMERGENCY,
+                errorCode,
+                errorMessage.str());
     }
 }
 
@@ -138,13 +148,21 @@ int GuardianUSBCommunicationStrategy::doUSBBulkTransferAndReturnNumberOfByteActu
     throwErrorOnLibUSBBulkTransferErrorCode(errorCode);
 
     if (numberOfByteActuallyTransferred != length) {
+        std::ostringstream errorMessage("An incorrect number of data has been transferred... \n", std::ios_base::ate);
+        errorMessage << "Expected: " << length
+                     << " actual: " << numberOfByteActuallyTransferred
+                     << std::endl;
+
+        // TODO : ERROR
+        throw ErrorHandling::SensorAccessLinkError(
+                "LibUSB",
+                ErrorHandling::Category::COMMUNICATION_ERROR,
+                ErrorHandling::Severity::WARNING,
+                errorCode,
+                errorMessage.str());
+
         // TODO: log when the logger has been created
-        // TODO: throw an exception?
-        std::cout << "An incorrect number of data has been transferred... \n"
-                  << "Expected: " << length
-                  << " actual: " << numberOfByteActuallyTransferred
-                  << std::endl;
-        numberOfByteActuallyTransferred = 0;
+
     }
     return numberOfByteActuallyTransferred;
 }
@@ -163,6 +181,7 @@ void GuardianUSBCommunicationStrategy::setupCleanConnection() noexcept {
                     timeout);
             hasReceivedData = numberOfReturnedData != 0;
         } catch (std::runtime_error& error) {
+            // TODO : ERROR
             hasNotThrownError = false;
         }
     }
@@ -186,9 +205,13 @@ void GuardianUSBCommunicationStrategy::throwErrorOnLibUSBBulkTransferErrorCode(i
     } else {
         errorMessage << "... something went wrong.\n";
     }
-    std::string message = errorMessage.str();
     // TODO : ERROR
-    throwRuntimeError(message.c_str());
+    throw ErrorHandling::SensorAccessLinkError(
+            "LibUSB",
+            ErrorHandling::Category::CONNECTION_ERROR,
+            ErrorHandling::Severity::ERROR,
+            errorCode,
+            errorMessage.str());
 }
 
 GuardianUSBCommunicationStrategy::super::Messages

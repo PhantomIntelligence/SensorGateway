@@ -83,11 +83,19 @@ namespace ErrorHandling {
          */
                 EMPTY_CODE = 10042,
 
-        PIXEL_ALREADY_HAS_MAXIMUM_TRACK = 10110, // 10100-10199 Spirit Protocol error code
+        // 10100-10199 Spirit Protocol error code
 
-        UNRECOGNIZED_AWL_MESSAGE_ID = 10200, // 10200-10299 AWL INTERNAL error code
+        PIXEL_ALREADY_HAS_MAXIMUM_TRACK = 10110,
 
-        UNRECOGNIZED_GUARDIAN_MESSAGE_ID = 10300, // 10300-10399 Guardian INTERNAL error code
+        // 10200-10299 AWL INTERNAL error code
+
+        UNRECOGNIZED_AWL_MESSAGE_ID = 10200,
+
+        // 10300-10399 Guardian INTERNAL error code
+
+        UNRECOGNIZED_GUARDIAN_MESSAGE_ID = 10300,
+        CANNOT_FIND_GUARDIAN_LIBUSB_DEVICE = 10305,
+
     };
 }
 
