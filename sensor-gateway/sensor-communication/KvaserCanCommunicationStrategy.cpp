@@ -48,13 +48,15 @@ void KvaserCanCommunicationStrategy::openConnection() {
     returnCode = canSetBusOutputControl(communicationChannel, CANLIB_CAN_DRIVER_TYPE);
     throwErrorIfnecessary(returnCode, "canSetBusOutputControl");
     returnCode = canBusOn(communicationChannel);
-    throwErrorIfnecessary(returnCode, "canSetBusParams");
+    throwErrorIfnecessary(returnCode, "canBusOn");
 }
 
 KvaserCanCommunicationStrategy::super::Messages KvaserCanCommunicationStrategy::fetchMessages() {
     CanMessage canMessage{};
-    canReadWait(communicationChannel, &canMessage.id, &canMessage.data, &canMessage.length, &canMessage.flags,
+    auto returnCode =canReadWait(communicationChannel, &canMessage.id, &canMessage.data, &canMessage.length, &canMessage.flags,
                 &canMessage.timestamp, CANLIB_READ_WAIT_INFINITE_DELAY);
+
+    throwErrorIfnecessary(returnCode, "canReadWait");
     auto message = convertCanMessageToSensorMessage(canMessage);
     super::Messages messages = {message};
     return messages;
@@ -79,8 +81,10 @@ KvaserCanCommunicationStrategy::convertCanMessageToSensorMessage(CanMessage canM
 }
 
 void KvaserCanCommunicationStrategy::closeConnection() {
-    canBusOff(communicationChannel);
-    canClose(communicationChannel);
+    auto returnCode = canBusOff(communicationChannel);
+    throwErrorIfnecessary(returnCode, "canBusOff");
+     returnCode = canClose(communicationChannel);
+    throwErrorIfnecessary(returnCode, "canClose");
 }
 
 void KvaserCanCommunicationStrategy::throwErrorIfnecessary(canStatus const& errorCode, std::string const& callOrigin) {
