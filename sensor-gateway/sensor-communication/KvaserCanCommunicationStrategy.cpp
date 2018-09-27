@@ -16,6 +16,7 @@
 */
 
 #include "KvaserCanCommunicationStrategy.h"
+#include "KvaserCommunicationErrorFactory.h"
 
 using SensorCommunication::KvaserCanCommunicationStrategy;
 
@@ -39,10 +40,15 @@ KvaserCanCommunicationStrategy::~KvaserCanCommunicationStrategy() {
 void KvaserCanCommunicationStrategy::openConnection() {
     canInitializeLibrary();
     canHandle communicationChannel = canOpenChannel(CANLIB_CHANNEL_ID, CANLIB_FLAGS_FOR_CHANNEL);
-    canSetBusParams(communicationChannel, CANLIB_KVASER_CAN_BIT_RATE, CANLIB_TIME_SEGMENT_1, CANLIB_TIME_SEGMENT_2,
-                    CANLIB_SYNCHRONIZATION_JUMP_WIDTH, CANLIB_NUMBER_OF_SAMPLING_POINTS, CANLIB_SYNCMODE);
-    canSetBusOutputControl(communicationChannel, CANLIB_CAN_DRIVER_TYPE);
-    canBusOn(communicationChannel);
+    auto returnCode = canSetBusParams(communicationChannel, CANLIB_KVASER_CAN_BIT_RATE, CANLIB_TIME_SEGMENT_1,
+                                      CANLIB_TIME_SEGMENT_2,
+                                      CANLIB_SYNCHRONIZATION_JUMP_WIDTH, CANLIB_NUMBER_OF_SAMPLING_POINTS,
+                                      CANLIB_SYNCMODE);
+    throwErrorIfnecessary(returnCode, "canSetBusParams");
+    returnCode = canSetBusOutputControl(communicationChannel, CANLIB_CAN_DRIVER_TYPE);
+    throwErrorIfnecessary(returnCode, "canSetBusOutputControl");
+    returnCode = canBusOn(communicationChannel);
+    throwErrorIfnecessary(returnCode, "canSetBusParams");
 }
 
 KvaserCanCommunicationStrategy::super::Messages KvaserCanCommunicationStrategy::fetchMessages() {
@@ -77,3 +83,8 @@ void KvaserCanCommunicationStrategy::closeConnection() {
     canClose(communicationChannel);
 }
 
+void KvaserCanCommunicationStrategy::throwErrorIfnecessary(canStatus const& errorCode, std::string const& callOrigin) {
+    if (CANSTATUS_FAILURE(errorCode)) {
+        ErrorHandling::throwKvaserCommunicationError(errorCode, callOrigin);
+    }
+}
