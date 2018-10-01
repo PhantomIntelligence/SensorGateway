@@ -103,7 +103,7 @@ namespace DataFlow {
         void addLinkIfNoneExists(Consumer* consumer) {
             if (hasNoExistingLinkWith(consumer)) {
                 RingBufferPad<T>* consumerLocation = &buffer[0];
-                 auto consumerLocationPair = std::make_pair(consumer, consumerLocation);
+                auto consumerLocationPair = std::make_pair(consumer, consumerLocation);
                 this->consumerLocationsMap.insert(consumerLocationPair);
             }
         }
@@ -114,7 +114,8 @@ namespace DataFlow {
 
         void notifyConsumersIfAnyDataIsPresent() {
             if (!consumerLocationsMap.empty()) {
-                for (auto location = consumerLocationsMap.begin(), end = consumerLocationsMap.end(); location != end; ++location) {
+                for (auto location = consumerLocationsMap.begin(), end = consumerLocationsMap.end();
+                     location != end; ++location) {
                     if (!istWriterLocation((*location).second)) {
                         (*location).first->activateFor(this);
                     }
@@ -137,7 +138,9 @@ namespace DataFlow {
 
         void throwErrorIfIllegalConsumption(Consumer* consumer) {
             if (isAtWriterLocation(consumer)) {
-                throwRuntimeError(ExceptionMessage::RING_BUFFER_ILLEGAL_CONSUMPTION_ON_WRITER_LOCATION_MESSAGE);
+                // TODO : Find a better way to report the error than this e.g.: logger
+                std::cout << ExceptionMessage::RING_BUFFER_ILLEGAL_CONSUMPTION_ON_WRITER_LOCATION_MESSAGE << std::endl;
+
             }
         }
 
