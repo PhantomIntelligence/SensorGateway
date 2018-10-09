@@ -108,27 +108,16 @@ void GuardianUSBCommunicationStrategy::closeConnection() {
 
 void GuardianUSBCommunicationStrategy::throwDeviceNotFoundErrorIfNeeded() {
     if (!usbDeviceHandle) {
-        // TODO : ERROR
-        throw ErrorHandling::SensorAccessLinkError(
-                "LibUSB",
-                ErrorHandling::Category::CONNECTION_ERROR,
-                ErrorHandling::Severity::ERROR,
-                ErrorHandling::GatewayErrorCode::CANNOT_FIND_GUARDIAN_LIBUSB_DEVICE,
-                "Guardian device not found!");
+        ErrorHandling::throwLibUSBDeviceNotFound();
     }
 }
 
 void GuardianUSBCommunicationStrategy::throwUsbClaimInterfaceErrorIfNeeded(int errorCode) {
     if (errorCode < 0) {
-        std::ostringstream errorMessage("usb_claim_interface returned an error: ", std::ios_base::ate);
-        errorMessage << errorCode;
-        // TODO : ERROR
-        throw ErrorHandling::SensorAccessLinkError(
-                "LibUSB",
-                ErrorHandling::Category::CONNECTION_ERROR,
-                ErrorHandling::Severity::EMERGENCY,
-                errorCode,
-                errorMessage.str());
+        std::ostringstream origin("usb_claim_interface returned an error: ", std::ios_base::ate);
+        origin << errorCode;
+        auto libUSBErrorCode = static_cast<libusb_error>(errorCode);
+        ErrorHandling::throwGuardianUSBCommunicationError(libUSBErrorCode, origin.str());
     }
 }
 
@@ -153,13 +142,12 @@ int GuardianUSBCommunicationStrategy::doUSBBulkTransferAndReturnNumberOfByteActu
                      << " actual: " << numberOfByteActuallyTransferred
                      << std::endl;
 
-        // TODO : ERROR
-        throw ErrorHandling::SensorAccessLinkError(
+        auto libUSBErrorCode = static_cast<libusb_error>(errorCode);
+        ErrorHandling::throwGuardianUSBCommunicationError(
+                libUSBErrorCode,
                 "LibUSB",
-                ErrorHandling::Category::COMMUNICATION_ERROR,
-                ErrorHandling::Severity::WARNING,
-                errorCode,
-                errorMessage.str());
+                errorMessage.str()
+        );
 
         // TODO: log when the logger has been created
 
@@ -180,8 +168,7 @@ void GuardianUSBCommunicationStrategy::setupCleanConnection() noexcept {
                     sizeof(Byte[256]),
                     timeout);
             hasReceivedData = numberOfReturnedData != 0;
-        } catch (std::runtime_error& error) {
-            // TODO : ERROR
+        } catch (...) {
             hasNotThrownError = false;
         }
     }
@@ -192,26 +179,9 @@ void GuardianUSBCommunicationStrategy::throwErrorOnLibUSBBulkTransferErrorCode(i
         return;
     }
 
-    std::ostringstream errorMessage("ERROR in libusb bulk write: ", std::ios_base::ate);
-    errorMessage << errorCode;
-    if (errorCode == LIBUSB_ERROR_TIMEOUT) {
-        errorMessage << "... transfer timed out.\n";
-    } else if (errorCode == LIBUSB_ERROR_PIPE) {
-        errorMessage << "... the endpoint halted.\n";
-    } else if (errorCode == LIBUSB_ERROR_OVERFLOW) {
-        errorMessage << "... the device offered more data than expected.\n";
-    } else if (errorCode == LIBUSB_ERROR_NO_DEVICE) {
-        errorMessage << "... the device has disconnected.\n";
-    } else {
-        errorMessage << "... something went wrong.\n";
-    }
-    // TODO : ERROR
-    throw ErrorHandling::SensorAccessLinkError(
-            "LibUSB",
-            ErrorHandling::Category::CONNECTION_ERROR,
-            ErrorHandling::Severity::ERROR,
-            errorCode,
-            errorMessage.str());
+    auto libUSBErrorCode = static_cast<libusb_error>(errorCode);
+    std::string origin = " in bulk write: ";
+    ErrorHandling::throwGuardianUSBCommunicationError(libUSBErrorCode, origin);
 }
 
 GuardianUSBCommunicationStrategy::super::Messages

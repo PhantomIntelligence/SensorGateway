@@ -44,6 +44,8 @@ protected:
     Severity const ARBITRARY_SEVERITY = Severity::DEBUG;
 };
 
+// TODO : If error = ALARM, do no reopen
+// TODO : If error = ALARM, SensorAccessLink-> will send error message
 SensorAccessLinkErrorTest::SensorAccessLinkErrorTest() {
 }
 

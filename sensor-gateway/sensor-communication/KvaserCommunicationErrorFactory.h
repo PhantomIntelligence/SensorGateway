@@ -73,8 +73,7 @@ namespace ErrorHandling {
         if (errorCode == canERR_PARAM) {
             category = COMMUNICATION_ERROR;
             severity = ERROR;
-            errorMessage =
-                    canERR_PARAM_MESSAGE;
+            errorMessage = canERR_PARAM_MESSAGE;
         } else if (errorCode == canERR_NOMSG) {
             category = COMMUNICATION_ERROR;
             severity = INFO;

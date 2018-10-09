@@ -17,8 +17,8 @@
 #ifndef SENSORGATEWAY_GUARDIANUSBCOMMUNICATIONSTRATEGY_H
 #define SENSORGATEWAY_GUARDIANUSBCOMMUNICATIONSTRATEGY_H
 
-#include <libusb-1.0/libusb.h>
 
+#include "LibUSBCommunicationErrorFactory.h"
 #include "sensor-gateway/common/data-structure/sensor/GuardianStructures.h"
 #include "SensorCommunicationStrategy.hpp"
 
