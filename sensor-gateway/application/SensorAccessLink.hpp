@@ -111,8 +111,13 @@ namespace SensorGateway {
 
             std::cout << error.fetchDetailedMessage() << std::endl;
             if (error.isFatalForGateway()) {
-                DetachableThread(&SensorAccessLink::terminateAndJoin,
-                                 this); // Avoid deadlock in errorScheduler::terminateAndJoin
+                // TODO : shutdown SensorAccessLink instance + kill whole gateway, throw
+                DetachableThread(&SensorAccessLink::terminateAndJoin, this);
+                // Avoid deadlock in errorScheduler::terminateAndJoin
+            } else if (error.isFatalForSensorAccess()) {
+                // TODO : sendMessage to server + shutdown SensorAccessLink instance
+                DetachableThread(&SensorAccessLink::terminateAndJoin, this);
+                // Avoid deadlock in errorScheduler::terminateAndJoin
             } else {
                 // TODO : sendErrorMessageToServer();
             }
