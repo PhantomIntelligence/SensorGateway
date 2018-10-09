@@ -65,12 +65,13 @@ TEST_F(RingBufferTest, given_twoDataOfWhichOneHasAlreadyBeenConsumed_when_consum
     ASSERT_EQ(simpleDataTwoCopy, consumedData);
 }
 
-TEST_F(RingBufferTest, given_noData_when_consumeNextDataForALink_then_throwsARuntimeException) {
-    SimpleBuffer simpleBuffer;
-    auto linkMock = MockConsumerLink();
-
-    EXPECT_THROW(simpleBuffer.consumeNextDataFor(&linkMock), std::runtime_error);
-}
+// TODO : Find a better way to handle this, log it at minimum
+//TEST_F(RingBufferTest, given_noData_when_consumeNextDataForALink_then_throwsARuntimeException) {
+//    SimpleBuffer simpleBuffer;
+//    auto linkMock = MockConsumerLink();
+//
+//    EXPECT_THROW(simpleBuffer.consumeNextDataFor(&linkMock), std::runtime_error);
+//}
 
 TEST_F(RingBufferTest, given_aDataAndTwoConsumers_when_consumeNextDataForALinkAfterTheOtherOne_then_returnsTheData) {
     SimpleBuffer simpleBuffer;

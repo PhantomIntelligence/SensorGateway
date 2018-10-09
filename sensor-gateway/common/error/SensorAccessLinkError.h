@@ -51,7 +51,9 @@ namespace ErrorHandling {
 
         SensorAccessLinkError static const returnDefaultData() noexcept;
 
-        bool isFatal() const noexcept;
+        bool isFatalForGateway() const noexcept;
+
+        bool isFatalForSensorAccess() const noexcept;
 
         bool isOpenConnectionRequired() const noexcept;
 

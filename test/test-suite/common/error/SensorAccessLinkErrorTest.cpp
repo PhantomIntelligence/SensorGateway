@@ -51,53 +51,100 @@ SensorAccessLinkErrorTest::SensorAccessLinkErrorTest() {
 
 SensorAccessLinkErrorTest::~SensorAccessLinkErrorTest() {}
 
-
-TEST_F(SensorAccessLinkErrorTest, given_anErrorWithEmergencySeverityLevel_when_askedIfIsFatal_then_returnsTrue) {
+TEST_F(SensorAccessLinkErrorTest, given_anErrorWithEmergencySeverityLevel_when_askedIfIsFatalForGateway_then_returnsTrue) {
     auto sensorAccessLinkError = createArbitrarySensorAccessLinkErrorWithSeverity(Severity::EMERGENCY);
-    auto isFatal = sensorAccessLinkError.isFatal();
-    ASSERT_TRUE(isFatal);
+    auto isFatalForGateway = sensorAccessLinkError.isFatalForGateway();
+    ASSERT_TRUE(isFatalForGateway);
 }
 
-TEST_F(SensorAccessLinkErrorTest, given_anErrorWithAlertSeverityLevel_when_askedIfIsFatal_then_returnsFalse) {
+TEST_F(SensorAccessLinkErrorTest, given_anErrorWithAlertSeverityLevel_when_askedIfIsFatalForGateway_then_returnsFalse) {
     auto sensorAccessLinkError = createArbitrarySensorAccessLinkErrorWithSeverity(Severity::ALERT);
-    auto isFatal = sensorAccessLinkError.isFatal();
-    ASSERT_FALSE(isFatal);
+    auto isFatalForGateway = sensorAccessLinkError.isFatalForGateway();
+    ASSERT_FALSE(isFatalForGateway);
 }
 
-TEST_F(SensorAccessLinkErrorTest, given_anErrorWithCriticalSeverityLevel_when_askedIfIsFatal_then_returnsFalse) {
+TEST_F(SensorAccessLinkErrorTest, given_anErrorWithCriticalSeverityLevel_when_askedIfIsFatalForGateway_then_returnsFalse) {
     auto sensorAccessLinkError = createArbitrarySensorAccessLinkErrorWithSeverity(Severity::CRITICAL);
-    auto isFatal = sensorAccessLinkError.isFatal();
-    ASSERT_FALSE(isFatal);
+    auto isFatalForGateway = sensorAccessLinkError.isFatalForGateway();
+    ASSERT_FALSE(isFatalForGateway);
 }
 
-TEST_F(SensorAccessLinkErrorTest, given_anErrorWithErrorSeverityLevel_when_askedIfIsFatal_then_returnsFalse) {
+TEST_F(SensorAccessLinkErrorTest, given_anErrorWithErrorSeverityLevel_when_askedIfIsFatalForGateway_then_returnsFalse) {
     auto sensorAccessLinkError = createArbitrarySensorAccessLinkErrorWithSeverity(Severity::ERROR);
-    auto isFatal = sensorAccessLinkError.isFatal();
-    ASSERT_FALSE(isFatal);
+    auto isFatalForGateway = sensorAccessLinkError.isFatalForGateway();
+    ASSERT_FALSE(isFatalForGateway);
 }
 
-TEST_F(SensorAccessLinkErrorTest, given_anErrorWithWarningSeverityLevel_when_askedIfIsFatal_then_returnsFalse) {
+TEST_F(SensorAccessLinkErrorTest, given_anErrorWithWarningSeverityLevel_when_askedIfIsFatalForGateway_then_returnsFalse) {
     auto sensorAccessLinkError = createArbitrarySensorAccessLinkErrorWithSeverity(Severity::WARNING);
-    auto isFatal = sensorAccessLinkError.isFatal();
-    ASSERT_FALSE(isFatal);
+    auto isFatalForGateway = sensorAccessLinkError.isFatalForGateway();
+    ASSERT_FALSE(isFatalForGateway);
 }
 
-TEST_F(SensorAccessLinkErrorTest, given_anErrorWithNoticeSeverityLevel_when_askedIfIsFatal_then_returnsFalse) {
+TEST_F(SensorAccessLinkErrorTest, given_anErrorWithNoticeSeverityLevel_when_askedIfIsFatalForGateway_then_returnsFalse) {
     auto sensorAccessLinkError = createArbitrarySensorAccessLinkErrorWithSeverity(Severity::NOTICE);
-    auto isFatal = sensorAccessLinkError.isFatal();
-    ASSERT_FALSE(isFatal);
+    auto isFatalForGateway = sensorAccessLinkError.isFatalForGateway();
+    ASSERT_FALSE(isFatalForGateway);
 }
 
-TEST_F(SensorAccessLinkErrorTest, given_anErrorWithInfoSeverityLevel_when_askedIfIsFatal_then_returnsFalse) {
+TEST_F(SensorAccessLinkErrorTest, given_anErrorWithInfoSeverityLevel_when_askedIfIsFatalForGateway_then_returnsFalse) {
     auto sensorAccessLinkError = createArbitrarySensorAccessLinkErrorWithSeverity(Severity::INFO);
-    auto isFatal = sensorAccessLinkError.isFatal();
-    ASSERT_FALSE(isFatal);
+    auto isFatalForGateway = sensorAccessLinkError.isFatalForGateway();
+    ASSERT_FALSE(isFatalForGateway);
 }
 
-TEST_F(SensorAccessLinkErrorTest, given_anErrorWithDebugSeverityLevel_when_askedIfIsFatal_then_returnsFalse) {
+TEST_F(SensorAccessLinkErrorTest, given_anErrorWithDebugSeverityLevel_when_askedIfIsFatalForGateway_then_returnsFalse) {
     auto sensorAccessLinkError = createArbitrarySensorAccessLinkErrorWithSeverity(Severity::DEBUG);
-    auto isFatal = sensorAccessLinkError.isFatal();
-    ASSERT_FALSE(isFatal);
+    auto isFatalForGateway = sensorAccessLinkError.isFatalForGateway();
+    ASSERT_FALSE(isFatalForGateway);
+}
+
+TEST_F(SensorAccessLinkErrorTest, given_anErrorWithEmergencySeverityLevel_when_askedIfIsFatalForSensorAccess_then_returnsTrue) {
+    auto sensorAccessLinkError = createArbitrarySensorAccessLinkErrorWithSeverity(Severity::EMERGENCY);
+    auto isFatalForSensorAccess = sensorAccessLinkError.isFatalForSensorAccess();
+    ASSERT_TRUE(isFatalForSensorAccess);
+}
+
+TEST_F(SensorAccessLinkErrorTest, given_anErrorWithAlertSeverityLevel_when_askedIfIsFatalForSensorAccess_then_returnsTrue) {
+    auto sensorAccessLinkError = createArbitrarySensorAccessLinkErrorWithSeverity(Severity::ALERT);
+    auto isFatalForSensorAccess = sensorAccessLinkError.isFatalForSensorAccess();
+    ASSERT_TRUE(isFatalForSensorAccess);
+}
+
+TEST_F(SensorAccessLinkErrorTest, given_anErrorWithCriticalSeverityLevel_when_askedIfIsFatalForSensorAccess_then_returnsFalse) {
+    auto sensorAccessLinkError = createArbitrarySensorAccessLinkErrorWithSeverity(Severity::CRITICAL);
+    auto isFatalForSensorAccess = sensorAccessLinkError.isFatalForSensorAccess();
+    ASSERT_FALSE(isFatalForSensorAccess);
+}
+
+TEST_F(SensorAccessLinkErrorTest, given_anErrorWithErrorSeverityLevel_when_askedIfIsFatalForSensorAccess_then_returnsFalse) {
+    auto sensorAccessLinkError = createArbitrarySensorAccessLinkErrorWithSeverity(Severity::ERROR);
+    auto isFatalForSensorAccess = sensorAccessLinkError.isFatalForSensorAccess();
+    ASSERT_FALSE(isFatalForSensorAccess);
+}
+
+TEST_F(SensorAccessLinkErrorTest, given_anErrorWithWarningSeverityLevel_when_askedIfIsFatalForSensorAccess_then_returnsFalse) {
+    auto sensorAccessLinkError = createArbitrarySensorAccessLinkErrorWithSeverity(Severity::WARNING);
+    auto isFatalForSensorAccess = sensorAccessLinkError.isFatalForSensorAccess();
+    ASSERT_FALSE(isFatalForSensorAccess);
+}
+
+TEST_F(SensorAccessLinkErrorTest, given_anErrorWithNoticeSeverityLevel_when_askedIfIsFatalForSensorAccess_then_returnsFalse) {
+    auto sensorAccessLinkError = createArbitrarySensorAccessLinkErrorWithSeverity(Severity::NOTICE);
+    auto isFatalForSensorAccess = sensorAccessLinkError.isFatalForSensorAccess();
+    ASSERT_FALSE(isFatalForSensorAccess);
+}
+
+TEST_F(SensorAccessLinkErrorTest, given_anErrorWithInfoSeverityLevel_when_askedIfIsFatalForSensorAccess_then_returnsFalse) {
+    auto sensorAccessLinkError = createArbitrarySensorAccessLinkErrorWithSeverity(Severity::INFO);
+    auto isFatalForSensorAccess = sensorAccessLinkError.isFatalForSensorAccess();
+    ASSERT_FALSE(isFatalForSensorAccess);
+}
+
+TEST_F(SensorAccessLinkErrorTest, given_anErrorWithDebugSeverityLevel_when_askedIfIsFatalForSensorAccess_then_returnsFalse) {
+    auto sensorAccessLinkError = createArbitrarySensorAccessLinkErrorWithSeverity(Severity::DEBUG);
+    auto isFatalForSensorAccess = sensorAccessLinkError.isFatalForSensorAccess();
+    ASSERT_FALSE(isFatalForSensorAccess);
 }
 
 TEST_F(SensorAccessLinkErrorTest,

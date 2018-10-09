@@ -90,9 +90,18 @@ SensorAccessLinkError const SensorAccessLinkError::returnDefaultData() noexcept 
     return Defaults::DEFAULT_SENSOR_ACCESS_LINK_ERROR;
 }
 
-bool SensorAccessLinkError::isFatal() const noexcept {
+bool SensorAccessLinkError::isFatalForGateway() const noexcept {
     bool isFatal = false;
     if (severity == EMERGENCY) {
+        isFatal = true;
+    }
+    return isFatal;
+}
+
+bool SensorAccessLinkError::isFatalForSensorAccess() const noexcept {
+    bool isFatal = false;
+    if (severity == EMERGENCY ||
+        severity == ALERT) {
         isFatal = true;
     }
     return isFatal;

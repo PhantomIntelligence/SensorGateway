@@ -110,7 +110,7 @@ namespace SensorGateway {
             // TODO: THE ARCHITECTURAL LOCATION WILL HAVE TO BE RETHOUGHT WHEN IMPLEMENTING SPIRIT PROTOCOL
 
             std::cout << error.fetchDetailedMessage() << std::endl;
-            if (error.isFatal()) {
+            if (error.isFatalForGateway()) {
                 DetachableThread(&SensorAccessLink::terminateAndJoin,
                                  this); // Avoid deadlock in errorScheduler::terminateAndJoin
             } else {
