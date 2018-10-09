@@ -197,6 +197,13 @@ TEST_F(SensorAccessLinkErrorTest,
 }
 
 TEST_F(SensorAccessLinkErrorTest,
+       given_anErrorWithAlertSeverityLevel_when_askedIfOpenConnectionIsRequired_then_returnsFalse) {
+    auto sensorAccessLinkError = createArbitrarySensorAccessLinkErrorWithSeverity(Severity::ALERT);
+    auto openConnectionIsRequired = sensorAccessLinkError.isOpenConnectionRequired();
+    ASSERT_FALSE(openConnectionIsRequired);
+}
+
+TEST_F(SensorAccessLinkErrorTest,
        given_anErrorWithConnectionErrorCategory_when_askedIfOpenConnectionIsRequired_then_returnsTrue) {
     auto sensorAccessLinkError = createArbitrarySensorAccessLinkErrorWithCategory(Category::CONNECTION_ERROR);
     auto openConnectionIsRequired = sensorAccessLinkError.isOpenConnectionRequired();

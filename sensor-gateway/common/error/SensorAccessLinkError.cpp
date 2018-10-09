@@ -110,7 +110,8 @@ bool SensorAccessLinkError::isFatalForSensorAccess() const noexcept {
 bool SensorAccessLinkError::isOpenConnectionRequired() const noexcept {
     bool isOpenConnectionRequired = true;
     if (category == COMMUNICATION_ERROR ||
-        severity == EMERGENCY) {
+        severity == EMERGENCY ||
+        severity == ALERT) {
         isOpenConnectionRequired = false;
     }
     return isOpenConnectionRequired;
