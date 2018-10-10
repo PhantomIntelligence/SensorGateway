@@ -45,7 +45,6 @@ protected:
 };
 
 // TODO : If error = ALARM, do no reopen
-// TODO : If error = ALARM, SensorAccessLink-> will send error message
 SensorAccessLinkErrorTest::SensorAccessLinkErrorTest() {
 }
 

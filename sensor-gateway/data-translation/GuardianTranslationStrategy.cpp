@@ -12,7 +12,7 @@
 */
 
 #include "GuardianTranslationStrategy.h"
-#include "UnknownMessageException.h"
+#include "TranslationErrorFactory.h"
 
 using DataTranslation::GuardianTranslationStrategy;
 using DataFlow::PixelID;
@@ -44,14 +44,8 @@ void GuardianTranslationStrategy::translateMessage(SensorMessage&& sensorMessage
             translateDetectionVelocityMessage(std::move(sensorMessage));
             break;
         default:
-            auto message = UnknownMessageException(std::move(sensorMessage));
-            // TODO : ERROR
-            throw ErrorHandling::SensorAccessLinkError(
-                    "GuardianTranslationStrategy::translateMessage",
-                    ErrorHandling::Category::TRANSLATION_ERROR,
-                    ErrorHandling::Severity::ERROR,
-                    ErrorHandling::GatewayErrorCode::UNRECOGNIZED_GUARDIAN_MESSAGE_ID,
-                    message.getMessage() );
+            ErrorHandling::throwGuardianTranslationError(
+                    "translateMessage", ErrorHandling::GatewayErrorCode::UNRECOGNIZED_GUARDIAN_MESSAGE_ID);
     }
 }
 

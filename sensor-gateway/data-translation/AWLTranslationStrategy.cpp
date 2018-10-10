@@ -12,7 +12,7 @@
 */
 
 #include "AWLTranslationStrategy.h"
-#include "UnknownMessageException.h"
+#include "TranslationErrorFactory.h"
 
 using DataTranslation::AWLTranslationStrategy;
 using DataFlow::PixelID;
@@ -44,14 +44,8 @@ void AWLTranslationStrategy::translateMessage(SensorMessage&& sensorMessage) {
             translateDetectionVelocityMessage(std::move(sensorMessage));
             break;
         default:
-            auto message = UnknownMessageException(std::move(sensorMessage));
-            // TODO : ERROR
-            throw ErrorHandling::SensorAccessLinkError(
-                    "AWLTranslationStrategy::translateMessage",
-                    ErrorHandling::Category::TRANSLATION_ERROR,
-                    ErrorHandling::Severity::ERROR,
-                    ErrorHandling::GatewayErrorCode::UNRECOGNIZED_AWL_MESSAGE_ID,
-                    message.getMessage() );
+            ErrorHandling::throwAWLTranslationError("translateMessage",
+                                                    ErrorHandling::GatewayErrorCode::UNRECOGNIZED_AWL_MESSAGE_ID);
     }
 }
 
