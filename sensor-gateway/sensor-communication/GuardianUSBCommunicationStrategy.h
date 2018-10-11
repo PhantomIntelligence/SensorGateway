@@ -97,7 +97,7 @@ namespace SensorCommunication {
             NUMBER_OF_VERSION_STRINGS
         };
 
-        enum USBCommandCode {
+        enum USBCommandCode : uint16_t {
             DO_NOTHING,
 
             USB_MESSAGE_LENGTH = 8,

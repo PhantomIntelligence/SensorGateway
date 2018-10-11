@@ -25,6 +25,15 @@ SensorAccessLinkError::SensorAccessLinkError(std::string const& origin,
                                              Category const& category,
                                              Severity const& severity,
                                              ErrorCode const& code,
+                                             std::string const& message) :
+        SensorAccessLinkError(origin, category,
+                              severity, code,
+                              message, HighResolutionClock::now()) {}
+
+SensorAccessLinkError::SensorAccessLinkError(std::string const& origin,
+                                             Category const& category,
+                                             Severity const& severity,
+                                             ErrorCode const& code,
                                              std::string const& message,
                                              HighResolutionTimePoint timestamp) :
         runtime_error(buildDetailedMessage(timestamp, origin, category, severity, code, message)),

@@ -44,7 +44,6 @@ protected:
     Severity const ARBITRARY_SEVERITY = Severity::DEBUG;
 };
 
-// TODO : If error = ALARM, do no reopen
 SensorAccessLinkErrorTest::SensorAccessLinkErrorTest() {
 }
 

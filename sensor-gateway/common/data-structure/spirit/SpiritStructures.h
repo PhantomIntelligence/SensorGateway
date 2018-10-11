@@ -28,7 +28,7 @@ namespace Sensor {
 
         public :
 
-            enum DataType {
+            enum DataType : uint32_t {
 //            [0, 499] -> reserved for SensorGateway messages
 
 

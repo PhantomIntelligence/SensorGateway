@@ -30,8 +30,7 @@ namespace ErrorHandling {
                                        Category const& category,
                                        Severity const& severity,
                                        ErrorCode const& code,
-                                       std::string const& message,
-                                       HighResolutionTimePoint timestamp = HighResolutionClock::now());
+                                       std::string const& message);
 
         ~SensorAccessLinkError() noexcept override;
 
@@ -82,6 +81,17 @@ namespace ErrorHandling {
         }
 
     private:
+
+        /**
+         * @note this private ctor is here to avoid using default arguments. See:
+         * https://web.archive.org/web/20170902171902/http://www.codingstandard.com:80/rule/8-3-3-do-not-use-default-arguments/
+         */
+        explicit SensorAccessLinkError(std::string const& origin,
+                                       Category const& category,
+                                       Severity const& severity,
+                                       ErrorCode const& code,
+                                       std::string const& message,
+                                       HighResolutionTimePoint timestamp);
 
         static std::string buildDetailedMessage(HighResolutionTimePoint const& timestamp,
                                                 std::string const& origin,
