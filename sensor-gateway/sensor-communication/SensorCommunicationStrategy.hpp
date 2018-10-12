@@ -14,7 +14,7 @@
 #ifndef SENSORGATEWAY_SENSORCOMMUNICATIONSTRATEGY_H
 #define SENSORGATEWAY_SENSORCOMMUNICATIONSTRATEGY_H
 
-#include "sensor-gateway/common/ConstantFunctionsDefinition.h"
+#include "sensor-gateway/common/error/SensorAccessLinkError.h"
 
 namespace SensorCommunication {
 

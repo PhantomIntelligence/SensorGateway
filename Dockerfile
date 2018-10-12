@@ -34,7 +34,7 @@ RUN wget http://canlandbucket.s3-website-eu-west-1.amazonaws.com/productionResou
 
 ENTRYPOINT sed -i 's?/.*/SensorGateway?'`pwd`'?g' cmake-build-debug/CMakeCache.txt &&\
     ./dev-script/conanUpdateDependencies &&\
-    sed -i s/libstdc++/libstdc++14/g ~/.conan/profiles/default &&\
+    sed -i s/libstdc++/libstdc++11/g ~/.conan/profiles/default &&\
     ./dev-script/conanUpdateDependencies &&\
     sed -i 's?/.*/SensorGateway?'`pwd`'?g' cmake-build-debug/Makefile &&\
     cmake --build /builddir/cmake-build-debug --target runtests -- -j 4 &&\

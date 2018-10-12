@@ -79,6 +79,7 @@ TEST_F(PixelTest,
     }
 
     auto trackCopy = Track(SOME_TRACK);
+    // TODO : ERROR
     ASSERT_THROW(pixel.addTrack(std::move(trackCopy)), std::runtime_error);
 }
 

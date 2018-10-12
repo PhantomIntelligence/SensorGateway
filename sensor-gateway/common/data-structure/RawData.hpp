@@ -59,7 +59,7 @@ namespace DataFlow {
             std::swap(current.content, other.content);
         }
 
-        bool operator==(RawData const other) const {
+        bool operator==(RawData const& other) const {
             auto sameContent = (content == other.content);
             auto messagesAreEqual = (sameContent);
             return messagesAreEqual;

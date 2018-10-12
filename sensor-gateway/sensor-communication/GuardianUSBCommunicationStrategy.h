@@ -17,8 +17,8 @@
 #ifndef SENSORGATEWAY_GUARDIANUSBCOMMUNICATIONSTRATEGY_H
 #define SENSORGATEWAY_GUARDIANUSBCOMMUNICATIONSTRATEGY_H
 
-#include <libusb-1.0/libusb.h>
 
+#include "LibUSBCommunicationErrorFactory.h"
 #include "sensor-gateway/common/data-structure/sensor/GuardianStructures.h"
 #include "SensorCommunicationStrategy.hpp"
 
@@ -97,7 +97,7 @@ namespace SensorCommunication {
             NUMBER_OF_VERSION_STRINGS
         };
 
-        enum USBCommandCode {
+        enum USBCommandCode : uint16_t {
             DO_NOTHING,
 
             USB_MESSAGE_LENGTH = 8,

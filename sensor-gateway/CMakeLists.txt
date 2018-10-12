@@ -7,6 +7,7 @@ set(DOT ${CMAKE_CURRENT_SOURCE_DIR}) # To ease reading
 # Select all the source and header files
 file(GLOB APPLICATION_FILES "${DOT}/application/*")
 file(GLOB COMMON_FILES "${DOT}/common/*")
+file(GLOB ERROR_FILES "${DOT}/common/error/*")
 file(GLOB DATA_STRUCTURE_FILES "${DOT}/common/data-structure/*")
 file(GLOB SENSOR_STRUCTURE_FILES "${DOT}/common/data-structure/sensor/*")
 file(GLOB SPIRIT_STRUCTURE_FILES "${DOT}/common/data-structure/spirit/*")
@@ -20,6 +21,7 @@ unset(DOT)
 add_library(${PROJECT_NAME} SHARED
         ${APPLICATION_FILES}
         ${COMMON_FILES}
+        ${ERROR_FILES}
         ${DATA_STRUCTURE_FILES}
         ${SPIRIT_STRUCTURE_FILES}
         ${SENSOR_STRUCTURE_FILES}

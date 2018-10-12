@@ -106,7 +106,14 @@ Pixel const& Pixel::returnDefaultData() noexcept {
 
 void Pixel::validateNotFull() const {
     if (currentNumberOfTracksInPixel >= NUMBER_OF_TRACKS_IN_PIXEL) {
-        throw std::runtime_error(ExceptionMessage::PIXEL_TRACK_ARRAY_ILLEGAL_STORE_FULL);
+        // TODO : Have a cleaner throw, elsewhere?
+        throw ErrorHandling::SensorAccessLinkError(
+                "pixel::addTrack",
+                ErrorHandling::Category::TRANSLATION_ERROR,
+                ErrorHandling::Severity::ERROR,
+                ErrorHandling::GatewayErrorCode::PIXEL_ALREADY_HAS_MAXIMUM_TRACK,
+                ExceptionMessage::PIXEL_TRACK_ARRAY_ILLEGAL_STORE_FULL
+        );
     }
 }
 

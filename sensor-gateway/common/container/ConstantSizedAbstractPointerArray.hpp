@@ -18,7 +18,7 @@
 #ifndef SENSORGATEWAY_ABSTRACTPOINTERARRAY_HPP
 #define SENSORGATEWAY_ABSTRACTPOINTERARRAY_HPP
 
-#include "sensor-gateway/common/ConstantFunctionsDefinition.h"
+#include "sensor-gateway/common/error/SensorAccessLinkError.h"
 
 namespace Container {
 

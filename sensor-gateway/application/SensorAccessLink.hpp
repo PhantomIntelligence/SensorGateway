@@ -23,7 +23,7 @@ namespace SensorGateway {
 
     // TODO: Using things like `enable_if<>, handle different sensors when there is or not RawData or fetching in bulk`
     template<class SENSOR_STRUCTURES, class SERVER_STRUCTURES>
-    class SensorAccessLink {
+    class SensorAccessLink : public DataFlow::DataSink<ErrorHandling::SensorAccessLinkError> {
 
     protected:
 
@@ -46,6 +46,9 @@ namespace SensorGateway {
         using SensorCommunicator = SensorAccessLinkElement::SensorCommunicator<SENSOR_STRUCTURES>;
         using SensorCommunicationStrategy = SensorCommunication::SensorCommunicationStrategy<SENSOR_STRUCTURES>;
 
+        using Error = ErrorHandling::SensorAccessLinkError;
+        using ThisClass = SensorAccessLink<SENSOR_STRUCTURES, SERVER_STRUCTURES>;
+        using ErrorScheduler = DataFlow::DataProcessingScheduler<Error, ThisClass, 3>;
 
     public:
         explicit SensorAccessLink(ServerCommunicationStrategy* serverCommunicationStrategy,
@@ -60,7 +63,9 @@ namespace SensorGateway {
                 translatorMessageScheduler(&dataTranslator),
                 translatorRawDataScheduler(&dataTranslator),
                 serverCommunicatorMessageScheduler(&serverCommunicator),
-                serverCommunicatorRawDataScheduler(&serverCommunicator) {}
+                serverCommunicatorRawDataScheduler(&serverCommunicator),
+                errorScheduler(this) // TODO : Change "this" for the SensorAccessLinkErrorHandler
+        {}
 
         ~SensorAccessLink() noexcept {
             terminateAndJoin();
@@ -83,7 +88,7 @@ namespace SensorGateway {
             std::this_thread::sleep_for(std::chrono::milliseconds(50));
             // TODO: implement }
 
-            serverCommunicator.connect(serverAddress);
+            serverCommunicator.openConnection(serverAddress);
             sensorCommunicator.start();
         };
 
@@ -93,7 +98,29 @@ namespace SensorGateway {
             translatorRawDataScheduler.terminateAndJoin();
             serverCommunicatorMessageScheduler.terminateAndJoin();
             serverCommunicatorRawDataScheduler.terminateAndJoin();
-            serverCommunicator.disconnect();
+            serverCommunicator.closeConnection();
+
+            errorScheduler.terminateAndJoin();
+        }
+
+        // TODO : extract this in a SensorAccessLinkErrorHandler, test behavior then.
+        void consume(Error&& error) override {
+
+            // NOTE: To allow Spirit stability on RP3, this is good enough, but untested.
+            // TODO: THE ARCHITECTURAL LOCATION WILL HAVE TO BE RETHOUGHT WHEN IMPLEMENTING SPIRIT PROTOCOL
+
+            std::cout << error.fetchDetailedMessage() << std::endl;
+            if (error.isFatalForGateway()) {
+                // TODO : shutdown SensorAccessLink instance + kill whole gateway, throw
+                DetachableThread(&SensorAccessLink::terminateAndJoin, this);
+                // Avoid deadlock in errorScheduler::terminateAndJoin
+            } else if (error.isFatalForSensorAccess()) {
+                // TODO : sendMessage to server + shutdown SensorAccessLink instance
+                DetachableThread(&SensorAccessLink::terminateAndJoin, this);
+                // Avoid deadlock in errorScheduler::terminateAndJoin
+            } else {
+                // TODO : sendErrorMessageToServer();
+            }
         }
 
     private:
@@ -103,6 +130,10 @@ namespace SensorGateway {
             dataTranslationStrategy->linkConsumer(&serverCommunicatorRawDataScheduler);
             sensorCommunicator.linkConsumer(&translatorMessageScheduler);
             sensorCommunicator.linkConsumer(&translatorRawDataScheduler);
+
+            sensorCommunicator.linkConsumer(&errorScheduler);
+            dataTranslator.linkConsumer(&errorScheduler);
+            serverCommunicator.linkConsumer(&errorScheduler);
         }
 
         ServerCommunicationStrategy* serverCommunicationStrategy;
@@ -118,6 +149,7 @@ namespace SensorGateway {
         SensorCommunicationStrategy* sensorCommunicationStrategy;
         SensorCommunicator sensorCommunicator;
 
+        ErrorScheduler errorScheduler;
     };
 }
 

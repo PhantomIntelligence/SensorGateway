@@ -19,7 +19,6 @@
 
 #include "DataSink.hpp"
 
-
 namespace DataFlow {
 
     template<class T, class SINK, size_t const NUMBER_OF_CONCURRENT_INPUTS>

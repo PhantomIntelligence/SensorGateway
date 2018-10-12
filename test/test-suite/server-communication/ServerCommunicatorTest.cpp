@@ -23,30 +23,16 @@
 
 #include "sensor-gateway/server-communication/ServerCommunicator.hpp"
 #include "test/utilities/data-model/DataModelFixture.h"
+#include "test/utilities/mock/ArbitraryDataSinkMock.hpp"
+#include "test/utilities/mock/ErrorThrowingServerCommunicationStrategyMock.hpp"
 
 using TestFunctions::DataTestUtil;
-
-class ServerCommunicatorTest : public ::testing::Test {
-
-protected:
-
-    using ServerCommunicator = SensorAccessLinkElement::ServerCommunicator<Sensor::Test::Simple::Structures>;
-    using Message = Sensor::Test::Simple::Structures::Message;
-    using RawData = Sensor::Test::Simple::Structures::RawData;
-
-    std::string const SERVER_ADRESS = "I like pears";
-
-    ServerCommunicatorTest() = default;
-
-    virtual ~ServerCommunicatorTest() = default;
-
-};
 
 namespace ServerCommunicatorTestMock {
 
     using ServerCommunication::ServerCommunicationStrategy;
 
-    class MockServerCommunicatorStrategy final : public ServerCommunicationStrategy<Sensor::Test::Simple::Structures> {
+    class MockServerCommunicatorStrategy : public ServerCommunicationStrategy<Sensor::Test::Simple::Structures> {
 
     protected:
 
@@ -63,11 +49,11 @@ namespace ServerCommunicatorTestMock {
                 sendRawDataCalled(false),
                 closeConnectionCalled(false),
                 sentMessage(Message::returnDefaultData()),
-                sentRawData(RawData::returnDefaultData()){
+                sentRawData(RawData::returnDefaultData()) {
 
         }
 
-        ~MockServerCommunicatorStrategy() noexcept = default;
+        ~MockServerCommunicatorStrategy() noexcept override = default;
 
         void sendMessage(Message&& message) override {
             sendMessageCalled.store(true);
@@ -102,6 +88,7 @@ namespace ServerCommunicatorTestMock {
         bool hasSendRawDataBeenCalled() const {
             return sendRawDataCalled.load();
         }
+
         Message getSentMessage() const {
             return sentMessage;
         }
@@ -110,24 +97,75 @@ namespace ServerCommunicatorTestMock {
             return sentRawData;
         }
 
-    private:
 
         AtomicFlag openConnectionCalled;
         AtomicFlag sendMessageCalled;
         AtomicFlag sendRawDataCalled;
         AtomicFlag closeConnectionCalled;
 
+    protected:
+
         Message sentMessage;
         RawData sentRawData;
     };
 }
 
+class ServerCommunicatorTest : public ::testing::Test {
+public:
+    using Error = ErrorHandling::SensorAccessLinkError;
+    using ErrorSinkMock = Mock::ArbitraryDataSinkMock<Error>;
+    using ErrorProcessingScheduler = DataFlow::DataProcessingScheduler<Error, ErrorSinkMock, 1>;
+    using ThrowingServerCommunicationStrategy = Mock::ErrorThrowingServerCommunicationStrategyMock<Sensor::Test::Simple::Structures>;
+
+protected:
+
+    using ServerCommunicator = SensorAccessLinkElement::ServerCommunicator<Sensor::Test::Simple::Structures>;
+    using Message = Sensor::Test::Simple::Structures::Message;
+    using RawData = Sensor::Test::Simple::Structures::RawData;
+
+    std::string const SERVER_ADDRESS = "I like trains";
+
+    ServerCommunicatorTest() = default;
+
+    virtual ~ServerCommunicatorTest() = default;
+
+    Error formatStrategyErrorWithCorrectOrigin(Error strategyIssuedError, std::string origin) const noexcept {
+        Error formattedError(origin + ErrorHandling::Message::SEPARATOR + strategyIssuedError.getOrigin(),
+                             strategyIssuedError.getCategory(),
+                             strategyIssuedError.getSeverity(),
+                             strategyIssuedError.getErrorCode(),
+                             strategyIssuedError.getMessage());
+        return formattedError;
+    }
+
+    ::testing::AssertionResult expectedErrorHasBeenThrown(ErrorSinkMock* sink, Error expectedError) const noexcept {
+
+        auto producedErrors = sink->getConsumedData();
+        bool expectedErrorPublished = true;
+        auto lastParsedError = ErrorHandling::SensorAccessLinkError::returnDefaultData();
+        for (auto t = 0; t < producedErrors.size() && expectedErrorPublished; ++t) {
+            lastParsedError = producedErrors.front();
+            expectedErrorPublished = lastParsedError == expectedError;
+            producedErrors.pop_front();
+        }
+        if (expectedErrorPublished) {
+            return ::testing::AssertionSuccess();
+        } else {
+            return ::testing::AssertionFailure()
+                    << "\nExpected : \n"
+                    << expectedError.fetchDetailedMessage()
+                    << "\nGot : \n"
+                    << lastParsedError.fetchDetailedMessage()
+                    << "\n";
+        }
+    }
+};
 
 TEST_F(ServerCommunicatorTest, given__when_connect_then_callsOpenConnectionInStrategy) {
     ServerCommunicatorTestMock::MockServerCommunicatorStrategy mockStrategy;
     ServerCommunicator serverCommunicator(&mockStrategy);
 
-    serverCommunicator.connect(SERVER_ADRESS);
+    serverCommunicator.openConnection(SERVER_ADDRESS);
 
     auto strategyHasBeenCalled = mockStrategy.hasOpenConnectionBeenCalled();
     ASSERT_TRUE(strategyHasBeenCalled);
@@ -183,10 +221,217 @@ TEST_F(ServerCommunicatorTest, given__when_disconnect_then_callsCloseConnectionI
     ServerCommunicatorTestMock::MockServerCommunicatorStrategy mockStrategy;
     ServerCommunicator serverCommunicator(&mockStrategy);
 
-    serverCommunicator.disconnect();
+    serverCommunicator.closeConnection();
 
     auto strategyHasBeenCalled = mockStrategy.hasCloseConnectionBeenCalled();
     ASSERT_TRUE(strategyHasBeenCalled);
+}
+
+TEST_F(ServerCommunicatorTest,
+       given_anErrorThatRequiresToCloseThrownOnOpenConnectionCall_when_isCaught_then_callsCloseConnectionInStrategy) {
+    ThrowingServerCommunicationStrategy throwingMockStrategy;
+    throwingMockStrategy.throwCloseConnectionRequiredErrorWhenOpenConnectionIsCalled();
+
+    ServerCommunicator serverCommunicator(&throwingMockStrategy);
+    serverCommunicator.openConnection(SERVER_ADDRESS);
+    throwingMockStrategy.waitUntilCloseConnectionCallIsMadeAfterErrorIsThrown();
+
+    auto closeConnectionCalled = throwingMockStrategy.hasCloseConnectionBeenCalledAfterThrowingFunction();
+
+    ASSERT_TRUE(closeConnectionCalled);
+}
+
+TEST_F(ServerCommunicatorTest,
+       given_anErrorThatRequiresToOpenThrownOnOpenConnectionCall_when_isCaught_then_callsOpenConnectionInStrategy) {
+    ThrowingServerCommunicationStrategy throwingMockStrategy;
+    throwingMockStrategy.throwOpenConnectionRequiredErrorWhenOpenConnectionIsCalled();
+
+    ServerCommunicator serverCommunicator(&throwingMockStrategy);
+    serverCommunicator.openConnection(SERVER_ADDRESS);
+    throwingMockStrategy.waitUntilOpenConnectionCallIsMadeAfterErrorIsThrown();
+
+    auto openConnectionCalled = throwingMockStrategy.hasOpenConnectionBeenCalledAfterThrowingFunction();
+
+    ASSERT_TRUE(openConnectionCalled);
+}
+
+TEST_F(ServerCommunicatorTest,
+       given_anErrorThatRequiresToCloseThrownOnCloseConnectionCall_when_isCaught_then_callsCloseConnectionInStrategy) {
+    ThrowingServerCommunicationStrategy throwingMockStrategy;
+    throwingMockStrategy.throwCloseConnectionRequiredErrorWhenCloseConnectionIsCalled();
+
+    ServerCommunicator serverCommunicator(&throwingMockStrategy);
+    serverCommunicator.closeConnection();
+    throwingMockStrategy.waitUntilCloseConnectionCallIsMadeAfterErrorIsThrown();
+
+    auto closeConnectionCalled = throwingMockStrategy.hasCloseConnectionBeenCalledAfterThrowingFunction();
+
+    ASSERT_TRUE(closeConnectionCalled);
+}
+
+TEST_F(ServerCommunicatorTest,
+       given_anErrorThatRequiresToOpenThrownOnCloseConnectionCall_when_isCaught_then_callsOpenConnectionInStrategy) {
+    ThrowingServerCommunicationStrategy throwingMockStrategy;
+    throwingMockStrategy.throwOpenConnectionRequiredErrorWhenCloseConnectionIsCalled();
+
+    ServerCommunicator serverCommunicator(&throwingMockStrategy);
+    serverCommunicator.closeConnection();
+    throwingMockStrategy.waitUntilOpenConnectionCallIsMadeAfterErrorIsThrown();
+
+    auto openConnectionCalled = throwingMockStrategy.hasOpenConnectionBeenCalledAfterThrowingFunction();
+
+    ASSERT_TRUE(openConnectionCalled);
+}
+
+TEST_F(ServerCommunicatorTest,
+       given_anErrorThatRequiresToCloseThrownOnSendMessageCall_when_isCaught_then_callsCloseConnectionInStrategy) {
+    ThrowingServerCommunicationStrategy throwingMockStrategy;
+    throwingMockStrategy.throwCloseConnectionRequiredErrorWhenSendMessageIsCalled();
+
+    ServerCommunicator serverCommunicator(&throwingMockStrategy);
+    auto message = DataTestUtil::createRandomSimpleMessage();
+    serverCommunicator.consume(std::move(message));
+    throwingMockStrategy.waitUntilCloseConnectionCallIsMadeAfterErrorIsThrown();
+
+    auto closeConnectionCalled = throwingMockStrategy.hasCloseConnectionBeenCalledAfterThrowingFunction();
+
+    ASSERT_TRUE(closeConnectionCalled);
+}
+
+TEST_F(ServerCommunicatorTest,
+       given_anErrorThatRequiresToOpenThrownOnSendMessageCall_when_isCaught_then_callsOpenConnectionInStrategy) {
+    ThrowingServerCommunicationStrategy throwingMockStrategy;
+    throwingMockStrategy.throwOpenConnectionRequiredErrorWhenSendMessageIsCalled();
+
+    ServerCommunicator serverCommunicator(&throwingMockStrategy);
+    auto message = DataTestUtil::createRandomSimpleMessage();
+    serverCommunicator.consume(std::move(message));
+    throwingMockStrategy.waitUntilOpenConnectionCallIsMadeAfterErrorIsThrown();
+
+    auto openConnectionCalled = throwingMockStrategy.hasOpenConnectionBeenCalledAfterThrowingFunction();
+
+    ASSERT_TRUE(openConnectionCalled);
+}
+
+TEST_F(ServerCommunicatorTest,
+       given_anErrorThatRequiresToCloseThrownOnSendRawDataCall_when_isCaught_then_callsCloseConnectionInStrategy) {
+    ThrowingServerCommunicationStrategy throwingMockStrategy;
+    throwingMockStrategy.throwCloseConnectionRequiredErrorWhenSendRawDataIsCalled();
+
+    ServerCommunicator serverCommunicator(&throwingMockStrategy);
+    auto rawData = DataTestUtil::createRandomSimpleRawData();
+    serverCommunicator.consume(std::move(rawData));
+    throwingMockStrategy.waitUntilCloseConnectionCallIsMadeAfterErrorIsThrown();
+
+    auto closeConnectionCalled = throwingMockStrategy.hasCloseConnectionBeenCalledAfterThrowingFunction();
+
+    ASSERT_TRUE(closeConnectionCalled);
+}
+
+TEST_F(ServerCommunicatorTest,
+       given_anErrorThatRequiresToOpenThrownOnSendRawDataCall_when_isCaught_then_callsOpenConnectionInStrategy) {
+    ThrowingServerCommunicationStrategy throwingMockStrategy;
+    throwingMockStrategy.throwOpenConnectionRequiredErrorWhenSendRawDataIsCalled();
+
+    ServerCommunicator serverCommunicator(&throwingMockStrategy);
+    auto rawData = DataTestUtil::createRandomSimpleRawData();
+    serverCommunicator.consume(std::move(rawData));
+    throwingMockStrategy.waitUntilOpenConnectionCallIsMadeAfterErrorIsThrown();
+
+    auto openConnectionCalled = throwingMockStrategy.hasOpenConnectionBeenCalledAfterThrowingFunction();
+
+    ASSERT_TRUE(openConnectionCalled);
+}
+
+TEST_F(ServerCommunicatorTest,
+       given_aStrategyThrowingErrorOnOpenConnectionCall_when_errorIsCaught_then_producesTheErrorWithCorrectOrigin) {
+    ThrowingServerCommunicationStrategy throwingMockStrategy;
+    throwingMockStrategy.throwErrorWhenOpenConnectionIsCalled();
+    Error expectedError = throwingMockStrategy.expectedErrorWhenOpenConnectionIsCalled();
+    expectedError = formatStrategyErrorWithCorrectOrigin(expectedError,
+                                                         ErrorHandling::Origin::SERVER_COMMUNICATOR_OPEN_CONNECTION);
+
+    auto numberOfErrorToReceive = 1;
+    ErrorSinkMock sink(numberOfErrorToReceive);
+    ErrorProcessingScheduler scheduler(&sink);
+    ServerCommunicator serverCommunicator(&throwingMockStrategy);
+
+    serverCommunicator.linkConsumer(&scheduler);
+
+    serverCommunicator.openConnection(SERVER_ADDRESS);
+    sink.waitConsumptionToBeReached();
+
+    scheduler.terminateAndJoin();
+
+    ASSERT_TRUE(expectedErrorHasBeenThrown(&sink, expectedError));
+}
+
+TEST_F(ServerCommunicatorTest,
+       given_aStrategyThrowingErrorOnCloseConnectionCall_when_errorIsCaught_then_producesTheErrorWithCorrectOrigin) {
+    ThrowingServerCommunicationStrategy throwingMockStrategy;
+    throwingMockStrategy.throwErrorWhenCloseConnectionIsCalled();
+    Error expectedError = throwingMockStrategy.expectedErrorWhenCloseConnectionIsCalled();
+    expectedError = formatStrategyErrorWithCorrectOrigin(expectedError,
+                                                         ErrorHandling::Origin::SERVER_COMMUNICATOR_CLOSE_CONNECTION);
+    auto numberOfErrorToReceive = 1;
+    ErrorSinkMock sink(numberOfErrorToReceive);
+    ErrorProcessingScheduler scheduler(&sink);
+    ServerCommunicator serverCommunicator(&throwingMockStrategy);
+
+    serverCommunicator.linkConsumer(&scheduler);
+
+    serverCommunicator.closeConnection();
+    sink.waitConsumptionToBeReached();
+
+    scheduler.terminateAndJoin();
+
+    ASSERT_TRUE(expectedErrorHasBeenThrown(&sink, expectedError));
+}
+
+TEST_F(ServerCommunicatorTest,
+       given_aStrategyThrowingErrorOnFetchMessagesCall_when_errorIsCaught_then_producesTheErrorWithCorrectOrigin) {
+    ThrowingServerCommunicationStrategy throwingMockStrategy;
+    throwingMockStrategy.throwErrorWhenSendMessageIsCalled();
+    Error expectedError = throwingMockStrategy.expectedErrorWhenSendMessageIsCalled();
+    expectedError = formatStrategyErrorWithCorrectOrigin(expectedError,
+                                                         ErrorHandling::Origin::SERVER_COMMUNICATOR_SEND_MESSAGE);
+    auto numberOfErrorToReceive = 1;
+    ErrorSinkMock sink(numberOfErrorToReceive);
+    ErrorProcessingScheduler scheduler(&sink);
+    ServerCommunicator serverCommunicator(&throwingMockStrategy);
+
+    serverCommunicator.linkConsumer(&scheduler);
+
+    auto message = DataTestUtil::createRandomSimpleMessage();
+    serverCommunicator.consume(std::move(message));
+    sink.waitConsumptionToBeReached();
+
+    scheduler.terminateAndJoin();
+
+    ASSERT_TRUE(expectedErrorHasBeenThrown(&sink, expectedError));
+}
+
+TEST_F(ServerCommunicatorTest,
+       given_aStrategyThrowingErrorOnFetchRawDataCyclesCall_when_errorIsCaught_then_producesTheErrorWithCorrectOrigin) {
+    ThrowingServerCommunicationStrategy throwingMockStrategy;
+    throwingMockStrategy.throwErrorWhenSendRawDataIsCalled();
+    Error expectedError = throwingMockStrategy.expectedErrorWhenSendRawDataIsCalled();
+    expectedError = formatStrategyErrorWithCorrectOrigin(expectedError,
+                                                         ErrorHandling::Origin::SERVER_COMMUNICATOR_SEND_RAWDATA);
+    auto numberOfErrorToReceive = 1;
+    ErrorSinkMock sink(numberOfErrorToReceive);
+    ErrorProcessingScheduler scheduler(&sink);
+    ServerCommunicator serverCommunicator(&throwingMockStrategy);
+
+    serverCommunicator.linkConsumer(&scheduler);
+
+    auto rawData = DataTestUtil::createRandomSimpleRawData();
+    serverCommunicator.consume(std::move(rawData));
+    sink.waitConsumptionToBeReached();
+
+    scheduler.terminateAndJoin();
+
+    ASSERT_TRUE(expectedErrorHasBeenThrown(&sink, expectedError));
 }
 
 #endif //SENSORGATEWAY_SERVERCOMMUNICATORTEST_CPP
