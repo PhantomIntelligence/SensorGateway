@@ -60,7 +60,7 @@ namespace ErrorHandling {
     std::string const canERR_SCRIPT_FAIL_MESSAGE = "Script Fail";
     std::string const canERR_SCRIPT_WRONG_VERSION_MESSAGE = "The t script version doesn't match the version(s) that the device firmware supports";
     std::string const canERR_SCRIPT_TXE_CONTAINER_VERSION_MESSAGE = "The compiled t script container file format is of a version which is not supported by this version of canlib";
-    std::string const canERR_SCRIPT_TXE_CONTAINER_FORMAT_MESSAGE = "An error occured while trying to parse the compiled t script file";
+    std::string const canERR_SCRIPT_TXE_CONTAINER_FORMAT_MESSAGE = "An error occurred while trying to parse the compiled t script file";
     std::string const canERR_BUFFER_TOO_SMALL_MESSAGE = "The buffer provided was not large enough to contain the requested data";
     std::string const canERR__RESERVED_MESSAGE = "The last entry - a dummy so we know where NOT to place a comma";
 
