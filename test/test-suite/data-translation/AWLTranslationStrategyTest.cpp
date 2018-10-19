@@ -27,7 +27,7 @@ using DataTranslation::AWLTranslationStrategy;
 using Mock::FrameProcessingScheduler;
 using Mock::FrameSinkMock;
 using DataFlow::PixelsArray;
-using DataFlow::PixelID;
+using DataFlow::PixelId;
 using DataFlow::Frame;
 using DataFlow::AWLMessage;
 
@@ -37,7 +37,7 @@ class AWLTranslationStrategyTest : public ::testing::Test {
 
 protected:
     int const FRAME_INDEX = 0;
-    PixelID const SOME_PIXEL_ID = 11;
+    PixelId const SOME_PIXEL_ID = 11;
     Frame const BASE_FRAME = Frame(64829, 16, PixelsArray());
     Frame const FRAME_AFTER_END_OF_FRAME_MESSAGE_TRANSLATION = BASE_FRAME;
     Frame const FRAME_AFTER_DETECTION_TRACK_AND_END_OF_FRAME_MESSAGES_TRANSLATION =
@@ -53,7 +53,7 @@ protected:
 private:
     Frame const addTrackToFrame(Frame frame, Track track) const {
         Frame frameCopy = Frame(frame);
-        frameCopy.addTrackToPixelWithID(SOME_PIXEL_ID, std::move(track));
+        frameCopy.addTrackToPixelWithId(SOME_PIXEL_ID, std::move(track));
         return frameCopy;
     }
 };

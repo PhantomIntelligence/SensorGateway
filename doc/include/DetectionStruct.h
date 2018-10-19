@@ -97,7 +97,7 @@ namespace awl {
         /** \brief Type of condition for the alert */
         AlertType alertType;
 
-        /** \brief sensor ID of the sensor where detection origins from */
+        /** \brief sensor id of the sensor where detection origins from */
         int receiverID;
 
         /** \brief channelMask of the channels where detection origins from */
@@ -145,10 +145,10 @@ namespace awl {
         int GetChannelID() { return (channelID); }
 
     public:
-        /** \brief sensor ID of the sensor where detection origins from */
+        /** \brief sensor id of the sensor where detection origins from */
         int receiverID;
 
-        /** \brief channel ID of the channel where detection origins from */
+        /** \brief channel id of the channel where detection origins from */
         int channelID;
 
         /** \brief index of the detection within the channel */
@@ -182,7 +182,7 @@ namespace awl {
         /** \brief First time stamp at which the target was acquired. */
         float firstTimeStamp;
 
-        /** \brief Track ID from which the detection was generated, if that is the case. */
+        /** \brief Track id from which the detection was generated, if that is the case. */
         TrackID trackID;
 
         /** \brief Coordinates of detection relative to sensor */
@@ -220,7 +220,7 @@ namespace awl {
         bool IsComplete() { return (part1Entered && part2Entered && part3Entered && part4Entered); };
 
     public:
-        /** \brief Track ID. */
+        /** \brief Track id. */
         TrackID trackID;
 
         /** \brief distance, in meters */
@@ -337,7 +337,7 @@ namespace awl {
         // as well as to support tracking algorithms
         SensorFrame::Queue sensorFrames;
 
-        // Frame ID counter.  Each SensorFrame within an acquisition sequence has a unique frame ID.
+        // Frame id counter.  Each SensorFrame within an acquisition sequence has a unique frame id.
         FrameID frameID;
     };
 

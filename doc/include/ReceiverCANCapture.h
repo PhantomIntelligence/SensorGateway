@@ -176,7 +176,7 @@ namespace awl {
 
 
         /** \brief Issues the command to set the current algorithm in the FPGA.
-          *\param[in] algorigthmID  ID of the selected algorithm.
+          *\param[in] algorigthmID  id of the selected algorithm.
         * \return true if success.  false on error.
         */
 
@@ -206,7 +206,7 @@ namespace awl {
         virtual bool SetGPIORegister(uint16_t registerAddress, uint32_t registerValue);
 
         /** \brief Sets algorithm parameters to the value sent as argument.
-          *\param[in] algoID ID of the detection algo affected by the change.
+          *\param[in] algoID id of the detection algo affected by the change.
           *\param[in] registerAddress Adrress of the parameter to change.
           *\param[in] registerValue Value to put into register (values accepted are 0-1).
         * \return true if success.  false on error.
@@ -263,7 +263,7 @@ namespace awl {
         virtual bool QueryGPIORegister(uint16_t registerAddress);
 
         /** \brief Send an asynchronous query command for an algorithm parameter.
-              *\param[in] algoID ID of the detection algo for which we want to query.
+              *\param[in] algoID id of the detection algo for which we want to query.
              *\param[in] registerAddress Adrress of the register to query.
           * \return true if success.  false on error.
           * \remarks On reception of the answer to query the register address and value will be
@@ -272,7 +272,7 @@ namespace awl {
         virtual bool QueryAlgoParameter(int algoID, uint16_t registerAddress);
 
         /** \brief Send an asynchronous query command for a global algorithm parameter.
-          *\param[in] algoID ID of the detection algo for which we want to query.
+          *\param[in] algoID id of the detection algo for which we want to query.
          *\param[in] registerAddress Adrress of the register to query.
       * \return true if success.  false on error.
       * \remarks On reception of the answer to query the register address and value will be
@@ -443,7 +443,7 @@ namespace awl {
          */
         bool GetDataByte(std::string& inResponse, uint8_t& outByte, int startIndex, int len = 1);
 
-        /** \brief Parse a message ID (which is an unsigned long in hex format) from the text response string supplied
+        /** \brief Parse a message id (which is an unsigned long in hex format) from the text response string supplied
           *        by the EasySync and convert it into a an unsigned_long value.
           *        Used in parsing the EasySync response lines.
           * \param[in] inResponse  EasySync response string that corresponds to a CAN message.

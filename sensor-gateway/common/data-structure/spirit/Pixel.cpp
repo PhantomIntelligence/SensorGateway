@@ -15,7 +15,7 @@
 
 using DataFlow::Pixel;
 using DataFlow::TracksArray;
-using DataFlow::PixelID;
+using DataFlow::PixelId;
 using Defaults::Pixel::DEFAULT_PIXEL;
 using Defaults::Pixel::DEFAULT_TRACKS_ARRAY;
 using Sensor::AWL::_16::NUMBER_OF_PIXELS_IN_LAYER;
@@ -25,18 +25,18 @@ using Sensor::AWL::_16::ANGLE_RANGE;
 using Sensor::AWL::_16::NUMBER_OF_LAYER;
 using Sensor::AWL::_16::MULTIPLICATIVE_CONSTANT;
 
-Pixel::Pixel(PixelID pixelID, TracksArray tracks, int currentNumberOfTracks) :
-        ID(pixelID), tracks(std::move(tracks)), currentNumberOfTracksInPixel(currentNumberOfTracks) {
+Pixel::Pixel(PixelId pixelId, TracksArray tracks, int currentNumberOfTracks) :
+        id(pixelId), tracks(std::move(tracks)), currentNumberOfTracksInPixel(currentNumberOfTracks) {
 };
 
 Pixel::Pixel() : Pixel(Pixel::returnDefaultData()) {};
 
 Pixel::Pixel(Pixel const& other) :
-        Pixel(other.ID, other.tracks, other.currentNumberOfTracksInPixel) {
+        Pixel(other.id, other.tracks, other.currentNumberOfTracksInPixel) {
 
 };
 
-Pixel::Pixel(Pixel&& other) noexcept: ID(other.ID),
+Pixel::Pixel(Pixel&& other) noexcept: id(other.id),
                                       tracks(std::move(other.tracks)),
                                       currentNumberOfTracksInPixel(other.currentNumberOfTracksInPixel) {
 
@@ -54,16 +54,16 @@ Pixel& Pixel::operator=(Pixel&& other)& noexcept {
 };
 
 void Pixel::swap(Pixel& current, Pixel& other) noexcept {
-    std::swap(current.ID, other.ID);
+    std::swap(current.id, other.id);
     std::swap(current.tracks, other.tracks);
     std::swap(current.currentNumberOfTracksInPixel, other.currentNumberOfTracksInPixel);
 };
 
 bool Pixel::operator==(Pixel const& other) const {
-    auto samePixelID = (ID == other.ID);
+    auto samePixelId = (id == other.id);
     auto sameTracks = (tracks == other.tracks);
     auto sameCurrentNumberOfTracks = (currentNumberOfTracksInPixel == other.currentNumberOfTracksInPixel);
-    auto pixelsAreEqual = (samePixelID && sameTracks && sameCurrentNumberOfTracks);
+    auto pixelsAreEqual = (samePixelId && sameTracks && sameCurrentNumberOfTracks);
     return pixelsAreEqual;
 }
 
@@ -77,19 +77,19 @@ void Pixel::addTrack(Track&& track) {
     currentNumberOfTracksInPixel++;
 }
 
-bool Pixel::doesTrackExist(TrackID const& trackID) {
+bool Pixel::doesTrackExist(TrackId const& trackId) {
     bool trackExists = false;
     for (auto track:*getTracks()) {
-        if (track.ID == trackID) {
+        if (track.id == trackId) {
             trackExists = true;
         }
     }
     return trackExists;
 };
 
-Track* Pixel::fetchTrackByID(TrackID const& trackID) {
+Track* Pixel::fetchTrackById(TrackId const& trackId) {
     for (auto trackIndex = 0; trackIndex < NUMBER_OF_TRACKS_IN_PIXEL; ++trackIndex) {
-        if (tracks[trackIndex].ID == trackID) {
+        if (tracks[trackIndex].id == trackId) {
             return &tracks[trackIndex];
         }
     }

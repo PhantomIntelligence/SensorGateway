@@ -22,7 +22,7 @@ namespace DataFlow {
 
     public:
 
-        explicit Track(TrackID trackID, ConfidenceLevel confidenceLevel, Intensity intensity,
+        explicit Track(TrackId trackId, ConfidenceLevel confidenceLevel, Intensity intensity,
                        Acceleration acceleration, Distance distance, Speed speed);
 
         Track();
@@ -45,7 +45,7 @@ namespace DataFlow {
 
         static Track const& returnDefaultData() noexcept;
 
-        TrackID ID;
+        TrackId id;
         ConfidenceLevel confidenceLevel;
         Intensity intensity;
         Acceleration acceleration;
@@ -57,20 +57,20 @@ namespace DataFlow {
 namespace Defaults {
     namespace Track {
         using DataFlow::Track;
-        using DataFlow::TrackID;
+        using DataFlow::TrackId;
         using DataFlow::ConfidenceLevel;
         using DataFlow::Intensity;
         using DataFlow::Acceleration;
         using DataFlow::Distance;
         using DataFlow::Speed;
-        TrackID const UNDEFINED_ID = std::numeric_limits<TrackID>::infinity();
-        TrackID const DEFAULT_ID = UNDEFINED_ID;
-        ConfidenceLevel const DEFAULT_CONFIDENCE_LEVEL = 0;
+        TrackId const UNDEFINED_ID = std::numeric_limits<TrackId>::infinity();
+        TrackId const DEFAULT_ID = UNDEFINED_ID;
+        ConfidenceLevel const DEFAULT_CONFIdENCE_LEVEL = 0;
         Intensity const DEFAULT_INTENSITY = 0;
         Acceleration const DEFAULT_ACCELERATION = 0;
         Distance const DEFAULT_DISTANCE = 0;
         Speed const DEFAULT_SPEED = 0;
-        Track const DEFAULT_TRACK = Track(DEFAULT_ID, DEFAULT_CONFIDENCE_LEVEL, DEFAULT_INTENSITY, DEFAULT_ACCELERATION,
+        Track const DEFAULT_TRACK = Track(DEFAULT_ID, DEFAULT_CONFIdENCE_LEVEL, DEFAULT_INTENSITY, DEFAULT_ACCELERATION,
                                           DEFAULT_DISTANCE, DEFAULT_SPEED);
     }
 }

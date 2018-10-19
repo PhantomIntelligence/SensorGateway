@@ -15,10 +15,10 @@
 #include "TranslationErrorFactory.h"
 
 using DataTranslation::GuardianTranslationStrategy;
-using DataFlow::PixelID;
-using DataFlow::FrameID;
-using DataFlow::SystemID;
-using DataFlow::TrackID;
+using DataFlow::PixelId;
+using DataFlow::FrameId;
+using DataFlow::SystemId;
+using DataFlow::TrackId;
 using DataFlow::Intensity;
 using DataFlow::Distance;
 using DataFlow::Acceleration;
@@ -60,47 +60,47 @@ void GuardianTranslationStrategy::translateRawData(SensorRawData&& sensorRawData
 }
 
 void GuardianTranslationStrategy::translateEndOfFrameMessage(SensorMessage&& sensorMessage) {
-    FrameID frameID = convertTwoBytesToUnsignedBigEndian(sensorMessage.data[0], sensorMessage.data[1]);
-    SystemID systemID = convertTwoBytesToUnsignedBigEndian(sensorMessage.data[2], sensorMessage.data[3]);
-    currentOutputMessage.systemID = systemID;
-    currentOutputMessage.frameID = frameID;
+    FrameId frameId = convertTwoBytesToUnsignedBigEndian(sensorMessage.data[0], sensorMessage.data[1]);
+    SystemId systemId = convertTwoBytesToUnsignedBigEndian(sensorMessage.data[2], sensorMessage.data[3]);
+    currentOutputMessage.systemId = systemId;
+    currentOutputMessage.frameId = frameId;
     MessageSource::produce(std::move(currentOutputMessage));
     currentOutputMessage = ServerMessage::returnDefaultData();
 }
 
 void GuardianTranslationStrategy::translateDetectionTrackMessage(SensorMessage&& sensorMessage) {
-    PixelID pixelID = convertTwoBytesToUnsignedBigEndian(sensorMessage.data[3], sensorMessage.data[4]);
-    addTrackInPixel(std::move(sensorMessage), pixelID);
+    PixelId pixelId = convertTwoBytesToUnsignedBigEndian(sensorMessage.data[3], sensorMessage.data[4]);
+    addTrackInPixel(std::move(sensorMessage), pixelId);
 }
 
-void GuardianTranslationStrategy::addTrackInPixel(SensorMessage&& sensorMessage, PixelID pixelID) {
-    TrackID trackID = convertTwoBytesToUnsignedBigEndian(sensorMessage.data[0], sensorMessage.data[1]);
+void GuardianTranslationStrategy::addTrackInPixel(SensorMessage&& sensorMessage, PixelId pixelId) {
+    TrackId trackId = convertTwoBytesToUnsignedBigEndian(sensorMessage.data[0], sensorMessage.data[1]);
     ConfidenceLevel confidenceLevel = sensorMessage.data[5];
     Intensity intensity = convertTwoBytesToUnsignedBigEndian(sensorMessage.data[6], sensorMessage.data[7]);
     Track track;
-    track.ID = trackID;
+    track.id = trackId;
     track.confidenceLevel = confidenceLevel;
     track.intensity = intensity;
-    currentOutputMessage.addTrackToPixelWithID(pixelID, std::move(track));
+    currentOutputMessage.addTrackToPixelWithId(pixelId, std::move(track));
 };
 
 void GuardianTranslationStrategy::translateDetectionVelocityMessage(SensorMessage&& sensorMessage) {
     Distance distance = convertTwoBytesToUnsignedBigEndian(sensorMessage.data[2], sensorMessage.data[3]);
     Speed speed = convertTwoBytesToSignedBigEndian(sensorMessage.data[4], sensorMessage.data[5]);
     Acceleration acceleration = convertTwoBytesToSignedBigEndian(sensorMessage.data[6], sensorMessage.data[7]);
-    TrackID trackID = convertTwoBytesToUnsignedBigEndian(sensorMessage.data[0], sensorMessage.data[1]);
-    auto track = fetchTrack(trackID);
+    TrackId trackId = convertTwoBytesToUnsignedBigEndian(sensorMessage.data[0], sensorMessage.data[1]);
+    auto track = fetchTrack(trackId);
     track->distance = distance;
     track->speed = speed;
     track->acceleration = acceleration;
 }
 
-Track* GuardianTranslationStrategy::fetchTrack(TrackID const& trackID) {
+Track* GuardianTranslationStrategy::fetchTrack(TrackId const& trackId) {
     auto pixels = currentOutputMessage.getPixels();
     for (auto i = 0; i < NUMBER_OF_PIXELS_IN_FRAME; ++i) {
         auto pixel = &pixels->at(i);
-        if (pixel->doesTrackExist(trackID)) {
-            return pixel->fetchTrackByID(trackID);
+        if (pixel->doesTrackExist(trackId)) {
+            return pixel->fetchTrackById(trackId);
         }
     }
     return nullptr;

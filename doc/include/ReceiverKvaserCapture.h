@@ -43,7 +43,7 @@ namespace awl {
         /** \brief ReceiverKvaserCapture constructor.
              * \param[in] inReceiverID  unique receiverID
             * \param[in] inReceiverChannelQty number of channels in the receiver
-            * \param[in] inKvaserChannel CAN Channel ID at the Kvaser level
+            * \param[in] inKvaserChannel CAN Channel id at the Kvaser level
             * \param[in] inCANRate bit rate of the Receiver Unit (in kBPS).  See ReceiverCANCapture for allowable values (default should be 1MBps).
             * \param[in] inFrameRate frameRate of the receiver
             * \param[in] inChannelMask  channelMask indicating which channels are activated in the receiver

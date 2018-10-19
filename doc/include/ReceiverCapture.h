@@ -215,7 +215,7 @@ namespace awl {
           */
         virtual void Go();
 
-        /** \brief Return the receiver ID.
+        /** \brief Return the receiver id.
           * \return receiverID used for other system structures.
           */
         int GetReceiverID() { return receiverID; };
@@ -360,7 +360,7 @@ namespace awl {
 
 
         /** \brief Issues the command to set the current algorithm in the FPGA.
-          *\param[in] algorigthmID  ID of the selected algorithm.
+          *\param[in] algorigthmID  id of the selected algorithm.
         * \return true if success.  false on error.
         */
 
@@ -390,7 +390,7 @@ namespace awl {
         virtual bool SetGPIORegister(uint16_t registerAddress, uint32_t registerValue) = 0;
 
         /** \brief Sets algorithm parameters to the value sent as argument.
-          *\param[in] algoID ID of the detection algo affected by the change.
+          *\param[in] algoID id of the detection algo affected by the change.
           *\param[in] registerAddress Adrress of the parameter to change.
           *\param[in] registerValue Value to put into register (values accepted are 0-1).
         * \return true if success.  false on error.
@@ -452,7 +452,7 @@ namespace awl {
         virtual bool QueryGPIORegister(uint16_t registerAddress) = 0;
 
         /** \brief Send an asynchronous query command for an algorithm parameter.
-              *\param[in] algoID ID of the detection algo for which we want to query.
+              *\param[in] algoID id of the detection algo for which we want to query.
              *\param[in] registerAddress Adrress of the register to query.
           * \return true if success.  false on error.
           * \remarks On reception of the answer to query the register address and value will be
@@ -461,7 +461,7 @@ namespace awl {
         virtual bool QueryAlgoParameter(int algoID, uint16_t registerAddress) = 0;
 
         /** \brief Send an asynchronous query command for a global algorithm parameter.
-          *\param[in] algoID ID of the detection algo for which we want to query.
+          *\param[in] algoID id of the detection algo for which we want to query.
          *\param[in] registerAddress Adrress of the register to query.
       * \return true if success.  false on error.
       * \remarks On reception of the answer to query the register address and value will be
@@ -471,7 +471,7 @@ namespace awl {
 
     public:
 
-        /** \brief Unique receiver ID. Corresponds to the index of receiver in receiverArray
+        /** \brief Unique receiver id. Corresponds to the index of receiver in receiverArray
         */
         int receiverID;
 
@@ -483,7 +483,7 @@ namespace awl {
           */
         int receiverChannelQty;
 
-        /** \brief Current frame ID being built.
+        /** \brief Current frame id being built.
             \remark Note that the frameID corresponds to the "incomplete" frame currently being assembled.
                     For the last complete frame, use acquisitionSequence->GetLastFrameID();
           */

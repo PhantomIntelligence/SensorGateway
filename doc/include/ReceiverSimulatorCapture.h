@@ -90,7 +90,7 @@ namespace awl {
         virtual bool StartCalibration(uint8_t frameQty, float beta, ChannelMask channelMask) { return (true); };
 
         /** \brief Issues the command to set the current algorithm in the FPGA.
-      *\param[in] algorigthmID  ID of the selected algorithm.
+      *\param[in] algorigthmID  id of the selected algorithm.
     * \return true if success.  false on error.
       * \remarks In Simulation, does nothing. Returns true.
     */
@@ -124,7 +124,7 @@ namespace awl {
         virtual bool SetGPIORegister(uint16_t registerAddress, uint32_t registerValue) { return (true); };
 
         /** \brief Sets algorithm parameters to the value sent as argument.
-          *\param[in] algoID ID of the detection algo affected by the change.
+          *\param[in] algoID id of the detection algo affected by the change.
           *\param[in] registerAddress Adrress of the parameter to change.
           *\param[in] registerValue Value to put into register (values accepted are 0-1).
         * \return true if success.  false on error.
@@ -171,7 +171,7 @@ namespace awl {
         virtual bool QueryGPIORegister(uint16_t registerAddress) { return (true); };
 
         /** \brief Send an asynchronous query command for an algorithm parameter.
-              *\param[in] algoID ID of the detection algo for which we want to query.
+              *\param[in] algoID id of the detection algo for which we want to query.
              *\param[in] registerAddress Adrress of the register to query.
           * \return true if success.  false on error.
           * \remarks In Simulation, does nothing. Returns true.
@@ -179,7 +179,7 @@ namespace awl {
         virtual bool QueryAlgoParameter(int algoID, uint16_t registerAddress) { return (true); };
 
         /** \brief Send an asynchronous query command for a global algorithm parameter.
-          *\param[in] algoID ID of the detection algo for which we want to query.
+          *\param[in] algoID id of the detection algo for which we want to query.
          *\param[in] registerAddress Adrress of the register to query.
       * \return true if success.  false on error.
       * \remarks In Simulation, does nothing. Returns true.

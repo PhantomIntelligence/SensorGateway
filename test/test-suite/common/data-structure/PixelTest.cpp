@@ -6,7 +6,7 @@
 #include "sensor-gateway/common/data-structure/spirit/Pixel.h"
 
 using DataFlow::Pixel;
-using DataFlow::PixelID;
+using DataFlow::PixelId;
 using DataFlow::TracksArray;
 
 class PixelTest : public ::testing::Test {
@@ -14,8 +14,8 @@ class PixelTest : public ::testing::Test {
 protected:
     Track const SOME_TRACK = Track(2, 0, 135, 0, 110, 0);
     Track const SOME_OTHER_TRACK = Track(14286, 0, 125, 0, 105, 0);
-    PixelID const SOME_ID = 1;
-    PixelID const SOME_OTHER_ID = 2;
+    PixelId const SOME_ID = 1;
+    PixelId const SOME_OTHER_ID = 2;
     TracksArray const SOME_TRACKS_ARRAY = TracksArray({SOME_TRACK});
     TracksArray const SOME_OTHER_TRACKS_ARRAY = TracksArray({SOME_TRACK, SOME_OTHER_TRACK});
     int const SOME_CURRENT_NUMBER_OF_TRACKS = 1;
@@ -25,7 +25,7 @@ protected:
 TEST_F(PixelTest, given_anExistingTrackInAPixel_when_checkingIfTheTrackExists_then_returnsTrue) {
     Pixel pixel(SOME_ID, {SOME_TRACK}, SOME_CURRENT_NUMBER_OF_TRACKS);
 
-    auto trackExists = pixel.doesTrackExist(SOME_TRACK.ID);
+    auto trackExists = pixel.doesTrackExist(SOME_TRACK.id);
 
     ASSERT_TRUE(trackExists);
 }
@@ -33,26 +33,26 @@ TEST_F(PixelTest, given_anExistingTrackInAPixel_when_checkingIfTheTrackExists_th
 TEST_F(PixelTest, given_noExistingTrackInAPixel_when_checkingIfTheTrackExists_then_returnsFalse) {
     Pixel pixel;
 
-    auto trackExists = pixel.doesTrackExist(SOME_TRACK.ID);
+    auto trackExists = pixel.doesTrackExist(SOME_TRACK.id);
 
     ASSERT_FALSE(trackExists);
 }
 
-TEST_F(PixelTest, given_anExistingTrackInAPixel_when_fetchingTheTrackByItsID_then_returnsAPointerToThisTrack) {
+TEST_F(PixelTest, given_anExistingTrackInAPixel_when_fetchingTheTrackByItsId_then_returnsAPointerToThisTrack) {
     Pixel pixel(SOME_ID, {SOME_TRACK}, SOME_CURRENT_NUMBER_OF_TRACKS);
     auto trackPosition = 0;
     Track* expectedTrackPointer = &pixel.getTracks()->at(trackPosition);
 
-    auto actualTrackPointer = pixel.fetchTrackByID(SOME_TRACK.ID);
+    auto actualTrackPointer = pixel.fetchTrackById(SOME_TRACK.id);
 
     ASSERT_EQ(expectedTrackPointer, actualTrackPointer);
 }
 
-TEST_F(PixelTest, given_noExistingTrackInAPixel_when_fetchingTheTrackByItsID_then_returnsANullPointer) {
+TEST_F(PixelTest, given_noExistingTrackInAPixel_when_fetchingTheTrackByItsId_then_returnsANullPointer) {
     Pixel pixel;
     Track* expectedTrackPointer = nullptr;
 
-    auto actualTrackPointer = pixel.fetchTrackByID(SOME_TRACK.ID);
+    auto actualTrackPointer = pixel.fetchTrackById(SOME_TRACK.id);
 
     ASSERT_EQ(expectedTrackPointer, actualTrackPointer);
 }
@@ -94,7 +94,7 @@ TEST_F(PixelTest, given_twoIdenticalPixels_when_checkingIfThePixelsAreEqual_then
     ASSERT_FALSE(tracksAreNotEqual);
 }
 
-TEST_F(PixelTest, given_twoIdenticalPixelsExceptForTheirID_when_checkingIfThePixelsAreEqual_then_returnsFalse) {
+TEST_F(PixelTest, given_twoIdenticalPixelsExceptForTheirId_when_checkingIfThePixelsAreEqual_then_returnsFalse) {
     auto firstPixel = Pixel(SOME_ID, SOME_TRACKS_ARRAY, SOME_CURRENT_NUMBER_OF_TRACKS);
     auto secondPixel = Pixel(SOME_OTHER_ID, SOME_TRACKS_ARRAY, SOME_CURRENT_NUMBER_OF_TRACKS);
 

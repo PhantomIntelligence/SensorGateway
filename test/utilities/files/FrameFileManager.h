@@ -43,21 +43,21 @@ namespace TestUtilities {
         void writeFileLineWithContentLabelAndValue(std::FILE* file, unsigned int numberOfTabulator,
                                                    char const* contentLabel, unsigned int contentValue);
 
-        std::string const FRAME_ID_LABEL = "Frame ID";
+        std::string const FRAME_ID_LABEL = "Frame id";
 
-        std::string const SYSTEM_ID_LABEL = "System ID";
+        std::string const SYSTEM_ID_LABEL = "System id";
 
         std::string const PIXELS_LABEL = "Pixels";
 
-        std::string const PIXEL_ID_LABEL = "Pixel ID";
+        std::string const PIXEL_ID_LABEL = "Pixel id";
 
         std::string const TRACKS_LABEL = "Tracks";
 
-        std::string const TRACK_ID_LABEL = "Track ID";
+        std::string const TRACK_ID_LABEL = "Track id";
 
         std::string const INTENSITY_LABEL = "Ìntensity";
 
-        std::string const CONFIDENCE_LEVEL_LABEL = "Confidence Level";
+        std::string const CONFIdENCE_LEVEL_LABEL = "Confidence Level";
 
         std::string const DISTANCE_LABEL = "Distance";
 

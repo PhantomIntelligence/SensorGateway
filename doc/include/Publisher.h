@@ -43,7 +43,7 @@
   *            }
   *        }
   *
-  *    Since some publishers also have non-incremental Publication ID, a more complex subscriber could:
+  *    Since some publishers also have non-incremental Publication id, a more complex subscriber could:
   *        PublisherDerivateClass publisher();
   *        Publisher::SubscriberID subscriberID= publisher->Subscribe();  // Subscribe to a publisher
   *
@@ -86,30 +86,30 @@ namespace awl {
 
         Publisher::SubscriberID Subscribe();
 
-        // Returns true if the current publication ID is differerent from the latest accessed.
+        // Returns true if the current publication id is differerent from the latest accessed.
         // Note that the publications are not kept in store
 
         bool HasNews(SubscriberID inSubscriber);
 
         // Locks the publisher's mutex for accessing the news.
-        // and marks the current publication ID as consumed for the given subscriber
+        // and marks the current publication id as consumed for the given subscriber
         // \return Returns true if successfully locked.  Otherwise returns false.
-        //         (Lock may fail if subscriber ID is invalid).
+        //         (Lock may fail if subscriber id is invalid).
         bool LockNews(SubscriberID inSubscriber);
 
         // Locks the publisher's mutex for accessing the news.
-        // and marks the provided publication ID as the last consumed for the given subscriber
+        // and marks the provided publication id as the last consumed for the given subscriber
         // \return Returns true if successfully locked.  Otherwise returns false.
-        //         (Lock may fail if subscriber ID is invalid).
+        //         (Lock may fail if subscriber id is invalid).
         bool LockNews(SubscriberID inSubscriber, IssueID inIssueID);
 
         // Unlocks the publisher's mutex for accessing the news.
         void UnlockNews(SubscriberID inSubscriber);
 
-        // Get the current publication ID for this subscriber
+        // Get the current publication id for this subscriber
         IssueID GetCurrentIssueID(SubscriberID inSubscriber);
 
-        // Get the publication ID of the latest issue that was Locked()
+        // Get the publication id of the latest issue that was Locked()
         IssueID GetConsumedIssueID(SubscriberID inSubscriber);
 
     protected:

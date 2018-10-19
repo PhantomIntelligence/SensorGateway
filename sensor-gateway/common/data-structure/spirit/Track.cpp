@@ -19,7 +19,7 @@
 using DataFlow::Acceleration;
 using DataFlow::ConfidenceLevel;
 using DataFlow::Distance;
-using DataFlow::TrackID;
+using DataFlow::TrackId;
 using DataFlow::Speed;
 using DataFlow::Intensity;
 using DataFlow::Track;
@@ -27,13 +27,13 @@ using Defaults::Track::DEFAULT_ID;
 using Defaults::Track::DEFAULT_ACCELERATION;
 using Defaults::Track::DEFAULT_SPEED;
 using Defaults::Track::DEFAULT_DISTANCE;
-using Defaults::Track::DEFAULT_CONFIDENCE_LEVEL;
+using Defaults::Track::DEFAULT_CONFIdENCE_LEVEL;
 using Defaults::Track::DEFAULT_INTENSITY;
 using Defaults::Track::DEFAULT_TRACK;
 
 
-Track::Track(TrackID trackID, ConfidenceLevel confidenceLevel, Intensity intensity,
-             Acceleration acceleration, Distance distance, Speed speed) : ID(trackID),
+Track::Track(TrackId trackId, ConfidenceLevel confidenceLevel, Intensity intensity,
+             Acceleration acceleration, Distance distance, Speed speed) : id(trackId),
                                                                           confidenceLevel(confidenceLevel),
                                                                           intensity(intensity),
                                                                           acceleration(acceleration),
@@ -44,11 +44,11 @@ Track::Track(TrackID trackID, ConfidenceLevel confidenceLevel, Intensity intensi
 
 Track::Track() : Track(Track::returnDefaultData()) {};
 
-Track::Track(Track const& other) : Track(other.ID, other.confidenceLevel, other.intensity,
+Track::Track(Track const& other) : Track(other.id, other.confidenceLevel, other.intensity,
                                          other.acceleration, other.distance, other.speed) {
 };
 
-Track::Track(Track&& other) noexcept: ID(other.ID),
+Track::Track(Track&& other) noexcept: id(other.id),
                                       confidenceLevel(other.confidenceLevel),
                                       intensity(other.intensity),
                                       acceleration(other.acceleration),
@@ -68,7 +68,7 @@ Track& Track::operator=(Track&& other)& noexcept {
 };
 
 void Track::swap(Track& current, Track& other) noexcept {
-    std::swap(current.ID, other.ID);
+    std::swap(current.id, other.id);
     std::swap(current.confidenceLevel, other.confidenceLevel);
     std::swap(current.intensity, other.intensity);
     std::swap(current.acceleration, other.acceleration);
@@ -77,7 +77,7 @@ void Track::swap(Track& current, Track& other) noexcept {
 };
 
 bool Track::operator==(Track const& other) const {
-    auto sameTrackID = (ID == other.ID);
+    auto sameTrackId = (id == other.id);
     auto sameConfidenceLevel = (confidenceLevel == other.confidenceLevel);
     auto sameIntensity = (intensity == other.intensity);
     auto sameAcceleration = (acceleration == other.acceleration);
@@ -86,7 +86,7 @@ bool Track::operator==(Track const& other) const {
     bool tracksAreEqual = (sameAcceleration &&
                            sameConfidenceLevel &&
                            sameDistance &&
-                           sameTrackID &&
+                           sameTrackId &&
                            sameIntensity &&
                            sameSpeed);
     return tracksAreEqual;

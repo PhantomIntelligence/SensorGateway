@@ -60,7 +60,7 @@ void GuardianUSBCommunicationStrategy::openConnection() {
 
 GuardianUSBCommunicationStrategy::super::Messages GuardianUSBCommunicationStrategy::fetchMessages() {
     USBSensorMessage lidarQueryCommandBlock;
-    lidarQueryCommandBlock.id = LIDAR_QUERY;
+    lidarQueryCommandBlock.id = LIdAR_QUERY;
 
     doUSBBulkTransferAndReturnNumberOfByteActuallyTransferred(
             usbConnectionParameters.endpointOut,

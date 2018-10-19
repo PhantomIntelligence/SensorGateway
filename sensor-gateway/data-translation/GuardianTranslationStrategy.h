@@ -56,9 +56,9 @@ namespace DataTranslation {
 
         using super::currentOutputMessage;
 
-        void addTrackInPixel(SensorMessage&& sensorMessage, DataFlow::PixelID pixelID);
+        void addTrackInPixel(SensorMessage&& sensorMessage, DataFlow::PixelId pixelId);
 
-        Track* fetchTrack(DataFlow::TrackID const& trackID);
+        Track* fetchTrack(DataFlow::TrackId const& trackId);
 
         void translateDetectionTrackMessage(SensorMessage&& sensorMessage);
 

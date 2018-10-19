@@ -6,37 +6,37 @@
 #include "sensor-gateway/common/data-structure/spirit/Frame.h"
 
 using DataFlow::Frame;
-using DataFlow::PixelID;
-using DataFlow::FrameID;
-using DataFlow::SystemID;
+using DataFlow::PixelId;
+using DataFlow::FrameId;
+using DataFlow::SystemId;
 using DataFlow::TracksArray;
-using DataFlow::TrackID;
+using DataFlow::TrackId;
 using DataFlow::PixelsArray;
 
 class FrameTest : public ::testing::Test {
 
 protected:
-    TrackID const SOME_TRACK_ID = 2;
+    TrackId const SOME_TRACK_ID = 2;
     Track const SOME_TRACK = Track(SOME_TRACK_ID, 0, 135, 0, 110, 0);
-    PixelID const SOME_PIXEL_ID = 1;
+    PixelId const SOME_PIXEL_ID = 1;
     Pixel const SOME_PIXEL = Pixel(SOME_PIXEL_ID, TracksArray({SOME_TRACK}), 1);
     Pixel const SOME_OTHER_PIXEL = Pixel(2, TracksArray({SOME_TRACK}), 1);
-    FrameID const SOME_FRAME_ID = 64830;
-    FrameID const SOME_OTHER_FRAME_ID = 63830;
-    SystemID const SOME_SYSTEM_ID = 16;
-    SystemID const SOME_OTHER_SYSTEM_ID = 15;
+    FrameId const SOME_FRAME_ID = 64830;
+    FrameId const SOME_OTHER_FRAME_ID = 63830;
+    SystemId const SOME_SYSTEM_ID = 16;
+    SystemId const SOME_OTHER_SYSTEM_ID = 15;
     PixelsArray const SOME_PIXELS_ARRAY = PixelsArray({SOME_PIXEL});
     PixelsArray const SOME_OTHER_PIXELS_ARRAY = PixelsArray({SOME_PIXEL, SOME_OTHER_PIXEL});
 };
 
 TEST_F(FrameTest,
-       given_aTrackAndAPixelID_when_addingTheTrackToThePixelWithCorrespondingID_then_trackIsAddedCorrectlyAtRightPositionInPixel) {
+       given_aTrackAndAPixelId_when_addingTheTrackToThePixelWithCorrespondingId_then_trackIsAddedCorrectlyAtRightPositionInPixel) {
     Frame frame;
     Track track;
     auto expectedAddedTrack = track;
     auto trackPosition = 0;
 
-    frame.addTrackToPixelWithID(SOME_PIXEL_ID, std::move(track));
+    frame.addTrackToPixelWithId(SOME_PIXEL_ID, std::move(track));
 
     auto actualAddedTrack = frame.getPixels()->at(SOME_PIXEL_ID).getTracks()->at(trackPosition);
     ASSERT_EQ(expectedAddedTrack, actualAddedTrack);
@@ -55,7 +55,7 @@ TEST_F(FrameTest, given_twoIdenticalFrames_when_checkingIfTheFramesAreEqual_then
 }
 
 
-TEST_F(FrameTest, given_twoIdenticalFramesExceptForTheirFrameID_when_checkingIfTheFramesAreEqual_then_returnsFalse) {
+TEST_F(FrameTest, given_twoIdenticalFramesExceptForTheirFrameId_when_checkingIfTheFramesAreEqual_then_returnsFalse) {
     auto firstFrame = Frame(SOME_FRAME_ID, SOME_SYSTEM_ID, SOME_PIXELS_ARRAY);
     auto secondFrame = Frame(SOME_OTHER_FRAME_ID, SOME_SYSTEM_ID, SOME_PIXELS_ARRAY);
 
@@ -66,7 +66,7 @@ TEST_F(FrameTest, given_twoIdenticalFramesExceptForTheirFrameID_when_checkingIfT
     ASSERT_TRUE(framesAreNotEqual);
 }
 
-TEST_F(FrameTest, given_twoIdenticalFramesExceptForTheirSystemID_when_checkingIfTheFramesAreEqual_then_returnsFalse) {
+TEST_F(FrameTest, given_twoIdenticalFramesExceptForTheirSystemId_when_checkingIfTheFramesAreEqual_then_returnsFalse) {
     auto firstFrame = Frame(SOME_FRAME_ID, SOME_SYSTEM_ID, SOME_PIXELS_ARRAY);
     auto secondFrame = Frame(SOME_FRAME_ID, SOME_OTHER_SYSTEM_ID, SOME_PIXELS_ARRAY);
 

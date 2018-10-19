@@ -20,7 +20,7 @@
 #include "sensor-gateway/common/ConstantFunctionsDefinition.h"
 
 namespace AWL {
-    using MessageID = int64_t;
+    using MessageId = int64_t;
     using MessageTimestamp = uint64_t;
     using MessageLength = uint32_t;
     using MessageDataUnit = uint8_t;
@@ -30,7 +30,7 @@ namespace AWL {
 namespace DataFlow {
     class AWLMessage {
     public:
-        explicit AWLMessage(AWL::MessageID id,
+        explicit AWLMessage(AWL::MessageId id,
                             AWL::MessageTimestamp timestamp,
                             AWL::MessageLength length,
                             AWL::MessageDataArray data) noexcept;
@@ -55,7 +55,7 @@ namespace DataFlow {
 
         static AWLMessage const& returnDefaultData() noexcept;
 
-        AWL::MessageID id;
+        AWL::MessageId id;
         AWL::MessageTimestamp timestamp;
         AWL::MessageLength length;
         AWL::MessageDataArray data;
@@ -63,7 +63,7 @@ namespace DataFlow {
 
     namespace Defaults {
         using DataFlow::AWLMessage;
-        AWL::MessageID const DEFAULT_ID = 0;
+        AWL::MessageId const DEFAULT_ID = 0;
         AWL::MessageTimestamp const DEFAULT_TIMESTAMP = 0;
         AWL::MessageLength const DEFAULT_LENGTH = 0;
         AWL::MessageDataArray const DEFAULT_AWL_DATA = AWL::MessageDataArray();
