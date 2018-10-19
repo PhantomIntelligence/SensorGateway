@@ -21,19 +21,19 @@ namespace DataFlow {
     size_t const RING_BUFFER_SIZE = 256;
 };
 
-namespace CommandID {
-    using CommandID = uint16_t;
-    CommandID const SET_PARAMETER = 0xC0;
-    CommandID const QUERY_PARAMETER = 0xC1;
-    CommandID const RESPONSE_PARAMETER = 0x2;
-    CommandID const ERROR_PARAMETER = 0xC3;
-    CommandID const RECORD_RAW = 0xD0;
-    CommandID const PLAYBACK_RAW = 0xD1;
-    CommandID const RECORD_CALIBRATION = 0xDA;
-    CommandID const CLEAR_CALIBRATION = 0xDB;
-    CommandID const DEBUG_DUMP = 0xF0;
-    CommandID const DEBUG_VERBOSE = 0xF1;
-    CommandID const DEBUG_FORCE_REFRESH = 0xF2;
+namespace CommandId {
+    using CommandId = uint16_t;
+    CommandId const SET_PARAMETER = 0xC0;
+    CommandId const QUERY_PARAMETER = 0xC1;
+    CommandId const RESPONSE_PARAMETER = 0x2;
+    CommandId const ERROR_PARAMETER = 0xC3;
+    CommandId const RECORD_RAW = 0xD0;
+    CommandId const PLAYBACK_RAW = 0xD1;
+    CommandId const RECORD_CALIBRATION = 0xDA;
+    CommandId const CLEAR_CALIBRATION = 0xDB;
+    CommandId const DEBUG_DUMP = 0xF0;
+    CommandId const DEBUG_VERBOSE = 0xF1;
+    CommandId const DEBUG_FORCE_REFRESH = 0xF2;
 };
 
 namespace CommandType {
@@ -57,7 +57,7 @@ namespace CommandType {
 }
 
 namespace Sensor {
-    using SensorID = uint16_t;
+    using SensorId = uint16_t;
 
     namespace Guardian {
         static size_t const NUMBER_OF_CHANNELS = 16;
@@ -69,10 +69,10 @@ namespace Sensor {
     }
 
     namespace AWL {
-        using MessageID = uint64_t;
-        MessageID const END_OF_FRAME = 0x09;
-        MessageID const DETECTION_TRACK = 0x0A;
-        MessageID const DETECTION_VELOCITY = 0x0B;
+        using MessageId = uint64_t;
+        MessageId const END_OF_FRAME = 0x09;
+        MessageId const DETECTION_TRACK = 0x0A;
+        MessageId const DETECTION_VELOCITY = 0x0B;
         int const NUMBER_OF_DATA_BYTES = 8;
 
         /**
@@ -86,7 +86,7 @@ namespace Sensor {
         static size_t const MAX_COMMAND_PAYLOAD_SIZE = 4; // 4 Bytes
 
         namespace _7 {
-            SensorID const SENSOR_ID = 0x0010;
+            SensorId const SENSOR_ID = 0x0010;
         }
         namespace _16 {
             static size_t const NUMBER_OF_CHANNELS = 16;
@@ -98,7 +98,7 @@ namespace Sensor {
             int const NUMBER_OF_PIXELS_IN_FRAME = 16;
             int const NUMBER_OF_TRACKS_IN_PIXEL = 16;
             int const ANGLE_RANGE = HORIZONTAL_FIELD_OF_VIEW / NUMBER_OF_PIXELS_IN_LAYER;
-            SensorID const SENSOR_ID = 0x0010;
+            SensorId const SENSOR_ID = 0x0010;
         }
     }
 }

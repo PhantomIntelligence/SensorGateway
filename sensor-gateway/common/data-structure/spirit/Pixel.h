@@ -32,7 +32,7 @@ namespace DataFlow {
 
     public:
 
-        explicit Pixel(PixelID pixelID, TracksArray tracks, int currentNumberOfTracks);
+        explicit Pixel(PixelId pixelId, TracksArray tracks, int currentNumberOfTracks);
 
         Pixel();
 
@@ -54,15 +54,15 @@ namespace DataFlow {
 
         void addTrack(Track&& track);
 
-        bool doesTrackExist(TrackID const& trackID);
+        bool doesTrackExist(TrackId const& trackId);
 
-        Track* fetchTrackByID(TrackID const& trackID);
+        Track* fetchTrackById(TrackId const& trackId);
 
         TracksArray* getTracks();
 
         static Pixel const& returnDefaultData() noexcept;
 
-        PixelID ID;
+        PixelId id;
 
         int getCurrentNumberOfTracksInPixel() const;
 
@@ -79,10 +79,10 @@ namespace DataFlow {
 namespace Defaults {
     namespace Pixel {
         using DataFlow::Pixel;
-        using DataFlow::PixelID;
+        using DataFlow::PixelId;
         using DataFlow::TracksArray;
-        PixelID const UNDEFINED_ID = std::numeric_limits<PixelID>::infinity();
-        PixelID const DEFAULT_ID = UNDEFINED_ID;
+        PixelId const UNDEFINED_ID = std::numeric_limits<PixelId>::infinity();
+        PixelId const DEFAULT_ID = UNDEFINED_ID;
         TracksArray const DEFAULT_TRACKS_ARRAY = TracksArray();
         int const DEFAULT_CURRENT_NUMBER_OF_TRACKS = 0;
         Pixel const DEFAULT_PIXEL = Pixel(DEFAULT_ID, DEFAULT_TRACKS_ARRAY, DEFAULT_CURRENT_NUMBER_OF_TRACKS);

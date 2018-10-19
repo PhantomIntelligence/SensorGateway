@@ -32,17 +32,17 @@ DataFlow::Frame FrameFileManager::readMessageFromFileBlock(std::string const& fi
 }
 
 void FrameFileManager::writeFileBlockWithMessage(DataFlow::Frame message, std::FILE* file) {
-    writeFileLineWithContentLabelAndValue(file, 0, FRAME_ID_LABEL.c_str(), message.frameID);
-    writeFileLineWithContentLabelAndValue(file, 0, SYSTEM_ID_LABEL.c_str(), message.systemID);
+    writeFileLineWithContentLabelAndValue(file, 0, FRAME_ID_LABEL.c_str(), message.frameId);
+    writeFileLineWithContentLabelAndValue(file, 0, SYSTEM_ID_LABEL.c_str(), message.systemId);
 
     auto pixels = message.getPixels();
     writeFileLineWithContentLabel(file, 0, PIXELS_LABEL.c_str());
     for (auto pixel : *pixels) {
-        writeFileLineWithContentLabelAndValue(file, 1, PIXEL_ID_LABEL.c_str(), pixel.ID);
+        writeFileLineWithContentLabelAndValue(file, 1, PIXEL_ID_LABEL.c_str(), pixel.id);
         writeFileLineWithContentLabel(file, 2, TRACKS_LABEL.c_str());
         auto tracks = pixel.getTracks();
         for (auto track : *tracks) {
-            writeFileLineWithContentLabelAndValue(file, 3, TRACK_ID_LABEL.c_str(), track.ID);
+            writeFileLineWithContentLabelAndValue(file, 3, TRACK_ID_LABEL.c_str(), track.id);
             writeFileLineWithContentLabelAndValue(file, 4, ACCELERATION_LABEL.c_str(), track.acceleration);
             writeFileLineWithContentLabelAndValue(file, 4, DISTANCE_LABEL.c_str(), track.distance);
             writeFileLineWithContentLabelAndValue(file, 4, INTENSITY_LABEL.c_str(), track.intensity);

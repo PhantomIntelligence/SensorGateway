@@ -104,7 +104,7 @@ namespace SensorCommunication {
             SEND_COMMAND = 80,
             FETCH_RAW_DATA_CYCLES = 87,
             POLL_MESSAGES = 88,
-            LIDAR_QUERY = 89
+            LIdAR_QUERY = 89
         };
 
         void throwDeviceNotFoundErrorIfNeeded();

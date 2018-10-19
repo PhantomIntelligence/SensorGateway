@@ -15,7 +15,7 @@
 #include <gmock/gmock.h>
 #include "sensor-gateway/common/data-structure/spirit/Pixel.h"
 
-using DataFlow::TrackID;
+using DataFlow::TrackId;
 using DataFlow::ConfidenceLevel;
 using DataFlow::Intensity;
 using DataFlow::Acceleration;
@@ -25,8 +25,8 @@ using DataFlow::Speed;
 class TrackTest : public ::testing::Test {
 
 protected:
-    TrackID const SOME_ID = 14275;
-    TrackID const SOME_OTHER_ID = 13275;
+    TrackId const SOME_ID = 14275;
+    TrackId const SOME_OTHER_ID = 13275;
     ConfidenceLevel const SOME_CONFIDENCE_LEVEL = 56;
     ConfidenceLevel const SOME_OTHER_CONFIDENCE_LEVEL = 96;
     Intensity const SOME_INTENSITY = 139;
@@ -51,7 +51,7 @@ TEST_F(TrackTest,given_twoIdenticalTracks_when_checkingIfTheTracksAreEqual_then_
     ASSERT_FALSE(tracksAreNotEqual);
 }
 
-TEST_F(TrackTest,given_twoIdenticalTracksExceptForTheirID_when_checkingIfTheTracksAreEqual_then_returnsFalse) {
+TEST_F(TrackTest,given_twoIdenticalTracksExceptForTheirId_when_checkingIfTheTracksAreEqual_then_returnsFalse) {
     auto firstTrack = Track(SOME_ID, SOME_CONFIDENCE_LEVEL, SOME_INTENSITY, SOME_ACCELERATION, SOME_DISTANCE, SOME_SPEED);
     auto secondTrack = Track(SOME_OTHER_ID, SOME_CONFIDENCE_LEVEL, SOME_INTENSITY, SOME_ACCELERATION, SOME_DISTANCE, SOME_SPEED);
 

@@ -33,7 +33,7 @@ namespace TestUtilities {
 
         void writeFileBlockWithMessage(DataFlow::AWLMessage message, std::FILE* file) override;
 
-        std::string const ID_LABEL = "ID";
+        std::string const Id_LABEL = "id";
 
         std::string const LENGTH_LABEL = "Length";
 

@@ -59,8 +59,8 @@ namespace DataFlow {
 
     namespace RawDataTypes {
 
-        using ReceiverID = int32_t;
-        using ChannelID = int32_t;
+        using ReceiverId = int32_t;
+        using ChannelId = int32_t;
         using Offset = size_t;
         using Drop = size_t;
         using Count = size_t;
@@ -71,12 +71,12 @@ namespace DataFlow {
     typedef int16_t Acceleration;
     typedef uint8_t ConfidenceLevel;
     typedef uint16_t Distance;
-    typedef uint16_t FrameID;
+    typedef uint16_t FrameId;
     typedef uint16_t Intensity;
-    typedef uint16_t PixelID;
+    typedef uint16_t PixelId;
     typedef int16_t Speed;
-    typedef uint16_t SystemID;
-    typedef uint16_t TrackID;
+    typedef uint16_t SystemId;
+    typedef uint16_t TrackId;
 };
 
 #endif //SENSORGATEWAY_TYPEDEFINITION_H

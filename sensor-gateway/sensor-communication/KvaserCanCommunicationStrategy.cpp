@@ -23,7 +23,7 @@ using SensorCommunication::KvaserCanCommunicationStrategy;
 int32_t const CANLIB_KVASER_CAN_BIT_RATE = canBITRATE_1M;
 uint32_t const CANLIB_TIME_SEGMENT_1 = 0;
 uint32_t const CANLIB_TIME_SEGMENT_2 = 0;
-uint32_t const CANLIB_SYNCHRONIZATION_JUMP_WIDTH = 0;
+uint32_t const CANLIB_SYNCHRONIZATION_JUMP_WIdTH = 0;
 uint32_t const CANLIB_NUMBER_OF_SAMPLING_POINTS = 0;
 uint32_t const CANLIB_SYNCMODE = 0;
 int32_t const CANLIB_FLAGS_FOR_CHANNEL = canOPEN_EXCLUSIVE;
@@ -42,7 +42,7 @@ void KvaserCanCommunicationStrategy::openConnection() {
     canHandle communicationChannel = canOpenChannel(CANLIB_CHANNEL_ID, CANLIB_FLAGS_FOR_CHANNEL);
     auto returnCode = canSetBusParams(communicationChannel, CANLIB_KVASER_CAN_BIT_RATE, CANLIB_TIME_SEGMENT_1,
                                       CANLIB_TIME_SEGMENT_2,
-                                      CANLIB_SYNCHRONIZATION_JUMP_WIDTH, CANLIB_NUMBER_OF_SAMPLING_POINTS,
+                                      CANLIB_SYNCHRONIZATION_JUMP_WIdTH, CANLIB_NUMBER_OF_SAMPLING_POINTS,
                                       CANLIB_SYNCMODE);
     throwErrorIfnecessary(returnCode, "canSetBusParams");
     returnCode = canSetBusOutputControl(communicationChannel, CANLIB_CAN_DRIVER_TYPE);

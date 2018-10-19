@@ -18,25 +18,25 @@
 namespace Stub {
 
     using DataFlow::Frame;
-    using DataFlow::FrameID;
-    using DataFlow::SystemID;
+    using DataFlow::FrameId;
+    using DataFlow::SystemId;
     using DataFlow::Pixel;
-    using DataFlow::PixelID;
+    using DataFlow::PixelId;
     using DataFlow::Track;
 
-    typedef std::pair<PixelID, std::vector<Track>> TracksInPixel;
+    typedef std::pair<PixelId, std::vector<Track>> TracksInPixel;
 
-    Frame const addTrackToFrameAtGivenPixelID(Frame frame, Track track, PixelID pixelID) {
+    Frame const addTrackToFrameAtGivenPixelId(Frame frame, Track track, PixelId pixelId) {
         Frame frameCopy = Frame(frame);
-        frameCopy.addTrackToPixelWithID(pixelID, std::move(track));
+        frameCopy.addTrackToPixelWithId(pixelId, std::move(track));
         return frameCopy;
     }
 
-    Frame createFrame(FrameID frameID, SystemID systemID, std::vector<TracksInPixel> tracksInPixels) {
-        Frame frame = Frame(frameID, systemID, {});
+    Frame createFrame(FrameId frameId, SystemId systemId, std::vector<TracksInPixel> tracksInPixels) {
+        Frame frame = Frame(frameId, systemId, {});
         for (auto tracksInPixel : tracksInPixels) {
             for (auto track : tracksInPixel.second) {
-                frame.addTrackToPixelWithID(tracksInPixel.first, std::move(track));
+                frame.addTrackToPixelWithId(tracksInPixel.first, std::move(track));
             }
         }
         return frame;
@@ -61,11 +61,11 @@ namespace Stub {
                                         TracksInPixel(15, {Track(14321, 0, 109, 0, 113, 0)})
                 });
     }
-    Frame createRandomIDFrame() {
+    Frame createRandomIdFrame() {
         std::default_random_engine randomEngine(std::random_device{}());
         std::uniform_int_distribution<uint16_t> distribution(0, 1000);
-        auto randomID = distribution(randomEngine);
-        return createFrame(randomID, 16, {TracksInPixel(0, {Track(14275, 0, 139, 0, 109, 0)}),
+        auto randomId = distribution(randomEngine);
+        return createFrame(randomId, 16, {TracksInPixel(0, {Track(14275, 0, 139, 0, 109, 0)}),
                                     TracksInPixel(1, {Track(42, 0, 135, 0, 110, 0)}),
                                     TracksInPixel(2, {Track(14286, 0, 125, 0, 105, 0)}),
                                     TracksInPixel(3, {Track(14270, 0, 127, 0, 106, 1)}),

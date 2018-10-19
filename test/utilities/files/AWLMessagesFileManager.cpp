@@ -19,8 +19,8 @@ using DataFlow::AWLMessage;
 using Sensor::AWL::NUMBER_OF_DATA_BYTES;
 
 AWLMessage AWLMessagesFileManager::readMessageFromFileBlock(std::string const& fileBlock) {
-    auto id = static_cast<AWL::MessageID>(std::stoi(
-            fetchSubstringBetweenDelimiters(fileBlock, ID_LABEL + MESSAGE_LABEL_VALUE_ASSOCIATOR, "\n")));
+    auto id = static_cast<AWL::MessageId>(std::stoi(
+            fetchSubstringBetweenDelimiters(fileBlock, Id_LABEL + MESSAGE_LABEL_VALUE_ASSOCIATOR, "\n")));
     auto length = static_cast<AWL::MessageLength>(std::stoi(
             fetchSubstringBetweenDelimiters(fileBlock, LENGTH_LABEL + MESSAGE_LABEL_VALUE_ASSOCIATOR, "\n")));
     auto timestamp = static_cast<AWL::MessageTimestamp> (std::stoi(
@@ -37,7 +37,7 @@ AWLMessage AWLMessagesFileManager::readMessageFromFileBlock(std::string const& f
 }
 
 void AWLMessagesFileManager::writeFileBlockWithMessage(AWLMessage message, std::FILE* file) {
-    std::fprintf(file, "%s%s%d\n", ID_LABEL.c_str(), MESSAGE_LABEL_VALUE_ASSOCIATOR.c_str(),
+    std::fprintf(file, "%s%s%d\n", Id_LABEL.c_str(), MESSAGE_LABEL_VALUE_ASSOCIATOR.c_str(),
                  static_cast<int>(message.id));
     std::fprintf(file, "%s%s%d\n", LENGTH_LABEL.c_str(), MESSAGE_LABEL_VALUE_ASSOCIATOR.c_str(),
                  static_cast<int>(message.length));

@@ -29,7 +29,7 @@ namespace DataFlow {
 
     public:
 
-        explicit Frame(FrameID frameID, SystemID systemID, PixelsArray pixels);
+        explicit Frame(FrameId frameId, SystemId systemId, PixelsArray pixels);
 
         Frame();
 
@@ -49,30 +49,30 @@ namespace DataFlow {
 
         bool operator!=(Frame const& other) const;
 
-        void addTrackToPixelWithID(PixelID const& pixelID, Track&& trackToAdd);
+        void addTrackToPixelWithId(PixelId const& pixelId, Track&& trackToAdd);
 
         PixelsArray* getPixels();
 
         static Frame const& returnDefaultData() noexcept;
 
-        FrameID frameID;
-        SystemID systemID;
+        FrameId frameId;
+        SystemId systemId;
         
     private:
         PixelsArray pixels;
 
-        void updatePixelID(PixelID const& pixelID);
+        void updatePixelId(PixelId const& pixelId);
     };
 }
 
 namespace Defaults {
     namespace Frame {
         using DataFlow::Frame;
-        using DataFlow::FrameID;
-        using DataFlow::SystemID;
+        using DataFlow::FrameId;
+        using DataFlow::SystemId;
         using DataFlow::PixelsArray;
-        FrameID const DEFAULT_FRAME_ID = 0;
-        SystemID const DEFAULT_SYSTEM_ID = -1;
+        FrameId const DEFAULT_FRAME_ID = 0;
+        SystemId const DEFAULT_SYSTEM_ID = -1;
         PixelsArray const DEFAULT_PIXELS_ARRAY = PixelsArray();
         Frame const DEFAULT_FRAME = Frame(DEFAULT_FRAME_ID, DEFAULT_SYSTEM_ID, DEFAULT_PIXELS_ARRAY);
     }
