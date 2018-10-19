@@ -57,7 +57,7 @@ namespace TestUtilities {
 
         std::string const INTENSITY_LABEL = "Ìntensity";
 
-        std::string const CONFIdENCE_LEVEL_LABEL = "Confidence Level";
+        std::string const CONFIDENCE_LEVEL_LABEL = "Confidence Level";
 
         std::string const DISTANCE_LABEL = "Distance";
 

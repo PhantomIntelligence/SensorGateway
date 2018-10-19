@@ -27,8 +27,8 @@ class TrackTest : public ::testing::Test {
 protected:
     TrackId const SOME_ID = 14275;
     TrackId const SOME_OTHER_ID = 13275;
-    ConfidenceLevel const SOME_CONFIdENCE_LEVEL = 56;
-    ConfidenceLevel const SOME_OTHER_CONFIdENCE_LEVEL = 96;
+    ConfidenceLevel const SOME_CONFIDENCE_LEVEL = 56;
+    ConfidenceLevel const SOME_OTHER_CONFIDENCE_LEVEL = 96;
     Intensity const SOME_INTENSITY = 139;
     Intensity const SOME_OTHER_INTENSITY = 135;
     Acceleration const SOME_ACCELERATION = 200;
@@ -41,8 +41,8 @@ protected:
 };
 
 TEST_F(TrackTest,given_twoIdenticalTracks_when_checkingIfTheTracksAreEqual_then_returnsTrue) {
-    auto firstTrack = Track(SOME_ID, SOME_CONFIdENCE_LEVEL, SOME_INTENSITY, SOME_ACCELERATION, SOME_DISTANCE, SOME_SPEED);
-    auto secondTrack = Track(SOME_ID, SOME_CONFIdENCE_LEVEL, SOME_INTENSITY, SOME_ACCELERATION, SOME_DISTANCE, SOME_SPEED);
+    auto firstTrack = Track(SOME_ID, SOME_CONFIDENCE_LEVEL, SOME_INTENSITY, SOME_ACCELERATION, SOME_DISTANCE, SOME_SPEED);
+    auto secondTrack = Track(SOME_ID, SOME_CONFIDENCE_LEVEL, SOME_INTENSITY, SOME_ACCELERATION, SOME_DISTANCE, SOME_SPEED);
 
     auto tracksAreEqual = (firstTrack == secondTrack);
     auto tracksAreNotEqual = (firstTrack != secondTrack);
@@ -52,8 +52,8 @@ TEST_F(TrackTest,given_twoIdenticalTracks_when_checkingIfTheTracksAreEqual_then_
 }
 
 TEST_F(TrackTest,given_twoIdenticalTracksExceptForTheirId_when_checkingIfTheTracksAreEqual_then_returnsFalse) {
-    auto firstTrack = Track(SOME_ID, SOME_CONFIdENCE_LEVEL, SOME_INTENSITY, SOME_ACCELERATION, SOME_DISTANCE, SOME_SPEED);
-    auto secondTrack = Track(SOME_OTHER_ID, SOME_CONFIdENCE_LEVEL, SOME_INTENSITY, SOME_ACCELERATION, SOME_DISTANCE, SOME_SPEED);
+    auto firstTrack = Track(SOME_ID, SOME_CONFIDENCE_LEVEL, SOME_INTENSITY, SOME_ACCELERATION, SOME_DISTANCE, SOME_SPEED);
+    auto secondTrack = Track(SOME_OTHER_ID, SOME_CONFIDENCE_LEVEL, SOME_INTENSITY, SOME_ACCELERATION, SOME_DISTANCE, SOME_SPEED);
 
     auto tracksAreEqual = (firstTrack == secondTrack);
     auto tracksAreNotEqual = (firstTrack != secondTrack);
@@ -63,8 +63,8 @@ TEST_F(TrackTest,given_twoIdenticalTracksExceptForTheirId_when_checkingIfTheTrac
 }
 
 TEST_F(TrackTest,given_twoIdenticalTracksExceptForTheirConfidenceLevel_when_checkingIfTheTracksAreEqual_then_returnsFalse) {
-    auto firstTrack = Track(SOME_ID, SOME_CONFIdENCE_LEVEL, SOME_INTENSITY, SOME_ACCELERATION, SOME_DISTANCE, SOME_SPEED);
-    auto secondTrack = Track(SOME_ID, SOME_OTHER_CONFIdENCE_LEVEL, SOME_INTENSITY, SOME_ACCELERATION, SOME_DISTANCE, SOME_SPEED);
+    auto firstTrack = Track(SOME_ID, SOME_CONFIDENCE_LEVEL, SOME_INTENSITY, SOME_ACCELERATION, SOME_DISTANCE, SOME_SPEED);
+    auto secondTrack = Track(SOME_ID, SOME_OTHER_CONFIDENCE_LEVEL, SOME_INTENSITY, SOME_ACCELERATION, SOME_DISTANCE, SOME_SPEED);
 
     auto tracksAreEqual = (firstTrack == secondTrack);
     auto tracksAreNotEqual = (firstTrack != secondTrack);
@@ -74,8 +74,8 @@ TEST_F(TrackTest,given_twoIdenticalTracksExceptForTheirConfidenceLevel_when_chec
 }
 
 TEST_F(TrackTest,given_twoIdenticalTracksExceptForTheirIntensity_when_checkingIfTheTracksAreEqual_then_returnsFalse) {
-    auto firstTrack = Track(SOME_ID, SOME_CONFIdENCE_LEVEL, SOME_INTENSITY, SOME_ACCELERATION, SOME_DISTANCE, SOME_SPEED);
-    auto secondTrack = Track(SOME_ID, SOME_CONFIdENCE_LEVEL, SOME_OTHER_INTENSITY, SOME_ACCELERATION, SOME_DISTANCE, SOME_SPEED);
+    auto firstTrack = Track(SOME_ID, SOME_CONFIDENCE_LEVEL, SOME_INTENSITY, SOME_ACCELERATION, SOME_DISTANCE, SOME_SPEED);
+    auto secondTrack = Track(SOME_ID, SOME_CONFIDENCE_LEVEL, SOME_OTHER_INTENSITY, SOME_ACCELERATION, SOME_DISTANCE, SOME_SPEED);
 
     auto tracksAreEqual = (firstTrack == secondTrack);
     auto tracksAreNotEqual = (firstTrack != secondTrack);
@@ -85,8 +85,8 @@ TEST_F(TrackTest,given_twoIdenticalTracksExceptForTheirIntensity_when_checkingIf
 }
 
 TEST_F(TrackTest,given_twoIdenticalTracksExceptForTheirAcceleration_when_checkingIfTheTracksAreEqual_then_returnsFalse) {
-    auto firstTrack = Track(SOME_ID, SOME_CONFIdENCE_LEVEL, SOME_INTENSITY, SOME_ACCELERATION, SOME_DISTANCE, SOME_SPEED);
-    auto secondTrack = Track(SOME_ID, SOME_CONFIdENCE_LEVEL, SOME_INTENSITY, SOME_OTHER_ACCELERATION, SOME_DISTANCE, SOME_SPEED);
+    auto firstTrack = Track(SOME_ID, SOME_CONFIDENCE_LEVEL, SOME_INTENSITY, SOME_ACCELERATION, SOME_DISTANCE, SOME_SPEED);
+    auto secondTrack = Track(SOME_ID, SOME_CONFIDENCE_LEVEL, SOME_INTENSITY, SOME_OTHER_ACCELERATION, SOME_DISTANCE, SOME_SPEED);
 
     auto tracksAreEqual = (firstTrack == secondTrack);
     auto tracksAreNotEqual = (firstTrack != secondTrack);
@@ -96,8 +96,8 @@ TEST_F(TrackTest,given_twoIdenticalTracksExceptForTheirAcceleration_when_checkin
 }
 
 TEST_F(TrackTest,given_twoIdenticalTracksExceptForTheirDistance_when_checkingIfTheTracksAreEqual_then_returnsFalse) {
-    auto firstTrack = Track(SOME_ID, SOME_CONFIdENCE_LEVEL, SOME_INTENSITY, SOME_ACCELERATION, SOME_DISTANCE, SOME_SPEED);
-    auto secondTrack = Track(SOME_ID, SOME_CONFIdENCE_LEVEL, SOME_INTENSITY, SOME_ACCELERATION, SOME_OTHER_DISTANCE, SOME_SPEED);
+    auto firstTrack = Track(SOME_ID, SOME_CONFIDENCE_LEVEL, SOME_INTENSITY, SOME_ACCELERATION, SOME_DISTANCE, SOME_SPEED);
+    auto secondTrack = Track(SOME_ID, SOME_CONFIDENCE_LEVEL, SOME_INTENSITY, SOME_ACCELERATION, SOME_OTHER_DISTANCE, SOME_SPEED);
 
     auto tracksAreEqual = (firstTrack == secondTrack);
     auto tracksAreNotEqual = (firstTrack != secondTrack);
@@ -108,8 +108,8 @@ TEST_F(TrackTest,given_twoIdenticalTracksExceptForTheirDistance_when_checkingIfT
 
 
 TEST_F(TrackTest,given_twoIdenticalTracksExceptForTheirSpeed_when_checkingIfTheTracksAreEqual_then_returnsFalse) {
-    auto firstTrack = Track(SOME_ID, SOME_CONFIdENCE_LEVEL, SOME_INTENSITY, SOME_ACCELERATION, SOME_DISTANCE, SOME_SPEED);
-    auto secondTrack = Track(SOME_ID, SOME_CONFIdENCE_LEVEL, SOME_INTENSITY, SOME_ACCELERATION, SOME_DISTANCE, SOME_OTHER_SPEED);
+    auto firstTrack = Track(SOME_ID, SOME_CONFIDENCE_LEVEL, SOME_INTENSITY, SOME_ACCELERATION, SOME_DISTANCE, SOME_SPEED);
+    auto secondTrack = Track(SOME_ID, SOME_CONFIDENCE_LEVEL, SOME_INTENSITY, SOME_ACCELERATION, SOME_DISTANCE, SOME_OTHER_SPEED);
 
     auto tracksAreEqual = (firstTrack == secondTrack);
     auto tracksAreNotEqual = (firstTrack != secondTrack);

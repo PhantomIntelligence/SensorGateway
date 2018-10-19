@@ -46,7 +46,7 @@ void FrameFileManager::writeFileBlockWithMessage(DataFlow::Frame message, std::F
             writeFileLineWithContentLabelAndValue(file, 4, ACCELERATION_LABEL.c_str(), track.acceleration);
             writeFileLineWithContentLabelAndValue(file, 4, DISTANCE_LABEL.c_str(), track.distance);
             writeFileLineWithContentLabelAndValue(file, 4, INTENSITY_LABEL.c_str(), track.intensity);
-            writeFileLineWithContentLabelAndValue(file, 4, CONFIdENCE_LEVEL_LABEL.c_str(), track.confidenceLevel);
+            writeFileLineWithContentLabelAndValue(file, 4, CONFIDENCE_LEVEL_LABEL.c_str(), track.confidenceLevel);
             writeFileLineWithContentLabelAndValue(file, 4, SPEED_LABEL.c_str(), track.speed);
         }
     }

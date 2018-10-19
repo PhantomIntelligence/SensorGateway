@@ -27,7 +27,7 @@ using Defaults::Track::DEFAULT_ID;
 using Defaults::Track::DEFAULT_ACCELERATION;
 using Defaults::Track::DEFAULT_SPEED;
 using Defaults::Track::DEFAULT_DISTANCE;
-using Defaults::Track::DEFAULT_CONFIdENCE_LEVEL;
+using Defaults::Track::DEFAULT_CONFIDENCE_LEVEL;
 using Defaults::Track::DEFAULT_INTENSITY;
 using Defaults::Track::DEFAULT_TRACK;
 
