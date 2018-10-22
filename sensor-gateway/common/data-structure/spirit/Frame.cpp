@@ -14,27 +14,27 @@
 #include "Frame.h"
 
 using DataFlow::Frame;
-using DataFlow::FrameId;
+using DataFlow::MessageId;
 using Defaults::Frame::DEFAULT_FRAME;
-using Defaults::Frame::DEFAULT_FRAME_ID;
+using Defaults::Frame::DEFAULT_MESSAGE_ID;
 using Defaults::Frame::DEFAULT_PIXELS_ARRAY;
 using Defaults::Frame::DEFAULT_SYSTEM_ID;
 using DataFlow::PixelsArray;
 using DataFlow::SystemId;
 
-Frame::Frame(FrameId frameId, SystemId systemId, PixelsArray pixels) :
-        frameId(frameId), systemId(systemId), pixels(std::move(pixels)) {};
+Frame::Frame(MessageId frameId, SystemId systemId, PixelsArray pixels) :
+        messageId(frameId), systemId(systemId), pixels(std::move(pixels)) {};
 
 Frame::Frame() : Frame(Frame::returnDefaultData()) {};
 
 Frame::Frame(Frame const& other) :
-        Frame(other.frameId, other.systemId, other.pixels) {};
+        Frame(other.messageId, other.systemId, other.pixels) {};
 
 Frame::Frame(Frame&& other) noexcept:
-        frameId(other.frameId),
+        messageId(other.messageId),
         systemId(other.systemId),
         pixels(other.pixels) {
-    other.frameId = DEFAULT_FRAME_ID;
+    other.messageId = DEFAULT_MESSAGE_ID;
     other.systemId = DEFAULT_SYSTEM_ID;
     other.pixels = DEFAULT_PIXELS_ARRAY;
 };
@@ -51,13 +51,13 @@ Frame& Frame::operator=(Frame&& other)& noexcept {
 };
 
 void Frame::swap(Frame& current, Frame& other) noexcept {
-    std::swap(current.frameId, other.frameId);
+    std::swap(current.messageId, other.messageId);
     std::swap(current.systemId, other.systemId);
     std::swap(current.pixels, other.pixels);
 };
 
 bool Frame::operator==(Frame const& other) const {
-    auto sameFrameId = (frameId == other.frameId);
+    auto sameFrameId = (messageId == other.messageId);
     auto sameSystemId = (systemId == other.systemId);
     auto samePixels = (pixels == other.pixels);
     auto framesAreEqual = (sameFrameId && sameSystemId && samePixels);
@@ -68,17 +68,24 @@ bool Frame::operator!=(Frame const& other) const {
     return !(operator==(other));
 }
 
+Frame const& Frame::returnDefaultData() noexcept {
+    return DEFAULT_FRAME;
+}
+
 void Frame::addTrackToPixelWithId(PixelId const& pixelId, Track&& trackToAdd) {
     updatePixelId(pixelId);
     pixels[pixelId].addTrack(std::forward<Track>(trackToAdd));
 }
 
+std::string const Frame::getSensorIdentifier() const noexcept {
+    std::ostringstream sensorIdentifierStream;
+    sensorIdentifierStream << "(" << systemId << ")";
+    std::string sensorIdentifier = sensorIdentifierStream.str();
+    return sensorIdentifier;
+}
+
 PixelsArray* Frame::getPixels() {
     return &pixels;
-};
-
-Frame const& Frame::returnDefaultData() noexcept {
-    return DEFAULT_FRAME;
 }
 
 void Frame::updatePixelId(PixelId const& pixelId) {

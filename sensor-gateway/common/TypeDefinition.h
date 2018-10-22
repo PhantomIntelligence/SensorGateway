@@ -71,7 +71,7 @@ namespace DataFlow {
     typedef int16_t Acceleration;
     typedef uint8_t ConfidenceLevel;
     typedef uint16_t Distance;
-    typedef uint16_t FrameId;
+    typedef uint16_t MessageId;
     typedef uint16_t Intensity;
     typedef uint16_t PixelId;
     typedef int16_t Speed;

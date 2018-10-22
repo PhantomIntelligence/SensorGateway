@@ -81,7 +81,13 @@ namespace Defaults {
         using DataFlow::Pixel;
         using DataFlow::PixelId;
         using DataFlow::TracksArray;
-        PixelId const UNDEFINED_ID = std::numeric_limits<PixelId>::infinity();
+
+        /**
+         * @warning Modifying these values without updating the FlatBuffers file WILL create a huge performance drop!!!
+         * If a value is modified here, be sure it homologous value in the FlatBuffers schema file.
+         * @see https://github.com/PhantomIntelligence/GatewayProtocol.git
+         */
+        PixelId const UNDEFINED_ID = 65535;
         PixelId const DEFAULT_ID = UNDEFINED_ID;
         TracksArray const DEFAULT_TRACKS_ARRAY = TracksArray();
         int const DEFAULT_CURRENT_NUMBER_OF_TRACKS = 0;

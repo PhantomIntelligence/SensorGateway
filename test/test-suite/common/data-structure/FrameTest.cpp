@@ -7,7 +7,7 @@
 
 using DataFlow::Frame;
 using DataFlow::PixelId;
-using DataFlow::FrameId;
+using DataFlow::MessageId;
 using DataFlow::SystemId;
 using DataFlow::TracksArray;
 using DataFlow::TrackId;
@@ -21,8 +21,8 @@ protected:
     PixelId const SOME_PIXEL_ID = 1;
     Pixel const SOME_PIXEL = Pixel(SOME_PIXEL_ID, TracksArray({SOME_TRACK}), 1);
     Pixel const SOME_OTHER_PIXEL = Pixel(2, TracksArray({SOME_TRACK}), 1);
-    FrameId const SOME_FRAME_ID = 64830;
-    FrameId const SOME_OTHER_FRAME_ID = 63830;
+    MessageId const SOME_MESSAGE_ID = 64830;
+    MessageId const SOME_OTHER_MESSAGE_ID = 63830;
     SystemId const SOME_SYSTEM_ID = 16;
     SystemId const SOME_OTHER_SYSTEM_ID = 15;
     PixelsArray const SOME_PIXELS_ARRAY = PixelsArray({SOME_PIXEL});
@@ -44,8 +44,8 @@ TEST_F(FrameTest,
 
 
 TEST_F(FrameTest, given_twoIdenticalFrames_when_checkingIfTheFramesAreEqual_then_returnsTrue) {
-    auto firstFrame = Frame(SOME_FRAME_ID, SOME_SYSTEM_ID, SOME_PIXELS_ARRAY);
-    auto secondFrame = Frame(SOME_FRAME_ID, SOME_SYSTEM_ID, SOME_PIXELS_ARRAY);
+    auto firstFrame = Frame(SOME_MESSAGE_ID, SOME_SYSTEM_ID, SOME_PIXELS_ARRAY);
+    auto secondFrame = Frame(SOME_MESSAGE_ID, SOME_SYSTEM_ID, SOME_PIXELS_ARRAY);
 
     auto framesAreEqual = (firstFrame == secondFrame);
     auto framesAreNotEqual = (firstFrame != secondFrame);
@@ -55,9 +55,9 @@ TEST_F(FrameTest, given_twoIdenticalFrames_when_checkingIfTheFramesAreEqual_then
 }
 
 
-TEST_F(FrameTest, given_twoIdenticalFramesExceptForTheirFrameId_when_checkingIfTheFramesAreEqual_then_returnsFalse) {
-    auto firstFrame = Frame(SOME_FRAME_ID, SOME_SYSTEM_ID, SOME_PIXELS_ARRAY);
-    auto secondFrame = Frame(SOME_OTHER_FRAME_ID, SOME_SYSTEM_ID, SOME_PIXELS_ARRAY);
+TEST_F(FrameTest, given_twoIdenticalFramesExceptForTheirMessageId_when_checkingIfTheFramesAreEqual_then_returnsFalse) {
+    auto firstFrame = Frame(SOME_MESSAGE_ID, SOME_SYSTEM_ID, SOME_PIXELS_ARRAY);
+    auto secondFrame = Frame(SOME_OTHER_MESSAGE_ID, SOME_SYSTEM_ID, SOME_PIXELS_ARRAY);
 
     auto framesAreEqual = (firstFrame == secondFrame);
     auto framesAreNotEqual = (firstFrame != secondFrame);
@@ -67,8 +67,8 @@ TEST_F(FrameTest, given_twoIdenticalFramesExceptForTheirFrameId_when_checkingIfT
 }
 
 TEST_F(FrameTest, given_twoIdenticalFramesExceptForTheirSystemId_when_checkingIfTheFramesAreEqual_then_returnsFalse) {
-    auto firstFrame = Frame(SOME_FRAME_ID, SOME_SYSTEM_ID, SOME_PIXELS_ARRAY);
-    auto secondFrame = Frame(SOME_FRAME_ID, SOME_OTHER_SYSTEM_ID, SOME_PIXELS_ARRAY);
+    auto firstFrame = Frame(SOME_MESSAGE_ID, SOME_SYSTEM_ID, SOME_PIXELS_ARRAY);
+    auto secondFrame = Frame(SOME_MESSAGE_ID, SOME_OTHER_SYSTEM_ID, SOME_PIXELS_ARRAY);
 
     auto framesAreEqual = (firstFrame == secondFrame);
     auto framesAreNotEqual = (firstFrame != secondFrame);
@@ -79,8 +79,8 @@ TEST_F(FrameTest, given_twoIdenticalFramesExceptForTheirSystemId_when_checkingIf
 
 TEST_F(FrameTest,
        given_twoIdenticalFramesExceptForTheirPixelsArray_when_checkingIfTheFramesAreEqual_then_returnsFalse) {
-    auto firstFrame = Frame(SOME_FRAME_ID, SOME_SYSTEM_ID, SOME_PIXELS_ARRAY);
-    auto secondFrame = Frame(SOME_FRAME_ID, SOME_SYSTEM_ID, SOME_OTHER_PIXELS_ARRAY);
+    auto firstFrame = Frame(SOME_MESSAGE_ID, SOME_SYSTEM_ID, SOME_PIXELS_ARRAY);
+    auto secondFrame = Frame(SOME_MESSAGE_ID, SOME_SYSTEM_ID, SOME_OTHER_PIXELS_ARRAY);
 
     auto framesAreEqual = (firstFrame == secondFrame);
     auto framesAreNotEqual = (firstFrame != secondFrame);

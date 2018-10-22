@@ -1,9 +1,12 @@
 /**
 	Copyright 2014-2018 Phantom Intelligence Inc.
+
 	Licensed under the Apache License, Version 2.0 (the "License");
 	you may not use this file except in compliance with the License.
 	You may obtain a copy of the License at
+
 		http://www.apache.org/licenses/LICENSE-2.0
+
 	Unless required by applicable law or agreed to in writing, software
 	distributed under the License is distributed on an "AS IS" BASIS,
 	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -29,7 +32,7 @@ namespace DataFlow {
 
     public:
 
-        explicit Frame(FrameId frameId, SystemId systemId, PixelsArray pixels);
+        explicit Frame(MessageId messageId, SystemId systemId, PixelsArray pixels);
 
         Frame();
 
@@ -49,16 +52,19 @@ namespace DataFlow {
 
         bool operator!=(Frame const& other) const;
 
+        static Frame const& returnDefaultData() noexcept;
+
         void addTrackToPixelWithId(PixelId const& pixelId, Track&& trackToAdd);
+
+        std::string const getSensorIdentifier() const noexcept;
 
         PixelsArray* getPixels();
 
-        static Frame const& returnDefaultData() noexcept;
-
-        FrameId frameId;
+        MessageId messageId;
         SystemId systemId;
-        
+
     private:
+
         PixelsArray pixels;
 
         void updatePixelId(PixelId const& pixelId);
@@ -68,13 +74,19 @@ namespace DataFlow {
 namespace Defaults {
     namespace Frame {
         using DataFlow::Frame;
-        using DataFlow::FrameId;
+        using DataFlow::MessageId;
         using DataFlow::SystemId;
         using DataFlow::PixelsArray;
-        FrameId const DEFAULT_FRAME_ID = 0;
+
+        /**
+         * @warning Carelessly modifying these values WILL cause a huge performance drop.
+         * If a value is modified here, be sure it homologous value in the communication protocol schema file.
+         * @see https://github.com/PhantomIntelligence/GatewayProtocol.git
+         */
+        MessageId const DEFAULT_MESSAGE_ID = 0;
         SystemId const DEFAULT_SYSTEM_ID = -1;
         PixelsArray const DEFAULT_PIXELS_ARRAY = PixelsArray();
-        Frame const DEFAULT_FRAME = Frame(DEFAULT_FRAME_ID, DEFAULT_SYSTEM_ID, DEFAULT_PIXELS_ARRAY);
+        Frame const DEFAULT_FRAME = Frame(DEFAULT_MESSAGE_ID, DEFAULT_SYSTEM_ID, DEFAULT_PIXELS_ARRAY);
     }
 }
 

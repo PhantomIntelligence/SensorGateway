@@ -32,7 +32,7 @@ DataFlow::Frame FrameFileManager::readMessageFromFileBlock(std::string const& fi
 }
 
 void FrameFileManager::writeFileBlockWithMessage(DataFlow::Frame message, std::FILE* file) {
-    writeFileLineWithContentLabelAndValue(file, 0, FRAME_ID_LABEL.c_str(), message.frameId);
+    writeFileLineWithContentLabelAndValue(file, 0, FRAME_ID_LABEL.c_str(), message.messageId);
     writeFileLineWithContentLabelAndValue(file, 0, SYSTEM_ID_LABEL.c_str(), message.systemId);
 
     auto pixels = message.getPixels();
