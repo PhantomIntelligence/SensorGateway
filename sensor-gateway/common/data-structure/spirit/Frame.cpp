@@ -18,24 +18,24 @@ using DataFlow::MessageId;
 using Defaults::Frame::DEFAULT_FRAME;
 using Defaults::Frame::DEFAULT_MESSAGE_ID;
 using Defaults::Frame::DEFAULT_PIXELS_ARRAY;
-using Defaults::Frame::DEFAULT_SYSTEM_ID;
+using Defaults::Frame::DEFAULT_SENSOR_ID;
 using DataFlow::PixelsArray;
-using DataFlow::SystemId;
+using DataFlow::SensorId;
 
-Frame::Frame(MessageId frameId, SystemId systemId, PixelsArray pixels) :
-        messageId(frameId), systemId(systemId), pixels(std::move(pixels)) {};
+Frame::Frame(MessageId frameId, SensorId sensorId, PixelsArray pixels) :
+        messageId(frameId), sensorId(sensorId), pixels(std::move(pixels)) {};
 
 Frame::Frame() : Frame(Frame::returnDefaultData()) {};
 
 Frame::Frame(Frame const& other) :
-        Frame(other.messageId, other.systemId, other.pixels) {};
+        Frame(other.messageId, other.sensorId, other.pixels) {};
 
 Frame::Frame(Frame&& other) noexcept:
         messageId(other.messageId),
-        systemId(other.systemId),
+        sensorId(other.sensorId),
         pixels(other.pixels) {
     other.messageId = DEFAULT_MESSAGE_ID;
-    other.systemId = DEFAULT_SYSTEM_ID;
+    other.sensorId = DEFAULT_SENSOR_ID;
     other.pixels = DEFAULT_PIXELS_ARRAY;
 };
 
@@ -52,13 +52,13 @@ Frame& Frame::operator=(Frame&& other)& noexcept {
 
 void Frame::swap(Frame& current, Frame& other) noexcept {
     std::swap(current.messageId, other.messageId);
-    std::swap(current.systemId, other.systemId);
+    std::swap(current.sensorId, other.sensorId);
     std::swap(current.pixels, other.pixels);
 };
 
 bool Frame::operator==(Frame const& other) const {
     auto sameFrameId = (messageId == other.messageId);
-    auto sameSystemId = (systemId == other.systemId);
+    auto sameSystemId = (sensorId == other.sensorId);
     auto samePixels = (pixels == other.pixels);
     auto framesAreEqual = (sameFrameId && sameSystemId && samePixels);
     return framesAreEqual;
@@ -79,7 +79,7 @@ void Frame::addTrackToPixelWithId(PixelId const& pixelId, Track&& trackToAdd) {
 
 std::string const Frame::getSensorIdentifier() const noexcept {
     std::ostringstream sensorIdentifierStream;
-    sensorIdentifierStream << "(" << systemId << ")";
+    sensorIdentifierStream << "(" << sensorId << ")";
     std::string sensorIdentifier = sensorIdentifierStream.str();
     return sensorIdentifier;
 }

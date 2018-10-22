@@ -75,7 +75,7 @@ namespace DataFlow {
     typedef uint16_t Intensity;
     typedef uint16_t PixelId;
     typedef int16_t Speed;
-    typedef uint16_t SystemId;
+    typedef uint16_t SensorId;
     typedef uint16_t TrackId;
 };
 

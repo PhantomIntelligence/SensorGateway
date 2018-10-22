@@ -19,7 +19,7 @@ namespace Stub {
 
     using DataFlow::Frame;
     using DataFlow::MessageId;
-    using DataFlow::SystemId;
+    using DataFlow::SensorId;
     using DataFlow::Pixel;
     using DataFlow::PixelId;
     using DataFlow::Track;
@@ -32,8 +32,8 @@ namespace Stub {
         return frameCopy;
     }
 
-    Frame createFrame(MessageId frameId, SystemId systemId, std::vector<TracksInPixel> tracksInPixels) {
-        Frame frame = Frame(frameId, systemId, {});
+    Frame createFrame(MessageId frameId, SensorId sensorId, std::vector<TracksInPixel> tracksInPixels) {
+        Frame frame = Frame(frameId, sensorId, {});
         for (auto tracksInPixel : tracksInPixels) {
             for (auto track : tracksInPixel.second) {
                 frame.addTrackToPixelWithId(tracksInPixel.first, std::move(track));

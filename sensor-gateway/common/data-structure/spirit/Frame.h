@@ -32,7 +32,7 @@ namespace DataFlow {
 
     public:
 
-        explicit Frame(MessageId messageId, SystemId systemId, PixelsArray pixels);
+        explicit Frame(MessageId messageId, SensorId sensorId, PixelsArray pixels);
 
         Frame();
 
@@ -61,7 +61,7 @@ namespace DataFlow {
         PixelsArray* getPixels();
 
         MessageId messageId;
-        SystemId systemId;
+        SensorId sensorId;
 
     private:
 
@@ -75,7 +75,7 @@ namespace Defaults {
     namespace Frame {
         using DataFlow::Frame;
         using DataFlow::MessageId;
-        using DataFlow::SystemId;
+        using DataFlow::SensorId;
         using DataFlow::PixelsArray;
 
         /**
@@ -84,9 +84,9 @@ namespace Defaults {
          * @see https://github.com/PhantomIntelligence/GatewayProtocol.git
          */
         MessageId const DEFAULT_MESSAGE_ID = 0;
-        SystemId const DEFAULT_SYSTEM_ID = -1;
+        SensorId const DEFAULT_SENSOR_ID = -1;
         PixelsArray const DEFAULT_PIXELS_ARRAY = PixelsArray();
-        Frame const DEFAULT_FRAME = Frame(DEFAULT_MESSAGE_ID, DEFAULT_SYSTEM_ID, DEFAULT_PIXELS_ARRAY);
+        Frame const DEFAULT_FRAME = Frame(DEFAULT_MESSAGE_ID, DEFAULT_SENSOR_ID, DEFAULT_PIXELS_ARRAY);
     }
 }
 

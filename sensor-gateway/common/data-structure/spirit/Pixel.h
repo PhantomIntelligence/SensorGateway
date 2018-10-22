@@ -23,7 +23,7 @@ using DataFlow::Track;
 using Sensor::AWL::_16::NUMBER_OF_TRACKS_IN_PIXEL;
 
 namespace DataFlow {
-    using TracksArray =  std::array<Track, NUMBER_OF_TRACKS_IN_PIXEL>;
+    using TracksArray = std::array<Track, NUMBER_OF_TRACKS_IN_PIXEL>;
 }
 
 namespace DataFlow {
@@ -42,7 +42,7 @@ namespace DataFlow {
 
         Pixel(Pixel&& other) noexcept;
 
-        Pixel& operator=(Pixel const& other)& ;
+        Pixel& operator=(Pixel const& other)&;
 
         Pixel& operator=(Pixel&& other)& noexcept;
 

@@ -17,7 +17,7 @@
 using DataTranslation::GuardianTranslationStrategy;
 using DataFlow::PixelId;
 using DataFlow::MessageId;
-using DataFlow::SystemId;
+using DataFlow::SensorId;
 using DataFlow::TrackId;
 using DataFlow::Intensity;
 using DataFlow::Distance;
@@ -60,10 +60,10 @@ void GuardianTranslationStrategy::translateRawData(SensorRawData&& sensorRawData
 }
 
 void GuardianTranslationStrategy::translateEndOfFrameMessage(SensorMessage&& sensorMessage) {
-    MessageId frameId = convertTwoBytesToUnsignedBigEndian(sensorMessage.data[0], sensorMessage.data[1]);
-    SystemId systemId = convertTwoBytesToUnsignedBigEndian(sensorMessage.data[2], sensorMessage.data[3]);
-    currentOutputMessage.systemId = systemId;
-    currentOutputMessage.messageId = frameId;
+    MessageId messageId = convertTwoBytesToUnsignedBigEndian(sensorMessage.data[0], sensorMessage.data[1]);
+    SensorId sensorId = convertTwoBytesToUnsignedBigEndian(sensorMessage.data[2], sensorMessage.data[3]);
+    currentOutputMessage.sensorId = sensorId;
+    currentOutputMessage.messageId = messageId;
     MessageSource::produce(std::move(currentOutputMessage));
     currentOutputMessage = ServerMessage::returnDefaultData();
 }
