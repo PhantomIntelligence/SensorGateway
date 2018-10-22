@@ -1,9 +1,12 @@
 /**
 	Copyright 2014-2018 Phantom Intelligence Inc.
+
 	Licensed under the Apache License, Version 2.0 (the "License");
 	you may not use this file except in compliance with the License.
 	You may obtain a copy of the License at
+
 		http://www.apache.org/licenses/LICENSE-2.0
+
 	Unless required by applicable law or agreed to in writing, software
 	distributed under the License is distributed on an "AS IS" BASIS,
 	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -22,8 +25,8 @@ using Defaults::Frame::DEFAULT_SENSOR_ID;
 using DataFlow::PixelsArray;
 using DataFlow::SensorId;
 
-Frame::Frame(MessageId frameId, SensorId sensorId, PixelsArray pixels) :
-        messageId(frameId), sensorId(sensorId), pixels(std::move(pixels)) {};
+Frame::Frame(MessageId messageId, SensorId sensorId, PixelsArray pixels) :
+        messageId(messageId), sensorId(sensorId), pixels(std::move(pixels)) {};
 
 Frame::Frame() : Frame(Frame::returnDefaultData()) {};
 
@@ -58,9 +61,16 @@ void Frame::swap(Frame& current, Frame& other) noexcept {
 
 bool Frame::operator==(Frame const& other) const {
     auto sameFrameId = (messageId == other.messageId);
-    auto sameSystemId = (sensorId == other.sensorId);
+    auto sameSensorId = (sensorId == other.sensorId);
     auto samePixels = (pixels == other.pixels);
-    auto framesAreEqual = (sameFrameId && sameSystemId && samePixels);
+    auto framesAreEqual = (sameFrameId && sameSensorId && samePixels);
+    if (!framesAreEqual) {
+        std::cout << "\n\n      messageId : " << messageId
+                  << "\n\nother.messageId : " << other.messageId << std::endl;
+        std::cout << "\n\n      sensorId : " << sensorId
+                  << "\n\nother.sensorId : " << other.sensorId << std::endl;
+        std::cout << "\n\n" << std::endl;
+    }
     return framesAreEqual;
 }
 
@@ -79,7 +89,7 @@ void Frame::addTrackToPixelWithId(PixelId const& pixelId, Track&& trackToAdd) {
 
 std::string const Frame::getSensorIdentifier() const noexcept {
     std::ostringstream sensorIdentifierStream;
-    sensorIdentifierStream << "(" << sensorId << ")";
+    sensorIdentifierStream << sensorId;
     std::string sensorIdentifier = sensorIdentifierStream.str();
     return sensorIdentifier;
 }

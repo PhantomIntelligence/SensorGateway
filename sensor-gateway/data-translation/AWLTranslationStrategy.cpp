@@ -56,8 +56,8 @@ void AWLTranslationStrategy::translateRawData(SensorRawData&& serverRawData) {
 void AWLTranslationStrategy::translateEndOfFrameMessage(SensorMessage&& sensorMessage) {
     MessageId messageId = convertTwoBytesToUnsignedBigEndian(sensorMessage.data[0], sensorMessage.data[1]);
     SensorId sensorId = convertTwoBytesToUnsignedBigEndian(sensorMessage.data[2], sensorMessage.data[3]);
-    currentOutputMessage.sensorId = sensorId;
     currentOutputMessage.messageId = messageId;
+    currentOutputMessage.sensorId = sensorId;
     MessageSource::produce(std::move(currentOutputMessage));
     currentOutputMessage = ServerMessage::returnDefaultData();
 }

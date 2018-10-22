@@ -21,16 +21,17 @@
 #include "test/utilities/files/FrameFileManager.h"
 #include "test/utilities/stub/AWLMessageStub.h"
 #include "test/utilities/stub/FrameStub.h"
+#include "test/utilities/mock/ArbitraryDataSinkMock.hpp"
 #include "sensor-gateway/data-translation/AWLTranslationStrategy.h"
-#include "test/utilities/mock/FrameSinkMock.h"
 
-using Mock::FrameProcessingScheduler;
-using Mock::FrameSinkMock;
 using TestUtilities::AWLMessagesFileManager;
 using TestUtilities::FrameFileManager;
 using Stub::createAWLMessageStub;
 using Stub::createFrameStub;
 using DataTranslation::AWLTranslationStrategy;
+
+using FrameSinkMock = Mock::ArbitraryDataSinkMock<DataFlow::Frame>;
+using FrameProcessingScheduler = DataFlow::DataProcessingScheduler<DataFlow::Frame, FrameSinkMock, 1>;
 
 class AWLTranslationStrategyTest : public ::testing::Test {
 protected:
@@ -64,6 +65,7 @@ TEST_F(AWLTranslationStrategyTest,
     }
 
     scheduler.terminateAndJoin();
+    frameSinkMock.waitConsumptionToBeReached();
 
     auto frames = frameSinkMock.getConsumedData();
 

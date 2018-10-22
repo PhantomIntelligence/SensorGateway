@@ -17,9 +17,9 @@
 
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
-#include "test/utilities/mock/FrameSinkMock.h"
 #include "test/utilities/mock/ArbitraryDataSinkMock.hpp"
 #include "sensor-gateway/data-translation/GuardianTranslationStrategy.h"
+#include "test/utilities/mock/ArbitraryDataSinkMock.hpp"
 
 #include "sensor-gateway/common/data-structure/sensor/GuardianStructures.h"
 
@@ -39,26 +39,24 @@ using SpiritRawData = GuardianSpiritStructures::RawData;
 using DataFlow::PixelsArray;
 using DataFlow::PixelId;
 
+
 class GuardianTranslationStrategyTest : public ::testing::Test {
 
 protected:
 
-    using SpiritMessageSinkMock = Mock::FrameSinkMock;
+    using SpiritMessageSinkMock = Mock::ArbitraryDataSinkMock<SpiritMessage>;
     using SpiritRawDataSinkMock = Mock::ArbitraryDataSinkMock<SpiritRawData>;
-    using SpiritMessageProcessingScheduler = Mock::FrameProcessingScheduler;
+    using SpiritMessageProcessingScheduler = DataFlow::DataProcessingScheduler<SpiritMessage, SpiritMessageSinkMock, 1>;
     using SpiritRawDataProcessingScheduler = DataFlow::DataProcessingScheduler<SpiritRawData, SpiritRawDataSinkMock, 1>;
 
-    int const FRAME_INDEX = 0;
     PixelId const SOME_PIXEL_ID = 11;
     SpiritMessage const BASE_FRAME = SpiritMessage(64829, 16, PixelsArray());
     SpiritMessage const FRAME_AFTER_END_OF_FRAME_MESSAGE_TRANSLATION = BASE_FRAME;
     SpiritMessage const FRAME_AFTER_DETECTION_TRACK_AND_END_OF_FRAME_MESSAGES_TRANSLATION =
             addTrackToSpiritMessage(BASE_FRAME,
-                                    Track(14291, 96, 379, DEFAULT_ACCELERATION, DEFAULT_DISTANCE,
-                                          DEFAULT_SPEED));
+                                    Track(14291, 96, 379, DEFAULT_ACCELERATION, DEFAULT_DISTANCE, DEFAULT_SPEED));
     SpiritMessage const FRAME_AFTER_DETECTION_TRACK_AND_VELOCITY_TRACK_AND_END_OF_FRAME_MESSAGES_TRANSLATION =
-            addTrackToSpiritMessage(BASE_FRAME,
-                                    Track(14291, 96, 379, 256, 106, 0));
+            addTrackToSpiritMessage(BASE_FRAME, Track(14291, 96, 379, 256, 106, 0));
 
     GuardianMessage const SOME_DETECTION_TRACK_AWL_MESSAGE = GuardianMessage(10, 2188169, 8,
                                                                              {211, 55, 0, 11, 0, 96, 123, 1});
@@ -126,7 +124,8 @@ TEST_F(GuardianTranslationStrategyTest,
     translationStrategy.translateMessage(std::move(endOfSpiritMessageAWLMessage));
 
     scheduler.terminateAndJoin();
-    auto actualSpiritMessage = frameSinkMock.getConsumedData().at(FRAME_INDEX);
+    frameSinkMock.waitConsumptionToBeReached();
+    auto actualSpiritMessage = frameSinkMock.getConsumedData().front();
     ASSERT_EQ(expectedSpiritMessage, actualSpiritMessage);
 }
 
@@ -145,7 +144,8 @@ TEST_F(GuardianTranslationStrategyTest,
     translationStrategy.translateMessage(std::move(endOfSpiritMessageAWLMessage));
 
     scheduler.terminateAndJoin();
-    auto actualSpiritMessage = frameSinkMock.getConsumedData().at(FRAME_INDEX);
+    frameSinkMock.waitConsumptionToBeReached();
+    auto actualSpiritMessage = frameSinkMock.getConsumedData().front();
     ASSERT_EQ(expectedSpiritMessage, actualSpiritMessage);
 }
 
@@ -166,7 +166,8 @@ TEST_F(GuardianTranslationStrategyTest,
     translationStrategy.translateMessage(std::move(endOfSpiritMessageAWLMessage));
 
     scheduler.terminateAndJoin();
-    auto actualSpiritMessage = frameSinkMock.getConsumedData().at(FRAME_INDEX);
+    frameSinkMock.waitConsumptionToBeReached();
+    auto actualSpiritMessage = frameSinkMock.getConsumedData().front();
     ASSERT_EQ(expectedSpiritMessage, actualSpiritMessage);
 }
 

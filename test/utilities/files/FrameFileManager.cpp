@@ -26,14 +26,23 @@ void FrameFileManager::writeFileWithFrames(TestUtilities::Structures::Frames fra
     fclose(file);
 }
 
+void FrameFileManager::writeFileWithFrames(Structures::FrameList frames, std::string const& filename) {
+    auto file = std::fopen(filename.c_str(), "w+");
+    for (auto frame : frames) {
+        writeFileBlockWithMessage(frame, file);
+    }
+    fflush(file);
+    fclose(file);
+}
+
 DataFlow::Frame FrameFileManager::readMessageFromFileBlock(std::string const& fileBlock) {
     //TODO: update method when testing Frames -> AWLMessages
     return DataFlow::Frame();
 }
 
 void FrameFileManager::writeFileBlockWithMessage(DataFlow::Frame message, std::FILE* file) {
-    writeFileLineWithContentLabelAndValue(file, 0, FRAME_ID_LABEL.c_str(), message.messageId);
-    writeFileLineWithContentLabelAndValue(file, 0, SYSTEM_ID_LABEL.c_str(), message.sensorId);
+    writeFileLineWithContentLabelAndValue(file, 0, MESSAGE_ID_LABEL.c_str(), message.messageId);
+    writeFileLineWithContentLabelAndValue(file, 0, SENSOR_ID_LABEL.c_str(), message.sensorId);
 
     auto pixels = message.getPixels();
     writeFileLineWithContentLabel(file, 0, PIXELS_LABEL.c_str());
@@ -54,8 +63,8 @@ void FrameFileManager::writeFileBlockWithMessage(DataFlow::Frame message, std::F
 }
 
 void TestUtilities::FrameFileManager::writeFileLineWithContentLabel(std::FILE* file,
-                                                                           unsigned int numberOfTabulator,
-                                                                           char const* contentLabel) {
+                                                                    unsigned int numberOfTabulator,
+                                                                    char const* contentLabel) {
     for (auto tabulatorNumber = 0; tabulatorNumber < numberOfTabulator; tabulatorNumber++) {
         std::fprintf(file, "%s", MESSAGE_CONTENT_TABULATOR.c_str());
     }
@@ -63,9 +72,9 @@ void TestUtilities::FrameFileManager::writeFileLineWithContentLabel(std::FILE* f
 }
 
 void FrameFileManager::writeFileLineWithContentLabelAndValue(std::FILE* file,
-                                                                    unsigned int numberOfTabulator,
-                                                                    char const* contentLabel,
-                                                                    unsigned int contentValue) {
+                                                             unsigned int numberOfTabulator,
+                                                             char const* contentLabel,
+                                                             unsigned int contentValue) {
     for (auto tabulatorNumber = 0; tabulatorNumber < numberOfTabulator; tabulatorNumber++) {
         std::fprintf(file, "%s", MESSAGE_CONTENT_TABULATOR.c_str());
     }
