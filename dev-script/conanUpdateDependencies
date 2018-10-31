@@ -6,7 +6,7 @@ BUILD_DIRECTORY=$2
 conan remote add conan-transit https://conan-transit.bintray.com --force --insert=0
 conan remote add conan-center https://api.bintray.com/conan/conan/conan-center --force --insert=1
 conan remote add bincrafters https://api.bintray.com/conan/bincrafters/public-conan --force --insert=2
-conan remote add flatbuffers https://api.bintray.com/conan/aardappel/flatbuffers --force --insert=3
+conan remote add flatbuffers-remote https://api.bintray.com/conan/aardappel/flatbuffers --force --insert=3
 conan remote add conan-community https://api.bintray.com/conan/conan-community/conan  --force --insert=4
 
 conan install $CONAN_FILE_LOCATION -s compiler.libcxx=libstdc++11 -s build_type=Debug --install-folder=$BUILD_DIRECTORY --build missing && \
