@@ -4,6 +4,7 @@ set(ACCEPTANCE_TEST acceptance-test-${PROJECT_NAME})
 file(GLOB TRANSLATION_FILES "${CMAKE_CURRENT_SOURCE_DIR}/data-translation/*")
 
 add_executable(${ACCEPTANCE_TEST}
+        ${DATA_MODEL_FILES}
         ${TRANSLATION_FILES}
         ${UTILITIES_FILES}
         ${MOCK_FILES}
