@@ -17,7 +17,26 @@
 #ifndef SENSORGATEWAY_COMMAND_HPP
 #define SENSORGATEWAY_COMMAND_HPP
 
-#include "sensor-gateway/common/ConstantFunctionsDefinition.h"
+#include "TimeTracking.hpp"
+
+namespace Sensor {
+    /**
+     * @brief This CommandDefinition struct serves to declare types used by <SensorName>Command classes
+     * @tparam T the type of an individual payload data
+     * @tparam N the max number of payload data in a command
+     */
+    template<typename T, std::size_t N>
+    struct CommandDefinition {
+        static std::size_t const SIZE = N;
+        using ValueType = T;
+        using Payload = std::array<ValueType, SIZE>;
+    };
+
+    namespace CommandPayloadTypes {
+        typedef Byte AWL;
+        typedef Byte GUARDIAN;
+    }
+}
 
 namespace DataFlow {
 
@@ -49,7 +68,7 @@ namespace DataFlow {
 
         Command(Command&& other) noexcept :
                 Command(std::move(other.commandCode),
-                              std::move(other.payload)) {}
+                        std::move(other.payload)) {}
 
         Command& operator=(Command const& other)& {
             Command temporary(other);

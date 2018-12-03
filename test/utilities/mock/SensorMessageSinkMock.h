@@ -11,26 +11,26 @@
 	limitations under the License.
 */
 
-#ifndef SENSORGATEWAY_FRAMESINKMOCK_H
-#define SENSORGATEWAY_FRAMESINKMOCK_H
+#ifndef SENSORGATEWAY_SENSORMESSAGESINKMOCK_H
+#define SENSORGATEWAY_SENSORMESSAGESINKMOCK_H
 
 #include "sensor-gateway/common/data-flow/DataSink.hpp"
-#include "test/utilities/files/FrameFileManager.h"
+#include "test/utilities/files/SensorMessageFileManager.h"
 
 
 namespace Mock {
 
     using DataFlow::DataSink;
-    using DataFlow::Frame;
-    using TestUtilities::Structures::Frames;
+    using DataFlow::SensorMessage;
+    using TestUtilities::Structures::SensorMessages;
 
-    class FrameSinkMock : public DataSink<Frame> {
+    class SensorMessageSinkMock : public DataSink<SensorMessage> {
 
     protected:
 
     public:
 
-        explicit FrameSinkMock(uint8_t numberOfDataToConsume) :
+        explicit SensorMessageSinkMock(uint8_t numberOfDataToConsume) :
                 actualNumberOfDataConsumed(0),
                 numberOfDataToConsume(numberOfDataToConsume) {
         }
@@ -45,7 +45,7 @@ namespace Mock {
         };
 
 
-        Frames const& getConsumedData() const noexcept {
+        SensorMessages const& getConsumedData() const noexcept {
             return consumedData;
         }
 
@@ -53,12 +53,12 @@ namespace Mock {
 
         AtomicCounter actualNumberOfDataConsumed;
         AtomicCounter numberOfDataToConsume;
-        Frames consumedData;
+        SensorMessages consumedData;
     };
 
-    using FrameProcessingScheduler = DataFlow::DataProcessingScheduler<Frame, FrameSinkMock, 1>;
+    using SensorMessageProcessingScheduler = DataFlow::DataProcessingScheduler<SensorMessage, SensorMessageSinkMock, 1>;
 
 }
 
-#endif //SENSORGATEWAY_FRAMESINKMOCK_H
+#endif //SENSORGATEWAY_SENSORMESSAGESINKMOCK_H
 

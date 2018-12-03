@@ -11,35 +11,35 @@
 	limitations under the License.
 */
 
-#ifndef SENSORGATEWAY_FRAMEFILEMANAGER_H
-#define SENSORGATEWAY_FRAMEFILEMANAGER_H
+#ifndef SENSORGATEWAY_SENSORMESSAGEFILEMANAGER_H
+#define SENSORGATEWAY_SENSORMESSAGEFILEMANAGER_H
 
 #include "FileManager.hpp"
-#include "sensor-gateway/common/data-structure/spirit/Frame.h"
+#include "sensor-gateway/common/data-structure/spirit/SensorMessage.h"
 
 namespace TestUtilities {
 
     namespace Structures {
-        static size_t const MAX_NUMBER_OF_FRAMES_CURRENTLY_NEEDED_FOR_TEST = 2;
-        using Frames = std::array<DataFlow::Frame, MAX_NUMBER_OF_FRAMES_CURRENTLY_NEEDED_FOR_TEST>;
-        using FrameList = std::list<DataFlow::Frame>;
+        static size_t const MAX_NUMBER_OF_SENSORMESSAGES_CURRENTLY_NEEDED_FOR_TEST = 2;
+        using SensorMessages = std::array<DataFlow::SensorMessage, MAX_NUMBER_OF_SENSORMESSAGES_CURRENTLY_NEEDED_FOR_TEST>;
+        using SensorMessageList = std::list<DataFlow::SensorMessage>;
     }
 
-    class FrameFileManager : public FileManager<DataFlow::Frame> {
+    class SensorMessageFileManager : public FileManager<DataFlow::SensorMessage> {
 
     public:
-        FrameFileManager() = default;
+        SensorMessageFileManager() = default;
 
-        ~FrameFileManager() override = default;
+        ~SensorMessageFileManager() override = default;
 
-        void writeFileWithFrames(Structures::Frames frames, std::string const& filename);
+        void writeFileWithSensorMessages(Structures::SensorMessages sensorMessages, std::string const& filename);
 
-        void writeFileWithFrames(Structures::FrameList frames, std::string const& filename);
+        void writeFileWithSensorMessages(Structures::SensorMessageList sensorMessages, std::string const& filename);
 
     private:
-        DataFlow::Frame readMessageFromFileBlock(std::string const& fileBlock) override;
+        DataFlow::SensorMessage readMessageFromFileBlock(std::string const& fileBlock) override;
 
-        void writeFileBlockWithMessage(DataFlow::Frame message, std::FILE* file) override;
+        void writeFileBlockWithMessage(DataFlow::SensorMessage message, std::FILE* file) override;
 
         void writeFileLineWithContentLabel(std::FILE* file, unsigned int numberOfTabulator, char const* contentLabel);
 
@@ -70,4 +70,4 @@ namespace TestUtilities {
     };
 }
 
-#endif //SENSORGATEWAY_FRAMEFILEMANAGER_H
+#endif //SENSORGATEWAY_SENSORMESSAGEFILEMANAGER_H

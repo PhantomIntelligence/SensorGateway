@@ -18,7 +18,7 @@
 #define SENSORGATEWAY_SPIRITSTRUCTURES_H
 
 #include "sensor-gateway/common/data-structure/DataStructures.h"
-#include "Frame.h"
+#include "SensorMessage.h"
 
 namespace Sensor {
     namespace Spirit {
@@ -38,7 +38,7 @@ namespace Sensor {
                 SENSOR_RAW_DATA = 501
             };
 
-            typedef typename DataFlow::Frame Message;
+            typedef typename DataFlow::SensorMessage Message;
             typedef typename DataFlow::RawData<RawDataDefinition> RawData;
             typedef typename DataFlow::Command<CommandDefinition> Command;
 

@@ -12,35 +12,35 @@
 */
 
 #include <map>
-#include "FrameFileManager.h"
+#include "SensorMessageFileManager.h"
 
-using TestUtilities::FrameFileManager;
+using TestUtilities::SensorMessageFileManager;
 
 
-void FrameFileManager::writeFileWithFrames(TestUtilities::Structures::Frames frames, std::string const& filename) {
+void SensorMessageFileManager::writeFileWithSensorMessages(TestUtilities::Structures::SensorMessages sensorMessages, std::string const& filename) {
     auto file = std::fopen(filename.c_str(), "w+");
-    for (auto frame : frames) {
-        writeFileBlockWithMessage(frame, file);
+    for (auto sensorMessage : sensorMessages) {
+        writeFileBlockWithMessage(sensorMessage, file);
     }
     fflush(file);
     fclose(file);
 }
 
-void FrameFileManager::writeFileWithFrames(Structures::FrameList frames, std::string const& filename) {
+void SensorMessageFileManager::writeFileWithSensorMessages(Structures::SensorMessageList sensorMessages, std::string const& filename) {
     auto file = std::fopen(filename.c_str(), "w+");
-    for (auto frame : frames) {
-        writeFileBlockWithMessage(frame, file);
+    for (auto sensorMessage : sensorMessages) {
+        writeFileBlockWithMessage(sensorMessage, file);
     }
     fflush(file);
     fclose(file);
 }
 
-DataFlow::Frame FrameFileManager::readMessageFromFileBlock(std::string const& fileBlock) {
-    //TODO: update method when testing Frames -> AWLMessages
-    return DataFlow::Frame();
+DataFlow::SensorMessage SensorMessageFileManager::readMessageFromFileBlock(std::string const& fileBlock) {
+    //TODO: update method when testing SensorMessages -> AWLMessages
+    return DataFlow::SensorMessage();
 }
 
-void FrameFileManager::writeFileBlockWithMessage(DataFlow::Frame message, std::FILE* file) {
+void SensorMessageFileManager::writeFileBlockWithMessage(DataFlow::SensorMessage message, std::FILE* file) {
     writeFileLineWithContentLabelAndValue(file, 0, MESSAGE_ID_LABEL.c_str(), message.messageId);
     writeFileLineWithContentLabelAndValue(file, 0, SENSOR_ID_LABEL.c_str(), message.sensorId);
 
@@ -62,7 +62,7 @@ void FrameFileManager::writeFileBlockWithMessage(DataFlow::Frame message, std::F
     std::fprintf(file, "%s\n", MESSAGES_SEPARATOR.c_str());
 }
 
-void TestUtilities::FrameFileManager::writeFileLineWithContentLabel(std::FILE* file,
+void TestUtilities::SensorMessageFileManager::writeFileLineWithContentLabel(std::FILE* file,
                                                                     unsigned int numberOfTabulator,
                                                                     char const* contentLabel) {
     for (auto tabulatorNumber = 0; tabulatorNumber < numberOfTabulator; tabulatorNumber++) {
@@ -71,7 +71,7 @@ void TestUtilities::FrameFileManager::writeFileLineWithContentLabel(std::FILE* f
     std::fprintf(file, "%s%s\n", contentLabel, MESSAGE_LABEL_VALUE_ASSOCIATOR.c_str());
 }
 
-void FrameFileManager::writeFileLineWithContentLabelAndValue(std::FILE* file,
+void SensorMessageFileManager::writeFileLineWithContentLabelAndValue(std::FILE* file,
                                                              unsigned int numberOfTabulator,
                                                              char const* contentLabel,
                                                              unsigned int contentValue) {

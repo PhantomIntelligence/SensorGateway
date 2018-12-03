@@ -28,31 +28,31 @@ namespace DataFlow {
 
 namespace DataFlow {
 
-    class Frame {
+    class SensorMessage {
 
     public:
 
-        explicit Frame(MessageId messageId, SensorId sensorId, PixelsArray pixels);
+        explicit SensorMessage(MessageId messageId, SensorId sensorId, PixelsArray pixels);
 
-        Frame();
+        SensorMessage();
 
-        ~Frame() = default;
+        ~SensorMessage() = default;
 
-        Frame(Frame const& other);
+        SensorMessage(SensorMessage const& other);
 
-        Frame(Frame&& other) noexcept;
+        SensorMessage(SensorMessage&& other) noexcept;
 
-        Frame& operator=(Frame const& other)&;
+        SensorMessage& operator=(SensorMessage const& other)&;
 
-        Frame& operator=(Frame&& other)& noexcept;
+        SensorMessage& operator=(SensorMessage&& other)& noexcept;
 
-        static void swap(Frame& current, Frame& other) noexcept;
+        static void swap(SensorMessage& current, SensorMessage& other) noexcept;
 
-        bool operator==(Frame const& other) const;
+        bool operator==(SensorMessage const& other) const;
 
-        bool operator!=(Frame const& other) const;
+        bool operator!=(SensorMessage const& other) const;
 
-        static Frame const& returnDefaultData() noexcept;
+        static SensorMessage const& returnDefaultData() noexcept;
 
         void addTrackToPixelWithId(PixelId const& pixelId, Track&& trackToAdd);
 
@@ -72,8 +72,8 @@ namespace DataFlow {
 }
 
 namespace Defaults {
-    namespace Frame {
-        using DataFlow::Frame;
+    namespace SensorMessage {
+        using DataFlow::SensorMessage;
         using DataFlow::MessageId;
         using DataFlow::SensorId;
         using DataFlow::PixelsArray;
@@ -86,7 +86,7 @@ namespace Defaults {
         MessageId const DEFAULT_MESSAGE_ID = 0;
         SensorId const DEFAULT_SENSOR_ID = -1;
         PixelsArray const DEFAULT_PIXELS_ARRAY = PixelsArray();
-        Frame const DEFAULT_FRAME = Frame(DEFAULT_MESSAGE_ID, DEFAULT_SENSOR_ID, DEFAULT_PIXELS_ARRAY);
+        SensorMessage const DEFAULT_SENSOR_MESSAGE = SensorMessage(DEFAULT_MESSAGE_ID, DEFAULT_SENSOR_ID, DEFAULT_PIXELS_ARRAY);
     }
 }
 

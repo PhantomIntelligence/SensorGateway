@@ -14,26 +14,26 @@
 	limitations under the License.
 */
 
-#include "Frame.h"
+#include "SensorMessage.h"
 
-using DataFlow::Frame;
+using DataFlow::SensorMessage;
 using DataFlow::MessageId;
-using Defaults::Frame::DEFAULT_FRAME;
-using Defaults::Frame::DEFAULT_MESSAGE_ID;
-using Defaults::Frame::DEFAULT_PIXELS_ARRAY;
-using Defaults::Frame::DEFAULT_SENSOR_ID;
+using Defaults::SensorMessage::DEFAULT_SENSOR_MESSAGE;
+using Defaults::SensorMessage::DEFAULT_MESSAGE_ID;
+using Defaults::SensorMessage::DEFAULT_PIXELS_ARRAY;
+using Defaults::SensorMessage::DEFAULT_SENSOR_ID;
 using DataFlow::PixelsArray;
 using DataFlow::SensorId;
 
-Frame::Frame(MessageId messageId, SensorId sensorId, PixelsArray pixels) :
+SensorMessage::SensorMessage(MessageId messageId, SensorId sensorId, PixelsArray pixels) :
         messageId(messageId), sensorId(sensorId), pixels(std::move(pixels)) {};
 
-Frame::Frame() : Frame(Frame::returnDefaultData()) {};
+SensorMessage::SensorMessage() : SensorMessage(SensorMessage::returnDefaultData()) {};
 
-Frame::Frame(Frame const& other) :
-        Frame(other.messageId, other.sensorId, other.pixels) {};
+SensorMessage::SensorMessage(SensorMessage const& other) :
+        SensorMessage(other.messageId, other.sensorId, other.pixels) {};
 
-Frame::Frame(Frame&& other) noexcept:
+SensorMessage::SensorMessage(SensorMessage&& other) noexcept:
         messageId(other.messageId),
         sensorId(other.sensorId),
         pixels(other.pixels) {
@@ -42,62 +42,55 @@ Frame::Frame(Frame&& other) noexcept:
     other.pixels = DEFAULT_PIXELS_ARRAY;
 };
 
-Frame& Frame::operator=(Frame const& other)& {
-    Frame temporary(other);
+SensorMessage& SensorMessage::operator=(SensorMessage const& other)& {
+    SensorMessage temporary(other);
     swap(*this, temporary);
     return *this;
 };
 
-Frame& Frame::operator=(Frame&& other)& noexcept {
+SensorMessage& SensorMessage::operator=(SensorMessage&& other)& noexcept {
     swap(*this, other);
     return *this;
 };
 
-void Frame::swap(Frame& current, Frame& other) noexcept {
+void SensorMessage::swap(SensorMessage& current, SensorMessage& other) noexcept {
     std::swap(current.messageId, other.messageId);
     std::swap(current.sensorId, other.sensorId);
     std::swap(current.pixels, other.pixels);
 };
 
-bool Frame::operator==(Frame const& other) const {
-    auto sameFrameId = (messageId == other.messageId);
+bool SensorMessage::operator==(SensorMessage const& other) const {
+    auto sameSensorMessageId = (messageId == other.messageId);
     auto sameSensorId = (sensorId == other.sensorId);
     auto samePixels = (pixels == other.pixels);
-    auto framesAreEqual = (sameFrameId && sameSensorId && samePixels);
-    if (!framesAreEqual) {
-        std::cout << "\n\n      messageId : " << messageId
-                  << "\n\nother.messageId : " << other.messageId << std::endl;
-        std::cout << "\n\n      sensorId : " << sensorId
-                  << "\n\nother.sensorId : " << other.sensorId << std::endl;
-        std::cout << "\n\n" << std::endl;
-    }
-    return framesAreEqual;
+    auto sensorMessagesAreEqual = (sameSensorMessageId && sameSensorId && samePixels);
+    return sensorMessagesAreEqual;
 }
 
-bool Frame::operator!=(Frame const& other) const {
+bool SensorMessage::operator!=(SensorMessage const& other) const {
     return !(operator==(other));
 }
 
-Frame const& Frame::returnDefaultData() noexcept {
-    return DEFAULT_FRAME;
+SensorMessage const& SensorMessage::returnDefaultData() noexcept {
+    return DEFAULT_SENSOR_MESSAGE;
 }
 
-void Frame::addTrackToPixelWithId(PixelId const& pixelId, Track&& trackToAdd) {
+void SensorMessage::addTrackToPixelWithId(PixelId const& pixelId, Track&& trackToAdd) {
     updatePixelId(pixelId);
     pixels[pixelId].addTrack(std::forward<Track>(trackToAdd));
 }
 
-std::string const Frame::getSensorIdentifier() const noexcept {
+std::string const SensorMessage::getSensorIdentifier() const noexcept {
     std::ostringstream sensorIdentifierStream;
     sensorIdentifierStream << sensorId;
     std::string sensorIdentifier = sensorIdentifierStream.str();
     return sensorIdentifier;
 }
 
-PixelsArray* Frame::getPixels() {
+PixelsArray* SensorMessage::getPixels() {
     return &pixels;
 }
 
-void Frame::updatePixelId(PixelId const& pixelId) {
+void SensorMessage::updatePixelId(PixelId const& pixelId) {
     pixels[pixelId].id = pixelId;
 }
