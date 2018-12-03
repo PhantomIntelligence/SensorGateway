@@ -26,23 +26,24 @@
 
 using TestUtilities::AWLMessagesFileManager;
 using TestUtilities::SensorMessageFileManager;
+using Stub::SensorMessage;
 using Stub::createAWLMessageStub;
 using Stub::createSensorMessageStub;
 using DataTranslation::AWLTranslationStrategy;
 
-using SensorMessageSinkMock = Mock::ArbitraryDataSinkMock<DataFlow::SensorMessage>;
-using SensorMessageProcessingScheduler = DataFlow::DataProcessingScheduler<DataFlow::SensorMessage, SensorMessageSinkMock, 1>;
+using SensorMessageSinkMock = Mock::ArbitraryDataSinkMock<SensorMessage>;
+using SensorMessageProcessingScheduler = DataFlow::DataProcessingScheduler<SensorMessage, SensorMessageSinkMock, 1>;
 
 class AWLTranslationStrategyTest : public ::testing::Test {
 protected:
     char const* AWLDATAS_INPUT_FILE_NAME = "AWLMessagesInputFile.txt";
-    char const* EXPECTED__FRAMES_OUTPUT_FILE_NAME = "ExpectedSensorMessagesOutputFile.txt";
+    char const* EXPECTED_FRAMES_OUTPUT_FILE_NAME = "ExpectedSensorMessagesOutputFile.txt";
 
     virtual void SetUp() {
         auto awlMessages = createAWLMessageStub();
         auto SensorMessages = createSensorMessageStub();
         awlMessagesFileManager.writeFileWithMessages(awlMessages, AWLDATAS_INPUT_FILE_NAME);
-        sensorMessageFileManager.writeFileWithMessages(SensorMessages, EXPECTED__FRAMES_OUTPUT_FILE_NAME);
+        sensorMessageFileManager.writeFileWithMessages(SensorMessages, EXPECTED_FRAMES_OUTPUT_FILE_NAME);
     }
 
     AWLMessagesFileManager awlMessagesFileManager;
@@ -70,7 +71,7 @@ TEST_F(AWLTranslationStrategyTest,
     auto sensorMessages = sensorMessageSinkMock.getConsumedData();
 
     sensorMessageFileManager.writeFileWithSensorMessages(sensorMessages, ACTUAL__FRAMES_OUTPUT_FILE_NAME);
-    ASSERT_TRUE(sensorMessageFileManager.areFilesEqual(EXPECTED__FRAMES_OUTPUT_FILE_NAME,
+    ASSERT_TRUE(sensorMessageFileManager.areFilesEqual(EXPECTED_FRAMES_OUTPUT_FILE_NAME,
                                                ACTUAL__FRAMES_OUTPUT_FILE_NAME));
 }
 

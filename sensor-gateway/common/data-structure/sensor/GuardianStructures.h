@@ -28,16 +28,21 @@ namespace Sensor {
         public :
 
             typedef typename
+            Sensor::SensorMessageDefinition<
+                    Guardian::NUMBER_OF_PIXELS
+            > GuardianMessageDefinition;
+
+            typedef typename
             Sensor::RawDataDefinition<
-                    Sensor::RawDataTypes::GUARDIAN,
-                    Sensor::Guardian::NUMBER_OF_CHANNELS,
-                    Sensor::Guardian::RAW_DATA_SAMPLING_LENGTH
+                    RawDataTypes::GUARDIAN,
+                    Guardian::NUMBER_OF_CHANNELS,
+                    Guardian::RAW_DATA_SAMPLING_LENGTH
             > GuardianRawDataDefinition;
 
             typedef typename
             Sensor::CommandDefinition<
-                    Sensor::CommandPayloadTypes::GUARDIAN,
-                    Sensor::Guardian::MAX_COMMAND_PAYLOAD_SIZE
+                    CommandPayloadTypes::GUARDIAN,
+                    Guardian::MAX_COMMAND_PAYLOAD_SIZE
             > GuardianCommandDefinition;
 
             typedef typename DataFlow::AWLMessage Message;
@@ -47,8 +52,8 @@ namespace Sensor {
             static size_t const MAX_NUMBER_OF_BULK_FETCHABLE_MESSAGES = 32;
             static size_t const MAX_NUMBER_OF_BULK_FETCHABLE_RAW_DATA_CYCLES = 8;
 
-            static std::array<Sensor::RawDataTypes::GUARDIAN,
-                    Sensor::Guardian::NUMBER_OF_CHANNELS> constexpr CHANNEL_POSITIONS = {
+            static std::array<RawDataTypes::GUARDIAN,
+                    Guardian::NUMBER_OF_CHANNELS> constexpr CHANNEL_POSITIONS = {
                     8, 0, 9, 1, 10, 2, 11, 3, 12, 4, 13, 5, 14, 6, 15, 7
             };
         };

@@ -18,12 +18,12 @@
 #define SENSORGATEWAY_SPIRITSTRUCTURES_H
 
 #include "sensor-gateway/common/data-structure/DataStructures.h"
-#include "SensorMessage.h"
+#include "SensorMessage.hpp"
 
 namespace Sensor {
     namespace Spirit {
 
-        template<typename RawDataDefinition, typename CommandDefinition>
+        template<typename SensorMessageDefinition, typename RawDataDefinition, typename CommandDefinition>
         class Structures final : public Communication::DataStructures {
 
         public :
@@ -38,7 +38,7 @@ namespace Sensor {
                 SENSOR_RAW_DATA = 501
             };
 
-            typedef typename DataFlow::SensorMessage Message;
+            typedef typename DataFlow::SensorMessage<SensorMessageDefinition> Message;
             typedef typename DataFlow::RawData<RawDataDefinition> RawData;
             typedef typename DataFlow::Command<CommandDefinition> Command;
 

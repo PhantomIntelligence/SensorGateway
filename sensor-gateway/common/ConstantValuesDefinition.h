@@ -60,6 +60,7 @@ namespace Sensor {
     using SensorId = uint16_t;
 
     namespace Guardian {
+        static size_t const NUMBER_OF_PIXELS = 16;
         static size_t const NUMBER_OF_CHANNELS = 16;
         static size_t const NUMBER_OF_DETECTION_PER_CHANNEL = 16;
         static size_t const RAW_DATA_SAMPLING_LENGTH = 100;
@@ -93,11 +94,11 @@ namespace Sensor {
             size_t const MAX_RAW_BUFFER_SIZE = 16384;
             int const MULTIPLICATIVE_CONSTANT = 10;  // Because all values are multiple with 1 decimal, 10 is sufficient to work with non-floating point representation
             int const HORIZONTAL_FIELD_OF_VIEW = static_cast<int>(30.4 * MULTIPLICATIVE_CONSTANT);
-            int const NUMBER_OF_LAYER = 2;
-            int const NUMBER_OF_PIXELS_IN_LAYER = 8;
-            int const NUMBER_OF_PIXELS_IN_FRAME = 16;
+            int const NUMBER_OF_PIXELS = 16;
+            int const NUMBER_OF_LAYERS = 2;
+            int const NUMBER_OF_PIXELS_PER_LAYER = 8;
             int const NUMBER_OF_TRACKS_IN_PIXEL = 16;
-            int const ANGLE_RANGE = HORIZONTAL_FIELD_OF_VIEW / NUMBER_OF_PIXELS_IN_LAYER;
+            int const ANGLE_RANGE = HORIZONTAL_FIELD_OF_VIEW / NUMBER_OF_PIXELS_PER_LAYER;
             SensorId const SENSOR_ID = 0x0010;
         }
     }

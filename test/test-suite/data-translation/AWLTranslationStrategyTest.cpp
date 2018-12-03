@@ -17,25 +17,36 @@
 
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
-#include "test/utilities/mock/SensorMessageSinkMock.h"
+#include "test/utilities/mock/ArbitraryDataSinkMock.hpp"
 #include "sensor-gateway/data-translation/AWLTranslationStrategy.h"
 
 using Defaults::Track::DEFAULT_ACCELERATION;
 using Defaults::Track::DEFAULT_DISTANCE;
 using Defaults::Track::DEFAULT_SPEED;
+
 using DataTranslation::AWLTranslationStrategy;
-using Mock::SensorMessageProcessingScheduler;
-using Mock::SensorMessageSinkMock;
-using DataFlow::PixelsArray;
+using DataTranslation::AWLStructures;
+using DataTranslation::AWLSpiritStructures;
+
+using SensorMessage = typename DataFlow::SensorMessage<AWLStructures::AWLMessageDefinition>;
+using SensorRawData = AWLStructures::RawData;
+using SpiritMessage = AWLSpiritStructures::Message;
+using SpiritRawData = AWLSpiritStructures::RawData;
+
+using PixelsArray = typename SpiritMessage::PixelsArray;
 using DataFlow::PixelId;
-using DataFlow::SensorMessage;
+
 using DataFlow::AWLMessage;
-
-
 
 class AWLTranslationStrategyTest : public ::testing::Test {
 
 protected:
+
+    using SpiritMessageSinkMock = Mock::ArbitraryDataSinkMock<SpiritMessage>;
+    using SpiritRawDataSinkMock = Mock::ArbitraryDataSinkMock<SpiritRawData>;
+    using SpiritMessageProcessingScheduler = DataFlow::DataProcessingScheduler<SpiritMessage, SpiritMessageSinkMock, 1>;
+    using SpiritRawDataProcessingScheduler = DataFlow::DataProcessingScheduler<SpiritRawData, SpiritRawDataSinkMock, 1>;
+
     int const FRAME_INDEX = 0;
     PixelId const SOME_PIXEL_ID = 11;
     SensorMessage const BASE_FRAME = SensorMessage(64829, 16, PixelsArray());
@@ -64,14 +75,14 @@ TEST_F(AWLTranslationStrategyTest,
     auto endOfSensorMessageAWLMessage = SOME_END_FRAME_AWL_MESSAGE;
     auto expectedSensorMessage = FRAME_AFTER_END_OF_FRAME_MESSAGE_TRANSLATION;
     AWLTranslationStrategy translationStrategy;
-    SensorMessageSinkMock sensorMessageSinkMock(1);
-    SensorMessageProcessingScheduler scheduler(&sensorMessageSinkMock);
+    SpiritMessageSinkMock sensorMessageSinkMock(1);
+    SpiritMessageProcessingScheduler scheduler(&sensorMessageSinkMock);
     translationStrategy.linkConsumer(&scheduler);
 
     translationStrategy.translateMessage(std::move(endOfSensorMessageAWLMessage));
 
     scheduler.terminateAndJoin();
-    auto actualSensorMessage = sensorMessageSinkMock.getConsumedData().at(FRAME_INDEX);
+    auto actualSensorMessage = sensorMessageSinkMock.getConsumedData().front();
     ASSERT_EQ(expectedSensorMessage, actualSensorMessage);
 }
 
@@ -82,15 +93,15 @@ TEST_F(AWLTranslationStrategyTest,
     auto endOfSensorMessageAWLMessage = SOME_END_FRAME_AWL_MESSAGE;
     auto expectedSensorMessage = FRAME_AFTER_DETECTION_TRACK_AND_END_OF_FRAME_MESSAGES_TRANSLATION;
     AWLTranslationStrategy translationStrategy;
-    SensorMessageSinkMock sensorMessageSinkMock(1);
-    SensorMessageProcessingScheduler scheduler(&sensorMessageSinkMock);
+    SpiritMessageSinkMock sensorMessageSinkMock(1);
+    SpiritMessageProcessingScheduler scheduler(&sensorMessageSinkMock);
     translationStrategy.linkConsumer(&scheduler);
 
     translationStrategy.translateMessage(std::move(detectionTrackAWLMessage));
     translationStrategy.translateMessage(std::move(endOfSensorMessageAWLMessage));
 
     scheduler.terminateAndJoin();
-    auto actualSensorMessage = sensorMessageSinkMock.getConsumedData().at(FRAME_INDEX);
+    auto actualSensorMessage = sensorMessageSinkMock.getConsumedData().front();
     ASSERT_EQ(expectedSensorMessage, actualSensorMessage);
 }
 
@@ -102,8 +113,8 @@ TEST_F(AWLTranslationStrategyTest,
     auto endOfSensorMessageAWLMessage = SOME_END_FRAME_AWL_MESSAGE;
     auto expectedSensorMessage = FRAME_AFTER_DETECTION_TRACK_AND_VELOCITY_TRACK_AND_END_OF_FRAME_MESSAGES_TRANSLATION;
     AWLTranslationStrategy translationStrategy;
-    SensorMessageSinkMock sensorMessageSinkMock(1);
-    SensorMessageProcessingScheduler scheduler(&sensorMessageSinkMock);
+    SpiritMessageSinkMock sensorMessageSinkMock(1);
+    SpiritMessageProcessingScheduler scheduler(&sensorMessageSinkMock);
     translationStrategy.linkConsumer(&scheduler);
 
     translationStrategy.translateMessage(std::move(detectionTrackAWLMessage));
@@ -111,7 +122,7 @@ TEST_F(AWLTranslationStrategyTest,
     translationStrategy.translateMessage(std::move(endOfSensorMessageAWLMessage));
 
     scheduler.terminateAndJoin();
-    auto actualSensorMessage = sensorMessageSinkMock.getConsumedData().at(FRAME_INDEX);
+    auto actualSensorMessage = sensorMessageSinkMock.getConsumedData().front();
     ASSERT_EQ(expectedSensorMessage, actualSensorMessage);
 }
 
@@ -120,8 +131,8 @@ TEST_F(AWLTranslationStrategyTest,
 
     auto endOfSensorMessageAWLMessage = SOME_END_FRAME_AWL_MESSAGE;
     AWLTranslationStrategy translationStrategy;
-    SensorMessageSinkMock sensorMessageSinkMock(1);
-    SensorMessageProcessingScheduler scheduler(&sensorMessageSinkMock);
+    SpiritMessageSinkMock sensorMessageSinkMock(1);
+    SpiritMessageProcessingScheduler scheduler(&sensorMessageSinkMock);
     translationStrategy.linkConsumer(&scheduler);
 
     translationStrategy.translateMessage(std::move(endOfSensorMessageAWLMessage));

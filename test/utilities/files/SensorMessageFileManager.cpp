@@ -16,7 +16,6 @@
 
 using TestUtilities::SensorMessageFileManager;
 
-
 void SensorMessageFileManager::writeFileWithSensorMessages(TestUtilities::Structures::SensorMessages sensorMessages, std::string const& filename) {
     auto file = std::fopen(filename.c_str(), "w+");
     for (auto sensorMessage : sensorMessages) {
@@ -35,12 +34,12 @@ void SensorMessageFileManager::writeFileWithSensorMessages(Structures::SensorMes
     fclose(file);
 }
 
-DataFlow::SensorMessage SensorMessageFileManager::readMessageFromFileBlock(std::string const& fileBlock) {
+TestUtilities::Structures::Message SensorMessageFileManager::readMessageFromFileBlock(std::string const& fileBlock) {
     //TODO: update method when testing SensorMessages -> AWLMessages
-    return DataFlow::SensorMessage();
+    return TestUtilities::Structures::Message();
 }
 
-void SensorMessageFileManager::writeFileBlockWithMessage(DataFlow::SensorMessage message, std::FILE* file) {
+void SensorMessageFileManager::writeFileBlockWithMessage(TestUtilities::Structures::Message message, std::FILE* file) {
     writeFileLineWithContentLabelAndValue(file, 0, MESSAGE_ID_LABEL.c_str(), message.messageId);
     writeFileLineWithContentLabelAndValue(file, 0, SENSOR_ID_LABEL.c_str(), message.sensorId);
 

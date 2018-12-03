@@ -21,6 +21,63 @@
 
 namespace Sensor {
 
+    /**
+     * @brief This SensorMessageDefinition struct serves to declare types used by <SensorName>Message classes
+     * @tparam P number of pixel for this sensor
+     */
+    template<std::size_t P>
+    struct SensorMessageDefinition {
+        static std::size_t const NUMBER_OF_PIXEL = P;
+
+        template<typename T>
+        struct Pixels {
+            using PixelType = T;
+            typedef std::array<PixelType, NUMBER_OF_PIXEL> type;
+        };
+    };
+
+    namespace SensorMessageTypes {
+        typedef int32_t AWL;
+        typedef int16_t GUARDIAN;
+    }
+
+    /**
+     * @brief This RawDataDefinition struct serves to declare types used by <SensorName>RawData classes
+     * @tparam T the type of an individual data
+     * @tparam C the number of channel of raw data
+     * @tparam N the number of sample of raw data per channel
+     */
+    template<typename T, std::size_t C, std::size_t N>
+    struct RawDataDefinition {
+        static std::size_t const NUMBER_OF_CHANNELS = C;
+        static std::size_t const NUMBER_OF_SAMPLES_PER_CHANNEL = N;
+        static std::size_t const SIZE = NUMBER_OF_CHANNELS * NUMBER_OF_SAMPLES_PER_CHANNEL;
+        using ValueType = T;
+        using Data = std::array<ValueType, SIZE>;
+    };
+
+    namespace RawDataTypes {
+        typedef int32_t AWL;
+        typedef int16_t GUARDIAN;
+    }
+
+    /**
+     * @brief This CommandDefinition struct serves to declare types used by <SensorName>Command classes
+     * @tparam T the type of an individual payload data
+     * @tparam N the max number of payload data in a command
+     */
+    template<typename T, std::size_t N>
+    struct CommandDefinition {
+        static std::size_t const SIZE = N;
+        using ValueType = T;
+        using Payload = std::array<ValueType, SIZE>;
+    };
+
+    namespace CommandPayloadTypes {
+        typedef Byte AWL;
+        typedef Byte GUARDIAN;
+    }
+
     namespace Communication {
         class DataStructures {
         public:

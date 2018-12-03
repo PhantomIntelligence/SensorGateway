@@ -28,6 +28,11 @@ namespace Sensor {
         public :
 
             typedef typename
+            Sensor::SensorMessageDefinition<
+                    AWL::_16::NUMBER_OF_PIXELS
+            > AWLMessageDefinition;
+
+            typedef typename
             Sensor::RawDataDefinition<
                     Sensor::RawDataTypes::AWL,
                     Sensor::AWL::_16::NUMBER_OF_CHANNELS,

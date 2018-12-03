@@ -3,15 +3,15 @@
 
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
-#include "sensor-gateway/common/data-structure/spirit/SensorMessage.h"
+#include "sensor-gateway/common/data-structure/sensor/AWLStructures.h"
+#include "sensor-gateway/common/data-structure/spirit/SensorMessage.hpp"
 
-using DataFlow::SensorMessage;
+using SensorMessage = typename DataFlow::SensorMessage<Sensor::AWL::Structures::AWLMessageDefinition>;
 using DataFlow::PixelId;
 using DataFlow::MessageId;
 using DataFlow::SensorId;
 using DataFlow::TracksArray;
 using DataFlow::TrackId;
-using DataFlow::PixelsArray;
 
 class SensorMessageTest : public ::testing::Test {
 
@@ -19,14 +19,14 @@ protected:
     TrackId const SOME_TRACK_ID = 2;
     Track const SOME_TRACK = Track(SOME_TRACK_ID, 0, 135, 0, 110, 0);
     PixelId const SOME_PIXEL_ID = 1;
-    Pixel const SOME_PIXEL = Pixel(SOME_PIXEL_ID, TracksArray({SOME_TRACK}), 1);
-    Pixel const SOME_OTHER_PIXEL = Pixel(2, TracksArray({SOME_TRACK}), 1);
+    DataFlow::Pixel const SOME_PIXEL = DataFlow::Pixel(SOME_PIXEL_ID, TracksArray({SOME_TRACK}), 1);
+    DataFlow::Pixel const SOME_OTHER_PIXEL = DataFlow::Pixel(2, TracksArray({SOME_TRACK}), 1);
     MessageId const SOME_MESSAGE_ID = 64830;
     MessageId const SOME_OTHER_MESSAGE_ID = 63830;
     SensorId const SOME_SENSOR_ID = 16;
     SensorId const SOME_OTHER_SENSOR_ID = 15;
-    PixelsArray const SOME_PIXELS_ARRAY = PixelsArray({SOME_PIXEL});
-    PixelsArray const SOME_OTHER_PIXELS_ARRAY = PixelsArray({SOME_PIXEL, SOME_OTHER_PIXEL});
+    typename SensorMessage::PixelsArray const SOME_PIXELS_ARRAY = {SOME_PIXEL};
+    typename SensorMessage::PixelsArray const SOME_OTHER_PIXELS_ARRAY = {SOME_PIXEL, SOME_OTHER_PIXEL};
 };
 
 TEST_F(SensorMessageTest,
@@ -55,7 +55,8 @@ TEST_F(SensorMessageTest, given_twoIdenticalSensorMessages_when_checkingIfTheSen
 }
 
 
-TEST_F(SensorMessageTest, given_twoIdenticalSensorMessagesExceptForTheirMessageId_when_checkingIfTheSensorMessagesAreEqual_then_returnsFalse) {
+TEST_F(SensorMessageTest,
+       given_twoIdenticalSensorMessagesExceptForTheirMessageId_when_checkingIfTheSensorMessagesAreEqual_then_returnsFalse) {
     auto firstSensorMessage = SensorMessage(SOME_MESSAGE_ID, SOME_SENSOR_ID, SOME_PIXELS_ARRAY);
     auto secondSensorMessage = SensorMessage(SOME_OTHER_MESSAGE_ID, SOME_SENSOR_ID, SOME_PIXELS_ARRAY);
 
@@ -66,7 +67,8 @@ TEST_F(SensorMessageTest, given_twoIdenticalSensorMessagesExceptForTheirMessageI
     ASSERT_TRUE(sensorMessagesAreNotEqual);
 }
 
-TEST_F(SensorMessageTest, given_twoIdenticalSensorMessagesExceptForTheirSensorId_when_checkingIfTheSensorMessagesAreEqual_then_returnsFalse) {
+TEST_F(SensorMessageTest,
+       given_twoIdenticalSensorMessagesExceptForTheirSensorId_when_checkingIfTheSensorMessagesAreEqual_then_returnsFalse) {
     auto firstSensorMessage = SensorMessage(SOME_MESSAGE_ID, SOME_SENSOR_ID, SOME_PIXELS_ARRAY);
     auto secondSensorMessage = SensorMessage(SOME_MESSAGE_ID, SOME_OTHER_SENSOR_ID, SOME_PIXELS_ARRAY);
 

@@ -1,9 +1,12 @@
 /**
 	Copyright 2014-2018 Phantom Intelligence Inc.
+
 	Licensed under the Apache License, Version 2.0 (the "License");
 	you may not use this file except in compliance with the License.
 	You may obtain a copy of the License at
+
 		http://www.apache.org/licenses/LICENSE-2.0
+
 	Unless required by applicable law or agreed to in writing, software
 	distributed under the License is distributed on an "AS IS" BASIS,
 	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,17 +18,19 @@
 #define SENSORGATEWAY_SENSORMESSAGEFILEMANAGER_H
 
 #include "FileManager.hpp"
-#include "sensor-gateway/common/data-structure/spirit/SensorMessage.h"
+#include "sensor-gateway/common/data-structure/spirit/SensorMessage.hpp"
+#include "sensor-gateway/common/data-structure/sensor/AWLStructures.h"
 
 namespace TestUtilities {
 
     namespace Structures {
-        static size_t const MAX_NUMBER_OF_SENSORMESSAGES_CURRENTLY_NEEDED_FOR_TEST = 2;
-        using SensorMessages = std::array<DataFlow::SensorMessage, MAX_NUMBER_OF_SENSORMESSAGES_CURRENTLY_NEEDED_FOR_TEST>;
-        using SensorMessageList = std::list<DataFlow::SensorMessage>;
+        static size_t const MAX_NUMBER_OF_SENSOR_MESSAGES_CURRENTLY_NEEDED_FOR_TEST = 2;
+        using Message = typename DataFlow::SensorMessage<Sensor::AWL::Structures::AWLMessageDefinition>;
+        using SensorMessages = std::array<Message, MAX_NUMBER_OF_SENSOR_MESSAGES_CURRENTLY_NEEDED_FOR_TEST>;
+        using SensorMessageList = std::list<Message>;
     }
 
-    class SensorMessageFileManager : public FileManager<DataFlow::SensorMessage> {
+    class SensorMessageFileManager : public FileManager<Structures::Message> {
 
     public:
         SensorMessageFileManager() = default;
@@ -37,9 +42,9 @@ namespace TestUtilities {
         void writeFileWithSensorMessages(Structures::SensorMessageList sensorMessages, std::string const& filename);
 
     private:
-        DataFlow::SensorMessage readMessageFromFileBlock(std::string const& fileBlock) override;
+        Structures::Message readMessageFromFileBlock(std::string const& fileBlock) override;
 
-        void writeFileBlockWithMessage(DataFlow::SensorMessage message, std::FILE* file) override;
+        void writeFileBlockWithMessage(Structures::Message message, std::FILE* file) override;
 
         void writeFileLineWithContentLabel(std::FILE* file, unsigned int numberOfTabulator, char const* contentLabel);
 

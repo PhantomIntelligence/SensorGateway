@@ -19,25 +19,6 @@
 
 #include "TimeTracking.hpp"
 
-namespace Sensor {
-    /**
-     * @brief This CommandDefinition struct serves to declare types used by <SensorName>Command classes
-     * @tparam T the type of an individual payload data
-     * @tparam N the max number of payload data in a command
-     */
-    template<typename T, std::size_t N>
-    struct CommandDefinition {
-        static std::size_t const SIZE = N;
-        using ValueType = T;
-        using Payload = std::array<ValueType, SIZE>;
-    };
-
-    namespace CommandPayloadTypes {
-        typedef Byte AWL;
-        typedef Byte GUARDIAN;
-    }
-}
-
 namespace DataFlow {
 
     template<typename CommandDefinition>

@@ -21,11 +21,11 @@ using DataFlow::TracksArray;
 using DataFlow::PixelId;
 using Defaults::Pixel::DEFAULT_PIXEL;
 using Defaults::Pixel::DEFAULT_TRACKS_ARRAY;
-using Sensor::AWL::_16::NUMBER_OF_PIXELS_IN_LAYER;
-using Sensor::AWL::_16::NUMBER_OF_PIXELS_IN_FRAME;
+using Sensor::AWL::_16::NUMBER_OF_PIXELS_PER_LAYER;
+using Sensor::AWL::_16::NUMBER_OF_PIXELS;
 using Sensor::AWL::_16::HORIZONTAL_FIELD_OF_VIEW;
 using Sensor::AWL::_16::ANGLE_RANGE;
-using Sensor::AWL::_16::NUMBER_OF_LAYER;
+using Sensor::AWL::_16::NUMBER_OF_LAYERS;
 using Sensor::AWL::_16::MULTIPLICATIVE_CONSTANT;
 
 Pixel::Pixel(PixelId pixelId, TracksArray tracks, int currentNumberOfTracks) :
