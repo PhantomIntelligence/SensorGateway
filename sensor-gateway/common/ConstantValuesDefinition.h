@@ -15,6 +15,9 @@
 #define SENSORGATEWAY_CONSTANTVALUESDEFINITION_H
 
 #include "TypeDefinition.h"
+namespace Metrics {
+    HighResolutionTimePoint const BEGINNING_OF_TIME_ITSELF = HighResolutionClock::from_time_t(0);
+}
 
 namespace DataFlow {
     uint8_t const NUMBER_OF_CONCURRENT_INPUT_FOR_SENSOR_ACCESS_LINK_ELEMENTS = 1;
@@ -66,7 +69,9 @@ namespace Sensor {
         static size_t const RAW_DATA_SAMPLING_LENGTH = 100;
         size_t const DETECTIONS_SIZE = NUMBER_OF_CHANNELS * NUMBER_OF_DETECTION_PER_CHANNEL;
 
+        // (Beginning + End) of acquisition + (Beginning + End) of transmission on sensor
         static size_t const NUMBER_OF_SENSOR_TIME_POINTS = 4;
+        // (Beginning + End) of reception + (Beginning + End) of translation + transmission on gateway
         static size_t const NUMBER_OF_GATEWAY_TIME_POINTS = 5;
 
         static size_t const MAX_COMMAND_PAYLOAD_SIZE = 4096; // 1024 * floats == 1024 * 4 Bytes
@@ -79,7 +84,10 @@ namespace Sensor {
         MessageId const DETECTION_VELOCITY = 0x0B;
         int const NUMBER_OF_DATA_BYTES = 8;
 
+        // (Beginning + End) of acquisition + (Beginning + End) of transmission on sensor
         static size_t const NUMBER_OF_SENSOR_TIME_POINTS = 4;
+
+        // (Beginning + End) of reception + (Beginning + End) of translation + transmission on gateway
         static size_t const NUMBER_OF_GATEWAY_TIME_POINTS = 5;
 
         /**

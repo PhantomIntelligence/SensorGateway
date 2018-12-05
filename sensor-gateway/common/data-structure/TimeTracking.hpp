@@ -47,10 +47,10 @@ namespace Metrics {
         using SensorTimestamps = typename TimeTrackingDefinition::SensorTimestamps;
         using GatewayTimestamps = typename TimeTrackingDefinition::GatewayTimestamps;
 
-        explicit TimeTracking(SensorTimestamps sensorTimestamps,
-                              GatewayTimestamps gatewayTimestamps) :
-                sensorTimestamps(std::move(sensorTimestamps)),
-                gatewayTimestamps(std::move(gatewayTimestamps)) {}
+        explicit TimeTracking(SensorTimestamps const& sensorTimestamps,
+                              GatewayTimestamps const& gatewayTimestamps) :
+                sensorTimestamps(sensorTimestamps),
+                gatewayTimestamps(gatewayTimestamps) {}
 
         explicit TimeTracking() :
                 TimeTracking(TimeTracking::returnDefaultData()) {}
@@ -94,10 +94,23 @@ namespace Metrics {
 
         static TimeTracking const& returnDefaultData() noexcept;
 
-    private:
+        SensorTimestamps const& getSensorTimestamps() noexcept {
+            return sensorTimestamps;
+        }
 
-        int numberOfSensorTimestamps;
-        int numberOfGatewayTimestamps;
+        GatewayTimestamps const& getGatewayTimestamps() noexcept {
+            return gatewayTimestamps;
+        }
+
+        void addTimePointForSensorWithLocation(std::string const& locationName) {
+            sensorTimestamps.addTimePointForLocation(locationName);
+        }
+
+        void addTimePointForGatewayWithLocation(std::string const& locationName) {
+            gatewayTimestamps.addTimePointForLocation(locationName);
+        }
+
+    private:
 
         SensorTimestamps sensorTimestamps;
         GatewayTimestamps gatewayTimestamps;
@@ -107,10 +120,10 @@ namespace Metrics {
         using Metrics::TimeTracking;
 
         template<typename TimeTrackingDefinition>
-        typename TimeTrackingDefinition::SensorTimestamps const DEFAULT_SENSOR_TIMESTAMPS{};
+        typename TimeTrackingDefinition::SensorTimestamps const DEFAULT_SENSOR_TIMESTAMPS;
 
         template<typename TimeTrackingDefinition>
-        typename TimeTrackingDefinition::GatewayTimestamps const DEFAULT_GATEWAY_TIMESTAMPS{};
+        typename TimeTrackingDefinition::GatewayTimestamps const DEFAULT_GATEWAY_TIMESTAMPS;
 
         template<typename TimeTrackingDefinition>
         TimeTracking<TimeTrackingDefinition> const DEFAULT_TIME_TRACKING = TimeTracking<TimeTrackingDefinition>(

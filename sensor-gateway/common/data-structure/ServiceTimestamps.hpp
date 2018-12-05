@@ -18,14 +18,9 @@
 #define SENSORGATEWAY_SERVICETIMESTAMPS_HPP
 
 #include "sensor-gateway/common/error/SensorAccessLinkError.h"
-#include "sensor-gateway/common/ConstantFunctionsDefinition.h"
+#include "TimePoint.h"
 
 namespace Metrics {
-
-    struct TimePoint {
-        HighResolutionTimePoint timestamp;
-        std::string location;
-    };
 
     /**
      * @warning The reading and writing of different timestamps is NOT thread-safe!
@@ -37,7 +32,7 @@ namespace Metrics {
 
         static std::size_t const MAXIMUM_SIZE = N;
 
-        using TimePoints = std::array<TimePoint, MAXIMUM_SIZE>;
+        using TimePoints = std::array<Metrics::TimePoint, MAXIMUM_SIZE>;
         using Counter = uint;
 
         explicit ServiceTimestamps(TimePoints timePoints,
@@ -46,7 +41,7 @@ namespace Metrics {
                 currentNumberOfTimePoints(numberOfTimePoints) {}
 
         explicit ServiceTimestamps() :
-                ServiceTimestamps(returnDefaultData()) {}
+                ServiceTimestamps(ServiceTimestamps<N>::returnDefaultData()) {}
 
         ~ServiceTimestamps() noexcept = default;
 
@@ -121,7 +116,7 @@ namespace Metrics {
             }
         }
 
-        Counter currentNumberOfTimePoints{};
+        Counter currentNumberOfTimePoints;
 
         TimePoints timePoints;
     };
@@ -133,7 +128,7 @@ namespace Metrics {
         typename ServiceTimestamps<N>::Counter const DEFAULT_NUMBER_OF_TIME_POINTS = 0;
 
         template<std::size_t N>
-        typename ServiceTimestamps<N>::TimePoints const DEFAULT_TIME_POINTS{};
+        typename ServiceTimestamps<N>::TimePoints const DEFAULT_TIME_POINTS;
 
         template<std::size_t N>
         ServiceTimestamps<N> const DEFAULT_SERVICE_TIMESTAMPS = ServiceTimestamps<N>(DEFAULT_TIME_POINTS<N>,

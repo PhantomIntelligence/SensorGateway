@@ -26,6 +26,7 @@ namespace SensorGateway {
 
     using GuardianStructures = Sensor::Guardian::Structures;
     using GuardianSpiritStructures = Sensor::Spirit::Structures<
+            GuardianStructures::GuardianMessageDefinition,
             GuardianStructures::GuardianRawDataDefinition,
             GuardianStructures::GuardianCommandDefinition>;
 
