@@ -64,10 +64,9 @@ namespace Defaults {
         using DataFlow::Distance;
         using DataFlow::Speed;
 
-
         /**
          * @warning Carelessly modifying these values WILL cause a huge performance drop.
-         * If a value is modified here, be sure it homologous value in the communication protocol schema file.
+         * If a value is modified here, be sure its homologous value in the communication protocol schema file is too.
          * @see https://github.com/PhantomIntelligence/GatewayProtocol.git
          */
         TrackId const UNDEFINED_ID = 65535;

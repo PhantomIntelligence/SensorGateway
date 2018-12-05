@@ -84,7 +84,7 @@ namespace Defaults {
 
         /**
          * @warning Modifying these values without updating the FlatBuffers file WILL create a huge performance drop!!!
-         * If a value is modified here, be sure it homologous value in the FlatBuffers schema file.
+         * If a value is modified here, be sure its homologous value in the communication protocol schema file is too.
          * @see https://github.com/PhantomIntelligence/GatewayProtocol.git
          */
         PixelId const UNDEFINED_ID = 65535;
