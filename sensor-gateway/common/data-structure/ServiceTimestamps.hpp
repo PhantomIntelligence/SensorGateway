@@ -65,7 +65,7 @@ namespace Metrics {
             return *this;
         }
 
-        void swap(ServiceTimestamps& current, ServiceTimestamps& other) noexcept {
+        static void swap(ServiceTimestamps& current, ServiceTimestamps& other) noexcept {
             std::swap(current.timePoints, other.timePoints);
             std::swap(current.currentNumberOfTimePoints, other.currentNumberOfTimePoints);
         }

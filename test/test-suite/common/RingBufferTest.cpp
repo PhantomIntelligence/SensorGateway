@@ -30,9 +30,9 @@ RingBufferTest::~RingBufferTest() {}
 
 
 SimpleMessage createRandomSimpleData() {
-    auto simpleData = DataTestUtil::createRandomSimpleMessage();
+    auto simpleData = DataTestUtil::createRandomSimpleMessageWithEmptyTimestamps();
     while (simpleData == SimpleMessage::returnDefaultData()) {
-        simpleData = DataTestUtil::createRandomSimpleMessage();
+        simpleData = DataTestUtil::createRandomSimpleMessageWithEmptyTimestamps();
     }
     return simpleData;
 }

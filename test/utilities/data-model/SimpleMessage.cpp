@@ -19,13 +19,16 @@
 using DataModel::SimpleMessage;
 using DataModel::Defaults::DEFAULT_SIMPLE_MESSAGE_CONTENT;
 
-SimpleMessage::SimpleMessage(Content simpleDataContent) :
-        content(std::move(simpleDataContent)) {}
+SimpleMessage::SimpleMessage(Content simpleDataContent,
+                             ServiceTimestamps const& gatewayTimestamps) :
+        content(std::move(simpleDataContent)),
+        gatewayTimestamps(gatewayTimestamps) {}
 
 SimpleMessage::SimpleMessage() : SimpleMessage(SimpleMessage::returnDefaultData()) {}
 
 SimpleMessage::SimpleMessage(SimpleMessage&& other) noexcept:
-        content(std::move(other.content)) {
+        content(std::move(other.content)),
+        gatewayTimestamps(std::move(other.gatewayTimestamps)) {
     other.content = DEFAULT_SIMPLE_MESSAGE_CONTENT;
 }
 
@@ -42,6 +45,7 @@ SimpleMessage& SimpleMessage::operator=(SimpleMessage&& other)& noexcept {
 
 void SimpleMessage::swap(SimpleMessage& current, SimpleMessage& other) noexcept {
     std::swap(current.content, other.content);
+    ServiceTimestamps::swap(current.gatewayTimestamps, other.gatewayTimestamps);
 }
 
 bool SimpleMessage::operator==(SimpleMessage const& other) const {
@@ -79,6 +83,14 @@ std::string SimpleMessage::toString() const noexcept {
         stringifiedContent += " " + content.at(i);
     }
     return stringifiedContent;
+}
+
+void SimpleMessage::addTimePointForGatewayWithLocation(std::string const& locationName) {
+    gatewayTimestamps.addTimePointForLocation(locationName);
+}
+
+SimpleMessage::ServiceTimestamps const& SimpleMessage::getGatewayTimestamps() const noexcept {
+    return gatewayTimestamps;
 }
 
 const SimpleMessage SimpleMessage::returnDefaultData() noexcept {

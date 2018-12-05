@@ -11,7 +11,6 @@ class ServiceTimestampsTest : public ::testing::Test {
 
 protected:
 
-    DurationInNanoseconds const TWO_HUNDRED_FIFTY_NANO_SECONDS = DurationInNanoseconds(250);
     static size_t const NUMBER_OF_TIME_POINTS = 19;
 
     std::array<std::string, NUMBER_OF_TIME_POINTS> LOCATIONS;

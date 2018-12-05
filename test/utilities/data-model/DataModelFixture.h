@@ -51,7 +51,7 @@ namespace TestFunctions {
             return randomString;
         }
 
-        static const DataModel::SimpleMessage createRandomSimpleMessage() {
+        static const DataModel::SimpleMessage createRandomSimpleMessageWithEmptyTimestamps() {
             auto const lengthOfDataToCreate = 42;
 
             DataModel::SimpleMessage::Content content;
@@ -59,7 +59,7 @@ namespace TestFunctions {
             for (unsigned long i = 0; i < numberOfStringToCreate; ++i) {
                 content.at(i) = createRandomStringOfLength(lengthOfDataToCreate);
             }
-            DataModel::SimpleMessage randomSimpleMessage(content);
+            DataModel::SimpleMessage randomSimpleMessage(content, DataModel::Defaults::DEFAULT_SERVICE_TIMESTAMPS);
 
             return randomSimpleMessage;
         }

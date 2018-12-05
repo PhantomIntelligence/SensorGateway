@@ -21,8 +21,13 @@
 #include "sensor-gateway/common/ConstantFunctionsDefinition.h"
 #include <typeinfo>
 
+namespace {
+    DurationInNanoseconds const TWO_HUNDRED_FIFTY_NANO_SECONDS = DurationInNanoseconds(250);
+    DurationInNanoseconds const FIVE_HUNDRED_NANO_SECONDS = DurationInNanoseconds(500);
+}
+
 namespace Assert {
-    ::testing::AssertionResult
+    static ::testing::AssertionResult
     firstOneComesBeforeTheSecondOne(HighResolutionTimePoint const& first, HighResolutionTimePoint const& second) {
         if (first >= second) {
             return ::testing::AssertionFailure()
@@ -36,7 +41,7 @@ namespace Assert {
         }
     }
 
-    ::testing::AssertionResult
+    static ::testing::AssertionResult
     timeWithinMicrosecondDelta(HighResolutionTimePoint const& lhs, HighResolutionTimePoint const& rhs,
                                DurationInNanoseconds const& maximalDelta) {
         DurationInNanoseconds absoluteValuedDelta;

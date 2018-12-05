@@ -95,7 +95,7 @@ namespace DataTranslatorTestMock {
 
 TEST_F(DataTranslatorTest,
        given_aTranslationStrategy_when_consumingMessage_then_callsTranslateMessageInStrategyWithTheConsumedMessage) {
-    auto message = DataTestUtil::createRandomSimpleMessage();
+    auto message = DataTestUtil::createRandomSimpleMessageWithEmptyTimestamps();
     auto copy = Structures::Message(message);
 
     DataTranslatorTestMock::MockDataTranslationStrategy mockStrategy;
@@ -131,7 +131,7 @@ TEST_F(DataTranslatorTest,
     DataTranslator<Structures, Structures> dataTranslator(&throwingMockStrategy);
 
     dataTranslator.linkConsumer(&scheduler);
-    auto data = DataTestUtil::createRandomSimpleMessage();
+    auto data = DataTestUtil::createRandomSimpleMessageWithEmptyTimestamps();
     dataTranslator.consume(std::move(data));
     sink.waitConsumptionToBeReached();
 

@@ -64,7 +64,8 @@ namespace SensorAccessLinkElement {
 
         void consume(Message&& message) override {
             try {
-                serverCommunicationStrategy->sendMessage(std::forward<Message>(message));
+                message.addTimePointForGatewayWithLocation(Metrics::LocationNames::SERVER_COMMUNICATOR_SENDING);
+                serverCommunicationStrategy->sendMessage(std::move(message));
             } catch (ErrorHandling::SensorAccessLinkError& strategyError) {
                 addOriginAndHandleError(std::move(strategyError),
                                         ErrorHandling::Origin::SERVER_COMMUNICATOR_SEND_MESSAGE);

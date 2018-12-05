@@ -31,12 +31,11 @@
 #include <cstring>
 #include <sstream>
 #include <limits>
-#include <iostream>
 #include <chrono>
 #include <utility>
 
 #include "hicpp/HighIntegrityThread.h"
-#include "ExceptionMessages.h"
+#include "TimePointLocationNames.h"
 
 namespace {
     typedef unsigned char Byte;

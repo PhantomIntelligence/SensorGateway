@@ -76,7 +76,7 @@ TEST_F(RingBufferPadTest, given_aNextPad_when_attemptingToSetANewNextPad_then_th
 
 TEST_F(RingBufferPadTest, given_data_when_read_then_returnsData) {
     auto testedPad = Pad();
-    auto data = DataTestUtil::createRandomSimpleMessage();
+    auto data = DataTestUtil::createRandomSimpleMessageWithEmptyTimestamps();
     testedPad.write(std::move(data));
 
     auto readData = testedPad.read();

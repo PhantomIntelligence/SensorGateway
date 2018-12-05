@@ -25,6 +25,7 @@
 #include "test/utilities/data-model/DataModelFixture.h"
 #include "test/utilities/mock/ArbitraryDataSinkMock.hpp"
 #include "test/utilities/mock/ErrorThrowingServerCommunicationStrategyMock.hpp"
+#include "test/utilities/assertion/TimeAssertion.hpp"
 
 using TestFunctions::DataTestUtil;
 
@@ -174,7 +175,7 @@ TEST_F(ServerCommunicatorTest, given__when_connect_then_callsOpenConnectionInStr
 TEST_F(ServerCommunicatorTest, given_aMessageToSend_when_consume_then_callsSendMessageInStrategy) {
     ServerCommunicatorTestMock::MockServerCommunicatorStrategy mockStrategy;
     ServerCommunicator serverCommunicator(&mockStrategy);
-    auto message = DataTestUtil::createRandomSimpleMessage();
+    auto message = DataTestUtil::createRandomSimpleMessageWithEmptyTimestamps();
 
     serverCommunicator.consume(std::move(message));
 
@@ -185,13 +186,35 @@ TEST_F(ServerCommunicatorTest, given_aMessageToSend_when_consume_then_callsSendM
 TEST_F(ServerCommunicatorTest, given_aMessageToSend_when_consume_then_callsSendMessageInStrategyWithTheMessage) {
     ServerCommunicatorTestMock::MockServerCommunicatorStrategy mockStrategy;
     ServerCommunicator serverCommunicator(&mockStrategy);
-    auto message = DataTestUtil::createRandomSimpleMessage();
+    auto message = DataTestUtil::createRandomSimpleMessageWithEmptyTimestamps();
     auto copy = Message(message);
 
     serverCommunicator.consume(std::move(message));
 
     auto receivedMessage = mockStrategy.getSentMessage();
     ASSERT_EQ(copy, receivedMessage);
+}
+
+/**
+ * @metric-test : timestamps
+ */
+TEST_F(ServerCommunicatorTest, given_aMessageToSend_when_consume_then_sendsItAfterHavingTimestampedIt) {
+    ServerCommunicatorTestMock::MockServerCommunicatorStrategy mockStrategy;
+    ServerCommunicator serverCommunicator(&mockStrategy);
+    auto message = DataTestUtil::createRandomSimpleMessageWithEmptyTimestamps();
+
+    auto now = HighResolutionClock::now();
+    serverCommunicator.consume(std::move(message));
+
+    auto receivedMessage = mockStrategy.getSentMessage();
+
+    auto timePoint = receivedMessage.getGatewayTimestamps().getTimePoints()[0];
+    auto timePointLocation = timePoint.location;
+    auto timePointTimestamp = timePoint.timestamp;
+
+    auto sameLocation = timePointLocation == Metrics::LocationNames::SERVER_COMMUNICATOR_SENDING;
+    ASSERT_TRUE(sameLocation);
+    ASSERT_TRUE(Assert::timeWithinMicrosecondDelta(timePointTimestamp, now, FIVE_HUNDRED_NANO_SECONDS));
 }
 
 TEST_F(ServerCommunicatorTest, given_aRawDataCycleToSend_when_consume_then_callsSendRawDataInStrategy) {
@@ -289,7 +312,7 @@ TEST_F(ServerCommunicatorTest,
     throwingMockStrategy.throwCloseConnectionRequiredErrorWhenSendMessageIsCalled();
 
     ServerCommunicator serverCommunicator(&throwingMockStrategy);
-    auto message = DataTestUtil::createRandomSimpleMessage();
+    auto message = DataTestUtil::createRandomSimpleMessageWithEmptyTimestamps();
     serverCommunicator.consume(std::move(message));
     throwingMockStrategy.waitUntilCloseConnectionCallIsMadeAfterErrorIsThrown();
 
@@ -304,7 +327,7 @@ TEST_F(ServerCommunicatorTest,
     throwingMockStrategy.throwOpenConnectionRequiredErrorWhenSendMessageIsCalled();
 
     ServerCommunicator serverCommunicator(&throwingMockStrategy);
-    auto message = DataTestUtil::createRandomSimpleMessage();
+    auto message = DataTestUtil::createRandomSimpleMessageWithEmptyTimestamps();
     serverCommunicator.consume(std::move(message));
     throwingMockStrategy.waitUntilOpenConnectionCallIsMadeAfterErrorIsThrown();
 
@@ -402,7 +425,7 @@ TEST_F(ServerCommunicatorTest,
 
     serverCommunicator.linkConsumer(&scheduler);
 
-    auto message = DataTestUtil::createRandomSimpleMessage();
+    auto message = DataTestUtil::createRandomSimpleMessageWithEmptyTimestamps();
     serverCommunicator.consume(std::move(message));
     sink.waitConsumptionToBeReached();
 

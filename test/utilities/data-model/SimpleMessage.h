@@ -17,22 +17,26 @@
 #ifndef SENSORGATEWAY_SIMPLEMESSAGE_H
 #define SENSORGATEWAY_SIMPLEMESSAGE_H
 
-#include "sensor-gateway/common/ConstantFunctionsDefinition.h"
+#include "sensor-gateway/common/data-structure/TimeTracking.hpp"
 
 namespace DataModel {
 
-    namespace TestSensor {
-    }
-
     class SimpleMessage {
+
+    protected:
+
 
     public:
 
         static int const NUMBER_OF_SIMPLE_MESSAGE_CONTENT = 2;
+        static int const NUMBER_OF_SIMPLE_MESSAGE_TIMESTAMPS = 2;
+
         // Allows to populate SimpleMessage with a "complex", non-primitive, element
         typedef std::array<std::string, NUMBER_OF_SIMPLE_MESSAGE_CONTENT> Content;
+        typedef Metrics::ServiceTimestamps<NUMBER_OF_SIMPLE_MESSAGE_TIMESTAMPS> ServiceTimestamps;
 
-        explicit SimpleMessage(Content simpleDataContent);
+        explicit SimpleMessage(Content simpleDataContent,
+                               ServiceTimestamps const& gatewayTimestamps);
 
         explicit SimpleMessage();
 
@@ -42,7 +46,7 @@ namespace DataModel {
 
         SimpleMessage(SimpleMessage&& other) noexcept;
 
-        SimpleMessage& operator=(SimpleMessage const& other)& ;
+        SimpleMessage& operator=(SimpleMessage const& other)&;
 
         SimpleMessage& operator=(SimpleMessage&& other)& noexcept;
 
@@ -58,11 +62,16 @@ namespace DataModel {
 
         std::string toString() const noexcept;
 
+        void addTimePointForGatewayWithLocation(std::string const& locationName);
+
+        ServiceTimestamps const& getGatewayTimestamps() const noexcept;
+
         SimpleMessage static const returnDefaultData() noexcept;
 
     private:
 
         Content content;
+        ServiceTimestamps gatewayTimestamps;
     };
 
     namespace Defaults {
@@ -70,9 +79,12 @@ namespace DataModel {
 
         std::string const DEFAULT_FIRST_SIMPLE_MESSAGE_CONTENT = "Some first simple data content";
         std::string const DEFAULT_SECOND_SIMPLE_MESSAGE_CONTENT = "Some second simple data content.";
-        SimpleMessage::Content const DEFAULT_SIMPLE_MESSAGE_CONTENT = SimpleMessage::Content({DEFAULT_FIRST_SIMPLE_MESSAGE_CONTENT,
-                                                                                          DEFAULT_SECOND_SIMPLE_MESSAGE_CONTENT});
-        SimpleMessage const DEFAULT_SIMPLE_MESSAGE = SimpleMessage(DEFAULT_SIMPLE_MESSAGE_CONTENT);
+        SimpleMessage::Content const DEFAULT_SIMPLE_MESSAGE_CONTENT = SimpleMessage::Content(
+                {DEFAULT_FIRST_SIMPLE_MESSAGE_CONTENT,
+                 DEFAULT_SECOND_SIMPLE_MESSAGE_CONTENT});
+        SimpleMessage::ServiceTimestamps const DEFAULT_SERVICE_TIMESTAMPS;
+        SimpleMessage const DEFAULT_SIMPLE_MESSAGE = SimpleMessage(DEFAULT_SIMPLE_MESSAGE_CONTENT,
+                                                                   DEFAULT_SERVICE_TIMESTAMPS);
     }
 }
 

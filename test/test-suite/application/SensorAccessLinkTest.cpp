@@ -92,7 +92,7 @@ namespace SensorAccessLinkTestMock {
             super::Messages createdMessages;
 
             for (auto i = 0u; i < Sensor::Test::Simple::Structures::MAX_NUMBER_OF_BULK_FETCHABLE_MESSAGES; ++i) {
-                auto createdData = DataTestUtil::createRandomSimpleMessage();
+                auto createdData = DataTestUtil::createRandomSimpleMessageWithEmptyTimestamps();
                 createdMessages[i] = createdData;
             }
             auto copy = super::Messages(createdMessages);
