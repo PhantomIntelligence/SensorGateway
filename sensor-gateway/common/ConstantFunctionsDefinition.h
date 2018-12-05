@@ -39,16 +39,20 @@ namespace {
         return reverseValue;
     }
 
+    template<typename T>
+    inline DurationInNanoseconds castToDuration(T duration) {
+        return std::chrono::duration_cast<DurationInNanoseconds>(duration);
+    }
+
     /**
       * @warning Allows to start the various JoinableThreads in the constructors without blocking anything
       */
     void doNothing() {}
 
-
     // TODO : ERROR
     // TODO: uncomment this to have a warning pop everywhere a std::runtime_error is thrown and should be replaced by some other error
 //    [[deprecated("std::runtime_error should be replaced with SensorAccessLinkError")]] [[noreturn]] void throwRuntimeError(char const* message) {
-        [[noreturn]] void throwRuntimeError(char const* message) {
+    [[noreturn]] void throwRuntimeError(char const* message) {
         throw std::runtime_error(message);
     }
 

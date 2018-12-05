@@ -14,7 +14,7 @@ foreach (file ${MANUAL_TEST_FILES})
         set(MANUAL_TEST manual-test-${MANUAL_TEST_NAME})
         message(STATUS "Building manual test ${MANUAL_TEST_NAME}")
 
-        add_executable(${MANUAL_TEST} ${MANUAL_TEST_FILES} ${DATA_MODEL_FILES})
+        add_executable(${MANUAL_TEST} ${MANUAL_TEST_FILES} ${ASSERTION_FILES}  ${DATA_MODEL_FILES})
         target_link_libraries(${MANUAL_TEST} ${SensorGateway_LIBRARIES} ${CONAN_LIBS})
 
 

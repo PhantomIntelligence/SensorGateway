@@ -66,6 +66,9 @@ namespace Sensor {
         static size_t const RAW_DATA_SAMPLING_LENGTH = 100;
         size_t const DETECTIONS_SIZE = NUMBER_OF_CHANNELS * NUMBER_OF_DETECTION_PER_CHANNEL;
 
+        static size_t const NUMBER_OF_SENSOR_TIME_POINTS = 4;
+        static size_t const NUMBER_OF_GATEWAY_TIME_POINTS = 5;
+
         static size_t const MAX_COMMAND_PAYLOAD_SIZE = 4096; // 1024 * floats == 1024 * 4 Bytes
     }
 
@@ -75,6 +78,9 @@ namespace Sensor {
         MessageId const DETECTION_TRACK = 0x0A;
         MessageId const DETECTION_VELOCITY = 0x0B;
         int const NUMBER_OF_DATA_BYTES = 8;
+
+        static size_t const NUMBER_OF_SENSOR_TIME_POINTS = 4;
+        static size_t const NUMBER_OF_GATEWAY_TIME_POINTS = 5;
 
         /**
          * @note: The AWL raw data is currently not supported. This is why the RAW_DATA_SAMPLING_LENGTH

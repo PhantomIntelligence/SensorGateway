@@ -25,7 +25,7 @@ namespace TestFunctions {
 
     public:
 
-        static const DataModel::SimpleMessage createRandomSimpleMessage() {
+        static const std::string createRandomStringOfLength(size_t const& stringLength) noexcept {
             auto const lengthOfDataToCreate = 42;
             typedef std::array<char, 62> CharArray;
             auto charSet = CharArray({'0', '1', '2', '3', '4',
@@ -47,10 +47,17 @@ namespace TestFunctions {
                 return charSet[distribution(randomEngine)];
             };
 
+            std::string randomString = drawRandomString(lengthOfDataToCreate, randomCharFunction);
+            return randomString;
+        }
+
+        static const DataModel::SimpleMessage createRandomSimpleMessage() {
+            auto const lengthOfDataToCreate = 42;
+
             DataModel::SimpleMessage::Content content;
             auto numberOfStringToCreate = content.size();
             for (unsigned long i = 0; i < numberOfStringToCreate; ++i) {
-                content.at(i) = createRandomStringOfLength(lengthOfDataToCreate, randomCharFunction);
+                content.at(i) = createRandomStringOfLength(lengthOfDataToCreate);
             }
             DataModel::SimpleMessage randomSimpleMessage(content);
 
@@ -72,9 +79,10 @@ namespace TestFunctions {
 
             return randomSimpleRawData;
         }
+
     private:
 
-        static std::string createRandomStringOfLength(size_t length, std::function<char(void)> const& pickRandomChar) {
+        static std::string drawRandomString(size_t length, std::function<char(void)> const& pickRandomChar) {
             std::string randomString(length, 0);
             std::generate_n(randomString.begin(), length, pickRandomChar);
             return randomString;

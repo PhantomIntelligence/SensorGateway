@@ -17,9 +17,9 @@
 #ifndef SENSORGATEWAY_TIMETRACKING_HPP
 #define SENSORGATEWAY_TIMETRACKING_HPP
 
-#include "sensor-gateway/common/ConstantFunctionsDefinition.h"
+#include "ServiceTimestamps.hpp"
 
-namespace DataFlow {
+namespace Metrics {
 
     /**
      * @brief This TimeTrackingDefinition struct serves to declare types used by <SensorName>TimeTracking classes
@@ -31,15 +31,14 @@ namespace DataFlow {
         static std::size_t const NUMBER_OF_SENSOR_TIME_POINTS = S;
         static std::size_t const NUMBER_OF_GATEWAY_TIME_POINTS = G;
 
-        struct TimePoint {
-            HighResolutionTimePoint const timestamp;
-            std::string const location;
-        };
-
-        using SensorTimestamps = std::array<TimePoint, NUMBER_OF_SENSOR_TIME_POINTS>;
-        using GatewayTimestamps = std::array<TimePoint, NUMBER_OF_GATEWAY_TIME_POINTS>;
+        using SensorTimestamps = ServiceTimestamps<NUMBER_OF_SENSOR_TIME_POINTS>;
+        using GatewayTimestamps = ServiceTimestamps<NUMBER_OF_GATEWAY_TIME_POINTS>;
     };
 
+    // TODO: For eventual debug/prod compilation, see https://en.cppreference.com/w/cpp/types/conditional
+    /**
+     * @warning This class is NOT thread-safe!
+     */
     template<typename TimeTrackingDefinition>
     class TimeTracking {
 
@@ -95,12 +94,17 @@ namespace DataFlow {
 
         static TimeTracking const& returnDefaultData() noexcept;
 
+    private:
+
+        int numberOfSensorTimestamps;
+        int numberOfGatewayTimestamps;
+
         SensorTimestamps sensorTimestamps;
         GatewayTimestamps gatewayTimestamps;
     };
 
     namespace Defaults {
-        using DataFlow::TimeTracking;
+        using Metrics::TimeTracking;
 
         template<typename TimeTrackingDefinition>
         typename TimeTrackingDefinition::SensorTimestamps const DEFAULT_SENSOR_TIMESTAMPS{};

@@ -53,6 +53,7 @@ namespace {
 
     typedef std::chrono::high_resolution_clock HighResolutionClock;
     typedef std::chrono::time_point<HighResolutionClock> HighResolutionTimePoint;
+    typedef std::chrono::duration<double, std::nano> DurationInNanoseconds;
 };
 
 namespace DataFlow {

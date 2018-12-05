@@ -33,7 +33,7 @@ using SensorRawData = AWLStructures::RawData;
 using SpiritMessage = AWLSpiritStructures::Message;
 using SpiritRawData = AWLSpiritStructures::RawData;
 
-using PixelsArray = typename SpiritMessage::PixelsArray;
+using PixelsArray = typename SpiritMessage::Pixels;
 using DataFlow::PixelId;
 
 using DataFlow::AWLMessage;

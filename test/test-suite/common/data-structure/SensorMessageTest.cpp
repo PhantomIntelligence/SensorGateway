@@ -25,8 +25,8 @@ protected:
     MessageId const SOME_OTHER_MESSAGE_ID = 63830;
     SensorId const SOME_SENSOR_ID = 16;
     SensorId const SOME_OTHER_SENSOR_ID = 15;
-    typename SensorMessage::PixelsArray const SOME_PIXELS_ARRAY = {SOME_PIXEL};
-    typename SensorMessage::PixelsArray const SOME_OTHER_PIXELS_ARRAY = {SOME_PIXEL, SOME_OTHER_PIXEL};
+    typename SensorMessage::Pixels const SOME_PIXELS_ARRAY = {SOME_PIXEL};
+    typename SensorMessage::Pixels const SOME_OTHER_PIXELS_ARRAY = {SOME_PIXEL, SOME_OTHER_PIXEL};
 };
 
 TEST_F(SensorMessageTest,

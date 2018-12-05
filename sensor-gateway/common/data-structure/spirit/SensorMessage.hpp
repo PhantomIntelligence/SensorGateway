@@ -26,9 +26,10 @@ namespace DataFlow {
 
     public:
 
-        using PixelsArray = typename SensorMessageDefinition::template Pixels<Pixel>::type;
+        using Pixels = typename SensorMessageDefinition::template Pixels<Pixel>::type;
+        using TimeTracking = typename SensorMessageDefinition::TimeTracking;
 
-        explicit SensorMessage(MessageId messageId, SensorId sensorId, PixelsArray pixels) :
+        explicit SensorMessage(MessageId messageId, SensorId sensorId, Pixels pixels) :
                 messageId(messageId), sensorId(sensorId), pixels(std::move(pixels)) {};
 
         SensorMessage() : SensorMessage(returnDefaultData()) {};
@@ -79,7 +80,7 @@ namespace DataFlow {
             return sensorIdentifier;
         }
 
-        PixelsArray* getPixels() {
+        Pixels* getPixels() {
             return &pixels;
         }
 
@@ -88,7 +89,7 @@ namespace DataFlow {
 
     private:
 
-        PixelsArray pixels;
+        Pixels pixels;
 
         void updatePixelId(PixelId const& pixelId) {
             pixels[pixelId].id = pixelId;
@@ -110,7 +111,7 @@ namespace DataFlow {
         SensorId const DEFAULT_SENSOR_ID = -1;
 
         template<typename SensorMessageDefinition>
-        typename SensorMessage<SensorMessageDefinition>::PixelsArray const DEFAULT_PIXELS_ARRAY;
+        typename SensorMessage<SensorMessageDefinition>::Pixels const DEFAULT_PIXELS_ARRAY;
 
         template<typename SensorMessageDefinition>
         SensorMessage<SensorMessageDefinition> const DEFAULT_SENSOR_MESSAGE = SensorMessage<SensorMessageDefinition>(

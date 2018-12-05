@@ -28,8 +28,15 @@ namespace Sensor {
         public :
 
             typedef typename
+            Metrics::TimeTrackingDefinition<
+                    Guardian::NUMBER_OF_SENSOR_TIME_POINTS,
+                    Guardian::NUMBER_OF_GATEWAY_TIME_POINTS
+            > GuardianTimeTrackingDefinition;
+
+            typedef typename
             Sensor::SensorMessageDefinition<
-                    Guardian::NUMBER_OF_PIXELS
+                    Guardian::NUMBER_OF_PIXELS,
+                    GuardianTimeTrackingDefinition
             > GuardianMessageDefinition;
 
             typedef typename

@@ -6,6 +6,7 @@ set(DOT ${CMAKE_CURRENT_SOURCE_DIR}) # To ease reading
 # Select all the test and source files
 file(GLOB TEST_FILES "${DOT}/test-suite/*")
 file(GLOB UTILITIES_FILES "${DOT}/utilities/files/*")
+file(GLOB ASSERTION_FILES "${DOT}/utilities/assertion/*")
 file(GLOB MOCK_FILES "${DOT}/utilities/mock/*")
 file(GLOB STUB_FILES "${DOT}/utilities/stub/*")
 file(GLOB DATA_MODEL_FILES "${DOT}/utilities/data-model/*")
@@ -26,6 +27,7 @@ find_package(SensorGateway)
 add_executable(${RUNTEST}
         ${TEST_FILES}
         ${UTILITIES_FILES}
+        ${ASSERTION_FILES}
         ${MOCK_FILES}
         ${STUB_FILES}
         ${DATA_MODEL_FILES}

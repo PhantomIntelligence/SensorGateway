@@ -28,8 +28,15 @@ namespace Sensor {
         public :
 
             typedef typename
+            Metrics::TimeTrackingDefinition<
+                    AWL::NUMBER_OF_SENSOR_TIME_POINTS,
+                    AWL::NUMBER_OF_GATEWAY_TIME_POINTS
+            > AWLTimeTrackingDefinition;
+
+            typedef typename
             Sensor::SensorMessageDefinition<
-                    AWL::_16::NUMBER_OF_PIXELS
+                    AWL::_16::NUMBER_OF_PIXELS,
+                    AWLTimeTrackingDefinition
             > AWLMessageDefinition;
 
             typedef typename

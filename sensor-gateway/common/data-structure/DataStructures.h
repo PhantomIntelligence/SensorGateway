@@ -25,7 +25,7 @@ namespace Sensor {
      * @brief This SensorMessageDefinition struct serves to declare types used by <SensorName>Message classes
      * @tparam P number of pixel for this sensor
      */
-    template<std::size_t P>
+    template<std::size_t P, typename TimeTrackingDefinition>
     struct SensorMessageDefinition {
         static std::size_t const NUMBER_OF_PIXEL = P;
 
@@ -34,6 +34,8 @@ namespace Sensor {
             using PixelType = T;
             typedef std::array<PixelType, NUMBER_OF_PIXEL> type;
         };
+
+        using TimeTracking = Metrics::TimeTracking<TimeTrackingDefinition>;
     };
 
     namespace SensorMessageTypes {

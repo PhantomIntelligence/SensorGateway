@@ -39,7 +39,7 @@ using GuardianRawData = GuardianStructures::RawData;
 using SpiritMessage = GuardianSpiritStructures::Message;
 using SpiritRawData = GuardianSpiritStructures::RawData;
 
-using PixelsArray = typename SpiritMessage::PixelsArray;
+using PixelsArray = typename SpiritMessage::Pixels;
 using DataFlow::PixelId;
 
 

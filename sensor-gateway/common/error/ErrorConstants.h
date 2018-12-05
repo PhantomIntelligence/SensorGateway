@@ -70,6 +70,8 @@ namespace ErrorHandling {
                 EMPTY_CATEGORY = 142,
 
         TRANSLATION_ERROR = 200,
+
+        TIME_POINTS_ERROR = 300,
     };
 
     typedef int64_t ErrorCode;
@@ -86,6 +88,8 @@ namespace ErrorHandling {
         // 10100-10199 Spirit Protocol error code
 
         PIXEL_ALREADY_HAS_MAXIMUM_TRACK = 10110,
+
+        TIME_POINTS_ALREADY_AT_MAXIMUM_CAPACITY = 10111,
 
         // 10200-10299 AWL INTERNAL error code
 
