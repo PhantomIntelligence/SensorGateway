@@ -13,10 +13,10 @@
 #ifndef SENSORGATEWAY_AWLMESSAGESTUB_H
 #define SENSORGATEWAY_AWLMESSAGESTUB_H
 
-#include "sensor-gateway/common/data-structure/sensor/AWLMessage.h"
+#include "sensor-gateway/common/data-structure/sensor/AWLStructures.h"
 
 namespace Stub {
-    using DataFlow::AWLMessage;
+    using AWLMessage = Sensor::AWL::Structures::Message;
 
     std::vector<AWLMessage> createAWLMessageStub() {
         std::vector<AWLMessage> awlMessages = {AWLMessage(10, 2188169, 8, {211, 55, 0, 11, 0, 0, 123, 0}),

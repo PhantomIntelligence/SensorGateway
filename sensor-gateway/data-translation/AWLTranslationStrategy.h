@@ -22,6 +22,7 @@ namespace DataTranslation {
 
     using AWLStructures = Sensor::AWL::Structures;
     using AWLSpiritStructures = Sensor::Spirit::Structures<
+            AWLStructures::AWLMessageDefinition,
             AWLStructures::AWLRawDataDefinition,
             AWLStructures::AWLCommandDefinition
             >;

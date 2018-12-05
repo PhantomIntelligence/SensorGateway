@@ -16,8 +16,8 @@
 
 using DataTranslation::AWLTranslationStrategy;
 using DataFlow::PixelId;
-using DataFlow::FrameId;
-using DataFlow::SystemId;
+using DataFlow::MessageId;
+using DataFlow::SensorId;
 using DataFlow::TrackId;
 using DataFlow::Intensity;
 using DataFlow::Distance;
@@ -27,8 +27,8 @@ using DataFlow::ConfidenceLevel;
 using Sensor::AWL::END_OF_FRAME;
 using Sensor::AWL::DETECTION_TRACK;
 using Sensor::AWL::DETECTION_VELOCITY;
-using Sensor::AWL::_16::NUMBER_OF_PIXELS_IN_LAYER;
-using Sensor::AWL::_16::NUMBER_OF_PIXELS_IN_FRAME;
+using Sensor::AWL::_16::NUMBER_OF_PIXELS_PER_LAYER;
+using Sensor::AWL::_16::NUMBER_OF_PIXELS;
 using Sensor::AWL::_16::HORIZONTAL_FIELD_OF_VIEW;
 using Sensor::AWL::_16::ANGLE_RANGE;
 
@@ -54,10 +54,10 @@ void AWLTranslationStrategy::translateRawData(SensorRawData&& serverRawData) {
 }
 
 void AWLTranslationStrategy::translateEndOfFrameMessage(SensorMessage&& sensorMessage) {
-    FrameId frameId = convertTwoBytesToUnsignedBigEndian(sensorMessage.data[0], sensorMessage.data[1]);
-    SystemId systemId = convertTwoBytesToUnsignedBigEndian(sensorMessage.data[2], sensorMessage.data[3]);
-    currentOutputMessage.systemId = systemId;
-    currentOutputMessage.frameId = frameId;
+    MessageId messageId = convertTwoBytesToUnsignedBigEndian(sensorMessage.data[0], sensorMessage.data[1]);
+    SensorId sensorId = convertTwoBytesToUnsignedBigEndian(sensorMessage.data[2], sensorMessage.data[3]);
+    currentOutputMessage.messageId = messageId;
+    currentOutputMessage.sensorId = sensorId;
     MessageSource::produce(std::move(currentOutputMessage));
     currentOutputMessage = ServerMessage::returnDefaultData();
 }
@@ -92,7 +92,7 @@ void AWLTranslationStrategy::translateDetectionVelocityMessage(SensorMessage&& s
 
 Track* AWLTranslationStrategy::fetchTrack(TrackId const& trackId) {
     auto pixels = currentOutputMessage.getPixels();
-    for (auto i = 0; i < NUMBER_OF_PIXELS_IN_FRAME; ++i) {
+    for (auto i = 0; i < NUMBER_OF_PIXELS; ++i) {
         auto pixel = &pixels->at(i);
         if (pixel->doesTrackExist(trackId)) {
             return pixel->fetchTrackById(trackId);

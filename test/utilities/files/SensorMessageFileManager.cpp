@@ -12,28 +12,36 @@
 */
 
 #include <map>
-#include "FrameFileManager.h"
+#include "SensorMessageFileManager.h"
 
-using TestUtilities::FrameFileManager;
+using TestUtilities::SensorMessageFileManager;
 
-
-void FrameFileManager::writeFileWithFrames(TestUtilities::Structures::Frames frames, std::string const& filename) {
+void SensorMessageFileManager::writeFileWithSensorMessages(TestUtilities::Structures::SensorMessages sensorMessages, std::string const& filename) {
     auto file = std::fopen(filename.c_str(), "w+");
-    for (auto frame : frames) {
-        writeFileBlockWithMessage(frame, file);
+    for (auto sensorMessage : sensorMessages) {
+        writeFileBlockWithMessage(sensorMessage, file);
     }
     fflush(file);
     fclose(file);
 }
 
-DataFlow::Frame FrameFileManager::readMessageFromFileBlock(std::string const& fileBlock) {
-    //TODO: update method when testing Frames -> AWLMessages
-    return DataFlow::Frame();
+void SensorMessageFileManager::writeFileWithSensorMessages(Structures::SensorMessageList sensorMessages, std::string const& filename) {
+    auto file = std::fopen(filename.c_str(), "w+");
+    for (auto sensorMessage : sensorMessages) {
+        writeFileBlockWithMessage(sensorMessage, file);
+    }
+    fflush(file);
+    fclose(file);
 }
 
-void FrameFileManager::writeFileBlockWithMessage(DataFlow::Frame message, std::FILE* file) {
-    writeFileLineWithContentLabelAndValue(file, 0, FRAME_ID_LABEL.c_str(), message.frameId);
-    writeFileLineWithContentLabelAndValue(file, 0, SYSTEM_ID_LABEL.c_str(), message.systemId);
+TestUtilities::Structures::Message SensorMessageFileManager::readMessageFromFileBlock(std::string const& fileBlock) {
+    //TODO: update method when testing SensorMessages -> AWLMessages
+    return TestUtilities::Structures::Message();
+}
+
+void SensorMessageFileManager::writeFileBlockWithMessage(TestUtilities::Structures::Message message, std::FILE* file) {
+    writeFileLineWithContentLabelAndValue(file, 0, MESSAGE_ID_LABEL.c_str(), message.messageId);
+    writeFileLineWithContentLabelAndValue(file, 0, SENSOR_ID_LABEL.c_str(), message.sensorId);
 
     auto pixels = message.getPixels();
     writeFileLineWithContentLabel(file, 0, PIXELS_LABEL.c_str());
@@ -53,19 +61,19 @@ void FrameFileManager::writeFileBlockWithMessage(DataFlow::Frame message, std::F
     std::fprintf(file, "%s\n", MESSAGES_SEPARATOR.c_str());
 }
 
-void TestUtilities::FrameFileManager::writeFileLineWithContentLabel(std::FILE* file,
-                                                                           unsigned int numberOfTabulator,
-                                                                           char const* contentLabel) {
+void TestUtilities::SensorMessageFileManager::writeFileLineWithContentLabel(std::FILE* file,
+                                                                    unsigned int numberOfTabulator,
+                                                                    char const* contentLabel) {
     for (auto tabulatorNumber = 0; tabulatorNumber < numberOfTabulator; tabulatorNumber++) {
         std::fprintf(file, "%s", MESSAGE_CONTENT_TABULATOR.c_str());
     }
     std::fprintf(file, "%s%s\n", contentLabel, MESSAGE_LABEL_VALUE_ASSOCIATOR.c_str());
 }
 
-void FrameFileManager::writeFileLineWithContentLabelAndValue(std::FILE* file,
-                                                                    unsigned int numberOfTabulator,
-                                                                    char const* contentLabel,
-                                                                    unsigned int contentValue) {
+void SensorMessageFileManager::writeFileLineWithContentLabelAndValue(std::FILE* file,
+                                                             unsigned int numberOfTabulator,
+                                                             char const* contentLabel,
+                                                             unsigned int contentValue) {
     for (auto tabulatorNumber = 0; tabulatorNumber < numberOfTabulator; tabulatorNumber++) {
         std::fprintf(file, "%s", MESSAGE_CONTENT_TABULATOR.c_str());
     }

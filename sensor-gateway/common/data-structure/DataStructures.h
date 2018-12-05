@@ -22,16 +22,26 @@
 namespace Sensor {
 
     /**
-     * @brief This CommandDefinition struct serves to declare types used by <SensorName>Command classes
-     * @tparam T the type of an individual payload data
-     * @tparam N the max number of payload data in a command
+     * @brief This SensorMessageDefinition struct serves to declare types used by <SensorName>Message classes
+     * @tparam P number of pixel for this sensor
      */
-    template<typename T, std::size_t N>
-    struct CommandDefinition {
-        static std::size_t const SIZE = N;
-        using ValueType = T;
-        using Payload = std::array<ValueType, SIZE>;
+    template<std::size_t P, typename TimeTrackingDefinition>
+    struct SensorMessageDefinition {
+        static std::size_t const NUMBER_OF_PIXELS = P;
+
+        template<typename T>
+        struct Pixels {
+            using PixelType = T;
+            typedef std::array<PixelType, NUMBER_OF_PIXELS> type;
+        };
+
+        using TimeTracking = Metrics::TimeTracking<TimeTrackingDefinition>;
     };
+
+    namespace SensorMessageTypes {
+        typedef int32_t AWL;
+        typedef int16_t GUARDIAN;
+    }
 
     /**
      * @brief This RawDataDefinition struct serves to declare types used by <SensorName>RawData classes
@@ -52,6 +62,18 @@ namespace Sensor {
         typedef int32_t AWL;
         typedef int16_t GUARDIAN;
     }
+
+    /**
+     * @brief This CommandDefinition struct serves to declare types used by <SensorName>Command classes
+     * @tparam T the type of an individual payload data
+     * @tparam N the max number of payload data in a command
+     */
+    template<typename T, std::size_t N>
+    struct CommandDefinition {
+        static std::size_t const SIZE = N;
+        using ValueType = T;
+        using Payload = std::array<ValueType, SIZE>;
+    };
 
     namespace CommandPayloadTypes {
         typedef Byte AWL;

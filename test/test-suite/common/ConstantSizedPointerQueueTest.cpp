@@ -40,7 +40,7 @@ public:
     using Queue = Container::ConstantSizedPointerQueue<SimpleMessage, ConstantSizedPointerQueueTest::TEST_SIZE>;
 
     void fillQueue(Queue* queue) const {
-        SimpleMessage data = DataTestUtil::createRandomSimpleMessage();
+        SimpleMessage data = DataTestUtil::createRandomSimpleMessageWithEmptyTimestamps();
         auto pointer = &data;
 
         for (auto i = 0; i < ConstantSizedPointerQueueTest::TEST_SIZE; ++i) {
@@ -59,7 +59,7 @@ TEST_F(ConstantSizedPointerQueueTest, given_anEmptyQueue_when_askedIfIsEmpty_the
 
 TEST_F(ConstantSizedPointerQueueTest, given_anQueueWithOneElement_when_askedIfIsEmpty_then_returnsFalse) {
     Queue queue;
-    SimpleMessage data = DataTestUtil::createRandomSimpleMessage();
+    SimpleMessage data = DataTestUtil::createRandomSimpleMessageWithEmptyTimestamps();
     auto pointer = &data;
     queue.store(pointer);
 
@@ -95,7 +95,7 @@ TEST_F(ConstantSizedPointerQueueTest, given_aFullQueue_when_storingANewPointer_t
     Queue queue;
     fillQueue(&queue);
 
-    SimpleMessage data = DataTestUtil::createRandomSimpleMessage();
+    SimpleMessage data = DataTestUtil::createRandomSimpleMessageWithEmptyTimestamps();
     auto pointer = &data;
 
     ASSERT_THROW(queue.store(pointer), std::runtime_error);
@@ -103,7 +103,7 @@ TEST_F(ConstantSizedPointerQueueTest, given_aFullQueue_when_storingANewPointer_t
 
 TEST_F(ConstantSizedPointerQueueTest, given_aStoredPointer_when_consumeNext_then_returnsThePointer) {
     Queue queue;
-    SimpleMessage data = DataTestUtil::createRandomSimpleMessage();
+    SimpleMessage data = DataTestUtil::createRandomSimpleMessageWithEmptyTimestamps();
     auto pointer = &data;
     queue.store(pointer);
 
@@ -114,8 +114,8 @@ TEST_F(ConstantSizedPointerQueueTest, given_aStoredPointer_when_consumeNext_then
 
 TEST_F(ConstantSizedPointerQueueTest, given_twoPointerStoredInOrder_when_consumed_then_returnedInTheOrderTheyWereStored) {
     Queue queue;
-    SimpleMessage firstData = DataTestUtil::createRandomSimpleMessage();
-    SimpleMessage secondData = DataTestUtil::createRandomSimpleMessage();
+    SimpleMessage firstData = DataTestUtil::createRandomSimpleMessageWithEmptyTimestamps();
+    SimpleMessage secondData = DataTestUtil::createRandomSimpleMessageWithEmptyTimestamps();
     auto firstPointer = &firstData;
     auto secondPointer = &secondData;
     queue.store(firstPointer);
@@ -130,7 +130,7 @@ TEST_F(ConstantSizedPointerQueueTest, given_twoPointerStoredInOrder_when_consume
 
 TEST_F(ConstantSizedPointerQueueTest, given_aPointerInTheQueue_when_consumeNext_then_returnsThePointer) {
     Queue queue;
-    SimpleMessage data = DataTestUtil::createRandomSimpleMessage();
+    SimpleMessage data = DataTestUtil::createRandomSimpleMessageWithEmptyTimestamps();
     auto pointer = &data;
     queue.store(pointer);
 
@@ -143,7 +143,7 @@ TEST_F(ConstantSizedPointerQueueTest, given_aNonFullQueue_when_fillingAndConsumi
     Queue queue;
 
     for (auto j = 0; j < ConstantSizedPointerQueueTest::TEST_SIZE * 2; ++j) {
-        SimpleMessage data = DataTestUtil::createRandomSimpleMessage();
+        SimpleMessage data = DataTestUtil::createRandomSimpleMessageWithEmptyTimestamps();
         auto pointer = &data;
         queue.store(pointer);
         auto storedPointer = queue.consumeNext();

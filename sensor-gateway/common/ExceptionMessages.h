@@ -24,7 +24,7 @@ namespace ExceptionMessage {
 
     static auto CONSTANT_SIZED_POINTER_LIST_ILLEGAL_REMOVAL_OF_POINTER = "Illegal removal of pointer: the ConstantSizedPointerList does not contain the pointer.";
 
-    static auto RING_BUFFER_ILLEGAL_CONSUMPTION_ON_WRITER_LOCATION_MESSAGE = "Illegal consumption, execution should not reach this point. The calling entity should not be allowed to proceed to this call";
+    static auto RING_BUFFER_ILLEGAL_CONSUMPTION_ON_WRITER_LOCATION_MESSAGE = "Illegal consumption, execution should not reach this point. The calling entity should not be allowed to proceed to this call. Data might have been lost";
 
     static auto DATA_PROCESSING_SCHEDULER_ILLEGAL_LINKING_SCHEDULER_HAS_BEEN_STOPPED = "Illegal linking attempt between DataProcessingScheduler and DataSourceBuffer: The DataProcessingScheduler has received the terminate order, no new DataSourceBuffer can be linked.";
     static auto DATA_PROCESSING_SCHEDULER_ILLEGAL_LINKING_OF_ALREADY_LINKED_BUFFER_MESSAGE = "Illegal linking attempt between DataProcessingScheduler and DataSourceBuffer: The DataSourceBuffer has already been linked.";
@@ -33,6 +33,7 @@ namespace ExceptionMessage {
     static auto DATA_PROCESSING_SCHEDULER_ILLEGAL_DEACTIVATION_MESSAGE = "Illegal DataProcessingScheduler deactivation attempt from an unlinked DataSourceBuffer";
 
     static auto PIXEL_TRACK_ARRAY_ILLEGAL_STORE_FULL = "Illegal storing of track: the pixel's track array is full";
+    static auto SERVICE_TIMESTAMPS_ILLEGAL_FULL_CAPACITY = "Illegal storing of timestamp: the time points array is already full";
 
 }
 

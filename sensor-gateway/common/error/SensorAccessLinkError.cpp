@@ -160,7 +160,7 @@ std::string SensorAccessLinkError::buildDetailedMessage(HighResolutionTimePoint 
 
 std::string SensorAccessLinkError::formatTimestamp(HighResolutionTimePoint const& timestamp) noexcept {
     std::size_t const ARBITRARY_BIG_ENOUGH_SIZE = 128;
-    auto time_tTimestamp = std::chrono::_V2::system_clock::to_time_t(timestamp);
+    auto time_tTimestamp = std::chrono::system_clock::to_time_t(timestamp);
     auto utcTime = gmtime(&time_tTimestamp);
     char charArrayTime[ARBITRARY_BIG_ENOUGH_SIZE];
     auto numberOfCharacterWritten = strftime(charArrayTime, sizeof(charArrayTime), "%D %T", utcTime);

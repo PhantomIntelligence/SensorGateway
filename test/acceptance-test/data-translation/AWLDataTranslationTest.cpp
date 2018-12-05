@@ -18,58 +18,61 @@
 #include <gmock/gmock.h>
 #include <fstream>
 #include "test/utilities/files/AWLMessagesFileManager.h"
-#include "test/utilities/files/FrameFileManager.h"
+#include "test/utilities/files/SensorMessageFileManager.h"
 #include "test/utilities/stub/AWLMessageStub.h"
-#include "test/utilities/stub/FrameStub.h"
+#include "test/utilities/stub/SensorMessageStub.h"
+#include "test/utilities/mock/ArbitraryDataSinkMock.hpp"
 #include "sensor-gateway/data-translation/AWLTranslationStrategy.h"
-#include "test/utilities/mock/FrameSinkMock.h"
 
-using Mock::FrameProcessingScheduler;
-using Mock::FrameSinkMock;
 using TestUtilities::AWLMessagesFileManager;
-using TestUtilities::FrameFileManager;
+using TestUtilities::SensorMessageFileManager;
+using Stub::SensorMessage;
 using Stub::createAWLMessageStub;
-using Stub::createFrameStub;
+using Stub::createSensorMessageStub;
 using DataTranslation::AWLTranslationStrategy;
+
+using SensorMessageSinkMock = Mock::ArbitraryDataSinkMock<SensorMessage>;
+using SensorMessageProcessingScheduler = DataFlow::DataProcessingScheduler<SensorMessage, SensorMessageSinkMock, 1>;
 
 class AWLTranslationStrategyTest : public ::testing::Test {
 protected:
-    char const* AWLDATAS_INPUT_FILE_NAME = "AWLMessagesInputFile.txt";
-    char const* EXPECTED__FRAMES_OUTPUT_FILE_NAME = "ExpectedFramesOutputFile.txt";
+    char const* AWL_DATAS_INPUT_FILE_NAME = "AWLMessagesInputFile.txt";
+    char const* EXPECTED_FRAMES_OUTPUT_FILE_NAME = "ExpectedSensorMessagesOutputFile.txt";
 
     virtual void SetUp() {
         auto awlMessages = createAWLMessageStub();
-        auto Frames = createFrameStub();
-        awlMessagesFileManager.writeFileWithMessages(awlMessages, AWLDATAS_INPUT_FILE_NAME);
-        frameFileManager.writeFileWithMessages(Frames, EXPECTED__FRAMES_OUTPUT_FILE_NAME);
+        auto sensorMessages = createSensorMessageStub();
+        awlMessagesFileManager.writeFileWithMessages(awlMessages, AWL_DATAS_INPUT_FILE_NAME);
+        sensorMessageFileManager.writeFileWithMessages(sensorMessages, EXPECTED_FRAMES_OUTPUT_FILE_NAME);
     }
 
     AWLMessagesFileManager awlMessagesFileManager;
-    FrameFileManager frameFileManager;
+    SensorMessageFileManager sensorMessageFileManager;
 };
 
 TEST_F(AWLTranslationStrategyTest,
-       given_someInputFileContainingValidAWLMessages_when_translatingAWLMessagesIntoFrames_then_returnCorrespondingSpiritFramesOutputFile) {
-    auto ACTUAL__FRAMES_OUTPUT_FILE_NAME = "ActualFramesOutputFile.txt";
+       given_someInputFileContainingValidAWLMessages_when_translatingAWLMessagesIntoSensorMessages_then_returnCorrespondingSpiritSensorMessagesOutputFile) {
+    auto ACTUAL_SENSOR_MESSAGES_OUTPUT_FILE_NAME = "ActualSensorMessagesOutputFile.txt";
     AWLTranslationStrategy awlMessageTranslator;
-    FrameSinkMock frameSinkMock(1);
-    FrameProcessingScheduler scheduler(&frameSinkMock);
+    SensorMessageSinkMock sensorMessageSinkMock(1);
+    SensorMessageProcessingScheduler scheduler(&sensorMessageSinkMock);
     awlMessageTranslator.linkConsumer(&scheduler);
     int counter = 0;
 
-    auto messages = awlMessagesFileManager.readMessagesFromFile(AWLDATAS_INPUT_FILE_NAME);
+    auto messages = awlMessagesFileManager.readMessagesFromFile(AWL_DATAS_INPUT_FILE_NAME);
     for (auto message : messages) {
         awlMessageTranslator.translateMessage(std::move(message));
         ++counter;
     }
 
     scheduler.terminateAndJoin();
+    sensorMessageSinkMock.waitConsumptionToBeReached();
 
-    auto frames = frameSinkMock.getConsumedData();
+    auto sensorMessages = sensorMessageSinkMock.getConsumedData();
 
-    frameFileManager.writeFileWithFrames(frames, ACTUAL__FRAMES_OUTPUT_FILE_NAME);
-    ASSERT_TRUE(frameFileManager.areFilesEqual(EXPECTED__FRAMES_OUTPUT_FILE_NAME,
-                                               ACTUAL__FRAMES_OUTPUT_FILE_NAME));
+    sensorMessageFileManager.writeFileWithSensorMessages(sensorMessages, ACTUAL_SENSOR_MESSAGES_OUTPUT_FILE_NAME);
+    ASSERT_TRUE(sensorMessageFileManager.areFilesEqual(EXPECTED_FRAMES_OUTPUT_FILE_NAME,
+                                               ACTUAL_SENSOR_MESSAGES_OUTPUT_FILE_NAME));
 }
 
 #endif //SENSORGATEWAY_AWLDATATRANSLATORTEST_CPP

@@ -21,6 +21,7 @@
 
 namespace SensorGateway {
 
+    // TODO: Use `type_index` to facilitate the mapping to the correct SensorAccessLink type : https://en.cppreference.com/w/cpp/types/type_index
     // TODO: Using things like `enable_if<>, handle different sensors when there is or not RawData or fetching in bulk`
     template<class SENSOR_STRUCTURES, class SERVER_STRUCTURES>
     class SensorAccessLink : public DataFlow::DataSink<ErrorHandling::SensorAccessLinkError> {

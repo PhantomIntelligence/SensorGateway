@@ -531,7 +531,7 @@ SimpleMessageList
 SensorCommunicatorTest::createASequenceOfDifferentMessagesOfSize(uint64_t numberOfMessagesToCreate) const noexcept {
     SimpleMessageList messages;
     for (uint8_t offset = 0; offset < numberOfMessagesToCreate; ++offset) {
-        auto message = TestFunctions::DataTestUtil::createRandomSimpleMessage();
+        auto message = TestFunctions::DataTestUtil::createRandomSimpleMessageWithEmptyTimestamps();
         messages.push_back(message);
     }
     return messages;

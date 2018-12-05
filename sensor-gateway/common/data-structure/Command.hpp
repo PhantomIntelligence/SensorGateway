@@ -17,7 +17,7 @@
 #ifndef SENSORGATEWAY_COMMAND_HPP
 #define SENSORGATEWAY_COMMAND_HPP
 
-#include "sensor-gateway/common/ConstantFunctionsDefinition.h"
+#include "TimeTracking.hpp"
 
 namespace DataFlow {
 
@@ -49,7 +49,7 @@ namespace DataFlow {
 
         Command(Command&& other) noexcept :
                 Command(std::move(other.commandCode),
-                              std::move(other.payload)) {}
+                        std::move(other.payload)) {}
 
         Command& operator=(Command const& other)& {
             Command temporary(other);

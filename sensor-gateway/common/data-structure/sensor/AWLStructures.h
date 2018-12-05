@@ -18,7 +18,7 @@
 #define SENSORGATEWAY_AWLSTRUCTURES_H
 
 #include "sensor-gateway/common/data-structure/DataStructures.h"
-#include "AWLMessage.h"
+#include "AWLMessage.hpp"
 
 namespace Sensor {
     namespace AWL {
@@ -26,6 +26,18 @@ namespace Sensor {
         class Structures final : public Communication::DataStructures {
 
         public :
+
+            typedef typename
+            Metrics::TimeTrackingDefinition<
+                    AWL::NUMBER_OF_SENSOR_TIME_POINTS,
+                    AWL::NUMBER_OF_GATEWAY_TIME_POINTS
+            > AWLTimeTrackingDefinition;
+
+            typedef typename
+            Sensor::SensorMessageDefinition<
+                    AWL::_16::NUMBER_OF_PIXELS,
+                    AWLTimeTrackingDefinition
+            > AWLMessageDefinition;
 
             typedef typename
             Sensor::RawDataDefinition<
@@ -40,7 +52,7 @@ namespace Sensor {
                     Sensor::AWL::MAX_COMMAND_PAYLOAD_SIZE
             > AWLCommandDefinition;
 
-            typedef typename DataFlow::AWLMessage Message;
+            typedef typename DataFlow::AWLMessage<AWLMessageDefinition> Message;
             typedef typename DataFlow::RawData<AWLRawDataDefinition> RawData;
             typedef typename DataFlow::Command<AWLCommandDefinition> Command;
 

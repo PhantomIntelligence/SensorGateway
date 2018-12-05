@@ -31,12 +31,11 @@
 #include <cstring>
 #include <sstream>
 #include <limits>
-#include <iostream>
 #include <chrono>
 #include <utility>
 
 #include "hicpp/HighIntegrityThread.h"
-#include "ExceptionMessages.h"
+#include "TimePointLocationNames.h"
 
 namespace {
     typedef unsigned char Byte;
@@ -53,6 +52,7 @@ namespace {
 
     typedef std::chrono::high_resolution_clock HighResolutionClock;
     typedef std::chrono::time_point<HighResolutionClock> HighResolutionTimePoint;
+    typedef std::chrono::duration<double, std::nano> DurationInNanoseconds;
 };
 
 namespace DataFlow {
@@ -71,11 +71,11 @@ namespace DataFlow {
     typedef int16_t Acceleration;
     typedef uint8_t ConfidenceLevel;
     typedef uint16_t Distance;
-    typedef uint16_t FrameId;
+    typedef uint16_t MessageId;
     typedef uint16_t Intensity;
     typedef uint16_t PixelId;
     typedef int16_t Speed;
-    typedef uint16_t SystemId;
+    typedef uint16_t SensorId;
     typedef uint16_t TrackId;
 };
 

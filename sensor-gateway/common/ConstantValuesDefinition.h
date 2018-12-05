@@ -15,6 +15,9 @@
 #define SENSORGATEWAY_CONSTANTVALUESDEFINITION_H
 
 #include "TypeDefinition.h"
+namespace Metrics {
+    HighResolutionTimePoint const BEGINNING_OF_TIME_ITSELF = HighResolutionClock::from_time_t(0);
+}
 
 namespace DataFlow {
     uint8_t const NUMBER_OF_CONCURRENT_INPUT_FOR_SENSOR_ACCESS_LINK_ELEMENTS = 1;
@@ -60,10 +63,16 @@ namespace Sensor {
     using SensorId = uint16_t;
 
     namespace Guardian {
+        static size_t const NUMBER_OF_PIXELS = 16;
         static size_t const NUMBER_OF_CHANNELS = 16;
         static size_t const NUMBER_OF_DETECTION_PER_CHANNEL = 16;
         static size_t const RAW_DATA_SAMPLING_LENGTH = 100;
         size_t const DETECTIONS_SIZE = NUMBER_OF_CHANNELS * NUMBER_OF_DETECTION_PER_CHANNEL;
+
+        // Internal sensor timestamps are included in untranslated structure
+        static size_t const NUMBER_OF_SENSOR_TIME_POINTS = 0;
+        // (Beginning + End) of reception
+        static size_t const NUMBER_OF_GATEWAY_TIME_POINTS = 2;
 
         static size_t const MAX_COMMAND_PAYLOAD_SIZE = 4096; // 1024 * floats == 1024 * 4 Bytes
     }
@@ -75,9 +84,16 @@ namespace Sensor {
         MessageId const DETECTION_VELOCITY = 0x0B;
         int const NUMBER_OF_DATA_BYTES = 8;
 
+        // Internal sensor timestamps are included in untranslated structure
+        static size_t const NUMBER_OF_SENSOR_TIME_POINTS = 0;
+
+        // (Beginning + End) of reception
+        static size_t const NUMBER_OF_GATEWAY_TIME_POINTS = 2;
+
+
         /**
          * @note: The AWL raw data is currently not supported. This is why the RAW_DATA_SAMPLING_LENGTH
-         * real value (1024) is commented out. Nontheless, the templates for DataStructures still require
+         * real value (1024) is commented out. Nonetheless, the templates for DataStructures still require
          * one to be defined, this is why the value is set to 1, which minimizes the memory usage for an AWLAccessLink
          */
 //        static size_t const RAW_DATA_SAMPLING_LENGTH = 1024;
@@ -93,11 +109,11 @@ namespace Sensor {
             size_t const MAX_RAW_BUFFER_SIZE = 16384;
             int const MULTIPLICATIVE_CONSTANT = 10;  // Because all values are multiple with 1 decimal, 10 is sufficient to work with non-floating point representation
             int const HORIZONTAL_FIELD_OF_VIEW = static_cast<int>(30.4 * MULTIPLICATIVE_CONSTANT);
-            int const NUMBER_OF_LAYER = 2;
-            int const NUMBER_OF_PIXELS_IN_LAYER = 8;
-            int const NUMBER_OF_PIXELS_IN_FRAME = 16;
+            int const NUMBER_OF_PIXELS = 16;
+            int const NUMBER_OF_LAYERS = 2;
+            int const NUMBER_OF_PIXELS_PER_LAYER = 8;
             int const NUMBER_OF_TRACKS_IN_PIXEL = 16;
-            int const ANGLE_RANGE = HORIZONTAL_FIELD_OF_VIEW / NUMBER_OF_PIXELS_IN_LAYER;
+            int const ANGLE_RANGE = HORIZONTAL_FIELD_OF_VIEW / NUMBER_OF_PIXELS_PER_LAYER;
             SensorId const SENSOR_ID = 0x0010;
         }
     }

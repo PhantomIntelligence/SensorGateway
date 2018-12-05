@@ -1,49 +1,61 @@
 /**
 	Copyright 2014-2018 Phantom Intelligence Inc.
+
 	Licensed under the Apache License, Version 2.0 (the "License");
 	you may not use this file except in compliance with the License.
 	You may obtain a copy of the License at
+
 		http://www.apache.org/licenses/LICENSE-2.0
+
 	Unless required by applicable law or agreed to in writing, software
 	distributed under the License is distributed on an "AS IS" BASIS,
 	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 	See the License for the specific language governing permissions and
 	limitations under the License.
 */
-#ifndef SENSORGATEWAY_FRAMESTUB_H
-#define SENSORGATEWAY_FRAMESTUB_H
 
-#include "sensor-gateway/common/data-structure/spirit/Frame.h"
+#ifndef SENSORGATEWAY_SENSORMESSAGESTUB_H
+#define SENSORGATEWAY_SENSORMESSAGESTUB_H
+
+#include "sensor-gateway/common/data-structure/spirit/SensorMessage.hpp"
+#include "sensor-gateway/common/data-structure/sensor/AWLStructures.h"
+#include "sensor-gateway/common/data-structure/spirit/SpiritStructures.h"
 
 namespace Stub {
 
-    using DataFlow::Frame;
-    using DataFlow::FrameId;
-    using DataFlow::SystemId;
+    using AWL16Structures = Sensor::AWL::Structures;
+    using AWL16SpiritStructures = Sensor::Spirit::Structures<
+            AWL16Structures::AWLMessageDefinition,
+            AWL16Structures::AWLRawDataDefinition,
+            AWL16Structures::AWLCommandDefinition
+    >;
+    using SensorMessage = AWL16SpiritStructures::Message;
+    using DataFlow::MessageId;
+    using DataFlow::SensorId;
     using DataFlow::Pixel;
     using DataFlow::PixelId;
     using DataFlow::Track;
 
     typedef std::pair<PixelId, std::vector<Track>> TracksInPixel;
 
-    Frame const addTrackToFrameAtGivenPixelId(Frame frame, Track track, PixelId pixelId) {
-        Frame frameCopy = Frame(frame);
-        frameCopy.addTrackToPixelWithId(pixelId, std::move(track));
-        return frameCopy;
+    SensorMessage const addTrackToSensorMessageAtGivenPixelId(SensorMessage sensorMessage, Track track, PixelId pixelId) {
+        SensorMessage sensorMessageCopy = SensorMessage(sensorMessage);
+        sensorMessageCopy.addTrackToPixelWithId(pixelId, std::move(track));
+        return sensorMessageCopy;
     }
 
-    Frame createFrame(FrameId frameId, SystemId systemId, std::vector<TracksInPixel> tracksInPixels) {
-        Frame frame = Frame(frameId, systemId, {});
+    SensorMessage createSensorMessage(MessageId sensorMessageId, SensorId sensorId, std::vector<TracksInPixel> tracksInPixels) {
+        SensorMessage sensorMessage = SensorMessage(sensorMessageId, sensorId, {});
         for (auto tracksInPixel : tracksInPixels) {
             for (auto track : tracksInPixel.second) {
-                frame.addTrackToPixelWithId(tracksInPixel.first, std::move(track));
+                sensorMessage.addTrackToPixelWithId(tracksInPixel.first, std::move(track));
             }
         }
-        return frame;
+        return sensorMessage;
     }
 
-    Frame createArbitraryFrame() {
-        return createFrame(42, 16, {TracksInPixel(0, {Track(14275, 0, 139, 0, 109, 0)}),
+    SensorMessage createArbitrarySensorMessage() {
+        return createSensorMessage(42, 16, {TracksInPixel(0, {Track(14275, 0, 139, 0, 109, 0)}),
                                         TracksInPixel(1, {Track(42, 0, 135, 0, 110, 0)}),
                                         TracksInPixel(2, {Track(14286, 0, 125, 0, 105, 0)}),
                                         TracksInPixel(3, {Track(14270, 0, 127, 0, 106, 1)}),
@@ -61,11 +73,11 @@ namespace Stub {
                                         TracksInPixel(15, {Track(14321, 0, 109, 0, 113, 0)})
                 });
     }
-    Frame createRandomIdFrame() {
+    SensorMessage createRandomIdSensorMessage() {
         std::default_random_engine randomEngine(std::random_device{}());
         std::uniform_int_distribution<uint16_t> distribution(0, 1000);
         auto randomId = distribution(randomEngine);
-        return createFrame(randomId, 16, {TracksInPixel(0, {Track(14275, 0, 139, 0, 109, 0)}),
+        return createSensorMessage(randomId, 16, {TracksInPixel(0, {Track(14275, 0, 139, 0, 109, 0)}),
                                     TracksInPixel(1, {Track(42, 0, 135, 0, 110, 0)}),
                                     TracksInPixel(2, {Track(14286, 0, 125, 0, 105, 0)}),
                                     TracksInPixel(3, {Track(14270, 0, 127, 0, 106, 1)}),
@@ -84,9 +96,9 @@ namespace Stub {
         });
     }
 
-    std::vector<Frame> createFrameStub() {
-        std::vector<Frame> Frames = {
-                createFrame(64829, 16, {TracksInPixel(11, {Track(14291, 0, 123, 0, 106, 0)}),
+    std::vector<SensorMessage> createSensorMessageStub() {
+        std::vector<SensorMessage> SensorMessages = {
+                createSensorMessage(64829, 16, {TracksInPixel(11, {Track(14291, 0, 123, 0, 106, 0)}),
                                         TracksInPixel(12, {Track(14324, 0, 93, 0, 109, 0)}),
                                         TracksInPixel(13, {Track(14302, 0, 115, 0, 109, -1)}),
                                         TracksInPixel(14, {Track(14322, 0, 104, 0, 115, -6)}),
@@ -94,7 +106,7 @@ namespace Stub {
                             }
                 ),
 
-                createFrame(64830, 16, {TracksInPixel(0, {Track(14275, 0, 139, 0, 109, 0)}),
+                createSensorMessage(64830, 16, {TracksInPixel(0, {Track(14275, 0, 139, 0, 109, 0)}),
                                         TracksInPixel(1, {Track(2, 0, 135, 0, 110, 0)}),
                                         TracksInPixel(2, {Track(14286, 0, 125, 0, 105, 0)}),
                                         TracksInPixel(3, {Track(14270, 0, 127, 0, 106, 1)}),
@@ -113,8 +125,8 @@ namespace Stub {
                             }
                 )
         };
-        return Frames;
+        return SensorMessages;
     }
 }
 
-#endif // SENSORGATEWAY_FRAMESTUB_H
+#endif // SENSORGATEWAY_SENSORMESSAGESTUB_H
