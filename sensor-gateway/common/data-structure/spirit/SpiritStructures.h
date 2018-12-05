@@ -26,7 +26,26 @@ namespace Sensor {
         template<typename SensorMessageDefinition, typename RawDataDefinition, typename CommandDefinition>
         class Structures final : public Communication::DataStructures {
 
+        protected:
+
+            // (Beginning + End) of acquisition + (Beginning + End) of transmission on sensor
+            static size_t const NUMBER_OF_SENSOR_TIME_POINTS = 4;
+            // (Beginning + End) of reception + (Beginning + End) of translation + transmission on gateway
+            static size_t const NUMBER_OF_GATEWAY_TIME_POINTS = 5;
+
         public :
+
+            typedef typename
+            Metrics::TimeTrackingDefinition<
+                    NUMBER_OF_SENSOR_TIME_POINTS,
+                    NUMBER_OF_GATEWAY_TIME_POINTS
+            > GatewayTimeTrackingDefinition;
+
+            typedef typename
+            Sensor::SensorMessageDefinition<
+                    SensorMessageDefinition::NUMBER_OF_PIXELS,
+                    GatewayTimeTrackingDefinition
+            > GatewaySensorMessageDefinition;
 
             enum DataType : uint32_t {
 //            [0, 499] -> reserved for SensorGateway messages
@@ -38,7 +57,7 @@ namespace Sensor {
                 SENSOR_RAW_DATA = 501
             };
 
-            typedef typename DataFlow::SensorMessage<SensorMessageDefinition> Message;
+            typedef typename DataFlow::SensorMessage<GatewaySensorMessageDefinition> Message;
             typedef typename DataFlow::RawData<RawDataDefinition> RawData;
             typedef typename DataFlow::Command<CommandDefinition> Command;
 

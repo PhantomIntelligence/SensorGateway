@@ -18,7 +18,7 @@
 #define SENSORGATEWAY_GUARDIANSTRUCTURES_H
 
 #include "sensor-gateway/common/data-structure/DataStructures.h"
-#include "AWLMessage.h"
+#include "AWLMessage.hpp"
 
 namespace Sensor {
     namespace Guardian {
@@ -52,7 +52,7 @@ namespace Sensor {
                     Guardian::MAX_COMMAND_PAYLOAD_SIZE
             > GuardianCommandDefinition;
 
-            typedef typename DataFlow::AWLMessage Message;
+            typedef typename DataFlow::AWLMessage<GuardianMessageDefinition> Message;
             typedef typename DataFlow::RawData<GuardianRawDataDefinition> RawData;
             typedef typename DataFlow::Command<GuardianCommandDefinition> Command;
 

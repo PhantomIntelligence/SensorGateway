@@ -22,12 +22,15 @@
 namespace DataFlow {
 
     template<typename SensorMessageDefinition>
-    class SensorMessage {
+    class SensorMessage : public SensorMessageDefinition::TimeTracking {
+
+    protected:
+
+        using superTimeTracking = typename SensorMessageDefinition::TimeTracking;
 
     public:
 
         using Pixels = typename SensorMessageDefinition::template Pixels<Pixel>::type;
-        using TimeTracking = typename SensorMessageDefinition::TimeTracking;
 
         explicit SensorMessage(MessageId messageId, SensorId sensorId, Pixels pixels) :
                 messageId(messageId), sensorId(sensorId), pixels(std::move(pixels)) {};
@@ -83,6 +86,11 @@ namespace DataFlow {
         Pixels* getPixels() {
             return &pixels;
         }
+
+        using superTimeTracking::addTimePointForSensorWithLocation;
+        using superTimeTracking::addTimePointForGatewayWithLocation;
+        using superTimeTracking::getSensorTimestamps;
+        using superTimeTracking::getGatewayTimestamps;
 
         MessageId messageId;
         SensorId sensorId;

@@ -1,9 +1,12 @@
 /**
 	Copyright 2014-2018 Phantom Intelligence Inc.
+
 	Licensed under the Apache License, Version 2.0 (the "License");
 	you may not use this file except in compliance with the License.
 	You may obtain a copy of the License at
+
 		http://www.apache.org/licenses/LICENSE-2.0
+
 	Unless required by applicable law or agreed to in writing, software
 	distributed under the License is distributed on an "AS IS" BASIS,
 	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -25,22 +28,26 @@ using Defaults::Track::DEFAULT_DISTANCE;
 using Defaults::Track::DEFAULT_SPEED;
 
 using DataTranslation::AWLTranslationStrategy;
-using DataTranslation::AWLStructures;
-using DataTranslation::AWLSpiritStructures;
 
-using SensorMessage = typename DataFlow::SensorMessage<AWLStructures::AWLMessageDefinition>;
-using SensorRawData = AWLStructures::RawData;
-using SpiritMessage = AWLSpiritStructures::Message;
-using SpiritRawData = AWLSpiritStructures::RawData;
+using AWL16Structures = Sensor::AWL::Structures;
+using AWL16SpiritStructures = Sensor::Spirit::Structures<
+        AWL16Structures::AWLMessageDefinition,
+        AWL16Structures::AWLRawDataDefinition,
+        AWL16Structures::AWLCommandDefinition
+>;
+
+using AWLMessage = AWL16Structures::Message;
+using SensorRawData = AWL16Structures::RawData;
+using SpiritMessage = AWL16SpiritStructures::Message;
+using SpiritRawData = AWL16SpiritStructures::RawData;
 
 using PixelsArray = typename SpiritMessage::Pixels;
 using DataFlow::PixelId;
 
-using DataFlow::AWLMessage;
-
 class AWLTranslationStrategyTest : public ::testing::Test {
 
 protected:
+
 
     using SpiritMessageSinkMock = Mock::ArbitraryDataSinkMock<SpiritMessage>;
     using SpiritRawDataSinkMock = Mock::ArbitraryDataSinkMock<SpiritRawData>;
@@ -49,12 +56,12 @@ protected:
 
     int const FRAME_INDEX = 0;
     PixelId const SOME_PIXEL_ID = 11;
-    SensorMessage const BASE_FRAME = SensorMessage(64829, 16, PixelsArray());
-    SensorMessage const FRAME_AFTER_END_OF_FRAME_MESSAGE_TRANSLATION = BASE_FRAME;
-    SensorMessage const FRAME_AFTER_DETECTION_TRACK_AND_END_OF_FRAME_MESSAGES_TRANSLATION =
+    SpiritMessage const BASE_FRAME = SpiritMessage(64829, 16, PixelsArray());
+    SpiritMessage const FRAME_AFTER_END_OF_FRAME_MESSAGE_TRANSLATION = BASE_FRAME;
+    SpiritMessage const FRAME_AFTER_DETECTION_TRACK_AND_END_OF_FRAME_MESSAGES_TRANSLATION =
             addTrackToSensorMessage(BASE_FRAME, Track(14291, 96, 379, DEFAULT_ACCELERATION, DEFAULT_DISTANCE,
                                                    DEFAULT_SPEED));
-    SensorMessage const FRAME_AFTER_DETECTION_TRACK_AND_VELOCITY_TRACK_AND_END_OF_FRAME_MESSAGES_TRANSLATION =
+    SpiritMessage const FRAME_AFTER_DETECTION_TRACK_AND_VELOCITY_TRACK_AND_END_OF_FRAME_MESSAGES_TRANSLATION =
             addTrackToSensorMessage(BASE_FRAME, Track(14291, 96, 379, 256, 106, 0));
 
     AWLMessage const SOME_DETECTION_TRACK_AWL_MESSAGE = AWLMessage(10, 2188169, 8, {211, 55, 0, 11, 0, 96, 123, 1});
@@ -62,8 +69,8 @@ protected:
     AWLMessage const SOME_END_FRAME_AWL_MESSAGE = AWLMessage(9, 2188170, 8, {61, 253, 16, 0, 0, 0, 0, 0});
 
 private:
-    SensorMessage const addTrackToSensorMessage(SensorMessage sensorMessage, Track track) const {
-        SensorMessage sensorMessageCopy = SensorMessage(sensorMessage);
+    SpiritMessage const addTrackToSensorMessage(SpiritMessage sensorMessage, Track track) const {
+        SpiritMessage sensorMessageCopy = SpiritMessage(std::move(sensorMessage));
         sensorMessageCopy.addTrackToPixelWithId(SOME_PIXEL_ID, std::move(track));
         return sensorMessageCopy;
     }

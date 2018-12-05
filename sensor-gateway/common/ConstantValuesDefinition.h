@@ -69,10 +69,10 @@ namespace Sensor {
         static size_t const RAW_DATA_SAMPLING_LENGTH = 100;
         size_t const DETECTIONS_SIZE = NUMBER_OF_CHANNELS * NUMBER_OF_DETECTION_PER_CHANNEL;
 
-        // (Beginning + End) of acquisition + (Beginning + End) of transmission on sensor
-        static size_t const NUMBER_OF_SENSOR_TIME_POINTS = 4;
-        // (Beginning + End) of reception + (Beginning + End) of translation + transmission on gateway
-        static size_t const NUMBER_OF_GATEWAY_TIME_POINTS = 5;
+        // Internal sensor timestamps are included in untranslated structure
+        static size_t const NUMBER_OF_SENSOR_TIME_POINTS = 0;
+        // (Beginning + End) of reception
+        static size_t const NUMBER_OF_GATEWAY_TIME_POINTS = 2;
 
         static size_t const MAX_COMMAND_PAYLOAD_SIZE = 4096; // 1024 * floats == 1024 * 4 Bytes
     }
@@ -84,15 +84,16 @@ namespace Sensor {
         MessageId const DETECTION_VELOCITY = 0x0B;
         int const NUMBER_OF_DATA_BYTES = 8;
 
-        // (Beginning + End) of acquisition + (Beginning + End) of transmission on sensor
-        static size_t const NUMBER_OF_SENSOR_TIME_POINTS = 4;
+        // Internal sensor timestamps are included in untranslated structure
+        static size_t const NUMBER_OF_SENSOR_TIME_POINTS = 0;
 
-        // (Beginning + End) of reception + (Beginning + End) of translation + transmission on gateway
-        static size_t const NUMBER_OF_GATEWAY_TIME_POINTS = 5;
+        // (Beginning + End) of reception
+        static size_t const NUMBER_OF_GATEWAY_TIME_POINTS = 2;
+
 
         /**
          * @note: The AWL raw data is currently not supported. This is why the RAW_DATA_SAMPLING_LENGTH
-         * real value (1024) is commented out. Nontheless, the templates for DataStructures still require
+         * real value (1024) is commented out. Nonetheless, the templates for DataStructures still require
          * one to be defined, this is why the value is set to 1, which minimizes the memory usage for an AWLAccessLink
          */
 //        static size_t const RAW_DATA_SAMPLING_LENGTH = 1024;

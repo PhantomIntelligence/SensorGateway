@@ -15,11 +15,15 @@
 #define SENSORGATEWAY_AWLMESSAGESFILEMANAGER_H
 
 #include "FileManager.hpp"
-#include "sensor-gateway/common/data-structure/sensor/AWLMessage.h"
+#include "sensor-gateway/common/data-structure/sensor/AWLStructures.h"
 
 namespace TestUtilities {
 
-    class AWLMessagesFileManager : public FileManager<DataFlow::AWLMessage> {
+    class AWLMessagesFileManager : public FileManager<Sensor::AWL::Structures::Message> {
+
+    protected:
+
+        using Message = Sensor::AWL::Structures::Message;
 
     public:
 
@@ -29,9 +33,9 @@ namespace TestUtilities {
 
     private:
 
-        DataFlow::AWLMessage readMessageFromFileBlock(std::string const& fileBlock) override;
+        Message readMessageFromFileBlock(std::string const& fileBlock) override;
 
-        void writeFileBlockWithMessage(DataFlow::AWLMessage message, std::FILE* file) override;
+        void writeFileBlockWithMessage(Message message, std::FILE* file) override;
 
         std::string const Id_LABEL = "id";
 

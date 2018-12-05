@@ -27,12 +27,12 @@ namespace Sensor {
      */
     template<std::size_t P, typename TimeTrackingDefinition>
     struct SensorMessageDefinition {
-        static std::size_t const NUMBER_OF_PIXEL = P;
+        static std::size_t const NUMBER_OF_PIXELS = P;
 
         template<typename T>
         struct Pixels {
             using PixelType = T;
-            typedef std::array<PixelType, NUMBER_OF_PIXEL> type;
+            typedef std::array<PixelType, NUMBER_OF_PIXELS> type;
         };
 
         using TimeTracking = Metrics::TimeTracking<TimeTrackingDefinition>;

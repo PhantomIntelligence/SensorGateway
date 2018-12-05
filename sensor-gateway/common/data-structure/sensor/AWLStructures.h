@@ -18,7 +18,7 @@
 #define SENSORGATEWAY_AWLSTRUCTURES_H
 
 #include "sensor-gateway/common/data-structure/DataStructures.h"
-#include "AWLMessage.h"
+#include "AWLMessage.hpp"
 
 namespace Sensor {
     namespace AWL {
@@ -52,7 +52,7 @@ namespace Sensor {
                     Sensor::AWL::MAX_COMMAND_PAYLOAD_SIZE
             > AWLCommandDefinition;
 
-            typedef typename DataFlow::AWLMessage Message;
+            typedef typename DataFlow::AWLMessage<AWLMessageDefinition> Message;
             typedef typename DataFlow::RawData<AWLRawDataDefinition> RawData;
             typedef typename DataFlow::Command<AWLCommandDefinition> Command;
 

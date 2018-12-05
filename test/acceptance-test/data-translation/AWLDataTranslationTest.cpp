@@ -36,14 +36,14 @@ using SensorMessageProcessingScheduler = DataFlow::DataProcessingScheduler<Senso
 
 class AWLTranslationStrategyTest : public ::testing::Test {
 protected:
-    char const* AWLDATAS_INPUT_FILE_NAME = "AWLMessagesInputFile.txt";
+    char const* AWL_DATAS_INPUT_FILE_NAME = "AWLMessagesInputFile.txt";
     char const* EXPECTED_FRAMES_OUTPUT_FILE_NAME = "ExpectedSensorMessagesOutputFile.txt";
 
     virtual void SetUp() {
         auto awlMessages = createAWLMessageStub();
-        auto SensorMessages = createSensorMessageStub();
-        awlMessagesFileManager.writeFileWithMessages(awlMessages, AWLDATAS_INPUT_FILE_NAME);
-        sensorMessageFileManager.writeFileWithMessages(SensorMessages, EXPECTED_FRAMES_OUTPUT_FILE_NAME);
+        auto sensorMessages = createSensorMessageStub();
+        awlMessagesFileManager.writeFileWithMessages(awlMessages, AWL_DATAS_INPUT_FILE_NAME);
+        sensorMessageFileManager.writeFileWithMessages(sensorMessages, EXPECTED_FRAMES_OUTPUT_FILE_NAME);
     }
 
     AWLMessagesFileManager awlMessagesFileManager;
@@ -52,14 +52,14 @@ protected:
 
 TEST_F(AWLTranslationStrategyTest,
        given_someInputFileContainingValidAWLMessages_when_translatingAWLMessagesIntoSensorMessages_then_returnCorrespondingSpiritSensorMessagesOutputFile) {
-    auto ACTUAL__FRAMES_OUTPUT_FILE_NAME = "ActualSensorMessagesOutputFile.txt";
+    auto ACTUAL_SENSOR_MESSAGES_OUTPUT_FILE_NAME = "ActualSensorMessagesOutputFile.txt";
     AWLTranslationStrategy awlMessageTranslator;
     SensorMessageSinkMock sensorMessageSinkMock(1);
     SensorMessageProcessingScheduler scheduler(&sensorMessageSinkMock);
     awlMessageTranslator.linkConsumer(&scheduler);
     int counter = 0;
 
-    auto messages = awlMessagesFileManager.readMessagesFromFile(AWLDATAS_INPUT_FILE_NAME);
+    auto messages = awlMessagesFileManager.readMessagesFromFile(AWL_DATAS_INPUT_FILE_NAME);
     for (auto message : messages) {
         awlMessageTranslator.translateMessage(std::move(message));
         ++counter;
@@ -70,9 +70,9 @@ TEST_F(AWLTranslationStrategyTest,
 
     auto sensorMessages = sensorMessageSinkMock.getConsumedData();
 
-    sensorMessageFileManager.writeFileWithSensorMessages(sensorMessages, ACTUAL__FRAMES_OUTPUT_FILE_NAME);
+    sensorMessageFileManager.writeFileWithSensorMessages(sensorMessages, ACTUAL_SENSOR_MESSAGES_OUTPUT_FILE_NAME);
     ASSERT_TRUE(sensorMessageFileManager.areFilesEqual(EXPECTED_FRAMES_OUTPUT_FILE_NAME,
-                                               ACTUAL__FRAMES_OUTPUT_FILE_NAME));
+                                               ACTUAL_SENSOR_MESSAGES_OUTPUT_FILE_NAME));
 }
 
 #endif //SENSORGATEWAY_AWLDATATRANSLATORTEST_CPP

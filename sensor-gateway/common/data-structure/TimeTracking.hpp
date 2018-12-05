@@ -94,20 +94,20 @@ namespace Metrics {
 
         static TimeTracking const& returnDefaultData() noexcept;
 
-        SensorTimestamps const& getSensorTimestamps() noexcept {
-            return sensorTimestamps;
-        }
-
-        GatewayTimestamps const& getGatewayTimestamps() noexcept {
-            return gatewayTimestamps;
-        }
-
         void addTimePointForSensorWithLocation(std::string const& locationName) {
             sensorTimestamps.addTimePointForLocation(locationName);
         }
 
         void addTimePointForGatewayWithLocation(std::string const& locationName) {
             gatewayTimestamps.addTimePointForLocation(locationName);
+        }
+
+        SensorTimestamps const& getSensorTimestamps() noexcept {
+            return sensorTimestamps;
+        }
+
+        GatewayTimestamps const& getGatewayTimestamps() noexcept {
+            return gatewayTimestamps;
         }
 
     private:

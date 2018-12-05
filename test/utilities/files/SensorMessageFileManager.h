@@ -20,12 +20,19 @@
 #include "FileManager.hpp"
 #include "sensor-gateway/common/data-structure/spirit/SensorMessage.hpp"
 #include "sensor-gateway/common/data-structure/sensor/AWLStructures.h"
+#include "sensor-gateway/common/data-structure/spirit/SpiritStructures.h"
 
 namespace TestUtilities {
 
     namespace Structures {
         static size_t const MAX_NUMBER_OF_SENSOR_MESSAGES_CURRENTLY_NEEDED_FOR_TEST = 2;
-        using Message = typename DataFlow::SensorMessage<Sensor::AWL::Structures::AWLMessageDefinition>;
+        using AWL16Structures = Sensor::AWL::Structures;
+        using AWL16SpiritStructures = Sensor::Spirit::Structures<
+                AWL16Structures::AWLMessageDefinition,
+                AWL16Structures::AWLRawDataDefinition,
+                AWL16Structures::AWLCommandDefinition
+        >;
+        using Message = AWL16SpiritStructures::Message;
         using SensorMessages = std::array<Message, MAX_NUMBER_OF_SENSOR_MESSAGES_CURRENTLY_NEEDED_FOR_TEST>;
         using SensorMessageList = std::list<Message>;
     }
