@@ -15,6 +15,10 @@
 #define SENSORGATEWAY_CONSTANTVALUESDEFINITION_H
 
 #include "TypeDefinition.h"
+namespace ConversionUnits {
+    int const NUMBER_OF_CENTIMETERS_IN_A_METER = 100;
+}
+
 namespace Metrics {
     HighResolutionTimePoint const BEGINNING_OF_TIME_ITSELF = HighResolutionClock::from_time_t(0);
 }

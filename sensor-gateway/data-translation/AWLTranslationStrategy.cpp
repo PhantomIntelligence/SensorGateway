@@ -13,6 +13,7 @@
 
 #include "AWLTranslationStrategy.h"
 #include "TranslationErrorFactory.h"
+#include "sensor-gateway/common/ConstantValuesDefinition.h"
 
 using DataTranslation::AWLTranslationStrategy;
 using DataFlow::PixelId;
@@ -74,7 +75,7 @@ void AWLTranslationStrategy::addTrackInPixel(SensorMessage&& sensorMessage, Pixe
     Track track;
     track.id = trackId;
     track.confidenceLevel = confidenceLevel;
-    track.intensity = intensity;
+    track.intensity = 20 * log(intensity);
     currentOutputMessage.addTrackToPixelWithId(pixelId, std::move(track));
 };
 
@@ -84,9 +85,9 @@ void AWLTranslationStrategy::translateDetectionVelocityMessage(SensorMessage&& s
     Acceleration acceleration = convertTwoBytesToSignedBigEndian(sensorMessage.data[6], sensorMessage.data[7]);
     TrackId trackId = convertTwoBytesToUnsignedBigEndian(sensorMessage.data[0], sensorMessage.data[1]);
     auto track = fetchTrack(trackId);
-    track->distance = distance / 100;
-    track->speed = speed / 100;
-    track->acceleration = acceleration / 100;
+    track->distance = distance / ConversionUnits::NUMBER_OF_CENTIMETERS_IN_A_METER;
+    track->speed = speed / ConversionUnits::NUMBER_OF_CENTIMETERS_IN_A_METER;
+    track->acceleration = acceleration / ConversionUnits::NUMBER_OF_CENTIMETERS_IN_A_METER;
 }
 
 
