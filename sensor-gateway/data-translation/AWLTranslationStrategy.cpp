@@ -84,9 +84,9 @@ void AWLTranslationStrategy::translateDetectionVelocityMessage(SensorMessage&& s
     Acceleration acceleration = convertTwoBytesToSignedBigEndian(sensorMessage.data[6], sensorMessage.data[7]);
     TrackId trackId = convertTwoBytesToUnsignedBigEndian(sensorMessage.data[0], sensorMessage.data[1]);
     auto track = fetchTrack(trackId);
-    track->distance = distance;
-    track->speed = speed;
-    track->acceleration = acceleration;
+    track->distance = distance / 100;
+    track->speed = speed / 100;
+    track->acceleration = acceleration / 100;
 }
 
 
