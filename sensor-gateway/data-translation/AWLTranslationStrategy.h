@@ -49,7 +49,7 @@ namespace DataTranslation {
         void translateRawData(SensorRawData&& serverRawData) override;
 
         static inline DataFlow::Intensity const convertIntensityToSNR(DataFlow::Intensity const& intensity) noexcept {
-            DataFlow::Intensity const snr = ((intensity / 1024) / 2.0) - 21; // w+f
+            DataFlow::Intensity const snr = (intensity / 2.0) - 21; // w+f
             return snr;
         }
 
