@@ -59,11 +59,11 @@ protected:
     SpiritMessage const BASE_FRAME = SpiritMessage(64829, 16, PixelsArray());
     SpiritMessage const FRAME_AFTER_END_OF_FRAME_MESSAGE_TRANSLATION = BASE_FRAME;
     SpiritMessage const FRAME_AFTER_DETECTION_TRACK_AND_END_OF_FRAME_MESSAGES_TRANSLATION =
-            addTrackToSensorMessage(BASE_FRAME, Track(14291, 96, 379, DEFAULT_ACCELERATION, DEFAULT_DISTANCE,
-                                                   DEFAULT_SPEED));
+            addTrackToSensorMessage(BASE_FRAME, Track(14291, 96, AWLTranslationStrategy::convertIntensityToSNR(379),
+                                                      DEFAULT_ACCELERATION, DEFAULT_DISTANCE, DEFAULT_SPEED));
     SpiritMessage const FRAME_AFTER_DETECTION_TRACK_AND_VELOCITY_TRACK_AND_END_OF_FRAME_MESSAGES_TRANSLATION =
-            addTrackToSensorMessage(BASE_FRAME, Track(14291, 96, 379, 256, 106, 0));
-
+            addTrackToSensorMessage(BASE_FRAME,
+                                    Track(14291, 96, AWLTranslationStrategy::convertIntensityToSNR(379), 256, 106, 0));
     AWLMessage const SOME_DETECTION_TRACK_AWL_MESSAGE = AWLMessage(10, 2188169, 8, {211, 55, 0, 11, 0, 96, 123, 1});
     AWLMessage const SOME_VELOCITY_TRACK_AWL_MESSAGE = AWLMessage(11, 2188169, 8, {211, 55, 106, 0, 0, 0, 0, 1});
     AWLMessage const SOME_END_FRAME_AWL_MESSAGE = AWLMessage(9, 2188170, 8, {61, 253, 16, 0, 0, 0, 0, 0});
