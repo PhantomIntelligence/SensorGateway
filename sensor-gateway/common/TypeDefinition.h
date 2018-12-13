@@ -68,13 +68,13 @@ namespace DataFlow {
         using Signed = bool;
     }
 
-    typedef int16_t Acceleration;
+    typedef double_t Acceleration;
     typedef uint8_t ConfidenceLevel;
-    typedef uint16_t Distance;
+    typedef double_t Distance;
     typedef uint16_t MessageId;
-    typedef uint16_t Intensity;
+    typedef double_t Intensity;
     typedef uint16_t PixelId;
-    typedef int16_t Speed;
+    typedef double_t Speed;
     typedef uint16_t SensorId;
     typedef uint16_t TrackId;
 };

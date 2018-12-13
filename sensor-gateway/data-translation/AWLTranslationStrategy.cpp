@@ -13,6 +13,7 @@
 
 #include "AWLTranslationStrategy.h"
 #include "TranslationErrorFactory.h"
+#include "sensor-gateway/common/ConstantValuesDefinition.h"
 
 using DataTranslation::AWLTranslationStrategy;
 using DataFlow::PixelId;
@@ -74,7 +75,7 @@ void AWLTranslationStrategy::addTrackInPixel(SensorMessage&& sensorMessage, Pixe
     Track track;
     track.id = trackId;
     track.confidenceLevel = confidenceLevel;
-    track.intensity = intensity;
+    track.intensity = convertIntensityToSNR(intensity);
     currentOutputMessage.addTrackToPixelWithId(pixelId, std::move(track));
 };
 
@@ -84,19 +85,20 @@ void AWLTranslationStrategy::translateDetectionVelocityMessage(SensorMessage&& s
     Acceleration acceleration = convertTwoBytesToSignedBigEndian(sensorMessage.data[6], sensorMessage.data[7]);
     TrackId trackId = convertTwoBytesToUnsignedBigEndian(sensorMessage.data[0], sensorMessage.data[1]);
     auto track = fetchTrack(trackId);
-    track->distance = distance;
-    track->speed = speed;
-    track->acceleration = acceleration;
+    track->distance = distance / ConversionUnits::NUMBER_OF_CENTIMETERS_IN_A_METER;
+    track->speed = speed / ConversionUnits::NUMBER_OF_CENTIMETERS_IN_A_METER;
+    track->acceleration = acceleration / ConversionUnits::NUMBER_OF_CENTIMETERS_IN_A_METER;
 }
 
 
 Track* AWLTranslationStrategy::fetchTrack(TrackId const& trackId) {
     auto pixels = currentOutputMessage.getPixels();
     for (auto i = 0; i < NUMBER_OF_PIXELS; ++i) {
-        auto pixel = &pixels->at(i);
+        auto pixel = &pixels->at(static_cast<unsigned long>(i));
         if (pixel->doesTrackExist(trackId)) {
             return pixel->fetchTrackById(trackId);
         }
     }
     return nullptr;
 }
+
