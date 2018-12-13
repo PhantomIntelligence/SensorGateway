@@ -68,6 +68,12 @@ void AWLTranslationStrategy::translateDetectionTrackMessage(SensorMessage&& sens
     addTrackInPixel(std::move(sensorMessage), pixelId);
 }
 
+DataFlow::Intensity const
+DataTranslation::AWLTranslationStrategy::convertIntensityToSNR(DataFlow::Intensity const& intensity) noexcept {
+    Intensity const snr = ((intensity / 1024) / 2.0) - 21; // w+f
+    return snr;
+}
+
 void AWLTranslationStrategy::addTrackInPixel(SensorMessage&& sensorMessage, PixelId pixelId) {
     TrackId trackId = convertTwoBytesToUnsignedBigEndian(sensorMessage.data[0], sensorMessage.data[1]);
     ConfidenceLevel confidenceLevel = sensorMessage.data[5];
@@ -75,7 +81,7 @@ void AWLTranslationStrategy::addTrackInPixel(SensorMessage&& sensorMessage, Pixe
     Track track;
     track.id = trackId;
     track.confidenceLevel = confidenceLevel;
-    track.intensity = 20 * log(intensity);
+    track.intensity = convertIntensityToSNR(intensity);
     currentOutputMessage.addTrackToPixelWithId(pixelId, std::move(track));
 };
 
@@ -101,3 +107,4 @@ Track* AWLTranslationStrategy::fetchTrack(TrackId const& trackId) {
     }
     return nullptr;
 }
+

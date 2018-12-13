@@ -48,6 +48,8 @@ namespace DataTranslation {
 
         void translateRawData(SensorRawData&& serverRawData) override;
 
+        static inline DataFlow::Intensity const convertIntensityToSNR(DataFlow::Intensity const& intensity) noexcept;
+
     private:
 
         using super::currentOutputMessage;
