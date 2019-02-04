@@ -14,14 +14,14 @@
 	limitations under the License.
 */
 
-#ifndef SENSORGATEWAY_SPIRITSTRUCTURES_H
-#define SENSORGATEWAY_SPIRITSTRUCTURES_H
+#ifndef SENSORGATEWAY_GATEWAYSTRUCTURES_H
+#define SENSORGATEWAY_GATEWAYSTRUCTURES_H
 
 #include "sensor-gateway/common/data-structure/DataStructures.h"
-#include "SensorMessage.hpp"
+#include "Parameters.hpp"
 
 namespace Sensor {
-    namespace Spirit {
+    namespace Gateway {
 
         template<typename SensorMessageDefinition, typename RawDataDefinition, typename CommandDefinition>
         class Structures final : public Communication::DataStructures {
@@ -67,4 +67,4 @@ namespace Sensor {
     }
 }
 
-#endif //SENSORGATEWAY_SPIRITSTRUCTURES_H
+#endif //SENSORGATEWAY_GATEWAYSTRUCTURES_H

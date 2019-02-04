@@ -17,19 +17,19 @@
 #ifndef SENSORGATEWAY_SENSORMESSAGESTUB_H
 #define SENSORGATEWAY_SENSORMESSAGESTUB_H
 
-#include "sensor-gateway/common/data-structure/spirit/SensorMessage.hpp"
+#include "sensor-gateway/common/data-structure/gateway/SensorMessage.hpp"
 #include "sensor-gateway/common/data-structure/sensor/AWLStructures.h"
-#include "sensor-gateway/common/data-structure/spirit/SpiritStructures.h"
+#include "sensor-gateway/common/data-structure/gateway/GatewayStructures.h"
 
 namespace Stub {
 
     using AWL16Structures = Sensor::AWL::Structures;
-    using AWL16SpiritStructures = Sensor::Spirit::Structures<
+    using AWL16GatewayStructures = Sensor::Gateway::Structures<
             AWL16Structures::AWLMessageDefinition,
             AWL16Structures::AWLRawDataDefinition,
             AWL16Structures::AWLCommandDefinition
     >;
-    using SensorMessage = AWL16SpiritStructures::Message;
+    using SensorMessage = AWL16GatewayStructures::Message;
     using DataFlow::MessageId;
     using DataFlow::SensorId;
     using DataFlow::Pixel;

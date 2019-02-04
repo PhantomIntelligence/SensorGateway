@@ -92,7 +92,7 @@ namespace DataFlow {
             auto firstPad = &buffer[0];
             auto currentPad = firstPad;
             RingBufferPad<T>* nextPad;
-            for (auto i = 1; i < RING_BUFFER_SIZE; ++i) {
+            for (size_t i = 1; i < RING_BUFFER_SIZE; ++i) {
                 nextPad = &buffer[i];
                 currentPad->setNext(nextPad);
                 currentPad = nextPad;

@@ -19,7 +19,7 @@
 
 namespace SensorAccessLinkElement {
 
-    // TODO: use parameter pack expansion to create an automatic {sink, consume, format} function addition for a list of type for the SpiritProtocol
+    // TODO: use parameter pack expansion to create an automatic {sink, consume, format} function addition for a list of type for the GatewayProtocol
     template<class T>
     class ServerCommunicator : public DataFlow::DataSink<typename T::Message>,
                                public DataFlow::DataSink<typename T::RawData>,

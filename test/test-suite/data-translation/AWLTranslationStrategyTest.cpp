@@ -30,7 +30,7 @@ using Defaults::Track::DEFAULT_SPEED;
 using DataTranslation::AWLTranslationStrategy;
 
 using AWL16Structures = Sensor::AWL::Structures;
-using AWL16SpiritStructures = Sensor::Spirit::Structures<
+using AWL16GatewayStructures = Sensor::Gateway::Structures<
         AWL16Structures::AWLMessageDefinition,
         AWL16Structures::AWLRawDataDefinition,
         AWL16Structures::AWLCommandDefinition
@@ -38,10 +38,10 @@ using AWL16SpiritStructures = Sensor::Spirit::Structures<
 
 using AWLMessage = AWL16Structures::Message;
 using SensorRawData = AWL16Structures::RawData;
-using SpiritMessage = AWL16SpiritStructures::Message;
-using SpiritRawData = AWL16SpiritStructures::RawData;
+using GatewayMessage = AWL16GatewayStructures::Message;
+using GatewayRawData = AWL16GatewayStructures::RawData;
 
-using PixelsArray = typename SpiritMessage::Pixels;
+using PixelsArray = typename GatewayMessage::Pixels;
 using DataFlow::PixelId;
 
 class AWLTranslationStrategyTest : public ::testing::Test {
@@ -49,19 +49,19 @@ class AWLTranslationStrategyTest : public ::testing::Test {
 protected:
 
 
-    using SpiritMessageSinkMock = Mock::ArbitraryDataSinkMock<SpiritMessage>;
-    using SpiritRawDataSinkMock = Mock::ArbitraryDataSinkMock<SpiritRawData>;
-    using SpiritMessageProcessingScheduler = DataFlow::DataProcessingScheduler<SpiritMessage, SpiritMessageSinkMock, 1>;
-    using SpiritRawDataProcessingScheduler = DataFlow::DataProcessingScheduler<SpiritRawData, SpiritRawDataSinkMock, 1>;
+    using GatewayMessageSinkMock = Mock::ArbitraryDataSinkMock<GatewayMessage>;
+    using GatewayRawDataSinkMock = Mock::ArbitraryDataSinkMock<GatewayRawData>;
+    using GatewayMessageProcessingScheduler = DataFlow::DataProcessingScheduler<GatewayMessage, GatewayMessageSinkMock, 1>;
+    using GatewayRawDataProcessingScheduler = DataFlow::DataProcessingScheduler<GatewayRawData, GatewayRawDataSinkMock, 1>;
 
     int const FRAME_INDEX = 0;
     PixelId const SOME_PIXEL_ID = 11;
-    SpiritMessage const BASE_FRAME = SpiritMessage(64829, 16, PixelsArray());
-    SpiritMessage const FRAME_AFTER_END_OF_FRAME_MESSAGE_TRANSLATION = BASE_FRAME;
-    SpiritMessage const FRAME_AFTER_DETECTION_TRACK_AND_END_OF_FRAME_MESSAGES_TRANSLATION =
+    GatewayMessage const BASE_FRAME = GatewayMessage(64829, 16, PixelsArray());
+    GatewayMessage const FRAME_AFTER_END_OF_FRAME_MESSAGE_TRANSLATION = BASE_FRAME;
+    GatewayMessage const FRAME_AFTER_DETECTION_TRACK_AND_END_OF_FRAME_MESSAGES_TRANSLATION =
             addTrackToSensorMessage(BASE_FRAME, Track(14291, 96, AWLTranslationStrategy::convertIntensityToSNR(379),
                                                       DEFAULT_ACCELERATION, DEFAULT_DISTANCE, DEFAULT_SPEED));
-    SpiritMessage const FRAME_AFTER_DETECTION_TRACK_AND_VELOCITY_TRACK_AND_END_OF_FRAME_MESSAGES_TRANSLATION =
+    GatewayMessage const FRAME_AFTER_DETECTION_TRACK_AND_VELOCITY_TRACK_AND_END_OF_FRAME_MESSAGES_TRANSLATION =
             addTrackToSensorMessage(BASE_FRAME,
                                     Track(14291, 96, AWLTranslationStrategy::convertIntensityToSNR(379), 256, 106, 0));
     AWLMessage const SOME_DETECTION_TRACK_AWL_MESSAGE = AWLMessage(10, 2188169, 8, {211, 55, 0, 11, 0, 96, 123, 1});
@@ -69,8 +69,8 @@ protected:
     AWLMessage const SOME_END_FRAME_AWL_MESSAGE = AWLMessage(9, 2188170, 8, {61, 253, 16, 0, 0, 0, 0, 0});
 
 private:
-    SpiritMessage const addTrackToSensorMessage(SpiritMessage sensorMessage, Track track) const {
-        SpiritMessage sensorMessageCopy = SpiritMessage(std::move(sensorMessage));
+    GatewayMessage const addTrackToSensorMessage(GatewayMessage sensorMessage, Track track) const {
+        GatewayMessage sensorMessageCopy = GatewayMessage(std::move(sensorMessage));
         sensorMessageCopy.addTrackToPixelWithId(SOME_PIXEL_ID, std::move(track));
         return sensorMessageCopy;
     }
@@ -82,8 +82,8 @@ TEST_F(AWLTranslationStrategyTest,
     auto endOfSensorMessageAWLMessage = SOME_END_FRAME_AWL_MESSAGE;
     auto expectedSensorMessage = FRAME_AFTER_END_OF_FRAME_MESSAGE_TRANSLATION;
     AWLTranslationStrategy translationStrategy;
-    SpiritMessageSinkMock sensorMessageSinkMock(1);
-    SpiritMessageProcessingScheduler scheduler(&sensorMessageSinkMock);
+    GatewayMessageSinkMock sensorMessageSinkMock(1);
+    GatewayMessageProcessingScheduler scheduler(&sensorMessageSinkMock);
     translationStrategy.linkConsumer(&scheduler);
 
     translationStrategy.translateMessage(std::move(endOfSensorMessageAWLMessage));
@@ -100,8 +100,8 @@ TEST_F(AWLTranslationStrategyTest,
     auto endOfSensorMessageAWLMessage = SOME_END_FRAME_AWL_MESSAGE;
     auto expectedSensorMessage = FRAME_AFTER_DETECTION_TRACK_AND_END_OF_FRAME_MESSAGES_TRANSLATION;
     AWLTranslationStrategy translationStrategy;
-    SpiritMessageSinkMock sensorMessageSinkMock(1);
-    SpiritMessageProcessingScheduler scheduler(&sensorMessageSinkMock);
+    GatewayMessageSinkMock sensorMessageSinkMock(1);
+    GatewayMessageProcessingScheduler scheduler(&sensorMessageSinkMock);
     translationStrategy.linkConsumer(&scheduler);
 
     translationStrategy.translateMessage(std::move(detectionTrackAWLMessage));
@@ -120,8 +120,8 @@ TEST_F(AWLTranslationStrategyTest,
     auto endOfSensorMessageAWLMessage = SOME_END_FRAME_AWL_MESSAGE;
     auto expectedSensorMessage = FRAME_AFTER_DETECTION_TRACK_AND_VELOCITY_TRACK_AND_END_OF_FRAME_MESSAGES_TRANSLATION;
     AWLTranslationStrategy translationStrategy;
-    SpiritMessageSinkMock sensorMessageSinkMock(1);
-    SpiritMessageProcessingScheduler scheduler(&sensorMessageSinkMock);
+    GatewayMessageSinkMock sensorMessageSinkMock(1);
+    GatewayMessageProcessingScheduler scheduler(&sensorMessageSinkMock);
     translationStrategy.linkConsumer(&scheduler);
 
     translationStrategy.translateMessage(std::move(detectionTrackAWLMessage));
@@ -138,8 +138,8 @@ TEST_F(AWLTranslationStrategyTest,
 
     auto endOfSensorMessageAWLMessage = SOME_END_FRAME_AWL_MESSAGE;
     AWLTranslationStrategy translationStrategy;
-    SpiritMessageSinkMock sensorMessageSinkMock(1);
-    SpiritMessageProcessingScheduler scheduler(&sensorMessageSinkMock);
+    GatewayMessageSinkMock sensorMessageSinkMock(1);
+    GatewayMessageProcessingScheduler scheduler(&sensorMessageSinkMock);
     translationStrategy.linkConsumer(&scheduler);
 
     translationStrategy.translateMessage(std::move(endOfSensorMessageAWLMessage));

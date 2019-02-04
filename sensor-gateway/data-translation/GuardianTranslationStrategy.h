@@ -14,25 +14,25 @@
 #ifndef SENSORGATEWAY_GUARDIANTRANSLATIONSTRATEGY_H
 #define SENSORGATEWAY_GUARDIANTRANSLATIONSTRATEGY_H
 
-#include "sensor-gateway/common/data-structure/spirit/SpiritStructures.h"
+#include "sensor-gateway/common/data-structure/gateway/GatewayStructures.h"
 #include "sensor-gateway/common/data-structure/sensor/GuardianStructures.h"
 #include "DataTranslationStrategy.hpp"
 
 namespace DataTranslation {
 
     using GuardianStructures = Sensor::Guardian::Structures;
-    using GuardianSpiritStructures = Sensor::Spirit::Structures<
+    using GuardianGatewayStructures = Sensor::Gateway::Structures<
             GuardianStructures::GuardianMessageDefinition,
             GuardianStructures::GuardianRawDataDefinition,
             GuardianStructures::GuardianCommandDefinition
     >;
 
     class GuardianTranslationStrategy final
-            : public DataTranslationStrategy<GuardianStructures, GuardianSpiritStructures> {
+            : public DataTranslationStrategy<GuardianStructures, GuardianGatewayStructures> {
 
     protected:
 
-        using super = DataTranslationStrategy<GuardianStructures, GuardianSpiritStructures>;
+        using super = DataTranslationStrategy<GuardianStructures, GuardianGatewayStructures>;
 
         using SensorStructures = GuardianStructures;
         using super::SensorMessage;

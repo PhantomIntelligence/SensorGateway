@@ -14,24 +14,24 @@
 #ifndef SENSORGATEWAY_AWLTRANSLATIONSTRATEGY_H
 #define SENSORGATEWAY_AWLTRANSLATIONSTRATEGY_H
 
-#include "sensor-gateway/common/data-structure/spirit/SpiritStructures.h"
+#include "sensor-gateway/common/data-structure/gateway/GatewayStructures.h"
 #include "sensor-gateway/common/data-structure/sensor/AWLStructures.h"
 #include "DataTranslationStrategy.hpp"
 
 namespace DataTranslation {
 
     using AWLStructures = Sensor::AWL::Structures;
-    using AWLSpiritStructures = Sensor::Spirit::Structures<
+    using AWLGatewayStructures = Sensor::Gateway::Structures<
             AWLStructures::AWLMessageDefinition,
             AWLStructures::AWLRawDataDefinition,
             AWLStructures::AWLCommandDefinition
             >;
 
-    class AWLTranslationStrategy final : public DataTranslationStrategy<AWLStructures, AWLSpiritStructures> {
+    class AWLTranslationStrategy final : public DataTranslationStrategy<AWLStructures, AWLGatewayStructures> {
 
     protected:
 
-        using super = DataTranslationStrategy<AWLStructures, AWLSpiritStructures>;
+        using super = DataTranslationStrategy<AWLStructures, AWLGatewayStructures>;
         using super::SensorMessage;
         using super::SensorRawData;
 

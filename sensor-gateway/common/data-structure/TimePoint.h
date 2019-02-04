@@ -55,7 +55,7 @@ namespace Metrics {
     namespace Defaults {
         using Metrics::TimePoint;
 
-        HighResolutionTimePoint const DEFAULT_TIMESTAMP = BEGINNING_OF_TIME_ITSELF;
+        HighResolutionTimePoint const DEFAULT_TIMESTAMP = Metrics::BEGINNING_OF_TIME_ITSELF;
 
         std::string const DEFAULT_LOCATION_NAME;
 

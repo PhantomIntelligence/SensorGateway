@@ -36,7 +36,7 @@ namespace HighIntegrity {
     public:
         template<class F, class ...ARGS>
         HighIntegrityThread(F&& f, ARGS&& ...args)
-                : thread(std::forward<F>(f), std::forward<ARGS>(args)...) {
+                : hi_thread(std::forward<F>(f), std::forward<ARGS>(args)...) {
         }
 
         HighIntegrityThread(HighIntegrityThread const&) = delete;
@@ -48,7 +48,7 @@ namespace HighIntegrity {
         }
 
         inline void exitSafely() {
-            if (thread.joinable()) {
+            if (hi_thread.joinable()) {
                 joinOrDetach();
             }
         }
@@ -63,14 +63,14 @@ namespace HighIntegrity {
             return *this;
         }
 
-        inline void join() { thread.join(); }
+        inline void join() { hi_thread.join(); }
 
-        void swap(HighIntegrityThread& other) noexcept { std::swap(thread, other.thread); }
+        void swap(HighIntegrityThread& other) noexcept { std::swap(hi_thread, other.hi_thread); }
 
     private:
         inline void joinOrDetach();
 
-        std::thread thread;
+        std::thread hi_thread;
 
     };
 
@@ -79,7 +79,7 @@ namespace HighIntegrity {
      */
     template<>
     inline void HighIntegrityThread<ThreadExecutionType::DETACH>::joinOrDetach() {
-        thread.detach();
+        hi_thread.detach();
     }
 
     /**
@@ -87,7 +87,7 @@ namespace HighIntegrity {
      */
     template<>
     inline void HighIntegrityThread<ThreadExecutionType::JOIN>::joinOrDetach() {
-        thread.join();
+        hi_thread.join();
     }
 
 }

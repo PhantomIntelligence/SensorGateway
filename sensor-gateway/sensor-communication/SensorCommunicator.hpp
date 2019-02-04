@@ -17,6 +17,7 @@
 #ifndef SENSORGATEWAY_SENSORCOMMUNICATOR_HPP
 #define SENSORGATEWAY_SENSORCOMMUNICATOR_HPP
 
+#include <sensor-gateway/common/data-structure/gateway/Parameters.hpp>
 #include "sensor-gateway/common/data-flow/DataProcessingScheduler.hpp"
 #include "SensorCommunicationStrategy.hpp"
 

@@ -17,7 +17,7 @@
 #ifndef SENSORGATEWAY_SERVERCOMMUNICATIONPROTOCOLSTRATEGY_HPP
 #define SENSORGATEWAY_SERVERCOMMUNICATIONPROTOCOLSTRATEGY_HPP
 
-#include "sensor-gateway/common/data-structure/spirit/SensorMessage.hpp"
+#include "sensor-gateway/common/data-structure/gateway/SensorMessage.hpp"
 
 namespace ServerCommunication {
 

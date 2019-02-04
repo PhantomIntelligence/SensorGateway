@@ -85,7 +85,7 @@ namespace ErrorHandling {
          */
                 EMPTY_CODE = 10042,
 
-        // 10100-10199 Spirit Protocol error code
+        // 10100-10199 Gateway Protocol error code
 
         PIXEL_ALREADY_HAS_MAXIMUM_TRACK = 10110,
 

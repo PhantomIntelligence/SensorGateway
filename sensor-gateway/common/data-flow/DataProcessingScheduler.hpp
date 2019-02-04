@@ -150,14 +150,15 @@ namespace DataFlow {
             }
         }
 
-        JoinableThread schedulerThread;
-
         AtomicFlag terminateOrderReceived;
         Mutex inputBufferStatusMutex;
         AtomicCounter numberOfLinkedBuffers;
         InputBuffers readyToConsumeInputBuffers;
         InputBuffers notReadyToConsumeInputBuffers;
+
         SINK* dataSink;
+        JoinableThread schedulerThread;
+
     };
 }
 

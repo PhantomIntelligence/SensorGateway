@@ -24,17 +24,17 @@
 namespace SensorGateway {
 
     using AWL16Structures = Sensor::AWL::Structures;
-    using AWL16SpiritStructures = Sensor::Spirit::Structures<
+    using AWL16GatewayStructures = Sensor::Gateway::Structures<
             AWL16Structures::AWLMessageDefinition,
             AWL16Structures::AWLRawDataDefinition,
             AWL16Structures::AWLCommandDefinition
             >;
 
-    class AWL16AccessLink final : public SensorAccessLink<AWL16Structures, AWL16SpiritStructures> {
+    class AWL16AccessLink final : public SensorAccessLink<AWL16Structures, AWL16GatewayStructures> {
 
     protected:
 
-        using super = SensorAccessLink<AWL16Structures, AWL16SpiritStructures>;
+        using super = SensorAccessLink<AWL16Structures, AWL16GatewayStructures>;
 
         using super::ServerCommunicationStrategy;
 

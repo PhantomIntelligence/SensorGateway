@@ -25,16 +25,16 @@
 namespace SensorGateway {
 
     using GuardianStructures = Sensor::Guardian::Structures;
-    using GuardianSpiritStructures = Sensor::Spirit::Structures<
+    using GuardianGatewayStructures = Sensor::Gateway::Structures<
             GuardianStructures::GuardianMessageDefinition,
             GuardianStructures::GuardianRawDataDefinition,
             GuardianStructures::GuardianCommandDefinition>;
 
-    class GuardianAccessLink final : public SensorAccessLink<GuardianStructures, GuardianSpiritStructures> {
+    class GuardianAccessLink final : public SensorAccessLink<GuardianStructures, GuardianGatewayStructures> {
 
     protected:
 
-        using super = SensorAccessLink<GuardianStructures, GuardianSpiritStructures>;
+        using super = SensorAccessLink<GuardianStructures, GuardianGatewayStructures>;
 
         using super::ServerCommunicationStrategy;
 

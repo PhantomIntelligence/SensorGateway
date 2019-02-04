@@ -14,7 +14,8 @@
 #ifndef SENSORGATEWAY_CONSTANTVALUESDEFINITION_H
 #define SENSORGATEWAY_CONSTANTVALUESDEFINITION_H
 
-#include "TypeDefinition.h"
+#include "StringLiteralType.h"
+
 namespace ConversionUnits {
     int const NUMBER_OF_CENTIMETERS_IN_A_METER = 100;
 }
@@ -26,7 +27,7 @@ namespace Metrics {
 namespace DataFlow {
     uint8_t const NUMBER_OF_CONCURRENT_INPUT_FOR_SENSOR_ACCESS_LINK_ELEMENTS = 1;
     size_t const RING_BUFFER_SIZE = 256;
-};
+}
 
 namespace CommandId {
     using CommandId = uint16_t;
@@ -41,7 +42,7 @@ namespace CommandId {
     CommandId const DEBUG_DUMP = 0xF0;
     CommandId const DEBUG_VERBOSE = 0xF1;
     CommandId const DEBUG_FORCE_REFRESH = 0xF2;
-};
+}
 
 namespace CommandType {
     using CommandType = uint16_t;

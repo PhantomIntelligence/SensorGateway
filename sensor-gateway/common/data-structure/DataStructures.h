@@ -36,6 +36,8 @@ namespace Sensor {
         };
 
         using TimeTracking = Metrics::TimeTracking<TimeTrackingDefinition>;
+
+        //TODO : Add SensorParameterDefinition here
     };
 
     namespace SensorMessageTypes {

@@ -134,7 +134,7 @@ namespace DataFlow {
         other.messageId = Defaults::DEFAULT_MESSAGE_ID;
         other.sensorId = Defaults::DEFAULT_SENSOR_ID;
         other.pixels = Defaults::DEFAULT_PIXELS_ARRAY<SensorMessageDefinition>;
-    };
+    }
 
 
     template<typename SensorMessageDefinition>
@@ -148,7 +148,7 @@ namespace DataFlow {
         std::swap(current.messageId, other.messageId);
         std::swap(current.sensorId, other.sensorId);
         std::swap(current.pixels, other.pixels);
-    };
+    }
 }
 
 #endif //SENSORGATEWAY_SENSORMESSAGE_HPP

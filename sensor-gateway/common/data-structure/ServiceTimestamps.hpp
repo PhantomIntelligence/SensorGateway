@@ -49,8 +49,9 @@ namespace Metrics {
                 timePoints(other.timePoints),
                 currentNumberOfTimePoints(other.currentNumberOfTimePoints) {}
 
+
         ServiceTimestamps(ServiceTimestamps&& other) noexcept :
-                timePoints(std::move(timePoints)),
+                timePoints(std::move(other.timePoints)),
                 currentNumberOfTimePoints(std::move(other.currentNumberOfTimePoints)) {
         }
 
@@ -111,14 +112,13 @@ namespace Metrics {
                         ErrorHandling::Category::TIME_POINTS_ERROR,
                         ErrorHandling::Severity::ERROR,
                         ErrorHandling::GatewayErrorCode::TIME_POINTS_ALREADY_AT_MAXIMUM_CAPACITY,
-                        ExceptionMessage::PIXEL_TRACK_ARRAY_ILLEGAL_STORE_FULL
+                        ExceptionMessage::SERVICE_TIMESTAMPS_ILLEGAL_FULL_CAPACITY
                 );
             }
         }
 
-        Counter currentNumberOfTimePoints;
-
         TimePoints timePoints;
+        Counter currentNumberOfTimePoints;
     };
 
     namespace Defaults {

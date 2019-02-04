@@ -51,7 +51,7 @@ protected:
 };
 
 TEST_F(AWLTranslationStrategyTest,
-       given_someInputFileContainingValidAWLMessages_when_translatingAWLMessagesIntoSensorMessages_then_returnCorrespondingSpiritSensorMessagesOutputFile) {
+       given_someInputFileContainingValidAWLMessages_when_translatingAWLMessagesIntoSensorMessages_then_returnCorrespondingGatewaySensorMessagesOutputFile) {
     auto ACTUAL_SENSOR_MESSAGES_OUTPUT_FILE_NAME = "ActualSensorMessagesOutputFile.txt";
     AWLTranslationStrategy awlMessageTranslator;
     SensorMessageSinkMock sensorMessageSinkMock(1);

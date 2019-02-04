@@ -107,7 +107,7 @@ namespace SensorGateway {
         // TODO : extract this in a SensorAccessLinkErrorHandler, test behavior then.
         void consume(Error&& error) override {
 
-            // NOTE: To allow Spirit stability on RP3, this is good enough, but untested.
+            // NOTE: To allow Gateway stability on RP3, this is good enough, but untested.
             // TODO: THE ARCHITECTURAL LOCATION WILL HAVE TO BE RETHOUGHT WHEN IMPLEMENTING SPIRIT PROTOCOL
 
             std::cout << error.fetchDetailedMessage() << std::endl;
