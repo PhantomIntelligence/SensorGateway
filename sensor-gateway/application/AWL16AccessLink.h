@@ -27,7 +27,7 @@ namespace SensorGateway {
     using AWL16GatewayStructures = Sensor::Gateway::Structures<
             AWL16Structures::AWLMessageDefinition,
             AWL16Structures::AWLRawDataDefinition,
-            AWL16Structures::AWLCommandDefinition
+            AWL16Structures::AWLControlMessageDefinition
             >;
 
     class AWL16AccessLink final : public SensorAccessLink<AWL16Structures, AWL16GatewayStructures> {

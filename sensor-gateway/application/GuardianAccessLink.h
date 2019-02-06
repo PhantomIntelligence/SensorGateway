@@ -28,7 +28,7 @@ namespace SensorGateway {
     using GuardianGatewayStructures = Sensor::Gateway::Structures<
             GuardianStructures::GuardianMessageDefinition,
             GuardianStructures::GuardianRawDataDefinition,
-            GuardianStructures::GuardianCommandDefinition>;
+            GuardianStructures::GuardianControlMessageDefinition>;
 
     class GuardianAccessLink final : public SensorAccessLink<GuardianStructures, GuardianGatewayStructures> {
 

@@ -30,7 +30,7 @@ namespace TestUtilities {
         using AWL16GatewayStructures = Sensor::Gateway::Structures<
                 AWL16Structures::AWLMessageDefinition,
                 AWL16Structures::AWLRawDataDefinition,
-                AWL16Structures::AWLCommandDefinition
+                AWL16Structures::AWLControlMessageDefinition
         >;
         using Message = AWL16GatewayStructures::Message;
         using SensorMessages = std::array<Message, MAX_NUMBER_OF_SENSOR_MESSAGES_CURRENTLY_NEEDED_FOR_TEST>;

@@ -33,7 +33,7 @@ namespace DataFlow {
         using Pixels = typename SensorMessageDefinition::template Pixels<Pixel>::type;
 
         explicit SensorMessage(MessageId messageId, SensorId sensorId, Pixels pixels) :
-                messageId(messageId), sensorId(sensorId), pixels(std::move(pixels)) {};
+                messageId(std::move(messageId)), sensorId(std::move(sensorId)), pixels(std::move(pixels)) {};
 
         SensorMessage() : SensorMessage(returnDefaultData()) {};
 

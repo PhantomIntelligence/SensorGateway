@@ -19,88 +19,108 @@
 
 #include "TimeTracking.hpp"
 
+namespace Sensor {
+    /**
+     * @brief This CommandDefinition struct serves to declare types used by <SensorName>Command classes
+     * @tparam T the type of an individual payload data
+     * @tparam N the max number of payload data in a command
+     */
+    template<typename T, std::size_t N>
+    struct ControlMessageDefinition {
+        static std::size_t const SIZE = N;
+        using ValueType = T;
+        using Payload = std::array<ValueType, SIZE>;
+    };
+
+    namespace ControlMessagePayloadTypes {
+        typedef Byte AWL;
+        typedef Byte GUARDIAN;
+    }
+
+}
+
 namespace DataFlow {
 
-    template<typename CommandDefinition>
-    class Command {
+    template<typename ControlMessageDefinition>
+    class ControlMessage {
 
     protected:
 
     public:
 
-        using Definitions = CommandDefinition;
+        using Definitions = ControlMessageDefinition;
         using Payload = typename Definitions::Payload;
 
         enum CommandCode {
-            NOOP = 0
+            NOOP = 0,
         };
 
-        explicit Command(CommandCode commandCode, Payload payload) noexcept :
+        explicit ControlMessage(CommandCode commandCode, Payload payload) noexcept :
                 commandCode(commandCode),
                 payload(payload) {}
 
-        explicit Command() noexcept :
-                Command(Command::returnDefaultData()) {}
+        explicit ControlMessage() noexcept :
+                ControlMessage(ControlMessage::returnDefaultData()) {}
 
-        ~Command() noexcept = default;
+        ~ControlMessage() noexcept = default;
 
-        Command(Command const& other) :
-                Command(other.commandCode, other.payload) {}
+        ControlMessage(ControlMessage const& other) :
+                ControlMessage(other.commandCode, other.payload) {}
 
-        Command(Command&& other) noexcept :
-                Command(std::move(other.commandCode),
+        ControlMessage(ControlMessage&& other) noexcept :
+                ControlMessage(std::move(other.commandCode),
                         std::move(other.payload)) {}
 
-        Command& operator=(Command const& other)& {
-            Command temporary(other);
+        ControlMessage& operator=(ControlMessage const& other)& {
+            ControlMessage temporary(other);
             swap(*this, temporary);
             return *this;
         }
 
-        Command& operator=(Command&& other)& noexcept {
+        ControlMessage& operator=(ControlMessage&& other)& noexcept {
             swap(*this, other);
             return *this;
         }
 
-        void swap(Command& current, Command& other) noexcept {
+        void swap(ControlMessage& current, ControlMessage& other) noexcept {
             std::swap(current.commandCode, other.commandCode);
             std::swap(current.payload, other.payload);
         }
 
-        bool operator==(Command const& other) const {
+        bool operator==(ControlMessage const& other) const {
             auto sameCommandCode = (commandCode == other.commandCode);
             auto samePayload = (payload == other.payload);
             auto messagesAreEqual = (sameCommandCode && samePayload);
             return messagesAreEqual;
         }
 
-        bool operator!=(Command const& other) const {
+        bool operator!=(ControlMessage const& other) const {
             return !operator==(other);
         }
 
-        static Command const& returnDefaultData() noexcept;
+        static ControlMessage const& returnDefaultData() noexcept;
 
         CommandCode const commandCode;
         Payload const payload;
     };
 
     namespace Defaults {
-        using DataFlow::Command;
+        using DataFlow::ControlMessage;
 
         template<typename CommandDefinition>
-        typename Command<CommandDefinition>::CommandCode const DEFAULT_COMMAND_CODE = Command<CommandDefinition>::CommandCode::NOOP;
+        typename ControlMessage<CommandDefinition>::CommandCode const DEFAULT_COMMAND_CODE = ControlMessage<CommandDefinition>::CommandCode::NOOP;
 
         template<typename CommandDefinition>
         typename CommandDefinition::Payload const DEFAULT_COMMAND_PAYLOAD{};
 
         template<typename CommandDefinition>
-        Command<CommandDefinition> const DEFAULT_COMMAND = Command<CommandDefinition>(
+        ControlMessage<CommandDefinition> const DEFAULT_COMMAND = ControlMessage<CommandDefinition>(
                 DEFAULT_COMMAND_CODE<CommandDefinition>,
                 DEFAULT_COMMAND_PAYLOAD<CommandDefinition>);
     }
 
     template<typename CommandDefinition>
-    Command<CommandDefinition> const& Command<CommandDefinition>::returnDefaultData() noexcept {
+    ControlMessage<CommandDefinition> const& ControlMessage<CommandDefinition>::returnDefaultData() noexcept {
         return Defaults::DEFAULT_COMMAND<CommandDefinition>;
     }
 

@@ -28,7 +28,7 @@ using Sensor::AWL::_16::ANGLE_RANGE;
 using Sensor::AWL::_16::NUMBER_OF_LAYERS;
 using Sensor::AWL::_16::MULTIPLICATIVE_CONSTANT;
 
-Pixel::Pixel(PixelId pixelId, TracksArray tracks, int currentNumberOfTracks) :
+Pixel::Pixel(PixelId const& pixelId, TracksArray tracks, int currentNumberOfTracks) :
         id(pixelId), tracks(std::move(tracks)), currentNumberOfTracksInPixel(currentNumberOfTracks) {
 }
 

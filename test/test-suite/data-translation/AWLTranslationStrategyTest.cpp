@@ -33,7 +33,7 @@ using AWL16Structures = Sensor::AWL::Structures;
 using AWL16GatewayStructures = Sensor::Gateway::Structures<
         AWL16Structures::AWLMessageDefinition,
         AWL16Structures::AWLRawDataDefinition,
-        AWL16Structures::AWLCommandDefinition
+        AWL16Structures::AWLControlMessageDefinition
 >;
 
 using AWLMessage = AWL16Structures::Message;
@@ -63,7 +63,8 @@ protected:
                                                       DEFAULT_ACCELERATION, DEFAULT_DISTANCE, DEFAULT_SPEED));
     GatewayMessage const FRAME_AFTER_DETECTION_TRACK_AND_VELOCITY_TRACK_AND_END_OF_FRAME_MESSAGES_TRANSLATION =
             addTrackToSensorMessage(BASE_FRAME,
-                                    Track(14291, 96, AWLTranslationStrategy::convertIntensityToSNR(379), 256, 106, 0));
+                                    Track(14291, 96, AWLTranslationStrategy::convertIntensityToSNR(379), 2.56, 1.06,
+                                          0));
     AWLMessage const SOME_DETECTION_TRACK_AWL_MESSAGE = AWLMessage(10, 2188169, 8, {211, 55, 0, 11, 0, 96, 123, 1});
     AWLMessage const SOME_VELOCITY_TRACK_AWL_MESSAGE = AWLMessage(11, 2188169, 8, {211, 55, 106, 0, 0, 0, 0, 1});
     AWLMessage const SOME_END_FRAME_AWL_MESSAGE = AWLMessage(9, 2188170, 8, {61, 253, 16, 0, 0, 0, 0, 0});

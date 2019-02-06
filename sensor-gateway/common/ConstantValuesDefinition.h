@@ -120,7 +120,7 @@ namespace Sensor {
             int const NUMBER_OF_PIXELS = 16;
             int const NUMBER_OF_LAYERS = 2;
             int const NUMBER_OF_PIXELS_PER_LAYER = 8;
-            int const NUMBER_OF_TRACKS_IN_PIXEL = 16;
+            int const NUMBER_OF_TRACKS_IN_PIXEL = 2;
             int const ANGLE_RANGE = HORIZONTAL_FIELD_OF_VIEW / NUMBER_OF_PIXELS_PER_LAYER;
             SensorId const SENSOR_ID = 0x0010;
         }

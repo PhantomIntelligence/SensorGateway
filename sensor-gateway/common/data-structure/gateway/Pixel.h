@@ -32,7 +32,7 @@ namespace DataFlow {
 
     public:
 
-        explicit Pixel(PixelId pixelId, TracksArray tracks, int currentNumberOfTracks);
+        explicit Pixel(PixelId const& pixelId, TracksArray tracks, int currentNumberOfTracks);
 
         Pixel();
 

@@ -24,7 +24,7 @@ namespace DataTranslation {
     using GuardianGatewayStructures = Sensor::Gateway::Structures<
             GuardianStructures::GuardianMessageDefinition,
             GuardianStructures::GuardianRawDataDefinition,
-            GuardianStructures::GuardianCommandDefinition
+            GuardianStructures::GuardianControlMessageDefinition
     >;
 
     class GuardianTranslationStrategy final

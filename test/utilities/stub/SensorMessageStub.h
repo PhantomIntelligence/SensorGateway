@@ -27,7 +27,7 @@ namespace Stub {
     using AWL16GatewayStructures = Sensor::Gateway::Structures<
             AWL16Structures::AWLMessageDefinition,
             AWL16Structures::AWLRawDataDefinition,
-            AWL16Structures::AWLCommandDefinition
+            AWL16Structures::AWLControlMessageDefinition
     >;
     using SensorMessage = AWL16GatewayStructures::Message;
     using DataFlow::MessageId;

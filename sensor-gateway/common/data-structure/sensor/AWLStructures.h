@@ -47,14 +47,14 @@ namespace Sensor {
             > AWLRawDataDefinition;
 
             typedef typename
-            Sensor::CommandDefinition<
-                    Sensor::CommandPayloadTypes::AWL,
+            Sensor::ControlMessageDefinition<
+                    Sensor::ControlMessagePayloadTypes::AWL,
                     Sensor::AWL::MAX_COMMAND_PAYLOAD_SIZE
-            > AWLCommandDefinition;
+            > AWLControlMessageDefinition;
 
             typedef typename DataFlow::AWLMessage<AWLMessageDefinition> Message;
             typedef typename DataFlow::RawData<AWLRawDataDefinition> RawData;
-            typedef typename DataFlow::Command<AWLCommandDefinition> Command;
+            typedef typename DataFlow::ControlMessage<AWLControlMessageDefinition> ControlMessage;
 
             static size_t const MAX_NUMBER_OF_BULK_FETCHABLE_MESSAGES = 1;
             static size_t const MAX_NUMBER_OF_BULK_FETCHABLE_RAW_DATA_CYCLES = 1;

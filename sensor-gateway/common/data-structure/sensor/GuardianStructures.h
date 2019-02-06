@@ -47,14 +47,14 @@ namespace Sensor {
             > GuardianRawDataDefinition;
 
             typedef typename
-            Sensor::CommandDefinition<
-                    CommandPayloadTypes::GUARDIAN,
+            Sensor::ControlMessageDefinition<
+                    ControlMessagePayloadTypes::GUARDIAN,
                     Guardian::MAX_COMMAND_PAYLOAD_SIZE
-            > GuardianCommandDefinition;
+            > GuardianControlMessageDefinition;
 
             typedef typename DataFlow::AWLMessage<GuardianMessageDefinition> Message;
             typedef typename DataFlow::RawData<GuardianRawDataDefinition> RawData;
-            typedef typename DataFlow::Command<GuardianCommandDefinition> Command;
+            typedef typename DataFlow::ControlMessage<GuardianControlMessageDefinition> ControlMessage;
 
             static size_t const MAX_NUMBER_OF_BULK_FETCHABLE_MESSAGES = 32;
             static size_t const MAX_NUMBER_OF_BULK_FETCHABLE_RAW_DATA_CYCLES = 8;
