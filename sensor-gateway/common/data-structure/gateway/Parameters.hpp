@@ -68,13 +68,14 @@ namespace Sensor {
 
             static auto const NUMBER_OF_AVAILABLE_PARAMETERS = sizeof...(P);
 
-            explicit Parameters() : params(std::make_tuple(P()...)) {}
+            explicit Parameters() : internalParameters(std::make_tuple(P()...)) {}
 
             constexpr auto getNames() const {
-                return applyToAllParameters(
+                auto namesTuple = applyToAllParameters(
                         [&](auto... Is) {
-                            return std::make_tuple(std::get<Is>(params).getName()...);
+                            return std::make_tuple(std::get<Is>(internalParameters).getName()...);
                         });
+                return convertTupleToArray(namesTuple);
             }
 
         private:
@@ -83,7 +84,7 @@ namespace Sensor {
             template<class F>
             constexpr auto apply(F f) {
                 return applyToAllParameters(
-                        [&](auto... Is) { return f(std::get<Is>(params)...); });
+                        [&](auto... Is) { return f(std::get<Is>(internalParameters)...); });
             }
 
             template<class F>
@@ -102,7 +103,7 @@ namespace Sensor {
 //                ((os << "\n" << std::get<Is>(p));
 //            }
 
-            Params params;
+            Params internalParameters;
         };
     }
 }

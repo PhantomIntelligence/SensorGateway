@@ -52,10 +52,29 @@ namespace {
     // TODO : ERROR
     // TODO: uncomment this to have a warning pop everywhere a std::runtime_error is thrown and should be replaced by some other error
 //    [[deprecated("std::runtime_error should be replaced with SensorAccessLinkError")]] [[noreturn]] void throwRuntimeError(char const* message) {
-        [[noreturn]] void throwRuntimeError(char const* message) {
-            throw std::runtime_error(message);
-        }
+    [[noreturn]] void throwRuntimeError(char const* message) {
+        throw std::runtime_error(message);
+    }
 
+}
+
+namespace {
+    template<typename T>
+    using Bare = typename std::remove_cv<typename std::remove_reference<T>::type>::type;
+
+    template<typename Tuple, size_t... Is>
+    std::array<typename std::tuple_element<0, Bare<Tuple>>::type,
+            std::tuple_size<Bare<Tuple>>::value>
+    convertTupleToArray(Tuple&& tuple, std::index_sequence<Is...>) {
+        using std::get;
+        return {{get<Is>(std::forward<Tuple>(tuple))...}};
+    }
+
+    template<typename Tuple>
+    auto convertTupleToArray(Tuple&& tuple)
+    -> decltype(convertTupleToArray(std::declval<Tuple>(), std::make_index_sequence<std::tuple_size<Bare<Tuple>>::value>{})) {
+        return convertTupleToArray(std::forward<Tuple>(tuple), std::make_index_sequence<std::tuple_size<Bare<Tuple>>::value>{});
+    }
 }
 
 #endif //SENSORGATEWAY_CONSTANTFUNCTIONSDEFINITION_H
