@@ -51,11 +51,15 @@ namespace DataFlow {
         using Definitions = ControlMessageDefinition;
         using Payload = typename Definitions::Payload;
 
-        enum CommandCode {
+        enum ControlMessageCode {
             NOOP = 0,
+            GET_VALUE = 10,
+            BULK_GET_VALUE = 11,
+            SET_VALUE = 20,
+            BULK_SET_VALUE = 21,
         };
 
-        explicit ControlMessage(CommandCode commandCode, Payload payload) noexcept :
+        explicit ControlMessage(ControlMessageCode const& commandCode, Payload payload) noexcept :
                 commandCode(commandCode),
                 payload(payload) {}
 
@@ -100,7 +104,7 @@ namespace DataFlow {
 
         static ControlMessage const& returnDefaultData() noexcept;
 
-        CommandCode const commandCode;
+        ControlMessageCode const commandCode;
         Payload const payload;
     };
 
@@ -108,7 +112,7 @@ namespace DataFlow {
         using DataFlow::ControlMessage;
 
         template<typename CommandDefinition>
-        typename ControlMessage<CommandDefinition>::CommandCode const DEFAULT_COMMAND_CODE = ControlMessage<CommandDefinition>::CommandCode::NOOP;
+        typename ControlMessage<CommandDefinition>::ControlMessageCode const DEFAULT_COMMAND_CODE = ControlMessage<CommandDefinition>::ControlMessageCode::NOOP;
 
         template<typename CommandDefinition>
         typename CommandDefinition::Payload const DEFAULT_COMMAND_PAYLOAD{};
