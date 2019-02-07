@@ -17,7 +17,7 @@
 #ifndef SENSORGATEWAY_SERVERCOMMUNICATIONPROTOCOLSTRATEGY_HPP
 #define SENSORGATEWAY_SERVERCOMMUNICATIONPROTOCOLSTRATEGY_HPP
 
-#include "sensor-gateway/common/data-structure/gateway/SensorMessage.hpp"
+#include "SensorRequest.hpp"
 
 namespace ServerCommunication {
 
@@ -32,6 +32,8 @@ namespace ServerCommunication {
         virtual ~ServerCommunicationStrategy() noexcept = default;
 
         virtual void openConnection(std::string const& serverAddress) = 0;
+
+        virtual void fetchSensorRequests() = 0;
 
         virtual void sendMessage(Message&& message) = 0;
 

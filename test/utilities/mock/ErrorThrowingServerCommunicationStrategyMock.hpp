@@ -14,8 +14,8 @@
 	limitations under the License.
 */
 
-#ifndef SENSORGATEWAY_ERRORTHROWINGSENSORCOMMUNICATIONSTRATEGYMOCK_HPP
-#define SENSORGATEWAY_ERRORTHROWINGSENSORCOMMUNICATIONSTRATEGYMOCK_HPP
+#ifndef SERVERGATEWAY_ERRORTHROWINGSERVERCOMMUNICATIONSTRATEGYMOCK_HPP
+#define SERVERGATEWAY_ERRORTHROWINGSERVERCOMMUNICATIONSTRATEGYMOCK_HPP
 
 #include "test/utilities/data-model/DataModelFixture.h"
 #include "sensor-gateway/server-communication/ServerCommunicationStrategy.hpp"
@@ -170,6 +170,8 @@ namespace Mock {
             errorToThrow = expectedErrorWhenSendRawDataIsCalled();
         }
 
+        void fetchSensorRequests() override {}
+
         void openConnection(std::string const& serverAddress) override {
             if (throwOnOpen.load()) {
                 throwOnOpen.store(false); // We only throw once to allow the test to pass
@@ -268,4 +270,4 @@ namespace Mock {
     };
 }
 
-#endif //SENSORGATEWAY_ERRORTHROWINGSENSORCOMMUNICATIONSTRATEGYMOCK_HPP
+#endif //SERVERGATEWAY_ERRORTHROWINGSERVERCOMMUNICATIONSTRATEGYMOCK_HPP

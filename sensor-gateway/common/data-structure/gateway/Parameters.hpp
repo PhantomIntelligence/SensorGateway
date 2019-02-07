@@ -49,7 +49,7 @@ namespace Sensor {
                     name(SensorParameterDefinition::name.toString()),
                     value() {};
 
-            constexpr std::string const& getName() const noexcept{
+            constexpr std::string const& getName() const noexcept {
                 return name;
             }
 
@@ -71,7 +71,7 @@ namespace Sensor {
             explicit Parameters() : internalParameters(std::make_tuple(P()...)) {}
 
             constexpr auto getNames() const {
-                auto namesTuple = applyToAllParameters(
+                auto namesTuple = index_apply<NUMBER_OF_AVAILABLE_PARAMETERS>(
                         [&](auto... Is) {
                             return std::make_tuple(std::get<Is>(internalParameters).getName()...);
                         });
@@ -79,29 +79,6 @@ namespace Sensor {
             }
 
         private:
-
-
-            template<class F>
-            constexpr auto apply(F f) {
-                return applyToAllParameters(
-                        [&](auto... Is) { return f(std::get<Is>(internalParameters)...); });
-            }
-
-            template<class F>
-            static constexpr auto applyToAllParameters(F f) {
-                return applyToAllParametersDetails(f, std::make_index_sequence<NUMBER_OF_AVAILABLE_PARAMETERS>{});
-            }
-
-            template<class F, size_t... Is>
-            static constexpr auto applyToAllParametersDetails(F f, std::index_sequence<Is...>) {
-                return f(std::integral_constant<size_t, Is>{}...);
-            }
-
-
-//            template<class Ch, class Tr, const std::size_t... Is>
-//            static void printOnlyOneParameter(std::basic_ostream<Ch, Tr>& os, Params const& p, std::index_sequence<Is...>) {
-//                ((os << "\n" << std::get<Is>(p));
-//            }
 
             Params internalParameters;
         };

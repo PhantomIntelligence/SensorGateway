@@ -14,7 +14,7 @@
 #ifndef SENSORGATEWAY_CONSTANTFUNCTIONSDEFINITION_H
 #define SENSORGATEWAY_CONSTANTFUNCTIONSDEFINITION_H
 
-#include "ConstantValuesDefinition.h"
+#include "StaticTupleFunctions.h"
 
 namespace {
     uint16_t convertTwoBytesToUnsignedBigEndian(uint8_t firstByte, uint8_t secondByte) noexcept {
@@ -56,25 +56,6 @@ namespace {
         throw std::runtime_error(message);
     }
 
-}
-
-namespace {
-    template<typename T>
-    using Bare = typename std::remove_cv<typename std::remove_reference<T>::type>::type;
-
-    template<typename Tuple, size_t... Is>
-    std::array<typename std::tuple_element<0, Bare<Tuple>>::type,
-            std::tuple_size<Bare<Tuple>>::value>
-    convertTupleToArray(Tuple&& tuple, std::index_sequence<Is...>) {
-        using std::get;
-        return {{get<Is>(std::forward<Tuple>(tuple))...}};
-    }
-
-    template<typename Tuple>
-    auto convertTupleToArray(Tuple&& tuple)
-    -> decltype(convertTupleToArray(std::declval<Tuple>(), std::make_index_sequence<std::tuple_size<Bare<Tuple>>::value>{})) {
-        return convertTupleToArray(std::forward<Tuple>(tuple), std::make_index_sequence<std::tuple_size<Bare<Tuple>>::value>{});
-    }
 }
 
 #endif //SENSORGATEWAY_CONSTANTFUNCTIONSDEFINITION_H

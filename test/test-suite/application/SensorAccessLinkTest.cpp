@@ -234,6 +234,8 @@ namespace SensorAccessLinkTestMock {
             return openConnectionCalled.load();
         }
 
+        void fetchSensorRequests() override {};
+
         void closeConnection() override {
             closeConnectionCalled.store(true);
         }

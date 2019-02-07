@@ -56,6 +56,8 @@ namespace ServerCommunicatorTestMock {
 
         ~MockServerCommunicatorStrategy() noexcept override = default;
 
+        void fetchSensorRequests() override {};
+
         void sendMessage(Message&& message) override {
             sendMessageCalled.store(true);
             sentMessage = message;
