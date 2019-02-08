@@ -23,6 +23,7 @@ namespace Sensor {
     namespace Parameter {
         namespace Names {
             using InvalidName = StringLiteral<decltype("InvalidName"_ToString)>;
+
             using PulseWidth = StringLiteral<decltype("PulseWidth"_ToString)>;
             using LaserControl = StringLiteral<decltype("LaserControl"_ToString)>;
             using Accumulation = StringLiteral<decltype("Accumulation"_ToString)>;
@@ -38,13 +39,24 @@ namespace Sensor {
         namespace Units {
             // TODO: Use UCUM to correctly encode units
             using not_applicable = StringLiteral<decltype("n/a"_ToString)>;
+
             using step = StringLiteral<decltype("step"_ToString)>;
             using meter = StringLiteral<decltype("m"_ToString)>;
         }
-
     }
 
     namespace Gateway {
+        using NoGatewayParameterDefinition = Sensor::Gateway::SensorParameterDefinition<
+                GatewayParameterDefinition<Sensor::Parameter::Names::InvalidName,
+                        Sensor::Parameter::Types::Boolean,
+                        Sensor::Parameter::Units::not_applicable>,
+                0x0,
+                0x0,
+                0x0,
+                0x0,
+                0x0
+        >;
+
         using PulseWidthDefinition = GatewayParameterDefinition<
                 Sensor::Parameter::Names::PulseWidth,
                 Sensor::Parameter::Types::UnsignedInteger,

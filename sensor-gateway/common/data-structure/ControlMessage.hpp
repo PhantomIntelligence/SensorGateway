@@ -14,8 +14,8 @@
 	limitations under the License.
 */
 
-#ifndef SENSORGATEWAY_COMMAND_HPP
-#define SENSORGATEWAY_COMMAND_HPP
+#ifndef SENSORGATEWAY_CONTROLMESSAGE_HPP
+#define SENSORGATEWAY_CONTROLMESSAGE_HPP
 
 #include "sensor-gateway/common/data-structure/time-tracking/TimeTracking.hpp"
 
@@ -112,22 +112,22 @@ namespace DataFlow {
         using DataFlow::ControlMessage;
 
         template<typename CommandDefinition>
-        typename ControlMessage<CommandDefinition>::ControlMessageCode const DEFAULT_COMMAND_CODE = ControlMessage<CommandDefinition>::ControlMessageCode::NOOP;
+        typename ControlMessage<CommandDefinition>::ControlMessageCode const DEFAULT_CONTROLMESSAGE_CODE = ControlMessage<CommandDefinition>::ControlMessageCode::NOOP;
 
         template<typename CommandDefinition>
-        typename CommandDefinition::Payload const DEFAULT_COMMAND_PAYLOAD{};
+        typename CommandDefinition::Payload const DEFAULT_CONTROLMESSAGE_PAYLOAD{};
 
         template<typename CommandDefinition>
-        ControlMessage<CommandDefinition> const DEFAULT_COMMAND = ControlMessage<CommandDefinition>(
-                DEFAULT_COMMAND_CODE<CommandDefinition>,
-                DEFAULT_COMMAND_PAYLOAD<CommandDefinition>);
+        ControlMessage<CommandDefinition> const DEFAULT_CONTROLMESSAGE = ControlMessage<CommandDefinition>(
+                DEFAULT_CONTROLMESSAGE_CODE<CommandDefinition>,
+                DEFAULT_CONTROLMESSAGE_PAYLOAD<CommandDefinition>);
     }
 
     template<typename CommandDefinition>
     ControlMessage<CommandDefinition> const& ControlMessage<CommandDefinition>::returnDefaultData() noexcept {
-        return Defaults::DEFAULT_COMMAND<CommandDefinition>;
+        return Defaults::DEFAULT_CONTROLMESSAGE<CommandDefinition>;
     }
 
 }
 
-#endif //SENSORGATEWAY_COMMAND_HPP
+#endif //SENSORGATEWAY_CONTROLMESSAGE_HPP

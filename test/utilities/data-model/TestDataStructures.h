@@ -17,7 +17,7 @@
 #ifndef SENSORGATEWAY_TESTDATASTRUCTURES_H
 #define SENSORGATEWAY_TESTDATASTRUCTURES_H
 
-#include "SimpleRawData.h"
+#include "SimpleControlMessage.h"
 
 namespace Sensor {
     namespace Test {
@@ -28,6 +28,7 @@ namespace Sensor {
 
                 typedef typename DataModel::SimpleMessage Message;
                 typedef typename DataModel::SimpleRawData RawData;
+                typedef typename DataModel::SimpleControlMessage ControlMessage;
 
                 static size_t const MAX_NUMBER_OF_BULK_FETCHABLE_MESSAGES = 1; // IMPORTANT: this has to stay = 1!
                 static size_t const MAX_NUMBER_OF_BULK_FETCHABLE_RAW_DATA_CYCLES = 1;

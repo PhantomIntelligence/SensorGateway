@@ -23,7 +23,7 @@
  * @warning: DO NOT MODIFY
  * @brief: Internal type to allow easy conversion of string to literal type. This is used to pass a string as template parameter.
  */
-namespace {
+namespace CustomType {
 
     template<char... chars>
     using StringType = std::integer_sequence<char, chars...>;
@@ -42,5 +42,7 @@ namespace {
         }
     };
 }
+
+using namespace CustomType;
 
 #endif //SENSORGATEWAY_STRINGLITERALTYPE_H
