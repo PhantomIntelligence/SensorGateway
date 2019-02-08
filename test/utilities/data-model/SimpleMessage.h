@@ -17,7 +17,7 @@
 #ifndef SENSORGATEWAY_SIMPLEMESSAGE_H
 #define SENSORGATEWAY_SIMPLEMESSAGE_H
 
-#include "sensor-gateway/common/data-structure/TimeTracking.hpp"
+#include "sensor-gateway/common/data-structure/time-tracking/TimeTracking.hpp"
 
 namespace DataModel {
 

@@ -18,7 +18,7 @@
 #define SENSORGATEWAY_GATEWAYSTRUCTURES_H
 
 #include "sensor-gateway/common/data-structure/DataStructures.h"
-#include "Parameters.hpp"
+#include "sensor-gateway/common/data-structure/parameter/ParameterConstants.hpp"
 
 namespace Sensor {
     namespace Gateway {

@@ -9,6 +9,8 @@ file(GLOB APPLICATION_FILES "${DOT}/application/*")
 file(GLOB COMMON_FILES "${DOT}/common/*")
 file(GLOB ERROR_FILES "${DOT}/common/error/*")
 file(GLOB DATA_STRUCTURE_FILES "${DOT}/common/data-structure/*")
+file(GLOB TIME_TRACKING_STRUCTURE_FILES "${DOT}/common/data-structure/time-tracking/*")
+file(GLOB PARAMETER_STRUCTURE_FILES "${DOT}/common/data-structure/parameter/*")
 file(GLOB SENSOR_STRUCTURE_FILES "${DOT}/common/data-structure/sensor/*")
 file(GLOB SPIRIT_STRUCTURE_FILES "${DOT}/common/data-structure/gateway/*")
 file(GLOB DOMAIN_FILES "${DOT}/domain/*")
@@ -23,6 +25,8 @@ add_library(${PROJECT_NAME} SHARED
         ${COMMON_FILES}
         ${ERROR_FILES}
         ${DATA_STRUCTURE_FILES}
+        ${TIME_TRACKING_STRUCTURE_FILES}
+        ${PARAMETER_STRUCTURE_FILES}
         ${SPIRIT_STRUCTURE_FILES}
         ${SENSOR_STRUCTURE_FILES}
         ${DOMAIN_FILES}

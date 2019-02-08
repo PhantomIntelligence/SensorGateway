@@ -5,7 +5,7 @@
 #include <gmock/gmock.h>
 #include <test/utilities/data-model/DataModelFixture.h>
 #include <test/utilities/assertion/TimeAssertion.hpp>
-#include "sensor-gateway/common/data-structure/ServiceTimestamps.hpp"
+#include "sensor-gateway/common/data-structure/time-tracking/ServiceTimestamps.hpp"
 
 class ServiceTimestampsTest : public ::testing::Test {
 

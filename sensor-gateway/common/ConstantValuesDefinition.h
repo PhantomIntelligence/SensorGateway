@@ -20,7 +20,23 @@
 #include "StringLiteralType.h"
 
 namespace ConversionUnits {
-    int const NUMBER_OF_CENTIMETERS_IN_A_METER = 100;
+    uint8_t const NUMBER_OF_CENTIMETERS_IN_A_METER = 100;
+}
+
+namespace NumberOfBit {
+    uint8_t const ZERO = 0;
+    uint8_t const ONE = 1;
+    uint8_t const TWO = 2;
+    uint8_t const THREE = 3;
+    uint8_t const FOUR = 4;
+    uint8_t const FIVE = 5;
+    uint8_t const SIX = 6;
+    uint8_t const SEVEN = 7;
+    uint8_t const EIGHT = 8;
+
+    uint8_t const IN_HALF_A_BYTE = FOUR;
+    uint8_t const IN_A_BYTE = EIGHT;
+    uint8_t const IN_TWO_BYTES = 2 * IN_A_BYTE;
 }
 
 namespace Metrics {

@@ -17,8 +17,7 @@
 #ifndef SENSORGATEWAY_PARAMETERS_HPP
 #define SENSORGATEWAY_PARAMETERS_HPP
 
-#include "SensorMessage.hpp"
-#include "sensor-gateway/common/StringLiteralType.h"
+#include "sensor-gateway/common/ConstantFunctionsDefinition.h"
 
 namespace Sensor {
     namespace Gateway {
@@ -26,14 +25,29 @@ namespace Sensor {
         template<
                 typename N,
                 typename T,
+                typename U
+        >
+        struct GatewayParameterDefinition {
+            using Name = N;
+            using ValueType = T;
+            using Unit = U;
+        };
+
+        // WARNING: Do not remove this to-do unless a more general structure has been created
+        // TODO : take revision # into account when creating Parameters list definition
+        template<
+                typename GatewayParameterDefinition,
+                Byte SENSOR_INTERNAL_COMMAND,
                 Byte SENSOR_INTERNAL_ADDRESS,
                 uint8_t SENSOR_INTERNAL_TOTAL_LENGTH_IN_BITS,
                 uint8_t PARAMETER_VALUE_OFFSET_IN_BITS,
                 uint8_t PARAMETER_VALUE_LENGTH_IN_BITS
         >
         struct SensorParameterDefinition {
-            static N const name;
-            using ValueType = T;
+            static typename GatewayParameterDefinition::Name const name;
+            using ValueType = typename GatewayParameterDefinition::ValueType;
+            static typename GatewayParameterDefinition::Unit const unit;
+            static Byte const sensorInternalCommand = SENSOR_INTERNAL_COMMAND;
             static Byte const sensorInternalAddress = SENSOR_INTERNAL_ADDRESS;
             static uint8_t const sensorInternalTotalLengthInBits = SENSOR_INTERNAL_TOTAL_LENGTH_IN_BITS;
             static uint8_t const valueOffsetInBits = PARAMETER_VALUE_OFFSET_IN_BITS;
@@ -47,16 +61,22 @@ namespace Sensor {
 
             explicit Parameter() :
                     name(SensorParameterDefinition::name.toString()),
-                    value() {};
+                    value(),
+                    unit(SensorParameterDefinition::unit.toString())
+                    {};
 
             constexpr std::string const& getName() const noexcept {
                 return name;
             }
 
+            constexpr std::string const& getUnit() const noexcept {
+                return unit;
+            }
         private:
 
             std::string const name;
             typename SensorParameterDefinition::ValueType const value;
+            std::string const unit;
         };
 
 
@@ -76,6 +96,14 @@ namespace Sensor {
                             return std::make_tuple(std::get<Is>(internalParameters).getName()...);
                         });
                 return convertTupleToArray(namesTuple);
+            }
+
+            constexpr auto getUnits() const {
+                auto unitsTuple = index_apply<NUMBER_OF_AVAILABLE_PARAMETERS>(
+                        [&](auto... Is) {
+                            return std::make_tuple(std::get<Is>(internalParameters).getUnit()...);
+                        });
+                return convertTupleToArray(unitsTuple);
             }
 
         private:

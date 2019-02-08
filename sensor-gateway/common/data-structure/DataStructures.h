@@ -17,6 +17,8 @@
 #ifndef SENSORGATEWAY_DATASTRUCTURES_H
 #define SENSORGATEWAY_DATASTRUCTURES_H
 
+#include "sensor-gateway/common/data-structure/gateway/SensorMessage.hpp"
+#include "parameter/ParameterConstants.hpp"
 #include "RawData.hpp"
 
 namespace Sensor {

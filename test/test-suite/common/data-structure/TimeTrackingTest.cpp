@@ -3,7 +3,7 @@
 
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
-#include "sensor-gateway/common/data-structure/TimeTracking.hpp"
+#include "sensor-gateway/common/data-structure/time-tracking/TimeTracking.hpp"
 
 class TimeTrackingTest : public ::testing::Test {
 protected:

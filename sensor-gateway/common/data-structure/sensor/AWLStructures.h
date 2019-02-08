@@ -18,6 +18,7 @@
 #define SENSORGATEWAY_AWLSTRUCTURES_H
 
 #include "sensor-gateway/common/data-structure/DataStructures.h"
+#include "AWLParameters.h"
 #include "AWLMessage.hpp"
 
 namespace Sensor {

@@ -17,7 +17,7 @@
 #ifndef SENSORGATEWAY_COMMAND_HPP
 #define SENSORGATEWAY_COMMAND_HPP
 
-#include "TimeTracking.hpp"
+#include "sensor-gateway/common/data-structure/time-tracking/TimeTracking.hpp"
 
 namespace Sensor {
     /**
