@@ -33,6 +33,7 @@ namespace Sensor {
     };
 
     namespace ControlMessagePayloadTypes {
+        typedef Byte NO_SENSOR;
         typedef Byte AWL;
         typedef Byte GUARDIAN;
     }

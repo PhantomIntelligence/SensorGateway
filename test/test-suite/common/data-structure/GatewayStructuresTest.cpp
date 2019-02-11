@@ -5,7 +5,7 @@
 #include <gmock/gmock-generated-matchers.h>
 
 #include <test/utilities/data-model/DataModelFixture.h>
-#include "sensor-gateway/common/data-structure/parameter/ParameterConstants.hpp"
+#include <sensor-gateway/common/data-structure/gateway/GatewayStructures.h>
 
 
 using TestFunctions::DataTestUtil;
@@ -19,8 +19,15 @@ protected:
     static Byte const WHATEVER_INTERNAL_ADDRESS = 0x16;
     static uint8_t const WHATEVER_SMALL_INTEGER_VALUE = 4;
 
+    using RealisticTestStructures = Sensor::Test::RealisticImplementation::Structures;
+    using PulseWidthDefinition = Sensor::Gateway::PulseWidthDefinition;
+    using LaserControlDefinition = Sensor::Gateway::LaserControlDefinition;
+    using AccumulationDefinition = Sensor::Gateway::AccumulationDefinition;
+    using TIAGainDefinition = Sensor::Gateway::TIAGainDefinition;
+    using NoParameterDefinition = Sensor::Gateway::Details::NoParameterDefinition;
+
     template<typename GPD>
-    struct TestParameter : public Sensor::Gateway::SensorParameterDefinition<
+    struct FakeSensorTestParameter : public Sensor::Gateway::SensorParameterDefinition<
             GPD,
             WHATEVER_INTERNAL_COMMAND,
             WHATEVER_INTERNAL_ADDRESS,
@@ -32,14 +39,36 @@ protected:
 
 };
 
+namespace GatewayStructureTest {
+    template<typename T>
+    using Param = Sensor::Gateway::Parameter<GatewayStructuresTest::FakeSensorTestParameter<T>>;
+
+}
+
 TEST_F(GatewayStructuresTest,
        given_aParameterList_when_getName_then_returnsTheNamesOfTheParameters) {
+    using FakeGatewayParametersList = Sensor::Gateway::Parameters<
+            GatewayStructureTest::Param<PulseWidthDefinition>,
+            GatewayStructureTest::Param<LaserControlDefinition>,
+            GatewayStructureTest::Param<TIAGainDefinition>,
+            GatewayStructureTest::Param<AccumulationDefinition>,
+            GatewayStructureTest::Param<LaserControlDefinition>
+    >;
 
-    // TODO: Create a Parameter List,
-    //  TODO: declare a GatewayStructure with it
-    //  TODO: Ensure the instantiated `Parameters`  from GatewayStructure returns same `getNames` the "type" list returns
+    using GatewayTestSturctures = Sensor::Gateway::Structures<
+            RealisticTestStructures::StubMessageDefinition,
+            RealisticTestStructures::StubRawDataDefinition,
+            RealisticTestStructures::StubControlMessageDefinition,
+            FakeGatewayParametersList
+            >;
 
-//    ASSERT_THAT(actualName, testing::StrEq(expectedName));
+    FakeGatewayParametersList fakeGatewayParametersList;
+    GatewayTestSturctures::Parameters parameters;
+
+    auto expectedParametersNames = fakeGatewayParametersList.getNames();
+    auto actualParametersNames = parameters.getNames();
+
+    ASSERT_EQ(expectedParametersNames, actualParametersNames);
 }
 
 #endif //SENSORGATEWAY_GATEWAYSTRUCTURESTEST_H

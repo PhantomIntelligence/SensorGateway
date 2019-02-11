@@ -34,6 +34,58 @@ namespace Sensor {
                 static size_t const MAX_NUMBER_OF_BULK_FETCHABLE_RAW_DATA_CYCLES = 1;
             };
         }
+
+        namespace RealisticImplementation {
+
+            namespace Constants {
+
+                static size_t const NUMBER_OF_SENSOR_TIME_POINTS = 0;
+                static size_t const NUMBER_OF_GATEWAY_TIME_POINTS = 2;
+
+                static size_t const NUMBER_OF_PIXELS = 4;
+                static size_t const NUMBER_OF_CHANNELS = 2;
+                static size_t const NUMBER_OF_DETECTION_PER_CHANNEL = 4;
+                static size_t const RAW_DATA_SAMPLING_LENGTH = 16;
+                static size_t const MAX_COMMAND_PAYLOAD_SIZE = 8;
+            }
+
+            class Structures final : public Sensor::Communication::DataStructures {
+
+            public :
+
+                typedef typename
+                Metrics::TimeTrackingDefinition<
+                        Constants::NUMBER_OF_SENSOR_TIME_POINTS,
+                        Constants::NUMBER_OF_GATEWAY_TIME_POINTS
+                > StubTimeTrackingDefinition;
+
+                typedef typename
+                Sensor::SensorMessageDefinition<
+                        Constants::NUMBER_OF_PIXELS,
+                        StubTimeTrackingDefinition
+                > StubMessageDefinition;
+
+                typedef typename
+                Sensor::RawDataDefinition<
+                        RawDataTypes::GUARDIAN,
+                        Constants::NUMBER_OF_CHANNELS,
+                        Constants::RAW_DATA_SAMPLING_LENGTH
+                > StubRawDataDefinition;
+
+                typedef typename
+                Sensor::ControlMessageDefinition<
+                        ControlMessagePayloadTypes::NO_SENSOR,
+                        Constants::MAX_COMMAND_PAYLOAD_SIZE
+                > StubControlMessageDefinition;
+
+                typedef typename DataFlow::SensorMessage<StubMessageDefinition> Message;
+                typedef typename DataFlow::RawData<StubRawDataDefinition> RawData;
+                typedef typename DataFlow::ControlMessage<StubControlMessageDefinition> ControlMessage;
+
+                static size_t const MAX_NUMBER_OF_BULK_FETCHABLE_MESSAGES = 1; // IMPORTANT: this has to stay = 1!
+                static size_t const MAX_NUMBER_OF_BULK_FETCHABLE_RAW_DATA_CYCLES = 1;
+            };
+        }
     }
 }
 

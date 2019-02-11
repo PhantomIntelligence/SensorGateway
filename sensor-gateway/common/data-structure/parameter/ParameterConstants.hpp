@@ -46,16 +46,20 @@ namespace Sensor {
     }
 
     namespace Gateway {
-        using NoGatewayParameterDefinition = Sensor::Gateway::SensorParameterDefinition<
-                GatewayParameterDefinition<Sensor::Parameter::Names::InvalidName,
-                        Sensor::Parameter::Types::Boolean,
-                        Sensor::Parameter::Units::not_applicable>,
-                0x0,
-                0x0,
-                0x0,
-                0x0,
-                0x0
-        >;
+
+        namespace Details {
+            using NoParameterDefinition = SensorParameterDefinition<
+                    GatewayParameterDefinition<Sensor::Parameter::Names::InvalidName,
+                            Sensor::Parameter::Types::Boolean,
+                            Sensor::Parameter::Units::not_applicable>,
+                    0x0,
+                    0x0,
+                    0x0,
+                    0x0,
+                    0x0
+            >;
+        }
+        using NoGatewayParametersDefinition = Gateway::Parameters<Details::NoParameterDefinition>;
 
         using PulseWidthDefinition = GatewayParameterDefinition<
                 Sensor::Parameter::Names::PulseWidth,
