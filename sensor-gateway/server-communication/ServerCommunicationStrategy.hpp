@@ -17,7 +17,7 @@
 #ifndef SENSORGATEWAY_SERVERCOMMUNICATIONPROTOCOLSTRATEGY_HPP
 #define SENSORGATEWAY_SERVERCOMMUNICATIONPROTOCOLSTRATEGY_HPP
 
-#include "SensorRequest.hpp"
+#include "ServerRequest.hpp"
 
 namespace ServerCommunication {
 

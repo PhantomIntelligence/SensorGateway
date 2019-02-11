@@ -14,8 +14,8 @@
 	limitations under the License.
 */
 
-#ifndef SENSORGATEWAY_SENSORREQUEST_HPP
-#define SENSORGATEWAY_SENSORREQUEST_HPP
+#ifndef SENSORGATEWAY_SENSORCOMMUNICATIONPAYLOADTYPES_HPP
+#define SENSORGATEWAY_SENSORCOMMUNICATIONPAYLOADTYPES_HPP
 
 #include "sensor-gateway/common/data-structure/gateway/SensorMessage.hpp"
 
@@ -34,33 +34,7 @@ namespace ServerCommunication {
             static ValueType const value = v;
         };
     }
-
-    template<typename PayloadType>
-    class SensorRequest {
-
-    };
-
-    template<class... R>
-    class BulkRequest {
-
-    public:
-
-        static auto const REQUEST_SIZE = sizeof...(R);
-
-        using Requests = std::tuple<R...>;
-
-        explicit BulkRequest() : requests(std::make_tuple(R()...)) {}
-
-        template <class F>
-        constexpr auto processRequests(F f) const {
-            return apply(requests, f);
-        }
-
-    private :
-        Requests requests;
-    };
-
 }
 
 
-#endif //SENSORGATEWAY_SENSORREQUEST_HPP
+#endif //SENSORGATEWAY_SENSORCOMMUNICATIONPAYLOADTYPES_HPP

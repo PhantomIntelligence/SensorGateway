@@ -42,15 +42,11 @@ namespace Sensor {
 
 namespace DataFlow {
 
+
     template<typename ControlMessageDefinition>
     class ControlMessage {
 
     protected:
-
-    public:
-
-        using Definitions = ControlMessageDefinition;
-        using Payload = typename Definitions::Payload;
 
         enum ControlMessageCode {
             NOOP = 0,
@@ -59,6 +55,11 @@ namespace DataFlow {
             SET_VALUE = 20,
             BULK_SET_VALUE = 21,
         };
+
+    public:
+
+        using Definitions = ControlMessageDefinition;
+        using Payload = typename Definitions::Payload;
 
         explicit ControlMessage(ControlMessageCode const& commandCode, Payload payload) noexcept :
                 commandCode(commandCode),
@@ -113,20 +114,20 @@ namespace DataFlow {
         using DataFlow::ControlMessage;
 
         template<typename CommandDefinition>
-        typename ControlMessage<CommandDefinition>::ControlMessageCode const DEFAULT_CONTROLMESSAGE_CODE = ControlMessage<CommandDefinition>::ControlMessageCode::NOOP;
+        typename ControlMessage<CommandDefinition>::ControlMessageCode const DEFAULT_CONTROL_MESSAGE_CODE = ControlMessage<CommandDefinition>::ControlMessageCode::NOOP;
 
         template<typename CommandDefinition>
-        typename CommandDefinition::Payload const DEFAULT_CONTROLMESSAGE_PAYLOAD{};
+        typename CommandDefinition::Payload const DEFAULT_CONTROL_MESSAGE_PAYLOAD{};
 
         template<typename CommandDefinition>
-        ControlMessage<CommandDefinition> const DEFAULT_CONTROLMESSAGE = ControlMessage<CommandDefinition>(
-                DEFAULT_CONTROLMESSAGE_CODE<CommandDefinition>,
-                DEFAULT_CONTROLMESSAGE_PAYLOAD<CommandDefinition>);
+        ControlMessage<CommandDefinition> const DEFAULT_CONTROL_MESSAGE = ControlMessage<CommandDefinition>(
+                DEFAULT_CONTROL_MESSAGE_CODE<CommandDefinition>,
+                DEFAULT_CONTROL_MESSAGE_PAYLOAD<CommandDefinition>);
     }
 
     template<typename CommandDefinition>
     ControlMessage<CommandDefinition> const& ControlMessage<CommandDefinition>::returnDefaultData() noexcept {
-        return Defaults::DEFAULT_CONTROLMESSAGE<CommandDefinition>;
+        return Defaults::DEFAULT_CONTROL_MESSAGE<CommandDefinition>;
     }
 
 }

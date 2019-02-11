@@ -16,6 +16,7 @@
 
 #include "sensor-gateway/data-translation/DataTranslator.hpp"
 #include "ServerCommunicationStrategy.hpp"
+#include "ServerRequest.hpp"
 
 namespace SensorAccessLinkElement {
 
@@ -23,6 +24,7 @@ namespace SensorAccessLinkElement {
     template<class T>
     class ServerCommunicator : public DataFlow::DataSink<typename T::Message>,
                                public DataFlow::DataSink<typename T::RawData>,
+                               public DataFlow::DataSource<typename T::ControlMessage>,
                                public DataFlow::DataSource<ErrorHandling::SensorAccessLinkError> {
 
     protected:
@@ -31,9 +33,13 @@ namespace SensorAccessLinkElement {
 
         using Message = typename T::Message;
         using RawData = typename T::RawData;
+        using ControlMessage = typename T::ControlMessage;
+
+        using HandleServerRequestCallback = std::function<void(ServerCommunicationStrategy*)>;
 
         using MessageSink = DataFlow::DataSink<Message>;
         using RawDataSink = DataFlow::DataSink<RawData>;
+
         using ErrorSource = DataFlow::DataSource<ErrorHandling::SensorAccessLinkError>;
 
     public:
@@ -89,6 +95,8 @@ namespace SensorAccessLinkElement {
                                         ErrorHandling::Origin::SERVER_COMMUNICATOR_CLOSE_CONNECTION);
             }
         }
+
+        using ErrorSource::linkConsumer;
 
     private:
 

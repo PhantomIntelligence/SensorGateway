@@ -17,7 +17,7 @@
 #ifndef SENSORGATEWAY_SENSORACCESSLINK_H
 #define SENSORGATEWAY_SENSORACCESSLINK_H
 
-#include "sensor-gateway/server-communication/ServerCommunicator.hpp"
+#include "sensor-gateway/common/data-structure/gateway/SensorParameterController.hpp"
 
 namespace SensorGateway {
 

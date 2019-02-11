@@ -46,7 +46,7 @@ namespace GatewayStructureTest {
 }
 
 TEST_F(GatewayStructuresTest,
-       given_aParameterList_when_getName_then_returnsTheNamesOfTheParameters) {
+       given_aParameterListAsTemplateParameter_when_compiledAndUsed_then_isValidTypeAndActsLikeThePassedType) {
     using FakeGatewayParametersList = Sensor::Gateway::Parameters<
             GatewayStructureTest::Param<PulseWidthDefinition>,
             GatewayStructureTest::Param<LaserControlDefinition>,

@@ -59,7 +59,7 @@ namespace Sensor {
 
             typedef typename DataFlow::SensorMessage<GatewaySensorMessageDefinition> Message;
             typedef typename DataFlow::RawData<RawDataDefinition> RawData;
-            typedef typename DataFlow::ControlMessage<CommandDefinition> Command;
+            typedef typename DataFlow::ControlMessage<CommandDefinition> ControlMessage;
             using Parameters = ParametersList;
 
             static size_t const MAX_NUMBER_OF_BULK_FETCHABLE_MESSAGES = 32;
