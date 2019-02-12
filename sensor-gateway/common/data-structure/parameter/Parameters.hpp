@@ -57,31 +57,44 @@ namespace Sensor {
         template<typename SensorParameterDefinition>
         class Parameter {
 
+        protected:
+
+            using Definition = SensorParameterDefinition;
+
         public:
 
             explicit Parameter() :
-                    name(SensorParameterDefinition::name.toString()),
+                    name(Definition::name.toString()),
                     value(),
-                    unit(SensorParameterDefinition::unit.toString())
-                    {};
+                    unit(Definition::unit.toString()) {};
 
-            constexpr std::string const& getName() const noexcept {
+            constexpr bool nameEquals(std::string const& otherName) const {
+                return name == otherName;
+            };
+
+            constexpr std::string const& getStringifiedName() const noexcept {
                 return name;
             }
 
-            constexpr std::string const& getUnit() const noexcept {
+            constexpr std::string const& getStringifiedUnit() const noexcept {
                 return unit;
             }
+
+            static constexpr auto extractNameDefinition(Parameter current) noexcept {
+                return Definition::name;
+            }
+
         private:
 
             std::string const name;
-            typename SensorParameterDefinition::ValueType const value;
+            typename Definition::ValueType const value;
             std::string const unit;
         };
 
 
         template<class... P>
         class Parameters {
+
             using Params = std::tuple<P...>;
 
         public:
@@ -90,23 +103,38 @@ namespace Sensor {
 
             explicit Parameters() : internalParameters(std::make_tuple(P()...)) {}
 
+            constexpr auto isAvailable(std::string const& parameterName) {
+                auto names = getNames();
+                bool containsParameterWithName = false;
+                for(size_t i = 0; i < NUMBER_OF_AVAILABLE_PARAMETERS && !containsParameterWithName; ++i) {
+                    containsParameterWithName = containsParameterWithName || names[i] == parameterName;
+                }
+
+                return containsParameterWithName;
+            }
+
             constexpr auto getNames() const {
-                auto namesTuple = index_apply<NUMBER_OF_AVAILABLE_PARAMETERS>(
-                        [&](auto... Is) {
-                            return std::make_tuple(std::get<Is>(internalParameters).getName()...);
-                        });
-                return convertTupleToArray(namesTuple);
+                auto names = convertTupleToArray(getNameTuple());
+                return names;
             }
 
             constexpr auto getUnits() const {
                 auto unitsTuple = index_apply<NUMBER_OF_AVAILABLE_PARAMETERS>(
                         [&](auto... Is) {
-                            return std::make_tuple(std::get<Is>(internalParameters).getUnit()...);
+                            return std::make_tuple(std::get<Is>(internalParameters).getStringifiedUnit()...);
                         });
                 return convertTupleToArray(unitsTuple);
             }
 
         private:
+
+            constexpr auto getNameTuple() const {
+                auto nameTuple = index_apply<NUMBER_OF_AVAILABLE_PARAMETERS>(
+                        [&](auto... Is) {
+                            return std::make_tuple(std::get<Is>(internalParameters).getStringifiedName()...);
+                        });
+                return nameTuple;
+            }
 
             Params internalParameters;
         };

@@ -15,12 +15,10 @@
 
 */
 
-#ifndef SPIRITSENSORGATEWAY_SENSORCOMMUNICATORTEST_CPP
-#define SPIRITSENSORGATEWAY_SENSORCOMMUNICATORTEST_CPP
+#ifndef SPIRITSENSORGATEWAY_SENSORACCESSLINKTEST_CPP
+#define SPIRITSENSORGATEWAY_SENSORACCESSLINKTEST_CPP
 
 #include <gtest/gtest.h>
-#include <list>
-#include <test/utilities/mock/ErrorThrowingSensorCommunicationStrategyMock.hpp>
 
 #include "sensor-gateway/application/SensorAccessLink.hpp"
 #include "test/utilities/mock/ErrorThrowingServerCommunicationStrategyMock.hpp"
@@ -470,6 +468,6 @@ TEST_F(SensorAccessLinkTest,
 
 // TODO: add *MEDIUM* test to check the integration of the SensorAccessLinkErrorHandler;
 
-#endif //SPIRITSENSORGATEWAY_SENSORCOMMUNICATORTEST_CPP
+#endif //SPIRITSENSORGATEWAY_SENSORACCESSLINKTEST_CPP
 
 

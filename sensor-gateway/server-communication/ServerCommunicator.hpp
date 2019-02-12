@@ -1,9 +1,12 @@
 /**
-	Copyright 2014-2018 Phantom Intelligence Inc.
+	Copyright 2014-2019 Phantom Intelligence Inc.
+
 	Licensed under the Apache License, Version 2.0 (the "License");
 	you may not use this file except in compliance with the License.
 	You may obtain a copy of the License at
+
 		http://www.apache.org/licenses/LICENSE-2.0
+
 	Unless required by applicable law or agreed to in writing, software
 	distributed under the License is distributed on an "AS IS" BASIS,
 	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -11,12 +14,12 @@
 	limitations under the License.
 */
 
-#ifndef SENSORGATEWAY_SERVERCOMMUNICATOR_H
-#define SENSORGATEWAY_SERVERCOMMUNICATOR_H
+#ifndef SENSORGATEWAY_SERVERCOMMUNICATOR_HPP
+#define SENSORGATEWAY_SERVERCOMMUNICATOR_HPP
 
 #include "sensor-gateway/data-translation/DataTranslator.hpp"
 #include "ServerCommunicationStrategy.hpp"
-#include "ServerRequest.hpp"
+#include "ServerResponseAssembler.hpp"
 
 namespace SensorAccessLinkElement {
 
@@ -24,7 +27,6 @@ namespace SensorAccessLinkElement {
     template<class T>
     class ServerCommunicator : public DataFlow::DataSink<typename T::Message>,
                                public DataFlow::DataSink<typename T::RawData>,
-                               public DataFlow::DataSource<typename T::ControlMessage>,
                                public DataFlow::DataSource<ErrorHandling::SensorAccessLinkError> {
 
     protected:
@@ -33,9 +35,6 @@ namespace SensorAccessLinkElement {
 
         using Message = typename T::Message;
         using RawData = typename T::RawData;
-        using ControlMessage = typename T::ControlMessage;
-
-        using HandleServerRequestCallback = std::function<void(ServerCommunicationStrategy*)>;
 
         using MessageSink = DataFlow::DataSink<Message>;
         using RawDataSink = DataFlow::DataSink<RawData>;
@@ -126,4 +125,4 @@ namespace SensorAccessLinkElement {
     };
 }
 
-#endif //SENSORGATEWAY_SERVERCOMMUNICATOR_H
+#endif //SENSORGATEWAY_SERVERCOMMUNICATOR_HPP

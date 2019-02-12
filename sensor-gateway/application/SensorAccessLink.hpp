@@ -1,5 +1,5 @@
 /**
-	Copyright 2014-2018 Phantom Intelligence Inc.
+	Copyright 2014-2019 Phantom Intelligence Inc.
 
 	Licensed under the Apache License, Version 2.0 (the "License");
 	you may not use this file except in compliance with the License.
@@ -14,10 +14,10 @@
 	limitations under the License.
 */
 
-#ifndef SENSORGATEWAY_SENSORACCESSLINK_H
-#define SENSORGATEWAY_SENSORACCESSLINK_H
+#ifndef SENSORGATEWAY_SENSORACCESSLINK_HPP
+#define SENSORGATEWAY_SENSORACCESSLINK_HPP
 
-#include "sensor-gateway/common/data-structure/gateway/SensorParameterController.hpp"
+#include "sensor-gateway/server-communication/ResponseWriter.hpp"
 
 namespace SensorGateway {
 
@@ -154,4 +154,4 @@ namespace SensorGateway {
     };
 }
 
-#endif //SENSORGATEWAY_SENSORACCESSLINK_H
+#endif //SENSORGATEWAY_SENSORACCESSLINK_HPP

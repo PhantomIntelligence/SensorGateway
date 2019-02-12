@@ -18,6 +18,7 @@
 #define SENSORGATEWAY_TESTDATASTRUCTURES_H
 
 #include "SimpleControlMessage.h"
+#include "FakeParameterConstants.hpp"
 
 namespace Sensor {
     namespace Test {
@@ -45,9 +46,10 @@ namespace Sensor {
 
                 static size_t const NUMBER_OF_PIXELS = 4;
                 static size_t const NUMBER_OF_CHANNELS = 2;
-                static size_t const NUMBER_OF_DETECTION_PER_CHANNEL = 4;
                 static size_t const RAW_DATA_SAMPLING_LENGTH = 16;
                 static size_t const MAX_COMMAND_PAYLOAD_SIZE = 8;
+
+                typedef Byte STUB_SENSOR_DATA_TYPE;
             }
 
             class Structures final : public Sensor::Communication::DataStructures {
@@ -68,14 +70,14 @@ namespace Sensor {
 
                 typedef typename
                 Sensor::RawDataDefinition<
-                        RawDataTypes::GUARDIAN,
+                        Constants::STUB_SENSOR_DATA_TYPE,
                         Constants::NUMBER_OF_CHANNELS,
                         Constants::RAW_DATA_SAMPLING_LENGTH
                 > StubRawDataDefinition;
 
                 typedef typename
                 Sensor::ControlMessageDefinition<
-                        ControlMessagePayloadTypes::NO_SENSOR,
+                        Constants::STUB_SENSOR_DATA_TYPE,
                         Constants::MAX_COMMAND_PAYLOAD_SIZE
                 > StubControlMessageDefinition;
 

@@ -24,7 +24,67 @@ namespace ServerCommunication {
     template<typename PayloadType>
     class ServerRequest {
 
+    public:
+
+        explicit ServerRequest(PayloadType const& payload) noexcept :
+                payload(payload) {}
+
+        explicit ServerRequest() noexcept :
+                ServerRequest(ServerRequest::returnDefaultData()) {}
+
+        ~ServerRequest() noexcept = default;
+
+        ServerRequest(ServerRequest const& other) :
+                ServerRequest(other.payload) {}
+
+        ServerRequest(ServerRequest&& other) noexcept :
+                ServerRequest(std::move(other.payload)) {}
+
+        ServerRequest& operator=(ServerRequest const& other)& {
+            ServerRequest temporary(other);
+            swap(*this, temporary);
+            return *this;
+        }
+
+        ServerRequest& operator=(ServerRequest&& other)& noexcept {
+            swap(*this, other);
+            return *this;
+        }
+
+        void swap(ServerRequest& current, ServerRequest& other) noexcept {
+            std::swap(current.payload, other.payload);
+        }
+
+        bool operator==(ServerRequest const& other) const {
+            auto samePayload = (payload == other.payload);
+            bool messagesAreEqual = samePayload;
+            return messagesAreEqual;
+        }
+
+        bool operator!=(ServerRequest const& other) const {
+            return !operator==(other);
+        }
+
+        static ServerRequest const& returnDefaultData() noexcept;
+
+        PayloadType const payload;
     };
+
+    namespace Defaults {
+        using ServerCommunication::ServerRequest;
+
+        template<typename PayloadType>
+        PayloadType const DEFAULT_SERVER_REQUEST_PAYLOAD{};
+
+        template<typename PayloadType>
+        ServerRequest<PayloadType> const DEFAULT_SERVER_REQUEST = ServerRequest<PayloadType>(
+                DEFAULT_SERVER_REQUEST_PAYLOAD<PayloadType>);
+    }
+
+    template<typename PayloadType>
+    ServerRequest<PayloadType> const& ServerRequest<PayloadType>::returnDefaultData() noexcept {
+        return Defaults::DEFAULT_SERVER_REQUEST<PayloadType>;
+    }
 
     template<class... R>
     class BulkRequest {
@@ -37,7 +97,7 @@ namespace ServerCommunication {
 
         explicit BulkRequest() : requests(std::make_tuple(R()...)) {}
 
-        template <class F>
+        template<class F>
         constexpr auto processRequests(F f) const {
             return apply(requests, f);
         }

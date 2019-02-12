@@ -23,7 +23,7 @@
 namespace Sensor {
     namespace Gateway {
 
-        template<typename SensorMessageDefinition, typename RawDataDefinition, typename CommandDefinition, typename ParametersList = NoGatewayParametersDefinition>
+        template<typename SensorMessageDefinition, typename RawDataDefinition, typename ControlMessageDefinition, typename ParametersList = NoGatewayParametersDefinition>
         class Structures final : public Communication::DataStructures {
 
         protected:
@@ -59,7 +59,7 @@ namespace Sensor {
 
             typedef typename DataFlow::SensorMessage<GatewaySensorMessageDefinition> Message;
             typedef typename DataFlow::RawData<RawDataDefinition> RawData;
-            typedef typename DataFlow::ControlMessage<CommandDefinition> ControlMessage;
+            typedef typename DataFlow::ControlMessage<ControlMessageDefinition> ControlMessage;
             using Parameters = ParametersList;
 
             static size_t const MAX_NUMBER_OF_BULK_FETCHABLE_MESSAGES = 32;

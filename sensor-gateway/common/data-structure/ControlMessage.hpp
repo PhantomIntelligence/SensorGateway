@@ -33,7 +33,6 @@ namespace Sensor {
     };
 
     namespace ControlMessagePayloadTypes {
-        typedef Byte NO_SENSOR;
         typedef Byte AWL;
         typedef Byte GUARDIAN;
     }
@@ -46,7 +45,7 @@ namespace DataFlow {
     template<typename ControlMessageDefinition>
     class ControlMessage {
 
-    protected:
+    public:
 
         enum ControlMessageCode {
             NOOP = 0,
@@ -56,13 +55,11 @@ namespace DataFlow {
             BULK_SET_VALUE = 21,
         };
 
-    public:
-
         using Definitions = ControlMessageDefinition;
         using Payload = typename Definitions::Payload;
 
         explicit ControlMessage(ControlMessageCode const& commandCode, Payload payload) noexcept :
-                commandCode(commandCode),
+                controlMessageCode(commandCode),
                 payload(payload) {}
 
         explicit ControlMessage() noexcept :
@@ -71,10 +68,10 @@ namespace DataFlow {
         ~ControlMessage() noexcept = default;
 
         ControlMessage(ControlMessage const& other) :
-                ControlMessage(other.commandCode, other.payload) {}
+                ControlMessage(other.controlMessageCode, other.payload) {}
 
         ControlMessage(ControlMessage&& other) noexcept :
-                ControlMessage(std::move(other.commandCode),
+                ControlMessage(std::move(other.controlMessageCode),
                         std::move(other.payload)) {}
 
         ControlMessage& operator=(ControlMessage const& other)& {
@@ -89,12 +86,12 @@ namespace DataFlow {
         }
 
         void swap(ControlMessage& current, ControlMessage& other) noexcept {
-            std::swap(current.commandCode, other.commandCode);
+            std::swap(current.controlMessageCode, other.controlMessageCode);
             std::swap(current.payload, other.payload);
         }
 
         bool operator==(ControlMessage const& other) const {
-            auto sameCommandCode = (commandCode == other.commandCode);
+            auto sameCommandCode = (controlMessageCode == other.controlMessageCode);
             auto samePayload = (payload == other.payload);
             auto messagesAreEqual = (sameCommandCode && samePayload);
             return messagesAreEqual;
@@ -106,8 +103,9 @@ namespace DataFlow {
 
         static ControlMessage const& returnDefaultData() noexcept;
 
-        ControlMessageCode const commandCode;
-        Payload const payload;
+    private:
+        ControlMessageCode controlMessageCode;
+        Payload payload;
     };
 
     namespace Defaults {

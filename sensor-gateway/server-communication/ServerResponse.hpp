@@ -17,13 +17,13 @@
 #ifndef SERVERGATEWAY_SERVERRESPONSE_HPP
 #define SERVERGATEWAY_SERVERRESPONSE_HPP
 
-#include "ServerResponse.hpp"
+#include "ServerRequestAssembler.hpp"
 
 namespace ServerCommunication {
 
-    template<typename PayloadType>
-    class SensorResponse {
-
+    template<typename PayloadType, typename Request, Request r>
+    class ServerResponse {
+        static Request const request = r;
     };
 
     template<class... R>

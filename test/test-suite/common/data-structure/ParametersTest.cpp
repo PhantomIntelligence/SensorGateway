@@ -46,7 +46,7 @@ TEST_F(ParametersTest,
 
     Sensor::Gateway::Parameter<sensorParameterDefinition> parameterTest;
 
-    std::string const actualName(parameterTest.getName());
+    std::string const actualName(parameterTest.getStringifiedName());
 
     std::string const expectedName("Test");
     ASSERT_THAT(actualName, testing::StrEq(expectedName));
@@ -59,7 +59,7 @@ TEST_F(ParametersTest,
 
     Sensor::Gateway::Parameter<sensorParameterDefinition> parameterTest;
 
-    std::string const actualUnit(parameterTest.getUnit());
+    std::string const actualUnit(parameterTest.getStringifiedUnit());
 
     std::string const expectedUnit("picofarad");
     ASSERT_THAT(actualUnit, testing::StrEq(expectedUnit));

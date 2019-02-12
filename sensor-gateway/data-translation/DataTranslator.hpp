@@ -33,11 +33,12 @@ namespace SensorAccessLinkElement {
 
         using SensorMessage = typename SENSOR_STRUCTURES::Message;
         using SensorRawData = typename SENSOR_STRUCTURES::RawData;
+        using SensorControlMessage = typename SENSOR_STRUCTURES::ControlMessage;
 
         using MessageSink = DataFlow::DataSink<SensorMessage>;
         using RawDataSink = DataFlow::DataSink<SensorRawData>;
         using ErrorSource = DataFlow::DataSource<ErrorHandling::SensorAccessLinkError>;
-        using ControlMessageSource = DataFlow::DataSource<typename SENSOR_STRUCTURES::ControlMessage>;
+        using ResponseControlMessageSource = DataFlow::DataSource<SensorControlMessage>;
 
     public:
 
@@ -86,8 +87,15 @@ namespace SensorAccessLinkElement {
             }
         };
 
+
+        template<typename N>
+        SensorControlMessage createGetParameterValueControlMessage(N parameterName) const {
+
+        }
+
         using ErrorSource::linkConsumer;
-        using ControlMessageSource::linkConsumer;
+        using ResponseControlMessageSource::linkConsumer;
+
     private:
 
         DataTranslationStrategy* dataTranslationStrategy;

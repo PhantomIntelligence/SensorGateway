@@ -24,7 +24,7 @@ namespace ServerCommunication {
     namespace PayloadTypes {
 
         template<typename N>
-        class NamePayload {
+        struct NamePayload {
             static N const name;
         };
 
