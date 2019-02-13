@@ -83,19 +83,6 @@ namespace RequestHandlerTestMock {
     };
 }
 
-TEST_F(RequestHandlerTest,
-       given_aGetSensorParameterValueRequestWithNameNotInAvailableParameters_when_handleIncomingServerRequest_then_throwsSensorAccessLinkError) {
-
-    using ImpossibleParameters = Sensor::Gateway::Parameters<
-            Sensor::FakeParameter::Impossible
-    >;
-    auto request = Assemble::ServerRequest::getParameterValue<ImpossibleParameters>("test");
-    // TODO : transfer isAvailable logic from assembler to RequestHandler
-//    std::cout << " test : " << getImpossibleParameterValueRequest.payload.name->Name << std::endl;
-
-//    ASSERT_TRUE(dataHasPassedThroughCorrectly);
-}
-
 //TEST_F(RequestHandlerTest,
 //       given_catchingDataTranslatorAndAGetParameterValueRequest_when_handleIncomingServerRequest_then_theDataTranslatorIsAskedToCreateAGetParameterValueControlMessage) {
 //    ASSERT_TRUE(dataHasPassedThroughCorrectly);

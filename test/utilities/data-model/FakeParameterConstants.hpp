@@ -23,7 +23,7 @@ namespace Sensor {
     namespace FakeParameter {
         namespace Details {
             namespace NameLiterals {
-                using Impossible = StringLiteral<decltype("A Truth Saying Donal Trump"_ToString)>;
+                using Impossible = StringLiteral<decltype("A Truth Saying Politician"_ToString)>;
             }
 
             template<typename N, typename T, typename V>

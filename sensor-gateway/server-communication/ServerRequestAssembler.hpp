@@ -18,20 +18,22 @@
 #define SENSORGATEWAY_SENSORREQUESTASSEMBLER_HPP
 
 #include "ServerRequest.hpp"
+#include "RequestHandlingErrorFactory.h"
 
 namespace Assemble {
     namespace ServerRequest {
 
-        template<class AvailableParameters>
-        auto getParameterValue(std::string const& parameterName) {
-            AvailableParameters availableParameters;
-            auto parameterAvailable = availableParameters.isAvailable(parameterName);
-            if(!parameterAvailable) {
-                return false;
+        template<class Parameters>
+        void ensureParameterIsAvailable(std::string const& parameterName) {
+            Parameters parameters;
+            auto parameterAvailable = parameters.isAvailable(parameterName);
+            if (!parameterAvailable) {
+                ErrorHandling::throwRequestHandlingError(
+                        ErrorHandling::INVALID_PARAMETER_NAME,
+                        ErrorHandling::Origin::SERVER_REQUEST_HANDLING_PARAMETER,
+                        "Parameter is not available");
             }
-            return true;
         }
-
     }
 }
 

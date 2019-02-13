@@ -36,9 +36,14 @@ namespace CustomType {
 
     template<char... elements>
     struct StringLiteral<StringType<elements...>> {
-        char const* toString() const {
+        static char const* toString_internals() {
             static constexpr char stringValue[sizeof...(elements) + 1] = {elements..., '\0'};
             return stringValue;
+        }
+
+        static std::string const& toString() {
+            static std::string const string = toString_internals();
+            return string;
         }
     };
 }

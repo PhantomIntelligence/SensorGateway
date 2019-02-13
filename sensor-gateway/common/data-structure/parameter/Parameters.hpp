@@ -44,9 +44,9 @@ namespace Sensor {
                 uint8_t PARAMETER_VALUE_LENGTH_IN_BITS
         >
         struct SensorParameterDefinition {
-            static typename GatewayParameterDefinition::Name const name;
+            using Name = typename GatewayParameterDefinition::Name;
             using ValueType = typename GatewayParameterDefinition::ValueType;
-            static typename GatewayParameterDefinition::Unit const unit;
+            using Unit = typename GatewayParameterDefinition::Unit;
             static Byte const sensorInternalCommand = SENSOR_INTERNAL_COMMAND;
             static Byte const sensorInternalAddress = SENSOR_INTERNAL_ADDRESS;
             static uint8_t const sensorInternalTotalLengthInBits = SENSOR_INTERNAL_TOTAL_LENGTH_IN_BITS;
@@ -60,35 +60,30 @@ namespace Sensor {
         protected:
 
             using Definition = SensorParameterDefinition;
+            using Name = typename Definition::Name;
+            using Unit = typename Definition::Unit;
 
         public:
 
-            explicit Parameter() :
-                    name(Definition::name.toString()),
-                    value(),
-                    unit(Definition::unit.toString()) {};
+            explicit Parameter()
+//                   : value()
+            {};
 
-            constexpr bool nameEquals(std::string const& otherName) const {
-                return name == otherName;
+            static constexpr bool nameEquals(std::string const& otherName) {
+                return getStringifiedName() == otherName;
             };
 
-            constexpr std::string const& getStringifiedName() const noexcept {
-                return name;
+            static constexpr std::string const& getStringifiedName() noexcept {
+                return Name::toString();
             }
 
-            constexpr std::string const& getStringifiedUnit() const noexcept {
-                return unit;
-            }
-
-            static constexpr auto extractNameDefinition(Parameter current) noexcept {
-                return Definition::name;
+            static constexpr std::string const& getStringifiedUnit() noexcept {
+                return Unit::toString();
             }
 
         private:
 
-            std::string const name;
-            typename Definition::ValueType const value;
-            std::string const unit;
+//            typename Definition::ValueType const value;
         };
 
 
@@ -106,7 +101,7 @@ namespace Sensor {
             constexpr auto isAvailable(std::string const& parameterName) {
                 auto names = getNames();
                 bool containsParameterWithName = false;
-                for(size_t i = 0; i < NUMBER_OF_AVAILABLE_PARAMETERS && !containsParameterWithName; ++i) {
+                for (size_t i = 0; i < NUMBER_OF_AVAILABLE_PARAMETERS && !containsParameterWithName; ++i) {
                     containsParameterWithName = containsParameterWithName || names[i] == parameterName;
                 }
 

@@ -34,6 +34,8 @@ namespace ErrorHandling {
         std::string const SERVER_COMMUNICATOR_CLOSE_CONNECTION = "close server connection";
         std::string const SERVER_COMMUNICATOR_SEND_MESSAGE = "send message";
         std::string const SERVER_COMMUNICATOR_SEND_RAWDATA = "send rawdata";
+
+        std::string const SERVER_REQUEST_HANDLING_PARAMETER = "sensor parameter value";
     }
 
     namespace Message {
@@ -100,7 +102,19 @@ namespace ErrorHandling {
         UNRECOGNIZED_GUARDIAN_MESSAGE_ID = 10300,
         CANNOT_FIND_GUARDIAN_LIBUSB_DEVICE = 10305,
 
-    };
-}
 
+        // 20000-20099 Server Communication error code
+
+
+        // 20100-20199 Request Handling error code
+
+        BAD_REQUEST = 20100,
+        REQUEST_NOT_SUPPORTED = 20101,
+
+        INVALID_PARAMETER_NAME = 20110,
+
+        INVALID_PARAMETER_VALUE = 20120,
+
+    };
+};
 #endif //SENSORGATEWAY_ERRORCONSTANTS_H
