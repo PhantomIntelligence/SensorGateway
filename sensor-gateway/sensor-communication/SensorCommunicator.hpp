@@ -63,7 +63,7 @@ namespace SensorAccessLinkElement {
 
         void start() {
             openConnection();
-            std::this_thread::yield();
+            yield();
             communicatorThread = JoinableThread(&SensorCommunicator::run, this);
         };
 

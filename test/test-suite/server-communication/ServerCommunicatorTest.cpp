@@ -92,8 +92,9 @@ TEST_F(ServerCommunicatorTest, given__when_connect_then_callsOpenConnectionInStr
     ServerCommunicator serverCommunicator(&mockStrategy);
 
     serverCommunicator.openConnection(SERVER_ADDRESS);
-
     auto strategyHasBeenCalled = mockStrategy.hasOpenConnectionBeenCalled();
+    serverCommunicator.terminateAndJoin();
+
     ASSERT_TRUE(strategyHasBeenCalled);
 }
 
@@ -164,11 +165,11 @@ TEST_F(ServerCommunicatorTest, given_aRawDataCycleToSend_when_consume_then_calls
     ASSERT_EQ(copy, receivedRawData);
 }
 
-TEST_F(ServerCommunicatorTest, given__when_disconnect_then_callsCloseConnectionInStrategy) {
+TEST_F(ServerCommunicatorTest, given__when_terminateAndJoin_then_callsCloseConnectionInStrategy) {
     MockServerCommunicatorStrategy mockStrategy;
     ServerCommunicator serverCommunicator(&mockStrategy);
 
-    serverCommunicator.closeConnection();
+    serverCommunicator.terminateAndJoin();
 
     auto strategyHasBeenCalled = mockStrategy.hasCloseConnectionBeenCalled();
     ASSERT_TRUE(strategyHasBeenCalled);
@@ -184,6 +185,7 @@ TEST_F(ServerCommunicatorTest,
     throwingMockStrategy.waitUntilCloseConnectionCallIsMadeAfterErrorIsThrown();
 
     auto closeConnectionCalled = throwingMockStrategy.hasCloseConnectionBeenCalledAfterThrowingFunction();
+    serverCommunicator.terminateAndJoin();
 
     ASSERT_TRUE(closeConnectionCalled);
 }
@@ -198,6 +200,7 @@ TEST_F(ServerCommunicatorTest,
     throwingMockStrategy.waitUntilOpenConnectionCallIsMadeAfterErrorIsThrown();
 
     auto openConnectionCalled = throwingMockStrategy.hasOpenConnectionBeenCalledAfterThrowingFunction();
+    serverCommunicator.terminateAndJoin();
 
     ASSERT_TRUE(openConnectionCalled);
 }
@@ -208,7 +211,7 @@ TEST_F(ServerCommunicatorTest,
     throwingMockStrategy.throwCloseConnectionRequiredErrorWhenCloseConnectionIsCalled();
 
     ServerCommunicator serverCommunicator(&throwingMockStrategy);
-    serverCommunicator.closeConnection();
+    serverCommunicator.terminateAndJoin();
     throwingMockStrategy.waitUntilCloseConnectionCallIsMadeAfterErrorIsThrown();
 
     auto closeConnectionCalled = throwingMockStrategy.hasCloseConnectionBeenCalledAfterThrowingFunction();
@@ -222,7 +225,7 @@ TEST_F(ServerCommunicatorTest,
     throwingMockStrategy.throwOpenConnectionRequiredErrorWhenCloseConnectionIsCalled();
 
     ServerCommunicator serverCommunicator(&throwingMockStrategy);
-    serverCommunicator.closeConnection();
+    serverCommunicator.terminateAndJoin();
     throwingMockStrategy.waitUntilOpenConnectionCallIsMadeAfterErrorIsThrown();
 
     auto openConnectionCalled = throwingMockStrategy.hasOpenConnectionBeenCalledAfterThrowingFunction();
@@ -327,7 +330,7 @@ TEST_F(ServerCommunicatorTest,
 
     serverCommunicator.linkConsumer(&scheduler);
 
-    serverCommunicator.closeConnection();
+    serverCommunicator.terminateAndJoin();
     sink.waitConsumptionToBeReached();
 
     scheduler.terminateAndJoin();
@@ -336,7 +339,7 @@ TEST_F(ServerCommunicatorTest,
 }
 
 TEST_F(ServerCommunicatorTest,
-       given_aStrategyThrowingErrorOnFetchMessagesCall_when_errorIsCaught_then_producesTheErrorWithCorrectOrigin) {
+       given_aStrategyThrowingErrorOnSendMessagesCall_when_errorIsCaught_then_producesTheErrorWithCorrectOrigin) {
     ThrowingServerCommunicationStrategy throwingMockStrategy;
     throwingMockStrategy.throwErrorWhenSendMessageIsCalled();
     Error expectedError = throwingMockStrategy.expectedErrorWhenSendMessageIsCalled();
@@ -359,7 +362,7 @@ TEST_F(ServerCommunicatorTest,
 }
 
 TEST_F(ServerCommunicatorTest,
-       given_aStrategyThrowingErrorOnFetchRawDataCyclesCall_when_errorIsCaught_then_producesTheErrorWithCorrectOrigin) {
+       given_aStrategyThrowingErrorOnSendRawDataCyclesCall_when_errorIsCaught_then_producesTheErrorWithCorrectOrigin) {
     ThrowingServerCommunicationStrategy throwingMockStrategy;
     throwingMockStrategy.throwErrorWhenSendRawDataIsCalled();
     Error expectedError = throwingMockStrategy.expectedErrorWhenSendRawDataIsCalled();
@@ -403,9 +406,23 @@ TEST_F(ServerCommunicatorTest,
     } while (!strategyHasBeenCalled);
 
     auto serverConnected = serverCommunicator.isServerConnected();
+    serverCommunicator.terminateAndJoin();
 
     ASSERT_TRUE(serverConnected);
 }
+
+TEST_F(ServerCommunicatorTest, given_anOpennedConnection_when_terminateAndJoin_then_serverIsNoLonguerConnected) {
+    MockServerCommunicatorStrategy mockStrategy;
+    ServerCommunicator serverCommunicator(&mockStrategy);
+
+    serverCommunicator.openConnection(SERVER_ADDRESS);
+    serverCommunicator.terminateAndJoin();
+
+    auto serverConnected = serverCommunicator.isServerConnected();
+
+    ASSERT_FALSE(serverConnected);
+}
+
 
 TEST_F(ServerCommunicatorTest,
        given_aThrowingStrategyOnConnection_when_isServerConnected_then_returnFalseAfterStrategyHasBeenCalled) {
@@ -417,21 +434,24 @@ TEST_F(ServerCommunicatorTest,
     throwingMockStrategy.waitUntilOpenConnectionCallIsMadeAfterErrorIsThrown();
 
     auto serverConnected = serverCommunicator.isServerConnected();
+    serverCommunicator.terminateAndJoin();
 
     ASSERT_FALSE(serverConnected);
 }
 
-TEST_F(ServerCommunicatorTest, given_aConnectedServer_when__then_callsFetchGetParameterValueContentsInStrategy) {
+TEST_F(ServerCommunicatorTest,
+       given_aConnectedServer_when_openConnection_then_callsFetchGetParameterValueContentsInStrategy) {
     MockServerCommunicatorStrategy mockStrategy;
     ServerCommunicator serverCommunicator(&mockStrategy);
 
-//    sensorCommunicator.start();
-//
-//    mockStrategy.waitUntilFetchMessagesIsCalled();
-//
-//    auto fetchMessagesCalled = mockStrategy.hasFetchMessagesBeenCalled();
-//    sensorCommunicator.terminateAndJoin();
-//    ASSERT_TRUE(fetchMessagesCalled);
+    serverCommunicator.openConnection(SERVER_ADDRESS);
+
+    mockStrategy.waitUntilFetchGetParameterValueContentsIsCalled();
+
+    serverCommunicator.terminateAndJoin();
+
+    auto fetchGetParameterValueContentsBeenCalled = mockStrategy.hasFetchGetParameterValueContentsBeenCalled();
+    ASSERT_TRUE(fetchGetParameterValueContentsBeenCalled);
 }
 
 #endif //SENSORGATEWAY_SERVERCOMMUNICATORTEST_CPP

@@ -99,7 +99,7 @@ namespace SensorGateway {
             translatorRawDataScheduler.terminateAndJoin();
             serverCommunicatorMessageScheduler.terminateAndJoin();
             serverCommunicatorRawDataScheduler.terminateAndJoin();
-            serverCommunicator.closeConnection();
+            serverCommunicator.terminateAndJoin();
 
             errorScheduler.terminateAndJoin();
         }

@@ -89,7 +89,6 @@ namespace HighIntegrity {
     inline void HighIntegrityThread<ThreadExecutionType::JOIN>::joinOrDetach() {
         hi_thread.join();
     }
-
 }
 
 #endif //SENSORGATEWAY_HIGHINTEGRITYTHREAD_H

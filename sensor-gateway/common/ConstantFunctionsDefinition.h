@@ -44,6 +44,15 @@ namespace {
         return std::chrono::duration_cast<DurationInNanoseconds>(duration);
     }
 
+    inline void yield() {
+        std::this_thread::yield();
+    }
+
+    inline void sleepForTenthOfASecond() {
+        using namespace std::literals::chrono_literals;
+        std::this_thread::sleep_for(100ms);
+    }
+
     /**
       * @warning Allows to start the various JoinableThreads in the constructors without blocking anything
       */

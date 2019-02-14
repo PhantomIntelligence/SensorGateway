@@ -14,8 +14,8 @@
 	limitations under the License.
 */
 
-#ifndef SERVERGATEWAY_ARBITRARYDATASERVERCOMMUNICATIONSTRATEGYMOCK_HPP
-#define SERVERGATEWAY_ARBITRARYDATASERVERCOMMUNICATIONSTRATEGYMOCK_HPP
+#ifndef SERVERGATEWAY_CATCHINGSERVERCOMMUNICATIONSTRATEGYMOCK_HPP
+#define SERVERGATEWAY_CATCHINGSERVERCOMMUNICATIONSTRATEGYMOCK_HPP
 
 #include "sensor-gateway/server-communication/ServerCommunicationStrategy.hpp"
 
@@ -68,7 +68,7 @@ namespace Mock {
             }
 
             // WARNING! This mock implementation of fetchGetParameterValueContents needs to be slowed down because the way gtest works. DO NOT REMOVE.
-            std::this_thread::yield();
+            yield();
 
             GetParameterValueContent getParameterValueContent;
             GetParameterValueContents getParameterValueContents = {getParameterValueContent};
@@ -91,6 +91,10 @@ namespace Mock {
 
         bool hasOpenConnectionBeenCalled() const {
             return openConnectionCalled.load();
+        }
+
+        bool hasFetchGetParameterValueContentsBeenCalled() const {
+            return fetchGetParameterValueContentsCalled.load();
         }
 
         bool hasSendMessageBeenCalled() const {
@@ -177,4 +181,4 @@ namespace Mock {
     };
 }
 
-#endif //SERVERGATEWAY_ARBITRARYDATASERVERCOMMUNICATIONSTRATEGYMOCK_HPP
+#endif //SERVERGATEWAY_CATCHINGSERVERCOMMUNICATIONSTRATEGYMOCK_HPP

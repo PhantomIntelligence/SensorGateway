@@ -201,7 +201,7 @@ namespace Mock {
                     throw errorToThrow;
                 }
             }
-            GetParameterValueContents getParameterValueContents;
+            GetParameterValueContents getParameterValueContents{{" "}};
             return getParameterValueContents;
         }
 

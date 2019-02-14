@@ -23,7 +23,6 @@
 
 namespace SensorAccessLinkElement {
 
-    // TODO: use parameter pack expansion to create an automatic {sink, consume, format} function addition for a list of type for the GatewayProtocol
     template<class T>
     class ServerCommunicator : public DataFlow::DataSink<typename T::Message>,
                                public DataFlow::DataSink<typename T::RawData>,
@@ -46,7 +45,9 @@ namespace SensorAccessLinkElement {
 
         explicit ServerCommunicator(ServerCommunicationStrategy* serverCommunicationStrategy) :
                 serverCommunicationStrategy(serverCommunicationStrategy),
-                serverConnected(false) {
+                serverConnected(false), // TODO: add logic not to send anything untill server is connected
+                terminateOrderReceived(false),
+                requestReceptionThread(JoinableThread(doNothing)) {
         };
 
         ~ServerCommunicator() noexcept = default;
@@ -64,6 +65,8 @@ namespace SensorAccessLinkElement {
             try {
                 serverCommunicationStrategy->openConnection(serverAddress);
                 serverConnected.store(true);
+                yield();
+                requestReceptionThread = JoinableThread(&ServerCommunicator::run, this);
             } catch (ErrorHandling::SensorAccessLinkError& strategyError) {
                 addOriginAndHandleError(std::move(strategyError),
                                         ErrorHandling::Origin::SERVER_COMMUNICATOR_OPEN_CONNECTION);
@@ -89,22 +92,40 @@ namespace SensorAccessLinkElement {
             }
         }
 
+        // TODO : add logic to handle behaviors when server is not connected
+        bool const isServerConnected() const noexcept {
+            return serverConnected.load();
+        }
+
+        void terminateAndJoin() {
+            closeConnection();
+            if (!terminateOrderHasBeenReceived()) {
+                terminateOrderReceived.store(true);
+            }
+            requestReceptionThread.exitSafely();
+        };
+
+        using ErrorSource::linkConsumer;
+
+    private:
+
+        void run() {
+            while (!terminateOrderHasBeenReceived()) {
+                serverCommunicationStrategy->fetchGetParameterValueContents();
+                sleepForTenthOfASecond();
+                yield();
+            }
+        }
+
         void closeConnection() {
             try {
                 serverCommunicationStrategy->closeConnection();
+                serverConnected.store(false);
             } catch (ErrorHandling::SensorAccessLinkError& strategyError) {
                 addOriginAndHandleError(std::move(strategyError),
                                         ErrorHandling::Origin::SERVER_COMMUNICATOR_CLOSE_CONNECTION);
             }
         }
-
-        bool const isServerConnected() const noexcept {
-            return serverConnected.load();
-        }
-
-        using ErrorSource::linkConsumer;
-
-    private:
 
         void addOriginAndHandleError(ErrorHandling::SensorAccessLinkError&& error, std::string const& originToAdd) {
             auto originAddedError = ErrorHandling::SensorAccessLinkError(
@@ -127,10 +148,18 @@ namespace SensorAccessLinkElement {
             }
         }
 
+        bool terminateOrderHasBeenReceived() const {
+            return terminateOrderReceived.load();
+        }
+
+        JoinableThread requestReceptionThread;
+
+        AtomicFlag serverConnected;
+        AtomicFlag terminateOrderReceived;
+
         ServerCommunicationStrategy* serverCommunicationStrategy;
         std::string serverAddress;
 
-        AtomicFlag serverConnected;
     };
 }
 
