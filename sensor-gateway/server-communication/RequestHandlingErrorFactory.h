@@ -28,24 +28,20 @@ namespace ErrorHandling {
         static std::string const REQUEST_HANDLING_NAME = "Request Handling";
 
         std::string origin = REQUEST_HANDLING_NAME + Message::SEPARATOR + callOrigin;
-        Category category;
+        Category category = COMMUNICATION_ERROR;
         Severity severity;
         std::string errorMessage;
         if (errorCode == BAD_REQUEST) {
-            category = COMMUNICATION_ERROR;
             severity = ERROR;
         } else if (errorCode == REQUEST_NOT_SUPPORTED) {
-            category = UNHANDLED_ERROR;
             severity = ERROR;
         } else if (errorCode == INVALID_PARAMETER_NAME) {
-            category = UNHANDLED_ERROR;
             severity = WARNING;
         } else if (errorCode == INVALID_PARAMETER_VALUE) {
-            category = EXTERNAL_ERROR;
             severity = INFO;
         } else {
             category = UNRECOGNIZED_ERROR;
-            severity = CRITICAL;
+            severity = EMERGENCY;
             errorMessage = "Error unknown for " + REQUEST_HANDLING_NAME;
         }
         throw SensorAccessLinkError(origin, category, severity, errorCode, errorMessage);

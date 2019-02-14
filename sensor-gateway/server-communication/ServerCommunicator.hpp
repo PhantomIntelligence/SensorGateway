@@ -111,7 +111,7 @@ namespace SensorAccessLinkElement {
 
         void run() {
             while (!terminateOrderHasBeenReceived()) {
-                serverCommunicationStrategy->fetchGetParameterValueContents();
+                handleIncomingGetParameterValueRequests();
                 sleepForTenthOfASecond();
                 yield();
             }
@@ -125,6 +125,27 @@ namespace SensorAccessLinkElement {
                 addOriginAndHandleError(std::move(strategyError),
                                         ErrorHandling::Origin::SERVER_COMMUNICATOR_CLOSE_CONNECTION);
             }
+        }
+
+        void handleIncomingGetParameterValueRequests() {
+            using GetParameterValueContents = typename ServerCommunicationStrategy::GetParameterValueContents;
+            GetParameterValueContents getParameterValueContents;
+            try {
+                getParameterValueContents = serverCommunicationStrategy->fetchGetParameterValueContents();
+            } catch (ErrorHandling::SensorAccessLinkError& strategyError) {
+                addOriginAndHandleError(std::move(strategyError),
+                                        ErrorHandling::Origin::SERVER_COMMUNICATOR_FETCH_GET_PARAMETER_VALUE);
+            }
+
+            // TODO : Validate request is allowed --> throw if not
+            // TODO : Assemble Request
+            // TODO : Pass to RequestHandler
+//            for (auto messageIndex = 0; messageIndex < messages.size(); ++messageIndex) {
+//                auto message = messages[messageIndex];
+//                if (message != DEFAULT_MESSAGE) {
+//                    MessageSource::produce(std::move(message));
+//                }
+//            }
         }
 
         void addOriginAndHandleError(ErrorHandling::SensorAccessLinkError&& error, std::string const& originToAdd) {

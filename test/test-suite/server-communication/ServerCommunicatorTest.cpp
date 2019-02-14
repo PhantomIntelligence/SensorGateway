@@ -34,7 +34,6 @@ class ServerCommunicatorTest : public ::testing::Test {
 
 public:
 
-//    using <Sensor::Test::Simple::Structures>;
     using Error = ErrorHandling::SensorAccessLinkError;
     using ErrorSinkMock = Mock::ArbitraryDataSinkMock<Error>;
     using ErrorProcessingScheduler = DataFlow::DataProcessingScheduler<Error, ErrorSinkMock, 1>;
@@ -452,6 +451,29 @@ TEST_F(ServerCommunicatorTest,
 
     auto fetchGetParameterValueContentsBeenCalled = mockStrategy.hasFetchGetParameterValueContentsBeenCalled();
     ASSERT_TRUE(fetchGetParameterValueContentsBeenCalled);
+}
+
+TEST_F(ServerCommunicatorTest,
+       given_aStrategyThrowingErrorOnFetchGetParameterValueContentsCall_when_errorIsCaught_then_producesTheErrorWithCorrectOrigin) {
+    ThrowingServerCommunicationStrategy throwingMockStrategy;
+    throwingMockStrategy.throwErrorWhenFetchGetParameterValueContentsIsCalled();
+    Error expectedError = throwingMockStrategy.expectedErrorWhenFetchGetParameterValueContentsIsCalled();
+    expectedError = formatStrategyErrorWithCorrectOrigin(expectedError,
+                                                         ErrorHandling::Origin::SERVER_COMMUNICATOR_FETCH_GET_PARAMETER_VALUE);
+    auto numberOfErrorToReceive = 1;
+    ErrorSinkMock sink(numberOfErrorToReceive);
+    ErrorProcessingScheduler scheduler(&sink);
+    ServerCommunicator serverCommunicator(&throwingMockStrategy);
+
+    serverCommunicator.linkConsumer(&scheduler);
+
+    serverCommunicator.openConnection(SERVER_ADDRESS);
+    sink.waitConsumptionToBeReached();
+
+    serverCommunicator.terminateAndJoin();
+    scheduler.terminateAndJoin();
+
+    ASSERT_TRUE(expectedErrorHasBeenThrown(&sink, expectedError));
 }
 
 #endif //SENSORGATEWAY_SERVERCOMMUNICATORTEST_CPP

@@ -315,6 +315,7 @@ protected:
         }
     }
 
+//    template<typename Communicator, typename Strategy>
     ::testing::AssertionResult expectedErrorGetsPublishedAfterThrow(
             ThrowingSensorCommunicationStrategyMock* throwingStrategy,
             ErrorHandling::SensorAccessLinkError&& expectedError) {

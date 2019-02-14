@@ -32,6 +32,7 @@ namespace ErrorHandling {
 
         std::string const SERVER_COMMUNICATOR_OPEN_CONNECTION = "open server connection";
         std::string const SERVER_COMMUNICATOR_CLOSE_CONNECTION = "close server connection";
+        std::string const SERVER_COMMUNICATOR_FETCH_GET_PARAMETER_VALUE = "fetch get parameter value content for requests";
         std::string const SERVER_COMMUNICATOR_SEND_MESSAGE = "send message";
         std::string const SERVER_COMMUNICATOR_SEND_RAWDATA = "send rawdata";
 
