@@ -3,7 +3,7 @@
 
 #include <gtest/gtest.h>
 #include <gmock/gmock-generated-matchers.h>
-#include "sensor-gateway/common/data-structure/parameter/ParameterConstants.hpp"
+#include "test/utilities/data-model/FakeParameterConstants.hpp"
 
 class ParametersTest : public ::testing::Test {
 
@@ -115,4 +115,27 @@ TEST_F(ParametersTest,
     ASSERT_THAT(secondActualUnit, testing::StrEq(secondExpectedUnit));
 }
 
+TEST_F(ParametersTest, given_someParametersAndTheNameOfOneOfThem_when_isAvailable_then_returnsTrue) {
+
+    using Apple = Sensor::FakeParameter::Apple;
+    Sensor::FakeParameter::FruitBasketParameters fruitBasketParameters;
+    Apple apple;
+
+    std::string const appleName = apple.getStringifiedName();
+    auto isParameterAvailable = fruitBasketParameters.isAvailable(appleName);
+
+    ASSERT_TRUE(isParameterAvailable);
+}
+
+TEST_F(ParametersTest, given_someParametersAndTheOneNameNotInThem_when_isAvailable_then_returnsFalse) {
+
+    using Carrot = Sensor::FakeParameter::Carrot;
+    Sensor::FakeParameter::FruitBasketParameters fruitBasketParameters;
+    Carrot carrot;
+
+    std::string const carrotName = carrot.getStringifiedName();
+    auto isParameterAvailable = fruitBasketParameters.isAvailable(carrotName);
+
+    ASSERT_FALSE(isParameterAvailable);
+}
 #endif //SENSORGATEWAY_PARAMETERSTEST_H

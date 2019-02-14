@@ -48,7 +48,7 @@ namespace Sensor {
     namespace Gateway {
 
         namespace Details {
-            using NoParameterDefinition = SensorParameterDefinition<
+            using NoParameter = Gateway::Parameter<SensorParameterDefinition<
                     GatewayParameterDefinition<Sensor::Parameter::Names::InvalidName,
                             Sensor::Parameter::Types::Boolean,
                             Sensor::Parameter::Units::not_applicable>,
@@ -57,9 +57,9 @@ namespace Sensor {
                     0x0,
                     0x0,
                     0x0
-            >;
+            >>;
         }
-        using NoGatewayParametersDefinition = Gateway::Parameters<Details::NoParameterDefinition>;
+        using NoGatewayParameters = Gateway::Parameters<Details::NoParameter>;
 
         using PulseWidthDefinition = GatewayParameterDefinition<
                 Sensor::Parameter::Names::PulseWidth,

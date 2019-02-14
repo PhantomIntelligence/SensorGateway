@@ -45,7 +45,6 @@ namespace RequestHandlerTestMock {
 
     protected:
 
-
         using super = DataTranslator;
 
         using super::SensorControlMessage;

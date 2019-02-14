@@ -38,13 +38,15 @@ namespace SensorAccessLinkElement {
 
         using MessageSink = DataFlow::DataSink<Message>;
         using RawDataSink = DataFlow::DataSink<RawData>;
+        using Parameters = typename T::Parameters;
 
         using ErrorSource = DataFlow::DataSource<ErrorHandling::SensorAccessLinkError>;
 
     public:
 
         explicit ServerCommunicator(ServerCommunicationStrategy* serverCommunicationStrategy) :
-                serverCommunicationStrategy(serverCommunicationStrategy) {
+                serverCommunicationStrategy(serverCommunicationStrategy),
+                serverConnected(false) {
         };
 
         ~ServerCommunicator() noexcept = default;
@@ -61,6 +63,7 @@ namespace SensorAccessLinkElement {
             this->serverAddress = serverAddress;
             try {
                 serverCommunicationStrategy->openConnection(serverAddress);
+                serverConnected.store(true);
             } catch (ErrorHandling::SensorAccessLinkError& strategyError) {
                 addOriginAndHandleError(std::move(strategyError),
                                         ErrorHandling::Origin::SERVER_COMMUNICATOR_OPEN_CONNECTION);
@@ -95,6 +98,10 @@ namespace SensorAccessLinkElement {
             }
         }
 
+        bool const isServerConnected() const noexcept {
+            return serverConnected.load();
+        }
+
         using ErrorSource::linkConsumer;
 
     private:
@@ -122,6 +129,8 @@ namespace SensorAccessLinkElement {
 
         ServerCommunicationStrategy* serverCommunicationStrategy;
         std::string serverAddress;
+
+        AtomicFlag serverConnected;
     };
 }
 

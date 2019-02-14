@@ -29,11 +29,16 @@ namespace ServerCommunication {
         using Message = typename T::Message;
         using RawData = typename T::RawData;
 
+        using GetParameterValueContent = std::string;
+        using GetParameterValueContents = std::array<GetParameterValueContent, T::MAX_NUMBER_OF_CONCURRENT_REQUEST_OF_ONE_KIND>;
+
+        using SetParameterValueBooleanContent = typename std::pair<GetParameterValueContent, bool>;
+
         virtual ~ServerCommunicationStrategy() noexcept = default;
 
         virtual void openConnection(std::string const& serverAddress) = 0;
 
-        virtual void fetchSensorRequests() = 0;
+        virtual GetParameterValueContents fetchGetParameterValueContents() = 0;
 
         virtual void sendMessage(Message&& message) = 0;
 

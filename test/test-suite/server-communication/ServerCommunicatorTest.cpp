@@ -1,5 +1,5 @@
 /**
-	Copyright 2014-2018 Phantom Intelligence Inc.
+	Copyright 2014-2019 Phantom Intelligence Inc.
 
 	Licensed under the Apache License, Version 2.0 (the "License");
 	you may not use this file except in compliance with the License.
@@ -24,101 +24,24 @@
 #include "sensor-gateway/server-communication/ServerCommunicator.hpp"
 #include "test/utilities/data-model/DataModelFixture.h"
 #include "test/utilities/mock/ArbitraryDataSinkMock.hpp"
+#include "test/utilities/mock/CatchingServerCommunicationStrategyMock.hpp"
 #include "test/utilities/mock/ErrorThrowingServerCommunicationStrategyMock.hpp"
 #include "test/utilities/assertion/TimeAssertion.hpp"
 
 using TestFunctions::DataTestUtil;
 
-namespace ServerCommunicatorTestMock {
-
-    using ServerCommunication::ServerCommunicationStrategy;
-
-    class MockServerCommunicatorStrategy : public ServerCommunicationStrategy<Sensor::Test::Simple::Structures> {
-
-    protected:
-
-        using super = ServerCommunicationStrategy<Sensor::Test::Simple::Structures>;
-
-        using super::Message;
-        using super::RawData;
-
-    public:
-
-        MockServerCommunicatorStrategy() :
-                openConnectionCalled(false),
-                sendMessageCalled(false),
-                sendRawDataCalled(false),
-                closeConnectionCalled(false),
-                sentMessage(Message::returnDefaultData()),
-                sentRawData(RawData::returnDefaultData()) {
-
-        }
-
-        ~MockServerCommunicatorStrategy() noexcept override = default;
-
-        void fetchSensorRequests() override {};
-
-        void sendMessage(Message&& message) override {
-            sendMessageCalled.store(true);
-            sentMessage = message;
-        }
-
-        void sendRawData(RawData&& rawData) override {
-            sendRawDataCalled.store(true);
-            sentRawData = rawData;
-        }
-
-        void openConnection(std::string const& serverAddress) override {
-            openConnectionCalled.store(true);
-        }
-
-        void closeConnection() override {
-            closeConnectionCalled.store(true);
-        }
-
-        bool hasOpenConnectionBeenCalled() const {
-            return openConnectionCalled.load();
-        }
-
-        bool hasCloseConnectionBeenCalled() const {
-            return closeConnectionCalled.load();
-        }
-
-        bool hasSendMessageBeenCalled() const {
-            return sendMessageCalled.load();
-        }
-
-        bool hasSendRawDataBeenCalled() const {
-            return sendRawDataCalled.load();
-        }
-
-        Message getSentMessage() const {
-            return sentMessage;
-        }
-
-        RawData getSentRawData() const {
-            return sentRawData;
-        }
-
-
-        AtomicFlag openConnectionCalled;
-        AtomicFlag sendMessageCalled;
-        AtomicFlag sendRawDataCalled;
-        AtomicFlag closeConnectionCalled;
-
-    protected:
-
-        Message sentMessage;
-        RawData sentRawData;
-    };
-}
-
 class ServerCommunicatorTest : public ::testing::Test {
+
 public:
+
+//    using <Sensor::Test::Simple::Structures>;
     using Error = ErrorHandling::SensorAccessLinkError;
     using ErrorSinkMock = Mock::ArbitraryDataSinkMock<Error>;
     using ErrorProcessingScheduler = DataFlow::DataProcessingScheduler<Error, ErrorSinkMock, 1>;
-    using ThrowingServerCommunicationStrategy = Mock::ErrorThrowingServerCommunicationStrategyMock<Sensor::Test::Simple::Structures>;
+
+    using DataStructures = Sensor::Test::Simple::Structures;
+    using MockServerCommunicatorStrategy = Mock::CatchingServerCommunicationStrategyMock<DataStructures>;
+    using ThrowingServerCommunicationStrategy = Mock::ErrorThrowingServerCommunicationStrategyMock<DataStructures>;
 
 protected:
 
@@ -165,7 +88,7 @@ protected:
 };
 
 TEST_F(ServerCommunicatorTest, given__when_connect_then_callsOpenConnectionInStrategy) {
-    ServerCommunicatorTestMock::MockServerCommunicatorStrategy mockStrategy;
+    MockServerCommunicatorStrategy mockStrategy;
     ServerCommunicator serverCommunicator(&mockStrategy);
 
     serverCommunicator.openConnection(SERVER_ADDRESS);
@@ -175,7 +98,7 @@ TEST_F(ServerCommunicatorTest, given__when_connect_then_callsOpenConnectionInStr
 }
 
 TEST_F(ServerCommunicatorTest, given_aMessageToSend_when_consume_then_callsSendMessageInStrategy) {
-    ServerCommunicatorTestMock::MockServerCommunicatorStrategy mockStrategy;
+    MockServerCommunicatorStrategy mockStrategy;
     ServerCommunicator serverCommunicator(&mockStrategy);
     auto message = DataTestUtil::createRandomSimpleMessageWithEmptyTimestamps();
 
@@ -186,14 +109,13 @@ TEST_F(ServerCommunicatorTest, given_aMessageToSend_when_consume_then_callsSendM
 }
 
 TEST_F(ServerCommunicatorTest, given_aMessageToSend_when_consume_then_callsSendMessageInStrategyWithTheMessage) {
-    ServerCommunicatorTestMock::MockServerCommunicatorStrategy mockStrategy;
+    MockServerCommunicatorStrategy mockStrategy;
     ServerCommunicator serverCommunicator(&mockStrategy);
     auto message = DataTestUtil::createRandomSimpleMessageWithEmptyTimestamps();
     auto copy = Message(message);
 
     serverCommunicator.consume(std::move(message));
-
-    auto receivedMessage = mockStrategy.getSentMessage();
+    auto receivedMessage = mockStrategy.getFirstSentMessage();
     ASSERT_EQ(copy, receivedMessage);
 }
 
@@ -201,14 +123,14 @@ TEST_F(ServerCommunicatorTest, given_aMessageToSend_when_consume_then_callsSendM
  * @metric-test : timestamps
  */
 TEST_F(ServerCommunicatorTest, given_aMessageToSend_when_consume_then_sendsItAfterHavingTimestampedIt) {
-    ServerCommunicatorTestMock::MockServerCommunicatorStrategy mockStrategy;
+    MockServerCommunicatorStrategy mockStrategy;
     ServerCommunicator serverCommunicator(&mockStrategy);
     auto message = DataTestUtil::createRandomSimpleMessageWithEmptyTimestamps();
 
     auto now = HighResolutionClock::now();
     serverCommunicator.consume(std::move(message));
 
-    auto receivedMessage = mockStrategy.getSentMessage();
+    auto receivedMessage = mockStrategy.getFirstSentMessage();
 
     auto timePoint = receivedMessage.getGatewayTimestamps().getTimePoints()[0];
     auto timePointLocation = timePoint.location;
@@ -220,7 +142,7 @@ TEST_F(ServerCommunicatorTest, given_aMessageToSend_when_consume_then_sendsItAft
 }
 
 TEST_F(ServerCommunicatorTest, given_aRawDataCycleToSend_when_consume_then_callsSendRawDataInStrategy) {
-    ServerCommunicatorTestMock::MockServerCommunicatorStrategy mockStrategy;
+    MockServerCommunicatorStrategy mockStrategy;
     ServerCommunicator serverCommunicator(&mockStrategy);
     auto rawData = DataTestUtil::createRandomSimpleRawData();
 
@@ -231,19 +153,19 @@ TEST_F(ServerCommunicatorTest, given_aRawDataCycleToSend_when_consume_then_calls
 }
 
 TEST_F(ServerCommunicatorTest, given_aRawDataCycleToSend_when_consume_then_callsSendRawDataInStrategyWithTheRawData) {
-    ServerCommunicatorTestMock::MockServerCommunicatorStrategy mockStrategy;
+    MockServerCommunicatorStrategy mockStrategy;
     ServerCommunicator serverCommunicator(&mockStrategy);
     auto rawData = DataTestUtil::createRandomSimpleRawData();
     auto copy = RawData(rawData);
 
     serverCommunicator.consume(std::move(rawData));
 
-    auto receivedRawData = mockStrategy.getSentRawData();
+    auto receivedRawData = mockStrategy.getFirstSentRawData();
     ASSERT_EQ(copy, receivedRawData);
 }
 
 TEST_F(ServerCommunicatorTest, given__when_disconnect_then_callsCloseConnectionInStrategy) {
-    ServerCommunicatorTestMock::MockServerCommunicatorStrategy mockStrategy;
+    MockServerCommunicatorStrategy mockStrategy;
     ServerCommunicator serverCommunicator(&mockStrategy);
 
     serverCommunicator.closeConnection();
@@ -457,6 +379,59 @@ TEST_F(ServerCommunicatorTest,
     scheduler.terminateAndJoin();
 
     ASSERT_TRUE(expectedErrorHasBeenThrown(&sink, expectedError));
+}
+
+TEST_F(ServerCommunicatorTest, given__when_isServerConnected_then_returnFalse) {
+    MockServerCommunicatorStrategy mockStrategy;
+    ServerCommunicator serverCommunicator(&mockStrategy);
+
+    auto serverConnected = serverCommunicator.isServerConnected();
+
+    ASSERT_FALSE(serverConnected);
+}
+
+TEST_F(ServerCommunicatorTest,
+       given_aConnectedServer_when_isServerConnected_then_returnTrueAfterStrategyHasBeenCalled) {
+    MockServerCommunicatorStrategy mockStrategy;
+    ServerCommunicator serverCommunicator(&mockStrategy);
+
+    serverCommunicator.openConnection(SERVER_ADDRESS);
+
+    bool strategyHasBeenCalled = false;
+    do {
+        strategyHasBeenCalled = mockStrategy.hasOpenConnectionBeenCalled();
+    } while (!strategyHasBeenCalled);
+
+    auto serverConnected = serverCommunicator.isServerConnected();
+
+    ASSERT_TRUE(serverConnected);
+}
+
+TEST_F(ServerCommunicatorTest,
+       given_aThrowingStrategyOnConnection_when_isServerConnected_then_returnFalseAfterStrategyHasBeenCalled) {
+    ThrowingServerCommunicationStrategy throwingMockStrategy;
+    throwingMockStrategy.throwOpenConnectionRequiredErrorWhenOpenConnectionIsCalled();
+
+    ServerCommunicator serverCommunicator(&throwingMockStrategy);
+    serverCommunicator.openConnection(SERVER_ADDRESS);
+    throwingMockStrategy.waitUntilOpenConnectionCallIsMadeAfterErrorIsThrown();
+
+    auto serverConnected = serverCommunicator.isServerConnected();
+
+    ASSERT_FALSE(serverConnected);
+}
+
+TEST_F(ServerCommunicatorTest, given_aConnectedServer_when__then_callsFetchGetParameterValueContentsInStrategy) {
+    MockServerCommunicatorStrategy mockStrategy;
+    ServerCommunicator serverCommunicator(&mockStrategy);
+
+//    sensorCommunicator.start();
+//
+//    mockStrategy.waitUntilFetchMessagesIsCalled();
+//
+//    auto fetchMessagesCalled = mockStrategy.hasFetchMessagesBeenCalled();
+//    sensorCommunicator.terminateAndJoin();
+//    ASSERT_TRUE(fetchMessagesCalled);
 }
 
 #endif //SENSORGATEWAY_SERVERCOMMUNICATORTEST_CPP

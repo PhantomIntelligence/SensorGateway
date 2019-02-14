@@ -1,5 +1,5 @@
 /**
-	Copyright 2014-2018 Phantom Intelligence Inc.
+	Copyright 2014-2019 Phantom Intelligence Inc.
 
 	Licensed under the Apache License, Version 2.0 (the "License");
 	you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@
 #include <gtest/gtest.h>
 
 #include "sensor-gateway/application/SensorAccessLink.hpp"
+#include "test/utilities/mock/CatchingServerCommunicationStrategyMock.hpp"
 #include "test/utilities/mock/ErrorThrowingServerCommunicationStrategyMock.hpp"
 #include "test/utilities/mock/ErrorThrowingDataTranslationStrategyMock.hpp"
 #include "test/utilities/mock/ErrorThrowingSensorCommunicationStrategyMock.hpp"
@@ -208,62 +209,7 @@ namespace SensorAccessLinkTestMock {
         }
     };
 
-    using SimpleServerCommunicationStrategy = ServerCommunication::ServerCommunicationStrategy<Sensor::Test::Simple::Structures>;
-
-    class MockServerCommunicationStrategy final : public SimpleServerCommunicationStrategy {
-    protected:
-        using super = SimpleServerCommunicationStrategy;
-
-        using Messages = std::list<super::Message>;
-        using RawDataCycles = std::list<super::RawData>;
-
-    public:
-        MockServerCommunicationStrategy() :
-                openConnectionCalled(false),
-                closeConnectionCalled(false) {}
-
-        ~MockServerCommunicationStrategy() noexcept override = default;
-
-        void openConnection(std::string const& serverAddress) override {
-            openConnectionCalled.store(true);
-        }
-
-        bool hasOpenConnectionBeenCalled() const {
-            return openConnectionCalled.load();
-        }
-
-        void fetchSensorRequests() override {};
-
-        void closeConnection() override {
-            closeConnectionCalled.store(true);
-        }
-
-        bool hasCloseConnectionBeenCalled() const {
-            return closeConnectionCalled.load();
-        }
-
-        void sendMessage(super::Message&& message) override {
-            receivedMessages.push_back(message);
-        }
-
-        void sendRawData(super::RawData&& rawData) override {
-            receivedRawData.push_back(rawData);
-        }
-
-        Messages const& getReceivedMessages() const {
-            return receivedMessages;
-        }
-
-        RawDataCycles const& getReceivedRawData() const {
-            return receivedRawData;
-        }
-
-    private:
-        Messages receivedMessages;
-        RawDataCycles receivedRawData;
-        AtomicFlag openConnectionCalled;
-        AtomicFlag closeConnectionCalled;
-    };
+    using MockServerCommunicationStrategy = Mock::CatchingServerCommunicationStrategyMock<Sensor::Test::Simple::Structures>;
 }
 
 TEST_F(SensorAccessLinkTest,

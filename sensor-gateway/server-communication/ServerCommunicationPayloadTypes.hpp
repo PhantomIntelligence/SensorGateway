@@ -23,15 +23,31 @@ namespace ServerCommunication {
 
     namespace PayloadTypes {
 
-        template<typename N>
-        struct NamePayload {
-            static N const name;
-        };
+        namespace Details {
 
-        template<typename N, typename ValueType, ValueType v>
-        struct NameValuePayload {
-            static N const name;
-            static ValueType const value = v;
+            template<typename N>
+            struct NamePayload {
+                N const name;
+            };
+
+            template<typename N, typename ValueType, ValueType v>
+            struct NameValuePayload {
+                static N const name;
+                static ValueType const value = v;
+            };
+        }
+
+        struct GetParameterValuePayload : public Details::NamePayload<std::string> {
+
+        protected:
+
+            using Value = Details::NamePayload<std::string>;
+
+        public:
+
+            explicit GetParameterValuePayload(std::string const& parameterName) : value{{parameterName}} {}
+
+            Value const value;
         };
     }
 }

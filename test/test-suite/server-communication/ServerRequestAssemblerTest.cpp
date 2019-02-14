@@ -46,9 +46,12 @@ TEST_F(ServerRequestAssemblerTest,
     using Sensor::Gateway::Parameters;
     using ImpossibleParameter = Sensor::FakeParameter::Impossible;
     using ImpossibleParameters = Parameters<ImpossibleParameter>;
+
+    using Carrot = Sensor::FakeParameter::Carrot;
+    std::string const& nameNotInParameters = Carrot::getStringifiedName();
     auto hasThrownError = false;
     try {
-        Assemble::ServerRequest::ensureParameterIsAvailable<ImpossibleParameters>("test");
+        Assemble::ServerRequest::ensureParameterIsAvailable<ImpossibleParameters>(nameNotInParameters);
     } catch (ErrorHandling::SensorAccessLinkError& strategyError) {
         hasThrownError = true;
     }
@@ -63,7 +66,8 @@ TEST_F(ServerRequestAssemblerTest,
     using ImpossibleParameters = Parameters<ImpossibleParameter>;
     auto hasThrownError = false;
     try {
-        Assemble::ServerRequest::ensureParameterIsAvailable<ImpossibleParameters>(ImpossibleParameter::getStringifiedName());
+        Assemble::ServerRequest::ensureParameterIsAvailable<ImpossibleParameters>(
+                ImpossibleParameter::getStringifiedName());
     } catch (ErrorHandling::SensorAccessLinkError& strategyError) {
         hasThrownError = true;
     }

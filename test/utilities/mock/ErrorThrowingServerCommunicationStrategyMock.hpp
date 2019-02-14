@@ -29,6 +29,8 @@ namespace Mock {
 
         using super = ServerCommunication::ServerCommunicationStrategy<T>;
 
+        using GetParameterValueContents = typename super::GetParameterValueContents;
+
     public:
 
         ErrorThrowingServerCommunicationStrategyMock() :
@@ -138,6 +140,20 @@ namespace Mock {
                                                         CLOSE_ERROR_MESSAGE);
         }
 
+        void throwErrorWhenFetchGetParameterValueContentsIsCalled() noexcept {
+            throwOnFetchGetParameterValueContents.store(true);
+            errorToThrow = expectedErrorWhenFetchGetParameterValueContentsIsCalled();
+        }
+
+        ErrorHandling::SensorAccessLinkError expectedErrorWhenFetchGetParameterValueContentsIsCalled() noexcept {
+            return ErrorHandling::SensorAccessLinkError(ORIGIN,
+                                                        ErrorHandling::Category::COMMUNICATION_ERROR,
+                                                        ErrorHandling::Severity::ERROR,
+                                                        ERROR_CODE,
+                                                        FETCH_GET_PARAMETER_VALUE_CONTENT_ERROR_MESSAGE);
+        }
+
+
         void throwErrorWhenCloseConnectionIsCalled() noexcept {
             throwOnClose.store(true);
             errorToThrow = expectedErrorWhenCloseConnectionIsCalled();
@@ -170,7 +186,24 @@ namespace Mock {
             errorToThrow = expectedErrorWhenSendRawDataIsCalled();
         }
 
-        void fetchSensorRequests() override {}
+        GetParameterValueContents fetchGetParameterValueContents() override {
+            if (hasCloseConnectionBeenCalled()) {
+                // WARNING! This mock implementation of readMessage needs to be slowed down because of the way gtest works. DO NOT REMOVE.
+                std::this_thread::sleep_for(std::chrono::milliseconds(5));
+                std::this_thread::yield();
+            }
+            if (!errorThrown.load()) {
+                if (throwOnFetchGetParameterValueContents.load()) {
+                    throwOnFetchGetParameterValueContents.store(false); // We only throw once to allow the test to pass
+                    openConnectionCalled.store(false);
+                    closeConnectionCalled.store(false);
+                    errorThrown.store(true);
+                    throw errorToThrow;
+                }
+            }
+            GetParameterValueContents getParameterValueContents;
+            return getParameterValueContents;
+        }
 
         void openConnection(std::string const& serverAddress) override {
             if (throwOnOpen.load()) {
@@ -246,6 +279,7 @@ namespace Mock {
         ErrorHandling::ErrorCode const ERROR_CODE = ErrorHandling::GatewayErrorCode::EMPTY_CODE;
         std::string const OPEN_ERROR_MESSAGE = "Dust in the Wind";
         std::string const CLOSE_ERROR_MESSAGE = "By Kansas";
+        std::string const FETCH_GET_PARAMETER_VALUE_CONTENT_ERROR_MESSAGE = "  -  -  -  -  -  ";
         std::string const MESSAGE_ERROR_MESSAGE = "I close my eyes, only for a moment, and the moment's gone";
         std::string const RAW_DATA_ERROR_MESSAGE = "All my dreams pass before my eyes, a curiosity";
         std::string const MESSAGE = "Dust in the wind; All they are is dust in the wind.";
@@ -264,6 +298,7 @@ namespace Mock {
         AtomicFlag errorThrown;
         AtomicFlag throwOnOpen;
         AtomicFlag throwOnClose;
+        AtomicFlag throwOnFetchGetParameterValueContents;
         AtomicFlag throwOnSendMessage;
         AtomicFlag throwOnSendRawData;
 

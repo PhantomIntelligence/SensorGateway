@@ -24,7 +24,7 @@ namespace Assemble {
     namespace ServerRequest {
 
         template<class Parameters>
-        void ensureParameterIsAvailable(std::string const& parameterName) {
+        static void ensureParameterIsAvailable(std::string const& parameterName) {
             Parameters parameters;
             auto parameterAvailable = parameters.isAvailable(parameterName);
             if (!parameterAvailable) {
@@ -33,6 +33,19 @@ namespace Assemble {
                         ErrorHandling::Origin::SERVER_REQUEST_HANDLING_PARAMETER,
                         "Parameter is not available");
             }
+        }
+
+        /**
+         * @note This is not tested by purpose, it is essentially a Factory.
+         * @param parameterName
+         * @return
+         */
+        static auto getParameterValueRequest(std::string const& parameterName) {
+            using Payload = ServerCommunication::PayloadTypes::GetParameterValuePayload;
+            using GetParameterValueRequest = ServerCommunication::ServerRequest<Payload>;
+            Payload payload(parameterName);
+            GetParameterValueRequest request(payload);
+            return request;
         }
     }
 }

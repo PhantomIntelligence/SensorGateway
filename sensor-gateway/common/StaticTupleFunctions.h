@@ -24,24 +24,25 @@ namespace {
     std::array<typename std::tuple_element<0, Bare<Tuple>>::type,
             std::tuple_size<Bare<Tuple>>::value>
     convertTupleToArray(Tuple&& tuple, std::index_sequence<Is...>) {
-        using std::get;
-        return {{get<Is>(std::forward<Tuple>(tuple))...}};
+        return {{std::get<Is>(std::forward<Tuple>(tuple))...}};
     }
 
     template<typename Tuple>
     auto convertTupleToArray(Tuple&& tuple)
-    -> decltype(convertTupleToArray(std::declval<Tuple>(), std::make_index_sequence<std::tuple_size<Bare<Tuple>>::value>{})) {
-        return convertTupleToArray(std::forward<Tuple>(tuple), std::make_index_sequence<std::tuple_size<Bare<Tuple>>::value>{});
+    -> decltype(convertTupleToArray(std::declval<Tuple>(),
+                                    std::make_index_sequence<std::tuple_size<Bare<Tuple>>::value>{})) {
+        return convertTupleToArray(std::forward<Tuple>(tuple),
+                                   std::make_index_sequence<std::tuple_size<Bare<Tuple>>::value>{});
     }
 
     // Tuple and static index function helper
-    template <class F, size_t... Is>
+    template<class F, size_t... Is>
     constexpr auto index_apply_impl(F f, std::index_sequence<Is...>) {
-        return f(std::integral_constant<size_t, Is> {}...);
+        return f(std::integral_constant<size_t, Is>{}...);
     }
 
     // Tuple and static index function helper
-    template <size_t N, class F>
+    template<size_t N, class F>
     constexpr auto index_apply(F f) {
         return index_apply_impl(f, std::make_index_sequence<N>{});
     }
