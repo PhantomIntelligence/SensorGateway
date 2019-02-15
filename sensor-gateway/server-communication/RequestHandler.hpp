@@ -17,9 +17,14 @@
 #ifndef SENSORGATEWAY_REQUESTHANDLER_HPP
 #define SENSORGATEWAY_REQUESTHANDLER_HPP
 
-#include "ResponseWriter.hpp"
+#include "sensor-gateway/data-translation/DataTranslator.hpp"
 
 namespace SensorAccessLinkElement {
+
+
+    // WARNING : This declaration is made here to break a circular dependency. DO NOT REMOVE
+    template<class SENSOR_STRUCTURES, class SERVER_STRUCTURES>
+    class ResponseWriter;
 
     template<class SENSOR_STRUCTURES, class SERVER_STRUCTURES>
     class RequestHandler : public DataFlow::DataSource<ErrorHandling::SensorAccessLinkError> {

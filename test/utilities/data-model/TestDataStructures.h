@@ -30,7 +30,7 @@ namespace Sensor {
                 typedef typename DataModel::SimpleMessage Message;
                 typedef typename DataModel::SimpleRawData RawData;
                 typedef typename DataModel::SimpleControlMessage ControlMessage;
-                using Parameters = Gateway::NoGatewayParameters; // TODO : change for actual test ones
+                using Parameters = Sensor::FakeParameter::FruitBasketParameters;
 
                 static size_t const MAX_NUMBER_OF_BULK_FETCHABLE_MESSAGES = 1; // IMPORTANT: this has to stay = 1!
                 static size_t const MAX_NUMBER_OF_BULK_FETCHABLE_RAW_DATA_CYCLES = 1;
@@ -86,7 +86,7 @@ namespace Sensor {
                 typedef typename DataFlow::SensorMessage<StubMessageDefinition> Message;
                 typedef typename DataFlow::RawData<StubRawDataDefinition> RawData;
                 typedef typename DataFlow::ControlMessage<StubControlMessageDefinition> ControlMessage;
-                using Parameters = Gateway::NoGatewayParameters; // TODO : change for actual test ones
+                using Parameters = Sensor::FakeParameter::FruitBasketParameters;
 
                 static size_t const MAX_NUMBER_OF_BULK_FETCHABLE_MESSAGES = 2;
                 static size_t const MAX_NUMBER_OF_BULK_FETCHABLE_RAW_DATA_CYCLES = 2;

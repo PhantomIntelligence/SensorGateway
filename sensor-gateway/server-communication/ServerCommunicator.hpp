@@ -17,8 +17,9 @@
 #ifndef SENSORGATEWAY_SERVERCOMMUNICATOR_HPP
 #define SENSORGATEWAY_SERVERCOMMUNICATOR_HPP
 
-#include "sensor-gateway/data-translation/DataTranslator.hpp"
+#include "RequestHandler.hpp"
 #include "ServerCommunicationStrategy.hpp"
+#include "ServerRequestAssembler.hpp"
 #include "ServerResponseAssembler.hpp"
 
 namespace SensorAccessLinkElement {

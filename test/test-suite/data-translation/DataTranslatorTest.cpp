@@ -1,9 +1,12 @@
 /**
-	Copyright 2014-2018 Phantom Intelligence Inc.
+	Copyright 2014-2019 Phantom Intelligence Inc.
+
 	Licensed under the Apache License, Version 2.0 (the "License");
 	you may not use this file except in compliance with the License.
 	You may obtain a copy of the License at
+
 		http://www.apache.org/licenses/LICENSE-2.0
+
 	Unless required by applicable law or agreed to in writing, software
 	distributed under the License is distributed on an "AS IS" BASIS,
 	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,14 +22,17 @@
 #include "test/utilities/mock/ArbitraryDataSinkMock.hpp"
 #include "test/utilities/mock/ErrorThrowingDataTranslationStrategyMock.hpp"
 
-using TestFunctions::DataTestUtil;
-using Sensor::Test::Simple::Structures;
-using DataTranslation::DataTranslationStrategy;
-using SensorAccessLinkElement::DataTranslator;
 
 class DataTranslatorTest : public ::testing::Test {
 
+public :
+
+    using Structures = Sensor::Test::Simple::Structures;
+
 protected:
+
+    using DataTestUtil = TestFunctions::DataTestUtil;
+    using DataTranslator = SensorAccessLinkElement::DataTranslator<Structures, Structures>;
 
     using Error = ErrorHandling::SensorAccessLinkError;
     using ErrorSinkMock = Mock::ArbitraryDataSinkMock<Error>;
@@ -35,16 +41,19 @@ protected:
     DataTranslatorTest() = default;
 
     ~DataTranslatorTest() override = default;
+
 };
 
 namespace DataTranslatorTestMock {
 
+    using Structures = DataTranslatorTest::Structures;
+    using DataTranslationStrategy = DataTranslation::DataTranslationStrategy<Structures, Structures>;
     class MockDataTranslationStrategy final :
-            public DataTranslationStrategy<Structures, Structures> {
+            public DataTranslationStrategy {
 
     protected:
 
-        using super = DataTranslation::DataTranslationStrategy<Structures, Structures>;
+        using super = DataTranslationStrategy;
         using super::SensorMessage;
         using super::SensorRawData;
 
@@ -99,7 +108,7 @@ TEST_F(DataTranslatorTest,
     auto copy = Structures::Message(message);
 
     DataTranslatorTestMock::MockDataTranslationStrategy mockStrategy;
-    DataTranslator<Structures, Structures> dataTranslator(&mockStrategy);
+    DataTranslator dataTranslator(&mockStrategy);
 
     dataTranslator.consume(std::move(message));
     auto strategyCalledWithTheRightMessage = mockStrategy.hasTranslateMessageBeenCalledWithRightSensorMessage(copy);
@@ -113,7 +122,7 @@ TEST_F(DataTranslatorTest,
     auto copy = Structures::RawData(data);
 
     DataTranslatorTestMock::MockDataTranslationStrategy mockStrategy;
-    DataTranslator<Structures, Structures> dataTranslator(&mockStrategy);
+    DataTranslator dataTranslator(&mockStrategy);
 
     dataTranslator.consume(std::move(data));
     auto strategyCalledWithTheRightRawData = mockStrategy.hasTranslateRawDataBeenCalledWithRightSensorRawData(copy);
@@ -128,7 +137,7 @@ TEST_F(DataTranslatorTest,
     DataFlow::DataProcessingScheduler<Error, ErrorSinkMock, 1> scheduler(&sink);
 
     ThrowingDataTranslationStrategy throwingMockStrategy;
-    DataTranslator<Structures, Structures> dataTranslator(&throwingMockStrategy);
+    DataTranslator dataTranslator(&throwingMockStrategy);
 
     dataTranslator.linkConsumer(&scheduler);
     auto data = DataTestUtil::createRandomSimpleMessageWithEmptyTimestamps();
@@ -158,7 +167,7 @@ TEST_F(DataTranslatorTest,
     DataFlow::DataProcessingScheduler<Error, ErrorSinkMock, 1> scheduler(&sink);
 
     ThrowingDataTranslationStrategy throwingMockStrategy;
-    DataTranslator<Structures, Structures> dataTranslator(&throwingMockStrategy);
+    DataTranslator dataTranslator(&throwingMockStrategy);
 
     Error expectedError = ErrorHandling::SensorAccessLinkError(
             ErrorHandling::Origin::TRANSLATE_RAWDATA + ErrorHandling::Message::SEPARATOR + throwingMockStrategy.ORIGIN,
