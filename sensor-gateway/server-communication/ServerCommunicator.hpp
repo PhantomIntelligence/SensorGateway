@@ -38,15 +38,25 @@ namespace SensorAccessLinkElement {
 
         using MessageSink = DataFlow::DataSink<Message>;
         using RawDataSink = DataFlow::DataSink<RawData>;
+
         using Parameters = typename T::Parameters;
+
+        using GetParameterValueRequest = ServerCommunication::RequestTypes::GetParameterValue;
+        using GetParameterValueContent = typename ServerCommunicationStrategy::GetParameterValueContent;
+        using GetParameterValueContents = typename ServerCommunicationStrategy::GetParameterValueContents;
+
+        GetParameterValueRequest const DEFAULT_GET_PARAMETER_VALUE_REQUEST = ServerCommunication::RequestTypes::GetParameterValue::returnDefaultData();
+        using HandleGetParameterValueRequest = std::function<void(GetParameterValueRequest&&)>;
 
         using ErrorSource = DataFlow::DataSource<ErrorHandling::SensorAccessLinkError>;
 
     public:
 
-        explicit ServerCommunicator(ServerCommunicationStrategy* serverCommunicationStrategy) :
+        explicit ServerCommunicator(ServerCommunicationStrategy* serverCommunicationStrategy,
+                                    HandleGetParameterValueRequest handleGetParameterValueRequest) :
                 serverCommunicationStrategy(serverCommunicationStrategy),
-                serverConnected(false), // TODO: add logic not to send anything untill server is connected
+                handleGetParameterValueRequest(handleGetParameterValueRequest),
+                serverConnected(false), // TODO: add logic not to send anything until server is connected
                 terminateOrderReceived(false),
                 requestReceptionThread(JoinableThread(doNothing)) {
         };
@@ -129,14 +139,28 @@ namespace SensorAccessLinkElement {
         }
 
         void handleIncomingGetParameterValueRequests() {
-            using GetParameterValueContents = typename ServerCommunicationStrategy::GetParameterValueContents;
             GetParameterValueContents getParameterValueContents;
             try {
+
                 getParameterValueContents = serverCommunicationStrategy->fetchGetParameterValueContents();
+
             } catch (ErrorHandling::SensorAccessLinkError& strategyError) {
                 addOriginAndHandleError(std::move(strategyError),
                                         ErrorHandling::Origin::SERVER_COMMUNICATOR_FETCH_GET_PARAMETER_VALUE);
             }
+
+            auto requestCount = 0u;
+            bool requestHasToBeHandled = false;
+            GetParameterValueRequest getParameterRequest;
+
+            std::tie(getParameterRequest, requestHasToBeHandled) = assembleGetParameterValueRequestFromContent(
+                    getParameterValueContents[requestCount++]);
+
+            while (requestHasToBeHandled) {
+                handleGetParameterValueRequest(std::move(getParameterRequest));
+                std::tie(getParameterRequest, requestHasToBeHandled) = assembleGetParameterValueRequestFromContent(
+                        getParameterValueContents[requestCount++]);
+            };
 
             // TODO : Validate request is allowed --> throw if not
             // TODO : Assemble Request
@@ -148,6 +172,13 @@ namespace SensorAccessLinkElement {
 //                }
 //            }
         }
+
+        auto assembleGetParameterValueRequestFromContent(
+                GetParameterValueContent const& content) const -> std::tuple<GetParameterValueRequest, bool> const {
+            GetParameterValueRequest getParameterRequest = Assemble::ServerRequest::getParameterValueRequest(content);
+            bool hasToBeHandled = getParameterRequest != DEFAULT_GET_PARAMETER_VALUE_REQUEST;
+            return std::make_tuple(getParameterRequest, hasToBeHandled);
+        };
 
         void addOriginAndHandleError(ErrorHandling::SensorAccessLinkError&& error, std::string const& originToAdd) {
             auto originAddedError = ErrorHandling::SensorAccessLinkError(
@@ -180,8 +211,9 @@ namespace SensorAccessLinkElement {
         AtomicFlag terminateOrderReceived;
 
         ServerCommunicationStrategy* serverCommunicationStrategy;
-        std::string serverAddress;
+        HandleGetParameterValueRequest handleGetParameterValueRequest;
 
+        std::string serverAddress;
     };
 }
 

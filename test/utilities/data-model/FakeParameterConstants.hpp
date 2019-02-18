@@ -68,6 +68,18 @@ namespace Sensor {
         using Egg = Details::NameOnlyParameter<Details::NameLiterals::Egg>;
         using Carrot = Details::NameOnlyParameter<Details::NameLiterals::Carrot>;
 
+        // IMPORTANT! : Keep this list up to date with declaration of FakeParameters. It MUST NOT be used in any Sensor::Communication::DataStructures declaration.
+        using AllFakeParameters = Sensor::Gateway::Parameters<
+                Impossible,
+                Apple,
+                Pear,
+                Banana,
+                Avocado,
+                Grape,
+                Orange,
+                Egg,
+                Carrot
+        >;
     }
 }
 

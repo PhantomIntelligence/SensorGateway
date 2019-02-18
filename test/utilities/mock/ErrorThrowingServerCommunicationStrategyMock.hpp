@@ -190,7 +190,7 @@ namespace Mock {
             if (hasCloseConnectionBeenCalled()) {
                 // WARNING! This mock implementation of readMessage needs to be slowed down because of the way gtest works. DO NOT REMOVE.
                 std::this_thread::sleep_for(std::chrono::milliseconds(5));
-                std::this_thread::yield();
+                yield();
             }
             if (!errorThrown.load()) {
                 if (throwOnFetchGetParameterValueContents.load()) {
@@ -265,13 +265,13 @@ namespace Mock {
 
         void waitUntilOpenConnectionCallIsMadeAfterErrorIsThrown() {
             while (!hasOpenConnectionBeenCalledAfterThrowingFunction()) {
-                std::this_thread::yield();
+                yield();
             }
         }
 
         void waitUntilCloseConnectionCallIsMadeAfterErrorIsThrown() {
             while (!hasCloseConnectionBeenCalledAfterThrowingFunction()) {
-                std::this_thread::yield();
+                yield();
             }
         }
 

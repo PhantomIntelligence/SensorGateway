@@ -67,7 +67,10 @@ namespace ServerCommunication {
 
         static ServerRequest const& returnDefaultData() noexcept;
 
-        PayloadType const payload;
+    private:
+
+        PayloadType payload;
+
     };
 
     namespace Defaults {
@@ -105,6 +108,10 @@ namespace ServerCommunication {
     private :
         Requests requests;
     };
+
+    namespace RequestTypes {
+        using GetParameterValue = ServerRequest<PayloadTypes::GetParameterValuePayload>;
+    }
 
 }
 

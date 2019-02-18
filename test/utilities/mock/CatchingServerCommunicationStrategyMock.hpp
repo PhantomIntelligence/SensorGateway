@@ -1,5 +1,5 @@
 /**
-	Copyright 2014-2018 Phantom Intelligence Inc.
+	Copyright 2014-2019 Phantom Intelligence Inc.
 
 	Licensed under the Apache License, Version 2.0 (the "License");
 	you may not use this file except in compliance with the License.
@@ -56,7 +56,6 @@ namespace Mock {
         GetParameterValueContents fetchGetParameterValueContents() override {
             acknowledgeGetParameterValueContentsHasBeenCalled();
 
-            GetParameterValueContents createdMessages;
             if (hasToReturnSpecificGetParameterValueContents && !getParameterValueContentsToReturn.empty()) {
                 GetParameterValueContents getParameterValueContents;
                 auto numberOfValues = getParameterValueContentsToReturn.size();
@@ -132,7 +131,7 @@ namespace Mock {
         }
 
         void waitUntilFetchGetParameterValueContentsIsCalled() {
-            if (!hasFetchGetParameterValueContentsCalledBeenCalled()) {
+            if (!hasFetchGetParameterValueContentsBeenCalled()) {
                 fetchGetParameterValueContentsCalledAcknowledgement.get_future().wait();
             }
         }
@@ -142,7 +141,7 @@ namespace Mock {
         void acknowledgeGetParameterValueContentsHasBeenCalled() {
             LockGuard sequenceGuard(callSequenceMutex);
             LockGuard guard(fetchGetParameterValueContentsAckMutex);
-            if (!hasFetchGetParameterValueContentsCalledBeenCalled()) {
+            if (!hasFetchGetParameterValueContentsBeenCalled()) {
                 fetchGetParameterValueContentsCalled.store(true);
                 fetchGetParameterValueContentsCalledAcknowledgement.set_value(true);
 //                if (!hasFetchRawDataCyclesBeenCalled()) {
@@ -161,10 +160,6 @@ namespace Mock {
         // TODO : Move the following in template (see TODO a few lines below)
 
         Mutex callSequenceMutex;
-
-        bool hasFetchGetParameterValueContentsCalledBeenCalled() const {
-            return fetchGetParameterValueContentsCalled.load();
-        }
 
         AtomicFlag fetchGetParameterValueContentsCalled;
         Mutex fetchGetParameterValueContentsAckMutex;

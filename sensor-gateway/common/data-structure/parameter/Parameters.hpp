@@ -111,7 +111,7 @@ namespace Sensor {
 
             explicit Parameters() : internalParameters(std::make_tuple(P()...)) {}
 
-            constexpr auto isAvailable(std::string const& parameterName) const {
+            constexpr auto isAvailable(std::string const& parameterName) const noexcept {
                 auto names = getNames();
                 bool containsParameterWithName = std::any_of(names.cbegin(), names.cend(), NameEquals(parameterName));
                 return containsParameterWithName;
@@ -126,7 +126,7 @@ namespace Sensor {
                 return true;
             }
 
-            constexpr auto getNames() const {
+            constexpr auto getNames() const noexcept {
                 auto names = convertTupleToArray(getNameTuple());
                 return names;
             }
@@ -148,7 +148,7 @@ namespace Sensor {
                 return index;
             }
 
-            constexpr auto getNameTuple() const {
+            constexpr auto getNameTuple() const noexcept {
                 auto nameTuple = index_apply<NUMBER_OF_AVAILABLE_PARAMETERS>(
                         [&](auto... Is) {
                             return std::make_tuple(getParam<Is>::getStringifiedName()...);

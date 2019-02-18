@@ -18,6 +18,7 @@
 #define SENSORGATEWAY_REQUESTHANDLER_HPP
 
 #include "sensor-gateway/data-translation/DataTranslator.hpp"
+#include "ServerRequest.hpp"
 
 namespace SensorAccessLinkElement {
 
@@ -39,6 +40,8 @@ namespace SensorAccessLinkElement {
 
         using ErrorSource = DataFlow::DataSource<ErrorHandling::SensorAccessLinkError>;
 
+        using GetParameterValueRequest = ServerCommunication::RequestTypes::GetParameterValue;
+
     public:
         explicit RequestHandler(ResponseWriter* responseWriter,
                                 DataTranslator* dataTranslator) :
@@ -55,8 +58,7 @@ namespace SensorAccessLinkElement {
 
         RequestHandler& operator=(RequestHandler&& other)& noexcept = delete;
 
-        template<class Request>
-        void handleIncomingServerRequest(Request&& request) {
+        virtual void handleGetParameterValueRequest(GetParameterValueRequest&& getParameterValueRequest) {
             /**
              *  TODO:
              *  - Give pointer to *this* to ServerCommunicator

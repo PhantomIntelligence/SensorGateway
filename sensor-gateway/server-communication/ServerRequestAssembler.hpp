@@ -40,10 +40,9 @@ namespace Assemble {
          * @param parameterName
          * @return
          */
-        static auto getParameterValueRequest(std::string const& parameterName) {
-            using Payload = ServerCommunication::PayloadTypes::GetParameterValuePayload;
-            using GetParameterValueRequest = ServerCommunication::ServerRequest<Payload>;
-            Payload payload(parameterName);
+        static auto getParameterValueRequest(std::string const& payloadContent) {
+            using GetParameterValueRequest = ServerCommunication::RequestTypes::GetParameterValue;
+            ServerCommunication::PayloadTypes::GetParameterValuePayload payload{payloadContent};
             GetParameterValueRequest request(payload);
             return request;
         }

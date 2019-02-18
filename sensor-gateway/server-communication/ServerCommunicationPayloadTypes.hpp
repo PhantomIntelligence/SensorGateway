@@ -25,11 +25,6 @@ namespace ServerCommunication {
 
         namespace Details {
 
-            template<typename N>
-            struct NamePayload {
-                N const name;
-            };
-
             template<typename N, typename ValueType, ValueType v>
             struct NameValuePayload {
                 static N const name;
@@ -37,18 +32,62 @@ namespace ServerCommunication {
             };
         }
 
-        struct GetParameterValuePayload : public Details::NamePayload<std::string> {
-
-        protected:
-
-            using Value = Details::NamePayload<std::string>;
+        class GetParameterValuePayload {
 
         public:
 
-            explicit GetParameterValuePayload(std::string const& parameterName) : value{{parameterName}} {}
+            explicit GetParameterValuePayload(std::string const& parameterName) noexcept : name(parameterName) {}
 
-            Value const value;
+            explicit GetParameterValuePayload() noexcept :
+                    GetParameterValuePayload(GetParameterValuePayload::returnDefaultData()) {}
+
+            ~GetParameterValuePayload() noexcept = default;
+
+            GetParameterValuePayload(GetParameterValuePayload const& other) :
+                    GetParameterValuePayload(other.name) {}
+
+            GetParameterValuePayload(GetParameterValuePayload&& other) noexcept :
+                    GetParameterValuePayload(std::move(other.name)) {}
+
+            GetParameterValuePayload& operator=(GetParameterValuePayload const& other)& {
+                GetParameterValuePayload temporary(other);
+                swap(*this, temporary);
+                return *this;
+            }
+
+            GetParameterValuePayload& operator=(GetParameterValuePayload&& other)& noexcept {
+                swap(*this, other);
+                return *this;
+            }
+
+            void swap(GetParameterValuePayload& current, GetParameterValuePayload& other) noexcept {
+                std::swap(current.name, other.name);
+            }
+
+            bool operator==(GetParameterValuePayload const& other) const {
+                auto sameName = (name == other.name);
+                return sameName;
+            }
+
+            bool operator!=(GetParameterValuePayload const& other) const {
+                return !operator==(other);
+            }
+
+            static inline GetParameterValuePayload const& returnDefaultData() noexcept;
+
+        private:
+
+            std::string name;
         };
+
+        namespace Defaults {
+            GetParameterValuePayload const DEFAULT_GET_PARAMETER_VALUE_PAYLOAD("");
+        }
+
+        inline GetParameterValuePayload const& GetParameterValuePayload::returnDefaultData() noexcept {
+            return Defaults::DEFAULT_GET_PARAMETER_VALUE_PAYLOAD;
+        }
+
     }
 }
 
