@@ -41,6 +41,7 @@ public:
     using ErrorProcessingScheduler = DataFlow::DataProcessingScheduler<Error, ErrorSinkMock, 1>;
 
     using DataStructures = Sensor::Test::Simple::Structures;
+    using ParameterListForThisTestCase = DataStructures::Parameters;
     using MockServerCommunicatorStrategy = Mock::CatchingServerCommunicationStrategyMock<DataStructures>;
     using ThrowingServerCommunicationStrategy = Mock::ErrorThrowingServerCommunicationStrategyMock<DataStructures>;
     using RequestResponseServerCommunicationStrategy = Mock::RequestResponseSpecializedServerCommunicationStrategyMock<DataStructures>;
@@ -53,10 +54,26 @@ protected:
     using RawData = Sensor::Test::Simple::Structures::RawData;
 
     std::string const SERVER_ADDRESS = "I like trains";
-
     MockRequestHandler defaultRequestHandlerMock;
+
     using GetParameterValueRequest = ServerCommunication::RequestTypes::GetParameterValue;
     using HandleGetParameterValueRequest = std::function<void(GetParameterValueRequest&&)>;
+
+    ServerCommunicatorTest() = default;
+
+    virtual ~ServerCommunicatorTest() = default;
+
+    void assertRequestHandlerReceivesExpectedNumberOfValidRequestsWithStrategy(MockRequestHandler* mockRequestHandler,
+                                                                               ServerCommunicator* serverCommunicator) {
+
+        serverCommunicator->openConnection(SERVER_ADDRESS);
+        mockRequestHandler->waitForExpectedNumberOfGetParameterValueRequest();
+        serverCommunicator->terminateAndJoin();
+
+        auto hasReceivedExpectedNumberOfCall = mockRequestHandler->hasReceivedExpectedNumberOfGetParameterValueRequest();
+
+        ASSERT_TRUE(hasReceivedExpectedNumberOfCall);
+    }
 
     auto bindHandlerGetParameterValueTo(MockRequestHandler* handlerMock) -> HandleGetParameterValueRequest {
         return std::bind(&MockRequestHandler::handleGetParameterValueRequest,
@@ -67,9 +84,18 @@ protected:
         return bindHandlerGetParameterValueTo(&defaultRequestHandlerMock);
     }
 
-    ServerCommunicatorTest() = default;
-
-    virtual ~ServerCommunicatorTest() = default;
+    auto recreateGetParameterValueRequestFromName(
+            std::string const& content) const -> std::tuple<GetParameterValueRequest, bool, bool> const {
+        GetParameterValueRequest getParameterRequest = Assemble::ServerRequest::getParameterValueRequest(content);
+        bool willCreateError = false;
+        try {
+            Assemble::ServerRequest::ensureParameterIsAvailable<ParameterListForThisTestCase>(content);
+        } catch (ErrorHandling::SensorAccessLinkError& e) {
+            willCreateError = true;
+        }
+        bool hasNonDefaultContent = getParameterRequest != GetParameterValueRequest::returnDefaultData();
+        return std::make_tuple(getParameterRequest, hasNonDefaultContent, willCreateError);
+    };
 
     Error formatStrategyErrorWithCorrectOrigin(Error strategyIssuedError, std::string origin) const noexcept {
         Error formattedError(origin + ErrorHandling::Message::SEPARATOR + strategyIssuedError.getOrigin(),
@@ -521,23 +547,69 @@ TEST_F(ServerCommunicatorTest,
 
 TEST_F(ServerCommunicatorTest,
        given_aServerStrategyThatReturnsOneValidGetParameterValueContent_when_openConnection_then_sendsTheRequestHandleOneGetParameterValidRequest) {
-    uint16_t expectedNumberOfRequest = 1;
-    RequestResponseServerCommunicationStrategy requestResponseStrategy;
-    requestResponseStrategy.setNumberOfUniqueValidGetParameterValueContentsToReturn(expectedNumberOfRequest);
+    auto expectedNumberOfRequest = 1u;
+
     MockRequestHandler mockRequestHandler;
     mockRequestHandler.setExpectedNumberOfGetParameterValueRequest(expectedNumberOfRequest);
+    RequestResponseServerCommunicationStrategy requestResponseStrategy;
+    requestResponseStrategy.setNumberOfUniqueValidGetParameterValueContentsToReturn(expectedNumberOfRequest);
+    ServerCommunicator serverCommunicator(&requestResponseStrategy,
+                                          bindHandlerGetParameterValueTo(&mockRequestHandler));
+
+    assertRequestHandlerReceivesExpectedNumberOfValidRequestsWithStrategy(&mockRequestHandler,
+                                                                          &serverCommunicator);
+    serverCommunicator.terminateAndJoin();
+}
+
+TEST_F(ServerCommunicatorTest,
+       given_aServerStrategyThatReturnsANumberOfUniqueValidGetParameterValueContent_when_openConnection_then_sendsTheRequestHandleAllRequest) {
+    auto expectedNumberOfRequest = 3u; // Warning: do not expect a bigger *unique* number than the number of available parameter names
+
+    MockRequestHandler mockRequestHandler;
+    mockRequestHandler.setExpectedNumberOfGetParameterValueRequest(expectedNumberOfRequest);
+    RequestResponseServerCommunicationStrategy requestResponseStrategy;
+    requestResponseStrategy.setNumberOfUniqueValidGetParameterValueContentsToReturn(expectedNumberOfRequest);
 
     ServerCommunicator serverCommunicator(&requestResponseStrategy,
                                           bindHandlerGetParameterValueTo(&mockRequestHandler));
 
-    serverCommunicator.openConnection(SERVER_ADDRESS);
-    mockRequestHandler.waitForExpectedNumberOfGetParameterValueRequest();
+    assertRequestHandlerReceivesExpectedNumberOfValidRequestsWithStrategy(&mockRequestHandler,
+                                                                          &serverCommunicator);
     serverCommunicator.terminateAndJoin();
-
-    auto hasReceivedExpectedNumberOfCall = mockRequestHandler.hasReceivedExpectedNumberOfGetParameterValueRequest();
-
-    ASSERT_TRUE(hasReceivedExpectedNumberOfCall);
 }
+
+//TEST_F(ServerCommunicatorTest,
+//       given_aServerStrategyThatReturnsANumberOfUniqueValidGetParameterValueContent_when_openConnection_then_sendsTheRequestHandleAllRequest) {
+//    auto expectedNumberOfRequest = 3u; // Warning: do not expect a bigger *unique* number than the number of available parameter names
+//    RequestResponseServerCommunicationStrategy requestResponseStrategy;
+//    requestResponseStrategy.setNumberOfUniqueValidGetParameterValueContentsToReturn(expectedNumberOfRequest);
+//    MockRequestHandler mockRequestHandler;
+//    mockRequestHandler.setExpectedNumberOfGetParameterValueRequest(expectedNumberOfRequest);
+//
+//    ServerCommunicator serverCommunicator(&requestResponseStrategy,
+//                                          bindHandlerGetParameterValueTo(&mockRequestHandler));
+//
+//    serverCommunicator.openConnection(SERVER_ADDRESS);
+//    mockRequestHandler.waitForExpectedNumberOfGetParameterValueRequest();
+//    serverCommunicator.terminateAndJoin();
+//
+//    auto expectedRequestContent = requestResponseStrategy.getReturnedGetParameterValueRequest();
+//    std::list<GetParameterValueRequest> getParameterValueRequests;
+//    auto requestCount = 0u;
+//    bool requestHasNonDefaultContent = false;
+//    bool requestWillCreateError = false;
+//    GetParameterValueRequest getParameterValueRequest;
+//
+//    std::tie(getParameterValueRequest, requestHasNonDefaultContent, requestWillCreateError) = recreateGetParameterValueRequestFromName(expectedRequestContent[requestCount++]);
+//
+//    while (requestHasNonDefaultContent) {
+//        getParameterValueRequests.emplace_back(std::move(getParameterValueRequest));
+//        std::tie(getParameterValueRequest, requestHasNonDefaultContent, requestWillCreateError) = recreateGetParameterValueRequestFromName(expectedRequestContent[requestCount++]);
+//    };
+//    auto numberOfRequestSentToHandler = getParameterValueRequests.size();
+//
+//    ASSERT_TRUE(hasReceivedExpectedNumberOfCall);
+//}
 
 #endif //SENSORGATEWAY_SERVERCOMMUNICATORTEST_CPP
 

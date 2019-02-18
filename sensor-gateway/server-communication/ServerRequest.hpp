@@ -27,7 +27,7 @@ namespace ServerCommunication {
     public:
 
         explicit ServerRequest(PayloadType const& payload) noexcept :
-                payload(payload) {}
+                ServerRequest(payload, false) {}
 
         explicit ServerRequest() noexcept :
                 ServerRequest(ServerRequest::returnDefaultData()) {}
@@ -35,10 +35,10 @@ namespace ServerCommunication {
         ~ServerRequest() noexcept = default;
 
         ServerRequest(ServerRequest const& other) :
-                ServerRequest(other.payload) {}
+                ServerRequest(other.payload, other.badRequest) {}
 
         ServerRequest(ServerRequest&& other) noexcept :
-                ServerRequest(std::move(other.payload)) {}
+                ServerRequest(std::move(other.payload), std::move(other.badRequest)) {}
 
         ServerRequest& operator=(ServerRequest const& other)& {
             ServerRequest temporary(other);
@@ -53,23 +53,37 @@ namespace ServerCommunication {
 
         void swap(ServerRequest& current, ServerRequest& other) noexcept {
             std::swap(current.payload, other.payload);
+            std::swap(current.badRequest, other.badRequest);
         }
 
         bool operator==(ServerRequest const& other) const {
             auto samePayload = (payload == other.payload);
-            bool messagesAreEqual = samePayload;
-            return messagesAreEqual;
+            auto sameBadness = (badRequest == other.badRequest);
+            bool requestsAreEqual = (samePayload &&
+                                     sameBadness);
+            return requestsAreEqual;
         }
 
         bool operator!=(ServerRequest const& other) const {
             return !operator==(other);
         }
 
+        void makeBad() noexcept {
+            badRequest = true;
+        }
+
+        bool const& isBadRequest() const noexcept {
+            return badRequest;
+        }
+
         static ServerRequest const& returnDefaultData() noexcept;
 
     private:
+        ServerRequest(PayloadType const& payload, bool badRequest) noexcept :
+                payload(payload), badRequest(badRequest) {}
 
         PayloadType payload;
+        bool badRequest;
 
     };
 

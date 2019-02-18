@@ -53,7 +53,8 @@ namespace Mock {
 
             ParameterNames validParameterNames;
             std::string name;
-            for(auto validNameIndex = 0u; validNameIndex < AvailableParameters::NUMBER_OF_AVAILABLE_PARAMETERS; ++validNameIndex) {
+            for (auto validNameIndex = 0u;
+                 validNameIndex < AvailableParameters::NUMBER_OF_AVAILABLE_PARAMETERS; ++validNameIndex) {
                 name = validNames[validNameIndex];
                 validParameterNames.push_front(name);
             }
@@ -96,22 +97,21 @@ namespace Mock {
         }
 
         GetParameterValueContents fetchGetParameterValueContents() override {
+            LockGuard guard(getParameterValueMutex);
             acknowledgeGetParameterValueContentsHasBeenCalled();
 
             GetParameterValueContents getParameterValueContents;
 
-            auto totalContentCounter = 0u;
-            auto uniqueValidRequestCounter = 0u;
             std::string name;
-            while (uniqueValidRequestCounter != numberOfUniqueValidGetParameterValueContentsToReturn) {
-                ++uniqueValidRequestCounter;
+            uint16_t totalContentCounter = 0;
 
-                name = validParameterNames.front();
-                getParameterValueContents[totalContentCounter] = GetParameterValueContent(name);
-                validParameterNames.pop_front();
-
-                totalContentCounter = uniqueValidRequestCounter;
+            auto endIterator = validParameterNames.begin();
+            for (auto counter = 0u; counter < numberOfUniqueValidGetParameterValueContentsToReturn; ++counter) {
+                endIterator++;
             }
+
+            std::copy(validParameterNames.begin(), endIterator, getParameterValueContents.begin());
+            totalContentCounter += numberOfUniqueValidGetParameterValueContentsToReturn;
 // TODO:
 //            uint_16_t duplicateValidRequestCounter = 0;
 //            while (duplicateValidRequestCounter != numberOfDuplicateValidGetParameterValueContentsToReturn) {
@@ -125,11 +125,11 @@ namespace Mock {
 //            while (duplicateInvalidRequestCounter != numberOfDuplicateInvalidGetParameterValueContentsToReturn) {
 //                ++duplicateInvalidRequestCounter;
 //            }
-            std::copy(getParameterValueContents.cbegin(), getParameterValueContents.cend(),
-                      returnedGetParameterValueContents.begin());
 
             // WARNING! This mock implementation of sendGetParameterValueResponse needs to be slowed down because the way gtest works. DO NOT REMOVE.
-            yield();
+
+            std::copy(getParameterValueContents.cbegin(), getParameterValueContents.cend(),
+                      returnedGetParameterValueContents.begin());
 
             return getParameterValueContents;
         };
@@ -170,6 +170,11 @@ namespace Mock {
             numberOfDuplicateInvalidGetParameterValueContentsToReturn = newNumberToReturn;
         }
 
+        GetParameterValueContents const& getReturnedGetParameterValueRequest() const noexcept {
+            LockGuard guard(getParameterValueMutex);
+            return returnedGetParameterValueContents;
+        }
+
     private:
 
         void acknowledgeGetParameterValueContentsHasBeenCalled() {
@@ -192,6 +197,7 @@ namespace Mock {
         Mutex sendGetParameterValueResponseAckMutex;
         mutable BooleanPromise sendGetParameterValueResponseCalledAcknowledgement;
 
+        Mutex getParameterValueMutex;
         uint16_t numberOfUniqueValidGetParameterValueContentsToReturn;
         uint16_t numberOfDuplicateValidGetParameterValueContentsToReturn;
         uint16_t numberOfUniqueInvalidGetParameterValueContentsToReturn;

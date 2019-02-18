@@ -35,7 +35,7 @@ namespace Sensor {
                 static size_t const MAX_NUMBER_OF_BULK_FETCHABLE_MESSAGES = 1; // IMPORTANT: this has to stay = 1!
                 static size_t const MAX_NUMBER_OF_BULK_FETCHABLE_RAW_DATA_CYCLES = 1;
 
-                static size_t const MAX_NUMBER_OF_CONCURRENT_REQUEST_OF_ONE_KIND = 1;
+                static size_t const MAX_NUMBER_OF_CONCURRENT_REQUEST_OF_ONE_KIND = 16;
             };
         }
 
@@ -91,7 +91,7 @@ namespace Sensor {
                 static size_t const MAX_NUMBER_OF_BULK_FETCHABLE_MESSAGES = 2;
                 static size_t const MAX_NUMBER_OF_BULK_FETCHABLE_RAW_DATA_CYCLES = 2;
 
-                static size_t const MAX_NUMBER_OF_CONCURRENT_REQUEST_OF_ONE_KIND = 4;
+                static size_t const MAX_NUMBER_OF_CONCURRENT_REQUEST_OF_ONE_KIND = 16;
             };
         }
     }

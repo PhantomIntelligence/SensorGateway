@@ -59,6 +59,7 @@ namespace SensorAccessLinkElement {
         RequestHandler& operator=(RequestHandler&& other)& noexcept = delete;
 
         virtual void handleGetParameterValueRequest(GetParameterValueRequest&& getParameterValueRequest) {
+            // TODO : ensure request is valid, if not getParameterValueRequest.makeBad();
             /**
              *  TODO:
              *  - Give pointer to *this* to ServerCommunicator

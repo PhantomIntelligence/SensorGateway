@@ -141,9 +141,7 @@ namespace SensorAccessLinkElement {
         void handleIncomingGetParameterValueRequests() {
             GetParameterValueContents getParameterValueContents;
             try {
-
                 getParameterValueContents = serverCommunicationStrategy->fetchGetParameterValueContents();
-
             } catch (ErrorHandling::SensorAccessLinkError& strategyError) {
                 addOriginAndHandleError(std::move(strategyError),
                                         ErrorHandling::Origin::SERVER_COMMUNICATOR_FETCH_GET_PARAMETER_VALUE);
@@ -161,16 +159,6 @@ namespace SensorAccessLinkElement {
                 std::tie(getParameterRequest, requestHasToBeHandled) = assembleGetParameterValueRequestFromContent(
                         getParameterValueContents[requestCount++]);
             };
-
-            // TODO : Validate request is allowed --> throw if not
-            // TODO : Assemble Request
-            // TODO : Pass to RequestHandler
-//            for (auto messageIndex = 0; messageIndex < messages.size(); ++messageIndex) {
-//                auto message = messages[messageIndex];
-//                if (message != DEFAULT_MESSAGE) {
-//                    MessageSource::produce(std::move(message));
-//                }
-//            }
         }
 
         auto assembleGetParameterValueRequestFromContent(
@@ -179,6 +167,7 @@ namespace SensorAccessLinkElement {
             bool hasToBeHandled = getParameterRequest != DEFAULT_GET_PARAMETER_VALUE_REQUEST;
             return std::make_tuple(getParameterRequest, hasToBeHandled);
         };
+
 
         void addOriginAndHandleError(ErrorHandling::SensorAccessLinkError&& error, std::string const& originToAdd) {
             auto originAddedError = ErrorHandling::SensorAccessLinkError(
