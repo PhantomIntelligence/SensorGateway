@@ -51,7 +51,7 @@ namespace {
     template<class Tuple, class F>
     constexpr auto apply(Tuple t, F f) {
         return index_apply<std::tuple_size<Tuple>{}>(
-                [&](auto... Is) { return f(std::get<Indices>(t)...); }
+                [&](auto... Indices) { return f(std::get<Indices>(t)...); }
         );
     }
 

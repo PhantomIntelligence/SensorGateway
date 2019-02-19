@@ -133,7 +133,7 @@ namespace Sensor {
 
             constexpr auto getUnits() const {
                 auto unitsTuple = index_apply<NUMBER_OF_AVAILABLE_PARAMETERS>(
-                        [&](auto... Is) {
+                        [&](auto... Indices) {
                             return std::make_tuple(getParam<Indices>::getStringifiedUnit()...);
                         });
                 return convertTupleToArray(unitsTuple);
@@ -150,7 +150,7 @@ namespace Sensor {
 
             constexpr auto getNameTuple() const noexcept {
                 auto nameTuple = index_apply<NUMBER_OF_AVAILABLE_PARAMETERS>(
-                        [&](auto... Is) {
+                        [&](auto... Indices) {
                             return std::make_tuple(getParam<Indices>::getStringifiedName()...);
                         });
                 return nameTuple;
@@ -179,7 +179,7 @@ namespace Sensor {
 
             constexpr auto getTypeTuple() const {
                 auto typeTuple = index_apply<NUMBER_OF_AVAILABLE_PARAMETERS>(
-                        [&](auto... Is) {
+                        [&](auto... Indices) {
                             return std::make_tuple(std::get<Indices>(internalParameters).extractType()...);
                         });
                 return typeTuple;
