@@ -20,11 +20,11 @@ namespace {
     template<typename T>
     using Bare = typename std::remove_cv<typename std::remove_reference<T>::type>::type;
 
-    template<typename Tuple, size_t... Is>
+    template<typename Tuple, size_t... Indices>
     std::array<typename std::tuple_element<0, Bare<Tuple>>::type,
             std::tuple_size<Bare<Tuple>>::value>
-    convertTupleToArray(Tuple&& tuple, std::index_sequence<Is...>) {
-        return {{std::get<Is>(std::forward<Tuple>(tuple))...}};
+    convertTupleToArray(Tuple&& tuple, std::index_sequence<Indices...>) {
+        return {{std::get<Indices>(std::forward<Tuple>(tuple))...}};
     }
 
     template<typename Tuple>
@@ -36,9 +36,9 @@ namespace {
     }
 
     // Tuple and static index function helper
-    template<class F, size_t... Is>
-    constexpr auto index_apply_impl(F f, std::index_sequence<Is...>) {
-        return f(std::integral_constant<size_t, Is>{}...);
+    template<class F, size_t... Indices>
+    constexpr auto index_apply_impl(F f, std::index_sequence<Indices...>) {
+        return f(std::integral_constant<size_t, Indices>{}...);
     }
 
     // Tuple and static index function helper
@@ -51,7 +51,7 @@ namespace {
     template<class Tuple, class F>
     constexpr auto apply(Tuple t, F f) {
         return index_apply<std::tuple_size<Tuple>{}>(
-                [&](auto... Is) { return f(std::get<Is>(t)...); }
+                [&](auto... Is) { return f(std::get<Indices>(t)...); }
         );
     }
 
