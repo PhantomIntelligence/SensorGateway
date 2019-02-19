@@ -61,6 +61,13 @@ protected:
 
     virtual ~ServerCommunicatorTest() = default;
 
+    auto givenABadRequestResponse() const {
+        auto badRequest = Given::anInvalidGetParameterValueRequest<ParameterListForThisTestCase>();
+        badRequest.markAsBadRequest();
+        auto badRequestResponse = Assemble::ServerResponse::createBadRequestResponseFrom(std::move(badRequest));
+        return badRequestResponse;
+    }
+
     void assertRequestHandlerReceivesExpectedNumberOfValidRequestsWithStrategy(MockRequestHandler* mockRequestHandler,
                                                                                ServerCommunicator* serverCommunicator) {
         serverCommunicator->openConnection(SERVER_ADDRESS);
@@ -87,7 +94,7 @@ protected:
         ParameterListForThisTestCase parameters;
         bool requestIsValid = parameters.isAvailable(content);
         if (!requestIsValid) {
-            getParameterRequest.makeBad();
+            getParameterRequest.markAsBadRequest();
         }
         bool hasNonDefaultContent = getParameterRequest != GetParameterValueRequest::returnDefaultData();
         return std::make_tuple(getParameterRequest, hasNonDefaultContent);
@@ -577,6 +584,11 @@ TEST_F(ServerCommunicatorTest,
 
 // TODO : write test : when sendResponse(std::move(response)) -> calls strategy once
 // TODO : write test : when sendResponse(std::move(response)) -> calls strategy with output of `auto ServerResponse.formatForCommunicationOut const -> std::tuple<RequestResult, Request>`
+
+TEST_F(ServerCommunicatorTest,
+       given_nonSuccessResponse_when_sendResponse_then_callsSendErrorResponseInStrategy) {
+    auto badRequestResponse = givenABadRequestResponse();
+}
 
 #endif //SENSORGATEWAY_SERVERCOMMUNICATORTEST_CPP
 

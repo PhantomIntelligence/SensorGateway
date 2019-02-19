@@ -45,19 +45,6 @@ protected:
 
     virtual ~RequestHandlerTest() = default;
 
-    GetParameterValueRequest givenValidGetParameterValueRequest() {
-        auto validParameterName = TestFunctions::Parameters::availableNames<AvailableParameters>().front();
-        auto validGetParameterValueRequest = RequestAssembler::getParameterValueRequest(validParameterName);
-        return validGetParameterValueRequest;
-    }
-
-    GetParameterValueRequest givenInvalidGetParameterValueRequest() {
-        auto invalidParameterName = TestFunctions::Parameters::nonAvailableNames<AvailableParameters>().front();
-        std::cout << "invalidParameterName : " << invalidParameterName << std::endl;
-        auto invalidGetParameterValueRequest = RequestAssembler::getParameterValueRequest(invalidParameterName);
-        return invalidGetParameterValueRequest;
-    }
-
 private:
 
 };
@@ -122,7 +109,7 @@ TEST_F(RequestHandlerTest, given_anInvalidGetParameterValueRequest_when_handle_t
     RequestHandler requestHandler(nullptr, nullptr);
     requestHandler.linkConsumer(&scheduler);
 
-    auto invalidRequest = givenInvalidGetParameterValueRequest();
+    auto invalidRequest = Given::anInvalidGetParameterValueRequest<AvailableParameters>();
     requestHandler.handleGetParameterValueRequest(std::move(invalidRequest));
 
     sink.waitConsumptionToBeReached();
@@ -137,17 +124,16 @@ TEST_F(RequestHandlerTest, given_anInvalidGetParameterValueRequest_when_handle_t
 }
 
 
-TEST_F(RequestHandlerTest, given_anInvalidGetParameterValueRequest_when_handle_then_asksTheServerCommunicatorToRespondBadRequest) {
-    auto invalidRequest = givenInvalidGetParameterValueRequest();
+TEST_F(RequestHandlerTest, given_anInvalidGetParameterValueRequest_when_handle_then_asksTheServerCommunicationStrategyReceives) {
+    auto invalidRequest = Given::anInvalidGetParameterValueRequest<AvailableParameters>();
     auto expectedBadRequest = ServerCommunication::RequestTypes::GetParameterValue(invalidRequest);
-    expectedBadRequest.makeBad();
+    expectedBadRequest.markAsBadRequest();
 
 //    ASSERT_TRUE(hasThrownError);
 
 
 // TODO : complete this test
 
-//
 //    using Sensor::Gateway::Parameters;
 //    using ImpossibleParameter = Sensor::FakeParameter::Impossible;
 //    using ImpossibleParameters = Parameters<ImpossibleParameter>;

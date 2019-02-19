@@ -17,6 +17,7 @@
 #ifndef SENSORGATEWAY_DATAMODELFIXTURE_H
 #define SENSORGATEWAY_DATAMODELFIXTURE_H
 
+#include <sensor-gateway/server-communication/ServerRequestAssembler.hpp>
 #include "TestDataStructures.h"
 
 namespace TestFunctions {
@@ -130,6 +131,22 @@ namespace TestFunctions {
             return invalidParameterNames;
         }
 
+    }
+
+}
+
+namespace Given {
+
+    template<typename ParametersToChoseFrom>
+    auto anInvalidGetParameterValueRequest() -> ServerCommunication::RequestTypes::GetParameterValue {
+        auto invalidParameterName = TestFunctions::Parameters::nonAvailableNames<ParametersToChoseFrom>().front();
+        return Assemble::ServerRequestAssembler::getParameterValueRequest(invalidParameterName);
+    }
+
+    template<typename ParametersToChoseFrom>
+    auto aValidGetParameterValueRequest() -> ServerCommunication::RequestTypes::GetParameterValue {
+        auto validParameterName = TestFunctions::Parameters::availableNames<ParametersToChoseFrom>().front();
+        return Assemble::ServerRequestAssembler::getParameterValueRequest(validParameterName);
     }
 
 }

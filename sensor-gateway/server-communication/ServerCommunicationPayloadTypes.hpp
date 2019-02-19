@@ -32,66 +32,65 @@ namespace ServerCommunication {
             };
         }
 
-        class GetParameterValuePayload {
+        class StringPayload {
 
         public:
 
-            explicit GetParameterValuePayload(std::string const& parameterName) noexcept : name(parameterName) {}
+            explicit StringPayload(std::string const& value) noexcept : value(value) {}
 
-            explicit GetParameterValuePayload() noexcept :
-                    GetParameterValuePayload(GetParameterValuePayload::returnDefaultData()) {}
+            explicit StringPayload() noexcept :
+                    StringPayload(StringPayload::returnDefaultData()) {}
 
-            ~GetParameterValuePayload() noexcept = default;
+            ~StringPayload() noexcept = default;
 
-            GetParameterValuePayload(GetParameterValuePayload const& other) :
-                    GetParameterValuePayload(other.name) {}
+            StringPayload(StringPayload const& other) :
+                    StringPayload(other.value) {}
 
-            GetParameterValuePayload(GetParameterValuePayload&& other) noexcept :
-                    GetParameterValuePayload(std::move(other.name)) {}
+            StringPayload(StringPayload&& other) noexcept :
+                    StringPayload(std::move(other.value)) {}
 
-            GetParameterValuePayload& operator=(GetParameterValuePayload const& other)& {
-                GetParameterValuePayload temporary(other);
+            StringPayload& operator=(StringPayload const& other)& {
+                StringPayload temporary(other);
                 swap(*this, temporary);
                 return *this;
             }
 
-            GetParameterValuePayload& operator=(GetParameterValuePayload&& other)& noexcept {
+            StringPayload& operator=(StringPayload&& other)& noexcept {
                 swap(*this, other);
                 return *this;
             }
 
-            void swap(GetParameterValuePayload& current, GetParameterValuePayload& other) noexcept {
-                std::swap(current.name, other.name);
+            void swap(StringPayload& current, StringPayload& other) noexcept {
+                std::swap(current.value, other.value);
             }
 
-            bool operator==(GetParameterValuePayload const& other) const {
-                auto sameName = (name == other.name);
+            bool operator==(StringPayload const& other) const {
+                auto sameName = (value == other.value);
                 return sameName;
             }
 
-            bool operator!=(GetParameterValuePayload const& other) const {
+            bool operator!=(StringPayload const& other) const {
                 return !operator==(other);
             }
 
-            static inline GetParameterValuePayload const& returnDefaultData() noexcept;
+            static inline StringPayload const& returnDefaultData() noexcept;
 
-            std::string const& getName() const noexcept {
-                return name;
+            std::string const& getValue() const noexcept {
+                return value;
             }
 
         private:
 
-            std::string name;
+            std::string value;
         };
 
         namespace Defaults {
-            GetParameterValuePayload const DEFAULT_GET_PARAMETER_VALUE_PAYLOAD("");
+            StringPayload const DEFAULT_GET_PARAMETER_VALUE_PAYLOAD("");
         }
 
-        inline GetParameterValuePayload const& GetParameterValuePayload::returnDefaultData() noexcept {
+        inline StringPayload const& StringPayload::returnDefaultData() noexcept {
             return Defaults::DEFAULT_GET_PARAMETER_VALUE_PAYLOAD;
         }
-
     }
 }
 

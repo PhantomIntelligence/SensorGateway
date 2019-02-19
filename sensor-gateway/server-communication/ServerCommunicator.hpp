@@ -108,6 +108,12 @@ namespace SensorAccessLinkElement {
             return serverConnected.load();
         }
 
+        template<typename Response>
+        void sendResponse(Response&& response) {
+
+        }
+
+
         void terminateAndJoin() {
             closeConnection();
             if (!terminateOrderHasBeenReceived()) {

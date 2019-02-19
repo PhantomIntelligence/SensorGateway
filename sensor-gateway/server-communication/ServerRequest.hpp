@@ -27,7 +27,7 @@ namespace ServerCommunication {
     public:
 
         explicit ServerRequest(PayloadType const& payload) noexcept :
-                ServerRequest(payload, false) {}
+                ServerRequest(payload, false, false) {}
 
         explicit ServerRequest() noexcept :
                 ServerRequest(ServerRequest::returnDefaultData()) {}
@@ -35,10 +35,10 @@ namespace ServerCommunication {
         ~ServerRequest() noexcept = default;
 
         ServerRequest(ServerRequest const& other) :
-                ServerRequest(other.payload, other.badRequest) {}
+                ServerRequest(other.payload, other.badRequest, other.causedAnError) {}
 
         ServerRequest(ServerRequest&& other) noexcept :
-                ServerRequest(std::move(other.payload), std::move(other.badRequest)) {}
+                ServerRequest(std::move(other.payload), std::move(other.badRequest), std::move(other.causedAnError)) {}
 
         ServerRequest& operator=(ServerRequest const& other)& {
             ServerRequest temporary(other);
@@ -54,12 +54,15 @@ namespace ServerCommunication {
         void swap(ServerRequest& current, ServerRequest& other) noexcept {
             std::swap(current.payload, other.payload);
             std::swap(current.badRequest, other.badRequest);
+            std::swap(current.causedAnError, other.causedAnError);
         }
 
         bool operator==(ServerRequest const& other) const {
             auto samePayload = (payload == other.payload);
             auto sameBadness = (badRequest == other.badRequest);
+            auto sameErrorCause = (causedAnError == other.causedAnError);
             bool requestsAreEqual = (samePayload &&
+                                     sameErrorCause &&
                                      sameBadness);
             return requestsAreEqual;
         }
@@ -68,26 +71,35 @@ namespace ServerCommunication {
             return !operator==(other);
         }
 
-        void makeBad() noexcept {
+        void markAsBadRequest() noexcept {
             badRequest = true;
+        }
+
+        void markAsErrorCause() noexcept {
+            causedAnError = true;
         }
 
         bool const& isBadRequest() const noexcept {
             return badRequest;
         }
 
+        bool const& hasCausedAnError() const noexcept {
+            return causedAnError;
+        }
+
         static ServerRequest const& returnDefaultData() noexcept;
 
-        std::string const& getPayloadName() const noexcept{
-            return payload.getName();
+        std::string const& getPayloadName() const noexcept {
+            return payload.getValue();
         }
 
     private:
-        ServerRequest(PayloadType const& payload, bool badRequest) noexcept :
-                payload(payload), badRequest(badRequest) {}
+        ServerRequest(PayloadType const& payload, bool const& badRequest, bool const& causedAnError) noexcept :
+                payload(payload), badRequest(badRequest), causedAnError(causedAnError) {}
 
         PayloadType payload;
         bool badRequest;
+        bool causedAnError;
 
     };
 
@@ -108,7 +120,7 @@ namespace ServerCommunication {
     }
 
     namespace RequestTypes {
-        using GetParameterValue = ServerRequest<PayloadTypes::GetParameterValuePayload>;
+        using GetParameterValue = ServerRequest<PayloadTypes::StringPayload>;
     }
 }
 

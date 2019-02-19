@@ -26,8 +26,12 @@ namespace ServerCommunication {
 
     public:
 
-        explicit ServerResponse(ResponsePayload const& payload, Request&& request) noexcept :
-                payload(payload), request(std::forward<Request>(request)) {}
+        using type = ResponsePayload;
+        using RequestType = Request;
+
+        explicit ServerResponse(ResponsePayload const& payload, Request&& request) noexcept:
+                payload(payload),
+                request(std::forward<Request>(request)) {}
 
         explicit ServerResponse() noexcept :
                 ServerResponse(ServerResponse::returnDefaultData()) {}
@@ -70,6 +74,13 @@ namespace ServerCommunication {
 
         static ServerResponse const& returnDefaultData() noexcept;
 
+        bool isSuccess() const {
+            auto badRequest = request.isBadRequest();
+            auto error = request.hasCausedAnError();
+            bool success = !badRequest && !error;
+            return success;
+        }
+
     private:
 
         ResponsePayload payload;
@@ -97,6 +108,16 @@ namespace ServerCommunication {
         return Defaults::DEFAULT_SERVER_RESULT<ResultPayload, Request>;
     }
 
+
+    namespace ResponseType {
+        template<typename Request>
+        using StringRequestResponse = ServerResponse<PayloadTypes::StringPayload, Request>;
+    }
+
+    namespace ResponseMessage {
+        using BadRequest = StringLiteral<decltype("Bad request"_ToString)>;
+        using NoPayload = StringLiteral<decltype(" - "_ToString)>;
+    }
 }
 
 

@@ -22,6 +22,25 @@
 namespace Assemble {
     namespace ServerResponse {
 
+        using ServerCommunication::ResponseType::StringRequestResponse;
+        using ServerCommunication::PayloadTypes::StringPayload;
+
+        template<typename Request>
+        static auto createBadRequestResponseFrom(Request&& request) -> StringRequestResponse<Request> {
+            using ServerCommunication::ResponseMessage::BadRequest;
+            StringPayload payload(BadRequest::toString());
+            StringRequestResponse<Request> response(payload, std::forward<Request>(request));
+            return response;
+        }
+
+        template<typename Request>
+        static auto createNoPayloadRequestResponseFrom(Request&& request) -> StringRequestResponse<Request> {
+            using ServerCommunication::ResponseMessage::NoPayload;
+            StringPayload payload(NoPayload::toString());
+            StringRequestResponse<Request> response(payload, std::forward<Request>(request));
+            return response;
+        }
+
     }
 }
 

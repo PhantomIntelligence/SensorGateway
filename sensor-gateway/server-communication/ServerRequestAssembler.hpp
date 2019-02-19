@@ -35,7 +35,7 @@ namespace Assemble {
 
         static auto getParameterValueRequest(std::string const& payloadContent) {
             using GetParameterValueRequest = ServerCommunication::RequestTypes::GetParameterValue;
-            ServerCommunication::PayloadTypes::GetParameterValuePayload payload{payloadContent};
+            ServerCommunication::PayloadTypes::StringPayload payload{payloadContent};
             GetParameterValueRequest request(payload);
             return request;
         }
