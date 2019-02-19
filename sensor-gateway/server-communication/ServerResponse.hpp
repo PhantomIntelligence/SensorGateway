@@ -21,30 +21,81 @@
 
 namespace ServerCommunication {
 
-    template<typename PayloadType, typename Request, Request r>
+    template<typename ResponsePayload, typename Request>
     class ServerResponse {
-        static Request const request = r;
-    };
-
-    template<class... R>
-    class BulkResponse {
 
     public:
 
-        static auto const RESPONSE_SIZE = sizeof...(R);
+        explicit ServerResponse(ResponsePayload const& payload, Request&& request) noexcept :
+                payload(payload), request(std::forward<Request>(request)) {}
 
-        using Responses = std::tuple<R...>;
+        explicit ServerResponse() noexcept :
+                ServerResponse(ServerResponse::returnDefaultData()) {}
 
-        explicit BulkResponse() : responses(std::make_tuple(R()...)) {}
+        ~ServerResponse() noexcept = default;
 
-        template <class F>
-        constexpr auto processResponses(F f) const {
-            return apply(responses, f);
+        ServerResponse(ServerResponse const& other) :
+                ServerResponse(other.payload, other.request) {}
+
+        ServerResponse(ServerResponse&& other) noexcept :
+                ServerResponse(std::move(other.payload), std::move(other.request)) {}
+
+        ServerResponse& operator=(ServerResponse const& other)& {
+            ServerResponse temporary(other);
+            swap(*this, temporary);
+            return *this;
         }
 
-    private :
-        Responses responses;
+        ServerResponse& operator=(ServerResponse&& other)& noexcept {
+            swap(*this, other);
+            return *this;
+        }
+
+        void swap(ServerResponse& current, ServerResponse& other) noexcept {
+            std::swap(current.payload, other.payload);
+            std::swap(current.request, other.request);
+        }
+
+        bool operator==(ServerResponse const& other) const {
+            auto samePayload = (payload == other.payload);
+            auto sameRequest = (request == other.request);
+            bool requestsAreEqual = (samePayload &&
+                                     sameRequest);
+            return requestsAreEqual;
+        }
+
+        bool operator!=(ServerResponse const& other) const {
+            return !operator==(other);
+        }
+
+        static ServerResponse const& returnDefaultData() noexcept;
+
+    private:
+
+        ResponsePayload payload;
+        Request request;
+
     };
+
+    namespace Defaults {
+        using ServerCommunication::ServerResponse;
+
+        template<typename ResultPayload>
+        ResultPayload const DEFAULT_SERVER_RESULT_PAYLOAD{};
+
+        template<typename Request>
+        Request const DEFAULT_SERVER_RESULT_REQUEST{};
+
+        template<typename ResultPayload, typename Request>
+        ServerResponse<ResultPayload, Request> const DEFAULT_SERVER_RESULT = ServerResponse<ResultPayload, Request>(
+                DEFAULT_SERVER_RESULT_PAYLOAD<ResultPayload>,
+                DEFAULT_SERVER_RESULT_REQUEST<Request>);
+    }
+
+    template<typename ResultPayload, typename Request>
+    ServerResponse<ResultPayload, Request> const& ServerResponse<ResultPayload, Request>::returnDefaultData() noexcept {
+        return Defaults::DEFAULT_SERVER_RESULT<ResultPayload, Request>;
+    }
 
 }
 

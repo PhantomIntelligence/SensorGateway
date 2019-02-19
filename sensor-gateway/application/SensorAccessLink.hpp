@@ -17,7 +17,7 @@
 #ifndef SENSORGATEWAY_SENSORACCESSLINK_HPP
 #define SENSORGATEWAY_SENSORACCESSLINK_HPP
 
-#include "sensor-gateway/server-communication/ResponseWriter.hpp"
+#include "sensor-gateway/parameter-control/SensorParameterController.hpp"
 
 namespace SensorGateway {
 
@@ -44,7 +44,7 @@ namespace SensorGateway {
         using TranslatorMessageScheduler = DataFlow::DataProcessingScheduler<SensorMessage, DataTranslator, 1>;
         using TranslatorRawDataScheduler = DataFlow::DataProcessingScheduler<SensorRawData, DataTranslator, 1>;
 
-        using ResponseWriter = SensorAccessLinkElement::ResponseWriter<SENSOR_STRUCTURES, SERVER_STRUCTURES>;
+        using SensorParameterController = SensorAccessLinkElement::SensorParameterController<SENSOR_STRUCTURES, SERVER_STRUCTURES>;
         using RequestHandler = SensorAccessLinkElement::RequestHandler<SENSOR_STRUCTURES, SERVER_STRUCTURES>;
 
         using SensorCommunicator = SensorAccessLinkElement::SensorCommunicator<SENSOR_STRUCTURES>;
@@ -64,9 +64,9 @@ namespace SensorGateway {
                 serverCommunicator(serverCommunicationStrategy,
                                    std::bind(&RequestHandler::handleGetParameterValueRequest, &requestHandler,
                                              std::placeholders::_1)),
+                requestHandler(&serverCommunicator, &sensorParameterController),
+                sensorParameterController(&requestHandler, &dataTranslator),
                 dataTranslator(dataTranslationStrategy),
-                responseWriter(&serverCommunicator),
-                requestHandler(&responseWriter, &dataTranslator),
                 sensorCommunicator(sensorCommunicationStrategy),
                 translatorMessageScheduler(&dataTranslator),
                 translatorRawDataScheduler(&dataTranslator),
@@ -143,7 +143,7 @@ namespace SensorGateway {
             dataTranslator.linkConsumer(&errorScheduler);
             serverCommunicator.linkConsumer(&errorScheduler);
             requestHandler.linkConsumer(&errorScheduler);
-            responseWriter.linkConsumer(&errorScheduler);
+            sensorParameterController.linkConsumer(&errorScheduler);
         }
 
         ServerCommunicationStrategy* serverCommunicationStrategy;
@@ -156,7 +156,7 @@ namespace SensorGateway {
         TranslatorMessageScheduler translatorMessageScheduler;
         TranslatorRawDataScheduler translatorRawDataScheduler;
 
-        ResponseWriter responseWriter;
+        SensorParameterController sensorParameterController;
         RequestHandler requestHandler;
 
         SensorCommunicationStrategy* sensorCommunicationStrategy;

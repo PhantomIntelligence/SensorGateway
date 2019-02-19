@@ -15,10 +15,10 @@
 
 */
 
-#ifndef SPIRITSENSORGATEWAY_RESPONSEWRITERTEST_CPP
-#define SPIRITSENSORGATEWAY_RESPONSEWRITERTEST_CPP
+#ifndef SENSORGATEWAY_SENSORPARAMETERCONTROLLERTEST_CPP
+#define SENSORGATEWAY_SENSORPARAMETERCONTROLLERTEST_CPP
 
-namespace ResponseWriterTestMock {
+namespace SensorParameterControllerTestMock {
 
 //    using RealisticDataStructures = Sensor::Test::RealisticImplementation::Structures;
 //    using DevNullTranslationStrategy = Mock::DevNullDataTranslationStrategyMock<RealisticDataStructures>;
@@ -105,6 +105,6 @@ namespace ResponseWriterTestMock {
 //    };
 }
 
-#endif //SPIRITSENSORGATEWAY_RESPONSEWRITERTEST_CPP
+#endif //SENSORGATEWAY_SENSORPARAMETERCONTROLLERTEST_CPP
 
 

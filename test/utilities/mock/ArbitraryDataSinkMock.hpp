@@ -17,8 +17,6 @@
 #ifndef SENSORGATEWAY_ARBITRARYDATASINKMOCK_HPP
 #define SENSORGATEWAY_ARBITRARYDATASINKMOCK_HPP
 
-#include <list>
-
 #include "test/utilities/data-model/DataModelFixture.h"
 #include "sensor-gateway/common/data-flow/DataSink.hpp"
 

@@ -14,8 +14,8 @@
 	limitations under the License.
 */
 
-#ifndef SERVERGATEWAY_CATCHINGREQUESTHANDLERMOCK_HPP
-#define SERVERGATEWAY_CATCHINGREQUESTHANDLERMOCK_HPP
+#ifndef SENSORGATEWAY_CATCHINGREQUESTHANDLERMOCK_HPP
+#define SENSORGATEWAY_CATCHINGREQUESTHANDLERMOCK_HPP
 
 #include "sensor-gateway/server-communication/RequestHandler.hpp"
 
@@ -60,7 +60,6 @@ namespace Mock {
         }
 
         void setExpectedNumberOfGetParameterValueRequest(uint16_t newExpectedValue) {
-
             expectedNumberOfGetParameterValueRequest = newExpectedValue;
         }
 
@@ -80,4 +79,4 @@ namespace Mock {
     };
 }
 
-#endif //SERVERGATEWAY_CATCHINGREQUESTHANDLERMOCK_HPP
+#endif //SENSORGATEWAY_CATCHINGREQUESTHANDLERMOCK_HPP

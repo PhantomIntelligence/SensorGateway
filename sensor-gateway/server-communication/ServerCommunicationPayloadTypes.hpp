@@ -75,6 +75,10 @@ namespace ServerCommunication {
 
             static inline GetParameterValuePayload const& returnDefaultData() noexcept;
 
+            std::string const& getName() const noexcept {
+                return name;
+            }
+
         private:
 
             std::string name;

@@ -14,8 +14,8 @@
 	limitations under the License.
 */
 
-#ifndef SERVERGATEWAY_REQUESTRESPONSESPECIALIZEDSERVERCOMMUNICATIONSTRATEGYMOCK_HPP
-#define SERVERGATEWAY_REQUESTRESPONSESPECIALIZEDSERVERCOMMUNICATIONSTRATEGYMOCK_HPP
+#ifndef SENSORGATEWAY_REQUESTRESPONSESPECIALIZEDSERVERCOMMUNICATIONSTRATEGYMOCK_HPP
+#define SENSORGATEWAY_REQUESTRESPONSESPECIALIZEDSERVERCOMMUNICATIONSTRATEGYMOCK_HPP
 
 #include <test/utilities/data-model/DataModelFixture.h>
 #include "sensor-gateway/server-communication/ServerCommunicationStrategy.hpp"
@@ -41,47 +41,12 @@ namespace Mock {
         using GetParameterValueContentList = std::list<GetParameterValueContent>;
 //        using SetParameterValueBooleanContent = std::list<super::SetParameterValueBooleanContent>;
 
-        using AvailableParameters = typename T::Parameters;
-        using AllFakeParameters = Sensor::FakeParameter::AllFakeParameters;
-
         using ParameterNames = std::list<std::string>;
-
-        static auto availableParameterNames() noexcept {
-            AvailableParameters availableParameters;
-            ParameterNames validParameters;
-            auto validNames = availableParameters.getNames();
-
-            ParameterNames validParameterNames;
-            std::string name;
-            for (auto validNameIndex = 0u;
-                 validNameIndex < AvailableParameters::NUMBER_OF_AVAILABLE_PARAMETERS; ++validNameIndex) {
-                name = validNames[validNameIndex];
-                validParameterNames.push_front(name);
-            }
-
-            return validParameterNames;
-        }
-
-        static auto nonAvailableParameterNames() noexcept {
-            // Ensure we have AT LEAST 1 invalid parameter name
-            AvailableParameters availableParameters;
-            AllFakeParameters allFakeParameters;
-            auto allNames = allFakeParameters.getNames();
-
-            ParameterNames invalidParameterNames = {TestFunctions::DataTestUtil::createRandomStringOfLength(100)};
-            for (uint16_t nameIndex = 0; nameIndex < AllFakeParameters::NUMBER_OF_AVAILABLE_PARAMETERS; ++nameIndex) {
-                auto parameterName = allNames[nameIndex];
-                if (!availableParameters.isAvailable(parameterName)) {
-                    invalidParameterNames.push_front(parameterName);
-                }
-            }
-            return invalidParameterNames;
-        }
 
     public:
         RequestResponseSpecializedServerCommunicationStrategyMock() :
-                validParameterNames(availableParameterNames()),
-                invalidParameterNames(nonAvailableParameterNames()),
+                validParameterNames(TestFunctions::Parameters::availableNames<typename T::Parameters>()),
+                invalidParameterNames(TestFunctions::Parameters::nonAvailableNames<typename T::Parameters>()),
                 // GetParameterValue
                 numberOfUniqueValidGetParameterValueContentsToReturn(0),
                 numberOfDuplicateValidGetParameterValueContentsToReturn(0),
@@ -103,33 +68,48 @@ namespace Mock {
             GetParameterValueContents getParameterValueContents;
 
             std::string name;
-            uint16_t totalContentCounter = 0;
 
-            auto endIterator = validParameterNames.begin();
+            auto totalNumberOfRequestToReturn = numberOfUniqueValidGetParameterValueContentsToReturn +
+                                                numberOfDuplicateValidGetParameterValueContentsToReturn +
+                                                numberOfUniqueInvalidGetParameterValueContentsToReturn +
+                                                numberOfDuplicateInvalidGetParameterValueContentsToReturn;
+            assert(totalNumberOfRequestToReturn <= T::MAX_NUMBER_OF_CONCURRENT_REQUEST_OF_ONE_KIND);
+
+            auto returnedContentStartIterator = getParameterValueContents.begin();
+
+            // Valid unique requests
+            std::copy_n(validParameterNames.begin(), numberOfUniqueValidGetParameterValueContentsToReturn, returnedContentStartIterator);
+
             for (auto counter = 0u; counter < numberOfUniqueValidGetParameterValueContentsToReturn; ++counter) {
-                endIterator++;
+                returnedContentStartIterator++;
             }
 
-            std::copy(validParameterNames.begin(), endIterator, getParameterValueContents.begin());
-            totalContentCounter += numberOfUniqueValidGetParameterValueContentsToReturn;
-// TODO:
-//            uint_16_t duplicateValidRequestCounter = 0;
-//            while (duplicateValidRequestCounter != numberOfDuplicateValidGetParameterValueContentsToReturn) {
-//                ++duplicateValidRequestCounter;
-//            }
-//            uint_16_t uniqueInvalidRequestCounter = 0;
-//            while (uniqueInvalidRequestCounter != numberOfUniqueInvalidGetParameterValueContentsToReturn) {
-//                ++uniqueInvalidRequestCounter;
-//            }
-//            uint_16_t duplicateInvalidRequestCounter = 0;
-//            while (duplicateInvalidRequestCounter != numberOfDuplicateInvalidGetParameterValueContentsToReturn) {
-//                ++duplicateInvalidRequestCounter;
-//            }
+            // Valid duplicate requests
+            uint16_t duplicateValidRequestCounter = 0;
+            while (duplicateValidRequestCounter != numberOfDuplicateValidGetParameterValueContentsToReturn) {
+                std::copy_n(validParameterNames.begin(), 1, returnedContentStartIterator);
+                returnedContentStartIterator++;
+                duplicateValidRequestCounter++;
+            }
 
-            // WARNING! This mock implementation of sendGetParameterValueResponse needs to be slowed down because the way gtest works. DO NOT REMOVE.
+            // Invalid unique requests
+            std::copy_n(invalidParameterNames.begin(), numberOfUniqueInvalidGetParameterValueContentsToReturn, returnedContentStartIterator);
 
-            std::copy(getParameterValueContents.cbegin(), getParameterValueContents.cend(),
-                      returnedGetParameterValueContents.begin());
+            for (auto counter = 0u; counter < numberOfUniqueInvalidGetParameterValueContentsToReturn; ++counter) {
+                returnedContentStartIterator++;
+            }
+
+            // Invalid duplicate requests
+            uint16_t duplicateInvalidRequestCounter = 0;
+            while (duplicateInvalidRequestCounter != numberOfDuplicateInvalidGetParameterValueContentsToReturn) {
+                std::copy_n(invalidParameterNames.begin(), 1, returnedContentStartIterator);
+                returnedContentStartIterator++;
+                duplicateInvalidRequestCounter++;
+            }
+
+
+            // Backup for test validation
+            std::copy_n(getParameterValueContents.cbegin(), totalNumberOfRequestToReturn, returnedGetParameterValueContents.begin());
 
             return getParameterValueContents;
         };
@@ -170,7 +150,7 @@ namespace Mock {
             numberOfDuplicateInvalidGetParameterValueContentsToReturn = newNumberToReturn;
         }
 
-        GetParameterValueContents const& getReturnedGetParameterValueRequest() const noexcept {
+        GetParameterValueContents const& getReturnedGetParameterValueRequest() noexcept {
             LockGuard guard(getParameterValueMutex);
             return returnedGetParameterValueContents;
         }
@@ -206,4 +186,4 @@ namespace Mock {
     };
 }
 
-#endif // SERVERGATEWAY_REQUESTRESPONSESPECIALIZEDSERVERCOMMUNICATIONSTRATEGYMOCK_HPP
+#endif // SENSORGATEWAY_REQUESTRESPONSESPECIALIZEDSERVERCOMMUNICATIONSTRATEGYMOCK_HPP

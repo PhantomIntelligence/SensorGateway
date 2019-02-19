@@ -19,11 +19,10 @@
 #define SENSORGATEWAY_SERVERCOMMUNICATORTEST_CPP
 
 #include <gtest/gtest.h>
-#include <list>
 
 #include "sensor-gateway/server-communication/ServerCommunicator.hpp"
 #include "test/utilities/data-model/DataModelFixture.h"
-#include "test/utilities/mock/ArbitraryDataSinkMock.hpp"
+#include "test/utilities/assertion/ErrorAssertion.hpp"
 #include "test/utilities/mock/CatchingRequestHandlerMock.hpp"
 #include "test/utilities/mock/CatchingServerCommunicationStrategyMock.hpp"
 #include "test/utilities/mock/ErrorThrowingServerCommunicationStrategyMock.hpp"
@@ -36,12 +35,11 @@ class ServerCommunicatorTest : public ::testing::Test {
 
 public:
 
-    using Error = ErrorHandling::SensorAccessLinkError;
-    using ErrorSinkMock = Mock::ArbitraryDataSinkMock<Error>;
-    using ErrorProcessingScheduler = DataFlow::DataProcessingScheduler<Error, ErrorSinkMock, 1>;
+    using RequestAssembler = Assemble::ServerRequestAssembler;
 
     using DataStructures = Sensor::Test::Simple::Structures;
     using ParameterListForThisTestCase = DataStructures::Parameters;
+
     using MockServerCommunicatorStrategy = Mock::CatchingServerCommunicationStrategyMock<DataStructures>;
     using ThrowingServerCommunicationStrategy = Mock::ErrorThrowingServerCommunicationStrategyMock<DataStructures>;
     using RequestResponseServerCommunicationStrategy = Mock::RequestResponseSpecializedServerCommunicationStrategyMock<DataStructures>;
@@ -65,7 +63,6 @@ protected:
 
     void assertRequestHandlerReceivesExpectedNumberOfValidRequestsWithStrategy(MockRequestHandler* mockRequestHandler,
                                                                                ServerCommunicator* serverCommunicator) {
-
         serverCommunicator->openConnection(SERVER_ADDRESS);
         mockRequestHandler->waitForExpectedNumberOfGetParameterValueRequest();
         serverCommunicator->terminateAndJoin();
@@ -85,49 +82,16 @@ protected:
     }
 
     auto recreateGetParameterValueRequestFromName(
-            std::string const& content) const -> std::tuple<GetParameterValueRequest, bool, bool> const {
-        GetParameterValueRequest getParameterRequest = Assemble::ServerRequest::getParameterValueRequest(content);
-        bool willCreateError = false;
-        try {
-            Assemble::ServerRequest::ensureParameterIsAvailable<ParameterListForThisTestCase>(content);
-        } catch (ErrorHandling::SensorAccessLinkError& e) {
-            willCreateError = true;
+            std::string const& content) const -> std::tuple<GetParameterValueRequest, bool> const {
+        GetParameterValueRequest getParameterRequest = RequestAssembler::getParameterValueRequest(content);
+        ParameterListForThisTestCase parameters;
+        bool requestIsValid = parameters.isAvailable(content);
+        if (!requestIsValid) {
+            getParameterRequest.makeBad();
         }
         bool hasNonDefaultContent = getParameterRequest != GetParameterValueRequest::returnDefaultData();
-        return std::make_tuple(getParameterRequest, hasNonDefaultContent, willCreateError);
+        return std::make_tuple(getParameterRequest, hasNonDefaultContent);
     };
-
-    Error formatStrategyErrorWithCorrectOrigin(Error strategyIssuedError, std::string origin) const noexcept {
-        Error formattedError(origin + ErrorHandling::Message::SEPARATOR + strategyIssuedError.getOrigin(),
-                             strategyIssuedError.getCategory(),
-                             strategyIssuedError.getSeverity(),
-                             strategyIssuedError.getErrorCode(),
-                             strategyIssuedError.getMessage());
-        return formattedError;
-    }
-
-    ::testing::AssertionResult expectedErrorHasBeenThrown(ErrorSinkMock* sink, Error expectedError) const noexcept {
-
-        auto producedErrors = sink->getConsumedData();
-        bool expectedErrorPublished = true;
-        auto lastParsedError = ErrorHandling::SensorAccessLinkError::returnDefaultData();
-        for (auto t = 0; t < producedErrors.size() && expectedErrorPublished; ++t) {
-            lastParsedError = producedErrors.front();
-            expectedErrorPublished = lastParsedError == expectedError;
-            producedErrors.pop_front();
-        }
-        if (expectedErrorPublished) {
-            return ::testing::AssertionSuccess();
-        } else {
-            return ::testing::AssertionFailure()
-                    << "\nExpected : \n"
-                    << expectedError.fetchDetailedMessage()
-                    << "\nGot : \n"
-                    << lastParsedError.fetchDetailedMessage()
-                    << "\n";
-        }
-    }
-
 };
 
 TEST_F(ServerCommunicatorTest, given__when_connect_then_callsOpenConnectionInStrategy) {
@@ -372,7 +336,7 @@ TEST_F(ServerCommunicatorTest,
 
     scheduler.terminateAndJoin();
 
-    ASSERT_TRUE(expectedErrorHasBeenThrown(&sink, expectedError));
+    ASSERT_TRUE(Assert::errorHasBeenThrown(&sink, expectedError));
 }
 
 TEST_F(ServerCommunicatorTest,
@@ -395,7 +359,7 @@ TEST_F(ServerCommunicatorTest,
 
     scheduler.terminateAndJoin();
 
-    ASSERT_TRUE(expectedErrorHasBeenThrown(&sink, expectedError));
+    ASSERT_TRUE(Assert::errorHasBeenThrown(&sink, expectedError));
 }
 
 TEST_F(ServerCommunicatorTest,
@@ -419,7 +383,7 @@ TEST_F(ServerCommunicatorTest,
 
     scheduler.terminateAndJoin();
 
-    ASSERT_TRUE(expectedErrorHasBeenThrown(&sink, expectedError));
+    ASSERT_TRUE(Assert::errorHasBeenThrown(&sink, expectedError));
 }
 
 TEST_F(ServerCommunicatorTest,
@@ -443,7 +407,7 @@ TEST_F(ServerCommunicatorTest,
 
     scheduler.terminateAndJoin();
 
-    ASSERT_TRUE(expectedErrorHasBeenThrown(&sink, expectedError));
+    ASSERT_TRUE(Assert::errorHasBeenThrown(&sink, expectedError));
 }
 
 TEST_F(ServerCommunicatorTest, given__when_isServerConnected_then_returnFalse) {
@@ -542,7 +506,7 @@ TEST_F(ServerCommunicatorTest,
     serverCommunicator.terminateAndJoin();
     scheduler.terminateAndJoin();
 
-    ASSERT_TRUE(expectedErrorHasBeenThrown(&sink, expectedError));
+    ASSERT_TRUE(Assert::errorHasBeenThrown(&sink, expectedError));
 }
 
 TEST_F(ServerCommunicatorTest,
@@ -562,7 +526,7 @@ TEST_F(ServerCommunicatorTest,
 }
 
 TEST_F(ServerCommunicatorTest,
-       given_aServerStrategyThatReturnsANumberOfUniqueValidGetParameterValueContent_when_openConnection_then_sendsTheRequestHandleAllRequest) {
+       given_aServerStrategyThatReturnsANumberOfUniqueGetParameterValueContent_when_openConnection_then_sendsTheRequestHandleAllRequest) {
     auto expectedNumberOfRequest = 3u; // Warning: do not expect a bigger *unique* number than the number of available parameter names
 
     MockRequestHandler mockRequestHandler;
@@ -578,38 +542,41 @@ TEST_F(ServerCommunicatorTest,
     serverCommunicator.terminateAndJoin();
 }
 
-//TEST_F(ServerCommunicatorTest,
-//       given_aServerStrategyThatReturnsANumberOfUniqueValidGetParameterValueContent_when_openConnection_then_sendsTheRequestHandleAllRequest) {
-//    auto expectedNumberOfRequest = 3u; // Warning: do not expect a bigger *unique* number than the number of available parameter names
-//    RequestResponseServerCommunicationStrategy requestResponseStrategy;
-//    requestResponseStrategy.setNumberOfUniqueValidGetParameterValueContentsToReturn(expectedNumberOfRequest);
-//    MockRequestHandler mockRequestHandler;
-//    mockRequestHandler.setExpectedNumberOfGetParameterValueRequest(expectedNumberOfRequest);
-//
-//    ServerCommunicator serverCommunicator(&requestResponseStrategy,
-//                                          bindHandlerGetParameterValueTo(&mockRequestHandler));
-//
-//    serverCommunicator.openConnection(SERVER_ADDRESS);
-//    mockRequestHandler.waitForExpectedNumberOfGetParameterValueRequest();
-//    serverCommunicator.terminateAndJoin();
-//
-//    auto expectedRequestContent = requestResponseStrategy.getReturnedGetParameterValueRequest();
-//    std::list<GetParameterValueRequest> getParameterValueRequests;
-//    auto requestCount = 0u;
-//    bool requestHasNonDefaultContent = false;
-//    bool requestWillCreateError = false;
-//    GetParameterValueRequest getParameterValueRequest;
-//
-//    std::tie(getParameterValueRequest, requestHasNonDefaultContent, requestWillCreateError) = recreateGetParameterValueRequestFromName(expectedRequestContent[requestCount++]);
-//
-//    while (requestHasNonDefaultContent) {
-//        getParameterValueRequests.emplace_back(std::move(getParameterValueRequest));
-//        std::tie(getParameterValueRequest, requestHasNonDefaultContent, requestWillCreateError) = recreateGetParameterValueRequestFromName(expectedRequestContent[requestCount++]);
-//    };
-//    auto numberOfRequestSentToHandler = getParameterValueRequests.size();
-//
-//    ASSERT_TRUE(hasReceivedExpectedNumberOfCall);
-//}
+TEST_F(ServerCommunicatorTest,
+       given_aServerStrategyThatReturnsANumberOfDuplicateGetParameterValueContent_when_openConnection_then_sendsTheRequestHandleAllRequest) {
+    auto numberOfUniqueRequest = 2u;
+    auto numberOfDuplicateRequest = 3u;
+
+    auto expectedNumberOfRequest = numberOfUniqueRequest + numberOfDuplicateRequest;
+
+    MockRequestHandler mockRequestHandler;
+    mockRequestHandler.setExpectedNumberOfGetParameterValueRequest(expectedNumberOfRequest);
+    RequestResponseServerCommunicationStrategy requestResponseStrategy;
+    requestResponseStrategy.setNumberOfUniqueValidGetParameterValueContentsToReturn(numberOfUniqueRequest);
+    requestResponseStrategy.setNumberOfDuplicateValidGetParameterValueContentsToReturn(numberOfDuplicateRequest);
+
+    ServerCommunicator serverCommunicator(&requestResponseStrategy,
+                                          bindHandlerGetParameterValueTo(&mockRequestHandler));
+
+    assertRequestHandlerReceivesExpectedNumberOfValidRequestsWithStrategy(&mockRequestHandler,
+                                                                          &serverCommunicator);
+    serverCommunicator.terminateAndJoin();
+
+    auto sentRequestContent = requestResponseStrategy.getReturnedGetParameterValueRequest();
+    auto receivedRequests = mockRequestHandler.getReceivedGetParameterValueRequests();
+    auto requestCounter = 0u;
+    while (requestCounter < expectedNumberOfRequest) {
+        auto expectedRequestContent = sentRequestContent.at(requestCounter);
+        auto expectedRequest = Assemble::ServerRequestAssembler::getParameterValueRequest(expectedRequestContent);
+        auto receivedRequest = receivedRequests.front();
+        receivedRequests.pop_front();
+        ASSERT_EQ(expectedRequest, receivedRequest);
+        requestCounter++;
+    }
+}
+
+// TODO : write test : when sendResponse(std::move(response)) -> calls strategy once
+// TODO : write test : when sendResponse(std::move(response)) -> calls strategy with output of `auto ServerResponse.formatForCommunicationOut const -> std::tuple<RequestResult, Request>`
 
 #endif //SENSORGATEWAY_SERVERCOMMUNICATORTEST_CPP
 

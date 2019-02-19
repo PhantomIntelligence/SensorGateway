@@ -19,6 +19,7 @@
 #define SENSORGATEWAY_SENSORCOMMUNICATORTEST_CPP
 
 #include <gtest/gtest.h>
+#include "test/utilities/assertion/ErrorAssertion.hpp"
 
 #include "sensor-gateway/sensor-communication/SensorCommunicator.hpp"
 #include "test/utilities/mock/ArbitraryDataSinkMock.hpp"
@@ -235,15 +236,6 @@ protected:
 
     SimpleRawDataList fetchRawDataProducedBySensorCommunicatorExecution(
             SimpleRawDataList&& rawDataCycles, uint8_t numberOfRawDataToReceive);
-
-    Error formatStrategyErrorWithCorrectOrigin(Error strategyIssuedError, std::string origin) const noexcept {
-        Error formattedError(origin + ErrorHandling::Message::SEPARATOR + strategyIssuedError.getOrigin(),
-                             strategyIssuedError.getCategory(),
-                             strategyIssuedError.getSeverity(),
-                             strategyIssuedError.getErrorCode(),
-                             strategyIssuedError.getMessage());
-        return formattedError;
-    }
 
     ::testing::AssertionResult openConnectionIsCalledAfterStrategyHasThrown(
             ThrowingSensorCommunicationStrategyMock* throwingStrategy) {

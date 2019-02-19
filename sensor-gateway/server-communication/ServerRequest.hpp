@@ -78,6 +78,10 @@ namespace ServerCommunication {
 
         static ServerRequest const& returnDefaultData() noexcept;
 
+        std::string const& getPayloadName() const noexcept{
+            return payload.getName();
+        }
+
     private:
         ServerRequest(PayloadType const& payload, bool badRequest) noexcept :
                 payload(payload), badRequest(badRequest) {}
@@ -103,30 +107,9 @@ namespace ServerCommunication {
         return Defaults::DEFAULT_SERVER_REQUEST<PayloadType>;
     }
 
-    template<class... R>
-    class BulkRequest {
-
-    public:
-
-        static auto const REQUEST_SIZE = sizeof...(R);
-
-        using Requests = std::tuple<R...>;
-
-        explicit BulkRequest() : requests(std::make_tuple(R()...)) {}
-
-        template<class F>
-        constexpr auto processRequests(F f) const {
-            return apply(requests, f);
-        }
-
-    private :
-        Requests requests;
-    };
-
     namespace RequestTypes {
         using GetParameterValue = ServerRequest<PayloadTypes::GetParameterValuePayload>;
     }
-
 }
 
 

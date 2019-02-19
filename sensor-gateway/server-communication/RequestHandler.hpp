@@ -17,36 +17,39 @@
 #ifndef SENSORGATEWAY_REQUESTHANDLER_HPP
 #define SENSORGATEWAY_REQUESTHANDLER_HPP
 
-#include "sensor-gateway/data-translation/DataTranslator.hpp"
 #include "ServerRequest.hpp"
+#include "RequestHandlingErrorFactory.h"
 
 namespace SensorAccessLinkElement {
 
+    // WARNING : This declaration is made here to break a circular dependency. DO NOT REMOVE
+    template<class SERVER_STRUCTURES>
+    class ServerCommunicator;
 
     // WARNING : This declaration is made here to break a circular dependency. DO NOT REMOVE
     template<class SENSOR_STRUCTURES, class SERVER_STRUCTURES>
-    class ResponseWriter;
+    class SensorParameterController;
 
     template<class SENSOR_STRUCTURES, class SERVER_STRUCTURES>
     class RequestHandler : public DataFlow::DataSource<ErrorHandling::SensorAccessLinkError> {
 
     protected:
 
-        using DataTranslator = SensorAccessLinkElement::DataTranslator<SENSOR_STRUCTURES, SERVER_STRUCTURES>;
-        using ResponseWriter = SensorAccessLinkElement::ResponseWriter<SENSOR_STRUCTURES, SERVER_STRUCTURES>;
+        using SensorParameterController = SensorAccessLinkElement::SensorParameterController<SENSOR_STRUCTURES, SERVER_STRUCTURES>;
+        using ServerCommunicator = SensorAccessLinkElement::ServerCommunicator<SERVER_STRUCTURES>;
 
         using ControlMessage = typename SENSOR_STRUCTURES::ControlMessage;
-        using AvailableParameters = typename SERVER_STRUCTURES::Parameters;  // TODO: Extract this in a `Sensor` or `SensorParameters` class
+        using AvailableParameters = typename SERVER_STRUCTURES::Parameters;
 
         using ErrorSource = DataFlow::DataSource<ErrorHandling::SensorAccessLinkError>;
 
         using GetParameterValueRequest = ServerCommunication::RequestTypes::GetParameterValue;
 
     public:
-        explicit RequestHandler(ResponseWriter* responseWriter,
-                                DataTranslator* dataTranslator) :
-                responseWriter(responseWriter),
-                dataTranslator(dataTranslator) {}
+        explicit RequestHandler(ServerCommunicator* serverCommunicator,
+                                SensorParameterController* sensorParameterController) :
+                serverCommunicator(serverCommunicator),
+                sensorParameterController(sensorParameterController) {}
 
         ~RequestHandler() noexcept {};
 
@@ -58,8 +61,25 @@ namespace SensorAccessLinkElement {
 
         RequestHandler& operator=(RequestHandler&& other)& noexcept = delete;
 
+        void ensureParameterIsAvailable(std::string const& parameterName) {
+            auto parameterAvailable = parameters.isAvailable(parameterName);
+            if (!parameterAvailable) {
+                ErrorHandling::throwRequestHandlingError(
+                        ErrorHandling::INVALID_PARAMETER_NAME,
+                        ErrorHandling::Origin::SERVER_REQUEST_HANDLING_PARAMETER,
+                        ErrorHandling::Message::PARAMETER_NOT_AVAILABLE);
+            }
+        }
+
         virtual void handleGetParameterValueRequest(GetParameterValueRequest&& getParameterValueRequest) {
-            // TODO : ensure request is valid, if not getParameterValueRequest.makeBad();
+            try {
+                ensureParameterIsAvailable(getParameterValueRequest.getPayloadName());
+            } catch(ErrorHandling::SensorAccessLinkError& error) {
+
+                ErrorSource::produce(std::move(error));
+            }
+
+            // TODO : If request.isBadRequest() ->
             /**
              *  TODO:
              *  - Give pointer to *this* to ServerCommunicator
@@ -73,8 +93,8 @@ namespace SensorAccessLinkElement {
 
     private:
 
-        ResponseWriter* responseWriter;
-        DataTranslator* dataTranslator;
+        ServerCommunicator* serverCommunicator;
+        SensorParameterController* sensorParameterController;
 
         AvailableParameters parameters;
     };

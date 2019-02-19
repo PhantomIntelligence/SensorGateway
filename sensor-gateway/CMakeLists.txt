@@ -13,7 +13,7 @@ file(GLOB TIME_TRACKING_STRUCTURE_FILES "${DOT}/common/data-structure/time-track
 file(GLOB PARAMETER_STRUCTURE_FILES "${DOT}/common/data-structure/parameter/*")
 file(GLOB SENSOR_STRUCTURE_FILES "${DOT}/common/data-structure/sensor/*")
 file(GLOB SPIRIT_STRUCTURE_FILES "${DOT}/common/data-structure/gateway/*")
-file(GLOB DOMAIN_FILES "${DOT}/domain/*")
+file(GLOB PARAMETER_CONTROL_FILES "${DOT}/parameter-control/*")
 file(GLOB SERVER_COMMUNICATION_FILES "${DOT}/server-communication/*")
 file(GLOB TRANSLATION_FILES "${DOT}/data-translation/*")
 file(GLOB SENSOR_COMMUNICATION_FILES "${DOT}/sensor-communication/*")
@@ -29,7 +29,7 @@ add_library(${PROJECT_NAME} SHARED
         ${PARAMETER_STRUCTURE_FILES}
         ${SPIRIT_STRUCTURE_FILES}
         ${SENSOR_STRUCTURE_FILES}
-        ${DOMAIN_FILES}
+        ${PARAMETER_CONTROL_FILES}
         ${SERVER_COMMUNICATION_FILES}
         ${TRANSLATION_FILES}
         ${SENSOR_COMMUNICATION_FILES}

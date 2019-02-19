@@ -42,6 +42,8 @@ namespace ErrorHandling {
     namespace Message {
         std::string const SEPARATOR = " - ";
         std::string const EMPTY_MESSAGE = "";
+
+        std::string const PARAMETER_NOT_AVAILABLE = "Parameter is not available";
     }
 
     enum Severity : int32_t {

@@ -21,9 +21,9 @@
 
 namespace ErrorHandling {
 
-    [[noreturn]] static void throwRequestHandlingError(GatewayErrorCode const& errorCode,
-                                                       std::string const& callOrigin,
-                                                       std::string const& message = Message::EMPTY_MESSAGE) {
+    static SensorAccessLinkError createRequestHandlingError(GatewayErrorCode const& errorCode,
+                                                             std::string const& callOrigin,
+                                                             std::string const& message = Message::EMPTY_MESSAGE) {
 
         static std::string const REQUEST_HANDLING_NAME = "Request Handling";
 
@@ -44,8 +44,15 @@ namespace ErrorHandling {
             severity = EMERGENCY;
             errorMessage = "Error unknown for " + REQUEST_HANDLING_NAME;
         }
-        throw SensorAccessLinkError(origin, category, severity, errorCode, errorMessage);
+        return SensorAccessLinkError(origin, category, severity, errorCode, errorMessage);
     }
+
+    [[noreturn]] static void throwRequestHandlingError(GatewayErrorCode const& errorCode,
+                                                       std::string const& callOrigin,
+                                                       std::string const& message) {
+        throw createRequestHandlingError(errorCode, callOrigin, message);
+    }
+
 
 }
 #endif //SENSORGATEWAY_REQUESTHANDLINGERRORFACTORY_H

@@ -14,40 +14,33 @@
 	limitations under the License.
 */
 
-#ifndef SENSORGATEWAY_SENSORREQUESTASSEMBLER_HPP
-#define SENSORGATEWAY_SENSORREQUESTASSEMBLER_HPP
+#ifndef SERVERGATEWAY_SERVERREQUESTASSEMBLER_HPP
+#define SERVERGATEWAY_SERVERREQUESTASSEMBLER_HPP
 
 #include "ServerRequest.hpp"
 #include "RequestHandlingErrorFactory.h"
 
 namespace Assemble {
-    namespace ServerRequest {
 
-        template<class Parameters>
-        static void ensureParameterIsAvailable(std::string const& parameterName) {
-            Parameters parameters;
-            auto parameterAvailable = parameters.isAvailable(parameterName);
-            if (!parameterAvailable) {
-                ErrorHandling::throwRequestHandlingError(
-                        ErrorHandling::INVALID_PARAMETER_NAME,
-                        ErrorHandling::Origin::SERVER_REQUEST_HANDLING_PARAMETER,
-                        "Parameter is not available");
-            }
-        }
+    /**
+     * @note This is not tested by purpose, it is essentially a Factory.
+     */
+    class ServerRequestAssembler {
 
-        /**
-         * @note This is not tested by purpose, it is essentially a Factory.
-         * @param parameterName
-         * @return
-         */
+    public:
+
+        explicit ServerRequestAssembler() = delete;
+
+        ~ServerRequestAssembler() = delete;
+
         static auto getParameterValueRequest(std::string const& payloadContent) {
             using GetParameterValueRequest = ServerCommunication::RequestTypes::GetParameterValue;
             ServerCommunication::PayloadTypes::GetParameterValuePayload payload{payloadContent};
             GetParameterValueRequest request(payload);
             return request;
         }
-    }
+    };
 }
 
 
-#endif //SENSORGATEWAY_SENSORREQUESTASSEMBLER_HPP
+#endif //SERVERGATEWAY_SERVERREQUESTASSEMBLER_HPP

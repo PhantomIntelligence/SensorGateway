@@ -39,7 +39,7 @@ namespace SensorAccessLinkElement {
         using MessageSink = DataFlow::DataSink<Message>;
         using RawDataSink = DataFlow::DataSink<RawData>;
 
-        using Parameters = typename T::Parameters;
+        using RequestAssembler = Assemble::ServerRequestAssembler;
 
         using GetParameterValueRequest = ServerCommunication::RequestTypes::GetParameterValue;
         using GetParameterValueContent = typename ServerCommunicationStrategy::GetParameterValueContent;
@@ -139,31 +139,29 @@ namespace SensorAccessLinkElement {
         }
 
         void handleIncomingGetParameterValueRequests() {
-            GetParameterValueContents getParameterValueContents;
+            GetParameterValueContents contents;
             try {
-                getParameterValueContents = serverCommunicationStrategy->fetchGetParameterValueContents();
+                contents = serverCommunicationStrategy->fetchGetParameterValueContents();
             } catch (ErrorHandling::SensorAccessLinkError& strategyError) {
                 addOriginAndHandleError(std::move(strategyError),
                                         ErrorHandling::Origin::SERVER_COMMUNICATOR_FETCH_GET_PARAMETER_VALUE);
             }
 
+            // TODO: Add logic to handle requests in bulk instead of one by one
             auto requestCount = 0u;
-            bool requestHasToBeHandled = false;
-            GetParameterValueRequest getParameterRequest;
+            bool handleRequest = false;
+            GetParameterValueRequest request;
 
-            std::tie(getParameterRequest, requestHasToBeHandled) = assembleGetParameterValueRequestFromContent(
-                    getParameterValueContents[requestCount++]);
-
-            while (requestHasToBeHandled) {
-                handleGetParameterValueRequest(std::move(getParameterRequest));
-                std::tie(getParameterRequest, requestHasToBeHandled) = assembleGetParameterValueRequestFromContent(
-                        getParameterValueContents[requestCount++]);
+            std::tie(request, handleRequest) = assembleGetParameterValueRequestFrom(contents[requestCount++]);
+            while (handleRequest) {
+                handleGetParameterValueRequest(std::move(request));
+                std::tie(request, handleRequest) = assembleGetParameterValueRequestFrom(contents[requestCount++]);
             };
         }
 
-        auto assembleGetParameterValueRequestFromContent(
+        auto assembleGetParameterValueRequestFrom(
                 GetParameterValueContent const& content) const -> std::tuple<GetParameterValueRequest, bool> const {
-            GetParameterValueRequest getParameterRequest = Assemble::ServerRequest::getParameterValueRequest(content);
+            GetParameterValueRequest getParameterRequest = RequestAssembler::getParameterValueRequest(content);
             bool hasToBeHandled = getParameterRequest != DEFAULT_GET_PARAMETER_VALUE_REQUEST;
             return std::make_tuple(getParameterRequest, hasToBeHandled);
         };

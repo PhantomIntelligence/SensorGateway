@@ -14,22 +14,24 @@
 	limitations under the License.
 */
 
-#ifndef SENSORGATEWAY_RESPONSEWRITER_HPP
-#define SENSORGATEWAY_RESPONSEWRITER_HPP
+#ifndef SENSORGATEWAY_SENSORPARAMETERCONTROLLER_HPP
+#define SENSORGATEWAY_SENSORPARAMETERCONTROLLER_HPP
 
+#include "sensor-gateway/data-translation/DataTranslator.hpp"
 #include "sensor-gateway/server-communication/ServerCommunicator.hpp"
 
 namespace SensorAccessLinkElement {
 
     template<class SENSOR_STRUCTURES, class SERVER_STRUCTURES>
-    class ResponseWriter : public DataFlow::DataSink<typename SENSOR_STRUCTURES::ControlMessage>,
-                           public DataFlow::DataSource<ErrorHandling::SensorAccessLinkError> {
+    class SensorParameterController : public DataFlow::DataSink<typename SENSOR_STRUCTURES::ControlMessage>,
+                                      public DataFlow::DataSource<ErrorHandling::SensorAccessLinkError> {
 
     protected:
 
-        using ServerCommunicator = SensorAccessLinkElement::ServerCommunicator<SERVER_STRUCTURES>;
+        using RequestHandler = SensorAccessLinkElement::RequestHandler<SENSOR_STRUCTURES, SERVER_STRUCTURES>;
+        using DataTranslator = SensorAccessLinkElement::DataTranslator<SENSOR_STRUCTURES, SERVER_STRUCTURES>;
 
-        using ThisClass = ResponseWriter<SENSOR_STRUCTURES, SERVER_STRUCTURES>;
+        using ThisClass = SensorParameterController<SENSOR_STRUCTURES, SERVER_STRUCTURES>;
 
         using SensorControlMessage = typename SENSOR_STRUCTURES::ControlMessage;
 
@@ -43,24 +45,22 @@ namespace SensorAccessLinkElement {
 
     public:
 
-        explicit ResponseWriter(ServerCommunicator* serverCommunicator) :
-                serverCommunicator(serverCommunicator) {}
+        explicit SensorParameterController(RequestHandler* requestHandler,
+                                           DataTranslator* dataTranslator) :
+                requestHandler(requestHandler),
+                dataTranslator(dataTranslator) {}
 
-        ~ResponseWriter() noexcept {};
+        ~SensorParameterController() noexcept {};
 
-        ResponseWriter(ResponseWriter const& other) = delete;
+        SensorParameterController(SensorParameterController const& other) = delete;
 
-        ResponseWriter(ResponseWriter&& other) noexcept = delete;
+        SensorParameterController(SensorParameterController&& other) noexcept = delete;
 
-        ResponseWriter& operator=(ResponseWriter const& other)& = delete;
+        SensorParameterController& operator=(SensorParameterController const& other)& = delete;
 
-        ResponseWriter& operator=(ResponseWriter&& other)& noexcept = delete;
+        SensorParameterController& operator=(SensorParameterController&& other)& noexcept = delete;
 
-        void storeSensorControlMessage(SensorControlMessage sensorControlMessage) {
-
-        }
-
-        void consume(SensorControlMessage&& sensorControlMessageResponse) override {
+        virtual void consume(SensorControlMessage&& sensorControlMessageResponse) override {
             /**
              *  TODO:
              *  - Create schedulers and link'em in SensorAccessLink
@@ -74,11 +74,12 @@ namespace SensorAccessLinkElement {
 
     private:
 
-        ServerCommunicator* serverCommunicator;
+        RequestHandler* requestHandler;
+        DataTranslator* dataTranslator;
 
         SensorControlMessages sensorControlMessageRequests;
         SensorControlMessagePointers sensorControlMessageRequestPointers;
     };
 }
 
-#endif //SENSORGATEWAY_RESPONSEWRITER_HPP
+#endif //SENSORGATEWAY_SENSORPARAMETERCONTROLLER_HPP

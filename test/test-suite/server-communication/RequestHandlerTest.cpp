@@ -15,30 +15,63 @@
 
 */
 
-#ifndef SPIRITSENSORGATEWAY_REQUESTHANDLERTEST_CPP
-#define SPIRITSENSORGATEWAY_REQUESTHANDLERTEST_CPP
+#ifndef SENSORGATEWAY_REQUESTHANDLERTEST_CPP
+#define SENSORGATEWAY_REQUESTHANDLERTEST_CPP
 
 #include <gtest/gtest.h>
 
-#include "test/utilities/data-model/TestDataStructures.h"
+#include "test/utilities/data-model/DataModelFixture.h"
 #include "test/utilities/mock/DevNullDataTranslationStrategyMock.hpp"
+#include "test/utilities/assertion/ErrorAssertion.hpp"
 
-#include "sensor-gateway/server-communication/RequestHandler.hpp"
+#include "sensor-gateway/parameter-control/SensorParameterController.hpp"
+#include "sensor-gateway/server-communication/ServerRequestAssembler.hpp"
 
 class RequestHandlerTest : public ::testing::Test {
 
+public:
+
+    using DataStructures = Sensor::Test::RealisticImplementation::Structures;
+
 protected:
+
+    using AvailableParameters = DataStructures::Parameters;
+    using RequestHandler = SensorAccessLinkElement::RequestHandler<DataStructures, DataStructures>;
+
+    using RequestAssembler = Assemble::ServerRequestAssembler;
+    using GetParameterValueRequest = ServerCommunication::RequestTypes::GetParameterValue;
 
     RequestHandlerTest() = default;
 
     virtual ~RequestHandlerTest() = default;
+
+    GetParameterValueRequest givenValidGetParameterValueRequest() {
+        auto validParameterName = TestFunctions::Parameters::availableNames<AvailableParameters>().front();
+        auto validGetParameterValueRequest = RequestAssembler::getParameterValueRequest(validParameterName);
+        return validGetParameterValueRequest;
+    }
+
+    GetParameterValueRequest givenInvalidGetParameterValueRequest() {
+        auto invalidParameterName = TestFunctions::Parameters::nonAvailableNames<AvailableParameters>().front();
+        std::cout << "invalidParameterName : " << invalidParameterName << std::endl;
+        auto invalidGetParameterValueRequest = RequestAssembler::getParameterValueRequest(invalidParameterName);
+        return invalidGetParameterValueRequest;
+    }
+
+private:
+
 };
 
 namespace RequestHandlerTestMock {
 
-    using RealisticDataStructures = Sensor::Test::RealisticImplementation::Structures;
-    using DevNullTranslationStrategy = Mock::DevNullDataTranslationStrategyMock<RealisticDataStructures>;
+    using RealisticDataStructures = typename RequestHandlerTest::DataStructures;
 
+    class SensorParameterControllerMock final
+            : public SensorAccessLinkElement::SensorParameterController<RealisticDataStructures, RealisticDataStructures> {
+
+    };
+
+    using DevNullTranslationStrategy = Mock::DevNullDataTranslationStrategyMock<RealisticDataStructures>;
     using DataTranslator = SensorAccessLinkElement::DataTranslator<RealisticDataStructures, RealisticDataStructures>;
 
     class CatchingDataTranslatorMock final : public DataTranslator {
@@ -64,7 +97,6 @@ namespace RequestHandlerTestMock {
 
     protected:
 
-
         using super = DataTranslator;
 
         using super::SensorControlMessage;
@@ -75,24 +107,62 @@ namespace RequestHandlerTestMock {
                 DataTranslator(&devNullTranslationStrategy) {
         }
 
-
     private:
 
         DevNullTranslationStrategy devNullTranslationStrategy;
     };
 }
 
-//TEST_F(RequestHandlerTest,
-//       given_catchingDataTranslatorAndAGetParameterValueRequest_when_handleIncomingServerRequest_then_theDataTranslatorIsAskedToCreateAGetParameterValueControlMessage) {
-//    ASSERT_TRUE(dataHasPassedThroughCorrectly);
-//}
+TEST_F(RequestHandlerTest, given_anInvalidGetParameterValueRequest_when_handle_then_producesSensorAccessLinkError) {
 
-TEST_F(RequestHandlerTest,
-       given_aGetSensorParameterValueRequestALoopBackDataTranslatorAndAResponseWriter_when_handleIncomingServerRequest_then_asksResponseWriterToStoreAControlMessageFromTheTranslator) {
-//    ASSERT_TRUE(dataHasPassedThroughCorrectly);
+    auto numberOfErrorToReceive = 1;
+    ErrorSinkMock sink(numberOfErrorToReceive);
+    ErrorProcessingScheduler scheduler(&sink);
+
+    RequestHandler requestHandler(nullptr, nullptr);
+    requestHandler.linkConsumer(&scheduler);
+
+    auto invalidRequest = givenInvalidGetParameterValueRequest();
+    requestHandler.handleGetParameterValueRequest(std::move(invalidRequest));
+
+    sink.waitConsumptionToBeReached();
+    scheduler.terminateAndJoin();
+
+    Error expectedError = ErrorHandling::createRequestHandlingError(
+            ErrorHandling::INVALID_PARAMETER_NAME,
+            ErrorHandling::Origin::SERVER_REQUEST_HANDLING_PARAMETER,
+            ErrorHandling::Message::PARAMETER_NOT_AVAILABLE);
+
+    ASSERT_TRUE(Assert::errorHasBeenThrown(&sink, expectedError));
 }
 
 
-#endif //SPIRITSENSORGATEWAY_REQUESTHANDLERTEST_CPP
+TEST_F(RequestHandlerTest, given_anInvalidGetParameterValueRequest_when_handle_then_asksTheServerCommunicatorToRespondBadRequest) {
+    auto invalidRequest = givenInvalidGetParameterValueRequest();
+    auto expectedBadRequest = ServerCommunication::RequestTypes::GetParameterValue(invalidRequest);
+    expectedBadRequest.makeBad();
+
+//    ASSERT_TRUE(hasThrownError);
+
+
+// TODO : complete this test
+
+//
+//    using Sensor::Gateway::Parameters;
+//    using ImpossibleParameter = Sensor::FakeParameter::Impossible;
+//    using ImpossibleParameters = Parameters<ImpossibleParameter>;
+//    auto hasThrownError = false;
+//    try {
+//        Assemble::ServerRequestAssembler<ImpossibleParameters>::ensureParameterIsAvailable(
+//                ImpossibleParameter::getStringifiedName());
+//    } catch (ErrorHandling::SensorAccessLinkError& strategyError) {
+//        hasThrownError = true;
+//    }
+//    ASSERT_EQ(expectedBadRequest, actualRequest);
+    SUCCEED();
+}
+
+
+#endif //SENSORGATEWAY_REQUESTHANDLERTEST_CPP
 
 
