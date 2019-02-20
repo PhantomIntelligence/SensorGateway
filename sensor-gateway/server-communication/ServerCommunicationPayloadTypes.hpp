@@ -85,12 +85,99 @@ namespace ServerCommunication {
         };
 
         namespace Defaults {
-            StringPayload const DEFAULT_GET_PARAMETER_VALUE_PAYLOAD("");
+            StringPayload const DEFAULT_STRING_PAYLOAD("");
         }
 
         inline StringPayload const& StringPayload::returnDefaultData() noexcept {
-            return Defaults::DEFAULT_GET_PARAMETER_VALUE_PAYLOAD;
+            return Defaults::DEFAULT_STRING_PAYLOAD;
         }
+
+        namespace Details {
+            template<typename T>
+            class SimplePayload {
+
+            public:
+
+                using Type = T;
+
+                explicit SimplePayload(Type const& value) noexcept : value(value) {}
+
+                explicit SimplePayload() noexcept :
+                        SimplePayload(SimplePayload::returnDefaultData()) {}
+
+                ~SimplePayload() noexcept = default;
+
+                SimplePayload(SimplePayload const& other) :
+                        SimplePayload(other.value) {}
+
+                SimplePayload(SimplePayload&& other) noexcept :
+                        SimplePayload(std::move(other.value)) {}
+
+                SimplePayload& operator=(SimplePayload const& other)& {
+                    SimplePayload temporary(other);
+                    swap(*this, temporary);
+                    return *this;
+                }
+
+                SimplePayload& operator=(SimplePayload&& other)& noexcept {
+                    swap(*this, other);
+                    return *this;
+                }
+
+                void swap(SimplePayload& current, SimplePayload& other) noexcept {
+                    std::swap(current.value, other.value);
+                }
+
+                bool operator==(SimplePayload const& other) const {
+                    auto sameName = (value == other.value);
+                    return sameName;
+                }
+
+                bool operator!=(SimplePayload const& other) const {
+                    return !operator==(other);
+                }
+
+                static inline SimplePayload const& returnDefaultData() noexcept;
+
+                Type const& getValue() const noexcept {
+                    return value;
+                }
+
+            private:
+
+                Type value;
+            };
+
+            namespace Defaults {
+                template<typename T>
+                T const DEFAULT_SIMPLE_PAYLOAD_VALUE{};
+
+                template<typename T>
+                SimplePayload<T> const DEFAULT_SIMPLE_PAYLOAD(DEFAULT_SIMPLE_PAYLOAD_VALUE<T>);
+            }
+
+            template<typename T>
+            inline SimplePayload<T> const& SimplePayload<T>::returnDefaultData() noexcept {
+                return Defaults::DEFAULT_SIMPLE_PAYLOAD<T>;
+            }
+        }
+
+        namespace Details {
+            template<typename T>
+            using ParameterType = std::tuple<std::string, T, std::string>;
+            using UnsignedIntegerParameterPayload = SimplePayload<ParameterType<uint64_t>>;
+            using SignedIntegerParameterPayload = Details::SimplePayload<ParameterType<int64_t>>;
+            using RealNumberParameterPayload = Details::SimplePayload<ParameterType<double_t>>;
+            using BooleanParameterPayload = Details::SimplePayload<ParameterType<bool>>;
+            using ParameterErrorPayload = Details::SimplePayload<ParameterType<StringPayload>>;
+        }
+
+        using Details::UnsignedIntegerParameterPayload;
+        using Details::SignedIntegerParameterPayload;
+        using Details::RealNumberParameterPayload;
+        using Details::BooleanParameterPayload;
+        using Details::ParameterErrorPayload;
+        using ErrorPayload = StringPayload;
     }
 }
 

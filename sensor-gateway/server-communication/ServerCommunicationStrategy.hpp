@@ -18,6 +18,7 @@
 #define SENSORGATEWAY_SERVERCOMMUNICATIONPROTOCOLSTRATEGY_HPP
 
 #include "ServerRequest.hpp"
+#include "ServerResponse.hpp"
 
 namespace ServerCommunication {
 
@@ -32,6 +33,12 @@ namespace ServerCommunication {
         using GetParameterValueContent = std::string;
         using GetParameterValueContents = std::array<GetParameterValueContent, T::MAX_NUMBER_OF_CONCURRENT_REQUEST_OF_ONE_KIND>;
 
+        using UnsignedIntegerParameterResponse = ResponseType::UnsignedIntegerParameterResponse;
+        using SignedIntegerParameterResponse = ResponseType::SignedIntegerParameterResponse;
+        using RealNumberParameterResponse = ResponseType::RealNumberParameterResponse;
+        using BooleanParameterResponse = ResponseType::BooleanParameterResponse;
+        using ErrorResponse = ResponseType::ErrorResponse;
+
         using SetParameterValueBooleanContent = typename std::pair<GetParameterValueContent, bool>;
 
         virtual ~ServerCommunicationStrategy() noexcept = default;
@@ -43,6 +50,9 @@ namespace ServerCommunication {
         virtual void sendMessage(Message&& message) = 0;
 
         virtual void sendRawData(RawData&& rawData) = 0;
+
+        // TODO: for each Response type, create a send response...
+//        virtual void sendResponse(Request&& request, Response&& response);
 
         virtual void closeConnection() = 0;
     };

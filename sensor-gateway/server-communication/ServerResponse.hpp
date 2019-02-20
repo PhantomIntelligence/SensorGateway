@@ -29,9 +29,9 @@ namespace ServerCommunication {
         using type = ResponsePayload;
         using RequestType = Request;
 
-        explicit ServerResponse(ResponsePayload const& payload, Request&& request) noexcept:
+        explicit ServerResponse(ResponsePayload const& payload, Request const& request) noexcept:
                 payload(payload),
-                request(std::forward<Request>(request)) {}
+                request(request) {}
 
         explicit ServerResponse() noexcept :
                 ServerResponse(ServerResponse::returnDefaultData()) {}
@@ -108,10 +108,23 @@ namespace ServerCommunication {
         return Defaults::DEFAULT_SERVER_RESULT<ResultPayload, Request>;
     }
 
-
     namespace ResponseType {
-        template<typename Request>
-        using StringRequestResponse = ServerResponse<PayloadTypes::StringPayload, Request>;
+
+        namespace Details {
+            template<typename ParameterResponsePayload>
+            using ParameterValueResponse = ServerResponse<ParameterResponsePayload, PayloadTypes::StringPayload>;
+
+            template<typename Request>
+            using StringRequestResponse = ServerResponse<PayloadTypes::StringPayload, Request>;
+        }
+
+
+        using UnsignedIntegerParameterResponse = Details::ParameterValueResponse<PayloadTypes::UnsignedIntegerParameterPayload>;
+        using SignedIntegerParameterResponse = Details::ParameterValueResponse<PayloadTypes::SignedIntegerParameterPayload>;
+        using RealNumberParameterResponse = Details::ParameterValueResponse<PayloadTypes::RealNumberParameterPayload>;
+        using BooleanParameterResponse = Details::ParameterValueResponse<PayloadTypes::BooleanParameterPayload>;
+        using ErrorResponse = Details::StringRequestResponse<PayloadTypes::ErrorPayload>;
+
     }
 
     namespace ResponseMessage {
