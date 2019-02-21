@@ -61,7 +61,7 @@ protected:
 
     virtual ~ServerCommunicatorTest() = default;
 
-    auto givenABadRequestResponse() const {
+    auto givenAnErrorMessageResponse() const {
         auto badRequest = Given::anInvalidGetParameterValueRequest<ParameterListForThisTestCase>();
         badRequest.markAsBadRequest();
         auto badRequestResponse = Assemble::ServerResponse::createErrorResponseFromBadRequest(std::move(badRequest));
@@ -323,6 +323,38 @@ TEST_F(ServerCommunicatorTest,
 }
 
 TEST_F(ServerCommunicatorTest,
+       given_anErrorThatRequiresToCloseThrownOnSendErrorMessageResponseCall_when_isCaught_then_callsCloseConnectionInStrategy) {
+    ThrowingServerCommunicationStrategy throwingMockStrategy;
+    throwingMockStrategy.throwCloseConnectionRequiredErrorWhenSendResponseIsCalled();
+
+    ServerCommunicator serverCommunicator(&throwingMockStrategy,
+                                          ignoreHandleGetParameterValue());
+    auto response = givenAnErrorMessageResponse();
+    serverCommunicator.sendResponse(std::move(response));
+    throwingMockStrategy.waitUntilCloseConnectionCallIsMadeAfterErrorIsThrown();
+
+    auto closeConnectionCalled = throwingMockStrategy.hasCloseConnectionBeenCalledAfterThrowingFunction();
+
+    ASSERT_TRUE(closeConnectionCalled);
+}
+
+TEST_F(ServerCommunicatorTest,
+       given_anErrorThatRequiresToOpenThrownOnSendErrorMessageResponseCall_when_isCaught_then_callsOpenConnectionInStrategy) {
+    ThrowingServerCommunicationStrategy throwingMockStrategy;
+    throwingMockStrategy.throwOpenConnectionRequiredErrorWhenSendResponseIsCalled();
+
+    ServerCommunicator serverCommunicator(&throwingMockStrategy,
+                                          ignoreHandleGetParameterValue());
+    auto response = givenAnErrorMessageResponse();
+    serverCommunicator.sendResponse(std::move(response));
+    throwingMockStrategy.waitUntilOpenConnectionCallIsMadeAfterErrorIsThrown();
+
+    auto openConnectionCalled = throwingMockStrategy.hasOpenConnectionBeenCalledAfterThrowingFunction();
+
+    ASSERT_TRUE(openConnectionCalled);
+}
+
+TEST_F(ServerCommunicatorTest,
        given_aStrategyThrowingErrorOnOpenConnectionCall_when_errorIsCaught_then_producesTheErrorWithCorrectOrigin) {
     ThrowingServerCommunicationStrategy throwingMockStrategy;
     throwingMockStrategy.throwErrorWhenOpenConnectionIsCalled();
@@ -410,6 +442,30 @@ TEST_F(ServerCommunicatorTest,
 
     auto rawData = DataTestUtil::createRandomSimpleRawData();
     serverCommunicator.consume(std::move(rawData));
+    sink.waitConsumptionToBeReached();
+
+    scheduler.terminateAndJoin();
+
+    ASSERT_TRUE(Assert::errorHasBeenThrown(&sink, expectedError));
+}
+
+TEST_F(ServerCommunicatorTest,
+       given_aStrategyThrowingErrorOnSendErrorMessageResponseCall_when_errorIsCaught_then_producesTheErrorWithCorrectOrigin) {
+    ThrowingServerCommunicationStrategy throwingMockStrategy;
+    throwingMockStrategy.throwErrorWhenSendResponseIsCalled();
+    Error expectedError = throwingMockStrategy.expectedErrorWhenSendResponseIsCalled();
+    expectedError = formatStrategyErrorWithCorrectOrigin(expectedError,
+                                                         ErrorHandling::Origin::SERVER_COMMUNICATOR_SEND_RESPONSE);
+    auto numberOfErrorToReceive = 1;
+    ErrorSinkMock sink(numberOfErrorToReceive);
+    ErrorProcessingScheduler scheduler(&sink);
+    ServerCommunicator serverCommunicator(&throwingMockStrategy,
+                                          ignoreHandleGetParameterValue());
+
+    serverCommunicator.linkConsumer(&scheduler);
+
+    auto response = givenAnErrorMessageResponse();
+    serverCommunicator.sendResponse(std::move(response));
     sink.waitConsumptionToBeReached();
 
     scheduler.terminateAndJoin();
@@ -577,18 +633,25 @@ TEST_F(ServerCommunicatorTest,
         auto expectedRequest = Assemble::ServerRequestAssembler::getParameterValueRequest(expectedRequestContent);
         auto receivedRequest = receivedRequests.front();
         receivedRequests.pop_front();
-        ASSERT_EQ(expectedRequest, receivedRequest);
         requestCounter++;
+        ASSERT_EQ(expectedRequest, receivedRequest);
     }
 }
 
-// TODO : write test : when sendResponse(std::move(response)) -> calls strategy once
-// TODO : write test : when sendResponse(std::move(response)) -> calls strategy with output of `auto ServerResponse.formatForCommunicationOut const -> std::tuple<RequestResult, Request>`
-
 TEST_F(ServerCommunicatorTest,
-       given_nonSuccessResponse_when_sendResponse_then_callsSendErrorResponseInStrategy) {
-    auto badRequestResponse = givenABadRequestResponse();
+       given_anErrorMessageResponse_when_sendResponse_then_callsSendErrorResponseInStrategy) {
+    MockServerCommunicatorStrategy mockStrategy;
+    ServerCommunicator serverCommunicator(&mockStrategy,
+                                          ignoreHandleGetParameterValue());
+    auto response = givenAnErrorMessageResponse();
+
+    serverCommunicator.sendResponse(std::move(response));
+
+    auto strategyHasBeenCalled = mockStrategy.hasSendErrorMessageResponseBeenCalled();
+    ASSERT_TRUE(strategyHasBeenCalled);
 }
+
+// TODO : write test : when sendResponse(std::move(response)) -> calls strategy with output of `auto ServerResponse.formatForCommunicationOut const -> std::tuple<RequestResult, Request>`
 
 #endif //SENSORGATEWAY_SERVERCOMMUNICATORTEST_CPP
 

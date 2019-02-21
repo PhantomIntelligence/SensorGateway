@@ -41,6 +41,7 @@ namespace Mock {
                 throwOnClose(false),
                 throwOnSendMessage(false),
                 throwOnSendRawData(false),
+                throwOnSendResponse(false),
                 openConnectionCalled(false),
                 closeConnectionCalled(false) {
         }
@@ -90,13 +91,16 @@ namespace Mock {
         void throwOpenConnectionRequiredErrorWhenSendMessageIsCalled() noexcept {
             throwOnSendMessage.store(true);
             errorToThrow = expectedErrorRequiringOpenConnection();
-
         }
 
         void throwOpenConnectionRequiredErrorWhenSendRawDataIsCalled() noexcept {
             throwOnSendRawData.store(true);
             errorToThrow = expectedErrorRequiringOpenConnection();
+        }
 
+        void throwOpenConnectionRequiredErrorWhenSendResponseIsCalled() noexcept {
+            throwOnSendResponse.store(true);
+            errorToThrow = expectedErrorRequiringOpenConnection();
         }
 
         void throwCloseConnectionRequiredErrorWhenOpenConnectionIsCalled() noexcept {
@@ -118,6 +122,12 @@ namespace Mock {
             throwOnSendRawData.store(true);
             errorToThrow = expectedErrorRequiringCloseConnection();
         }
+
+        void throwCloseConnectionRequiredErrorWhenSendResponseIsCalled() noexcept {
+            throwOnSendResponse.store(true);
+            errorToThrow = expectedErrorRequiringCloseConnection();
+        }
+
 
         ErrorHandling::SensorAccessLinkError expectedErrorWhenOpenConnectionIsCalled() noexcept {
             return ErrorHandling::SensorAccessLinkError(ORIGIN,
@@ -186,6 +196,19 @@ namespace Mock {
             errorToThrow = expectedErrorWhenSendRawDataIsCalled();
         }
 
+        ErrorHandling::SensorAccessLinkError expectedErrorWhenSendResponseIsCalled() noexcept {
+            return ErrorHandling::SensorAccessLinkError(ORIGIN,
+                                                        ErrorHandling::Category::COMMUNICATION_ERROR,
+                                                        ErrorHandling::Severity::ERROR,
+                                                        ERROR_CODE,
+                                                        SEND_RESPONSE);
+        }
+
+        void throwErrorWhenSendResponseIsCalled() noexcept {
+            throwOnSendResponse.store(true);
+            errorToThrow = expectedErrorWhenSendResponseIsCalled();
+        }
+
         GetParameterValueContents fetchGetParameterValueContents() override {
             if (hasCloseConnectionBeenCalled()) {
                 // WARNING! This mock implementation of readMessage needs to be slowed down because of the way gtest works. DO NOT REMOVE.
@@ -247,6 +270,18 @@ namespace Mock {
             }
         }
 
+        void sendResponse(typename super::ErrorMessageResponse&& errorMessageResponse) override {
+            if (!errorThrown.load()) {
+                if (throwOnSendResponse.load()) {
+                    throwOnSendResponse.store(false); // We only throw once to allow the test to pass
+                    openConnectionCalled.store(false);
+                    closeConnectionCalled.store(false);
+                    errorThrown.store(true);
+                    throw errorToThrow;
+                }
+            }
+        }
+
         bool hasCloseConnectionBeenCalledAfterThrowingFunction() const noexcept {
             return hasCloseConnectionBeenCalled() && hasErrorBeenThrown();
         }
@@ -282,7 +317,8 @@ namespace Mock {
         std::string const FETCH_GET_PARAMETER_VALUE_CONTENT_ERROR_MESSAGE = "  -  -  -  -  -  ";
         std::string const MESSAGE_ERROR_MESSAGE = "I close my eyes, only for a moment, and the moment's gone";
         std::string const RAW_DATA_ERROR_MESSAGE = "All my dreams pass before my eyes, a curiosity";
-        std::string const MESSAGE = "Dust in the wind; All they are is dust in the wind.";
+        std::string const MESSAGE = "Dust in the wind;";
+        std::string const SEND_RESPONSE = "All they are is dust in the wind.";
 
     private:
 
@@ -301,6 +337,7 @@ namespace Mock {
         AtomicFlag throwOnFetchGetParameterValueContents;
         AtomicFlag throwOnSendMessage;
         AtomicFlag throwOnSendRawData;
+        AtomicFlag throwOnSendResponse;
 
     };
 }

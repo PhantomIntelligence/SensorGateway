@@ -76,7 +76,7 @@ namespace ServerCommunication {
 
             static inline StringPayload const& returnDefaultData() noexcept;
 
-            std::string const& getValue() const noexcept {
+            std::string const& toString() const noexcept {
                 return value;
             }
 
@@ -145,6 +145,10 @@ namespace ServerCommunication {
                 }
 
                 static inline SimplePayload const& returnDefaultData() noexcept;
+
+                std::string const& toString() const noexcept {
+                    return value;
+                }
 
                 Type const& getValue() const noexcept {
                     return value;

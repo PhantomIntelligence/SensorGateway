@@ -37,12 +37,14 @@ namespace Mock {
         using GetParameterValueContents = typename super::GetParameterValueContents;
         using GetParameterValueContentList = std::list<GetParameterValueContent>;
 //        using SetParameterValueBooleanContent = std::list<super::SetParameterValueBooleanContent>;
+        using ErrorMessageResponse = typename super::ErrorMessageResponse;
 
     public:
         CatchingServerCommunicationStrategyMock() :
                 openConnectionCalled(false),
                 sendMessageCalled(false),
                 sendRawDataCalled(false),
+                sendErrorMessageResponseCalled(false),
                 closeConnectionCalled(false),
                 fetchGetParameterValueContentsCalled(false),
                 hasToReturnSpecificGetParameterValueContents(false) {}
@@ -84,6 +86,11 @@ namespace Mock {
             receivedRawData.push_back(rawData);
         }
 
+        void sendResponse(ErrorMessageResponse&& errorMessageResponse) override {
+            sendErrorMessageResponseCalled.store(true);
+            sentErrorMessageResponse = errorMessageResponse;
+        }
+
         void closeConnection() override {
             closeConnectionCalled.store(true);
         }
@@ -103,6 +110,10 @@ namespace Mock {
         bool hasSendRawDataBeenCalled() const {
             return sendRawDataCalled.load();
         }
+
+        bool hasSendErrorMessageResponseBeenCalled() const {
+            return sendErrorMessageResponseCalled.load();
+        };
 
         bool hasCloseConnectionBeenCalled() const {
             return closeConnectionCalled.load();
@@ -130,6 +141,10 @@ namespace Mock {
             return receivedRawData;
         }
 
+        ErrorMessageResponse const& getSentErrorMessageResponse() const {
+            return sentErrorMessageResponse;
+        };
+
         void waitUntilFetchGetParameterValueContentsIsCalled() {
             if (!hasFetchGetParameterValueContentsBeenCalled()) {
                 fetchGetParameterValueContentsCalledAcknowledgement.get_future().wait();
@@ -155,6 +170,7 @@ namespace Mock {
         AtomicFlag openConnectionCalled;
         AtomicFlag sendMessageCalled;
         AtomicFlag sendRawDataCalled;
+        AtomicFlag sendErrorMessageResponseCalled;
         AtomicFlag closeConnectionCalled;
 
         // TODO : Move the following in template (see TODO a few lines below)
@@ -173,6 +189,8 @@ namespace Mock {
 //        mutable BooleanPromise fetchSetParameterValueContentsCalledAcknowledgement;
 //        bool hasToReturnSpecificSetParameterValueContents;
 //        SetParameterValueContentList setParameterValueContentsToReturn;
+
+        ErrorMessageResponse sentErrorMessageResponse;
     };
 }
 

@@ -33,7 +33,7 @@ namespace Assemble {
         static auto createErrorResponseFromBadRequest(Request&& request) -> ErrorMessageResponse {
             using ServerCommunication::ResponseMessage::BadRequest;
             ErrorPayload responseBadRequestPayload(BadRequest::toString());
-            ServerCommunication::PayloadTypes::ErrorPayload badRequestPayload(BadRequest::toString());
+            ServerCommunication::PayloadTypes::ErrorPayload badRequestPayload(request.payloadToString());
             ErrorMessageResponse response(responseBadRequestPayload, badRequestPayload);
             return response;
         }
@@ -56,7 +56,7 @@ namespace Assemble {
         static auto createParameterErrorResponse(Data const& data, Request&& request) -> ParameterErrorResponse {
             using ServerCommunication::ResponseMessage::ParameterError;
             ParameterErrorPayload const parameterErrorPayload = Details::createParameterErrorPayload(data);
-            ErrorPayload const errorMessage(ParameterError::toString());
+            ErrorPayload const errorMessage(request.payloadToString());
             ParameterErrorResponse response(parameterErrorPayload, errorMessage);
             return response;
         }

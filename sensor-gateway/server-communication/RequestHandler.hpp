@@ -73,7 +73,7 @@ namespace SensorAccessLinkElement {
 
         virtual void handleGetParameterValueRequest(GetParameterValueRequest&& getParameterValueRequest) {
             try {
-                ensureParameterIsAvailable(getParameterValueRequest.getPayloadName());
+                ensureParameterIsAvailable(getParameterValueRequest.payloadToString());
             } catch(ErrorHandling::SensorAccessLinkError& error) {
 
                 ErrorSource::produce(std::move(error));

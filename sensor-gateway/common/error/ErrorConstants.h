@@ -35,6 +35,7 @@ namespace ErrorHandling {
         std::string const SERVER_COMMUNICATOR_FETCH_GET_PARAMETER_VALUE = "fetch get parameter value content for requests";
         std::string const SERVER_COMMUNICATOR_SEND_MESSAGE = "send message";
         std::string const SERVER_COMMUNICATOR_SEND_RAWDATA = "send rawdata";
+        std::string const SERVER_COMMUNICATOR_SEND_RESPONSE = "send response";
 
         std::string const SERVER_REQUEST_HANDLING_PARAMETER = "sensor parameter value";
     }

@@ -110,9 +110,13 @@ namespace SensorAccessLinkElement {
 
         template<typename Response>
         void sendResponse(Response&& response) {
-
+            try{
+                serverCommunicationStrategy->sendResponse(std::forward<Response>(response));
+            } catch (ErrorHandling::SensorAccessLinkError& strategyError) {
+                addOriginAndHandleError(std::move(strategyError),
+                                        ErrorHandling::Origin::SERVER_COMMUNICATOR_SEND_RESPONSE);
+            }
         }
-
 
         void terminateAndJoin() {
             closeConnection();

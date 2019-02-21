@@ -89,8 +89,8 @@ namespace ServerCommunication {
 
         static ServerRequest const& returnDefaultData() noexcept;
 
-        std::string const& getPayloadName() const noexcept {
-            return payload.getValue();
+        std::string const& payloadToString() const noexcept {
+            return payload.toString();
         }
 
     private:
