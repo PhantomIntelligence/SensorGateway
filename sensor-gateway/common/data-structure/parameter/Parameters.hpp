@@ -54,9 +54,9 @@ namespace Sensor {
             static uint8_t const valueLengthInBits = PARAMETER_VALUE_LENGTH_IN_BITS;
         };
 
-        template<typename T>
-        struct ExtractedType {
-            using type = T;
+        struct ParameterMetadata {
+            std::string const name;
+            std::string const unit;
         };
 
 
@@ -75,10 +75,6 @@ namespace Sensor {
 //                   : value(),
             {};
 
-            static constexpr auto const extractType() noexcept {
-                return &extractedType;
-            }
-
             static constexpr bool nameEquals(std::string const& otherName) {
                 return getStringifiedName() == otherName;
             };
@@ -91,14 +87,17 @@ namespace Sensor {
                 return Unit::toString();
             }
 
-        private:
+            auto extractMetadata() const noexcept -> ParameterMetadata {
+                return {.name = getStringifiedName(), .unit = getStringifiedUnit()};
+            }
 
-            static constexpr ExtractedType<Parameter<SensorParameterDefinition>> const extractedType{};
         };
 
 
         template<class... P>
         class Parameters {
+
+        protected:
 
             using Params = std::tuple<P...>;
 
@@ -124,6 +123,15 @@ namespace Sensor {
                 auto const index = getIndexFor(parameterName);
                 // TODO : return create ControlMessage from sensor @ index
                 return true;
+            }
+
+            /**
+             * @warning It is assumed that parameterName correspond to an existing name of parameter in this container
+             */
+            constexpr auto getMetadataFor(std::string const& parameterName) const {
+                auto const index = getIndexFor(parameterName);
+                auto const metadata = convertTupleToArray(getMetadataTuple());
+                return metadata[index];
             }
 
             constexpr auto getNames() const noexcept {
@@ -166,21 +174,10 @@ namespace Sensor {
                 }
             };
 
-            struct TypeNameEquals {
-                std::string const value;
-
-                TypeNameEquals(std::string const& s) : value(s) {}
-
-                template<typename T>
-                bool const operator()(T const& t) const {
-                    return T::type::getStringifiedName() == value;
-                }
-            };
-
-            constexpr auto getTypeTuple() const {
+            constexpr auto getMetadataTuple() const {
                 auto typeTuple = index_apply<NUMBER_OF_AVAILABLE_PARAMETERS>(
                         [&](auto... Indices) {
-                            return std::make_tuple(std::get<Indices>(internalParameters).extractType()...);
+                            return std::make_tuple(std::get<Indices>(internalParameters).extractMetadata()...);
                         });
                 return typeTuple;
             }

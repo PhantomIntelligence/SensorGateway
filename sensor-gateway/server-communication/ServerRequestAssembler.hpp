@@ -27,6 +27,8 @@ namespace Assemble {
      */
     class ServerRequestAssembler {
 
+        using MessagePayload = ServerCommunication::PayloadTypes::MessagePayload;
+
     public:
 
         explicit ServerRequestAssembler() = delete;
@@ -35,7 +37,7 @@ namespace Assemble {
 
         static auto getParameterValueRequest(std::string const& payloadContent) {
             using GetParameterValueRequest = ServerCommunication::RequestTypes::GetParameterValue;
-            ServerCommunication::PayloadTypes::StringPayload payload{payloadContent};
+            MessagePayload payload{payloadContent};
             GetParameterValueRequest request(payload);
             return request;
         }

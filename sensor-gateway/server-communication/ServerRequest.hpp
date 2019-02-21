@@ -120,7 +120,7 @@ namespace ServerCommunication {
     }
 
     namespace RequestTypes {
-        using GetParameterValue = ServerRequest<PayloadTypes::StringPayload>;
+        using GetParameterValue = ServerRequest<PayloadTypes::MessagePayload>;
     }
 }
 

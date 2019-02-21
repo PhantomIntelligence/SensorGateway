@@ -37,7 +37,8 @@ namespace ServerCommunication {
         using SignedIntegerParameterResponse = ResponseType::SignedIntegerParameterResponse;
         using RealNumberParameterResponse = ResponseType::RealNumberParameterResponse;
         using BooleanParameterResponse = ResponseType::BooleanParameterResponse;
-        using ErrorResponse = ResponseType::ErrorResponse;
+        using ParameterErrorResponse = ResponseType::ParameterErrorResponse;
+        using ErrorMessageResponse = ResponseType::ErrorMessageResponse;
 
         using SetParameterValueBooleanContent = typename std::pair<GetParameterValueContent, bool>;
 
@@ -51,8 +52,17 @@ namespace ServerCommunication {
 
         virtual void sendRawData(RawData&& rawData) = 0;
 
-        // TODO: for each Response type, create a send response...
-//        virtual void sendResponse(Request&& request, Response&& response);
+//        virtual void sendResponse(UnsignedIntegerParameterResponse&& unsignedIntegerParameterResponse) = 0;
+//
+//        virtual void sendResponse(SignedIntegerParameterResponse&& signedIntegerParameterResponse) = 0;
+//
+//        virtual void sendResponse(RealNumberParameterResponse&& realNumberParameterResponse) = 0;
+//
+//        virtual void sendResponse(BooleanParameterResponse&& booleanParameterResponse) = 0;
+//
+//        virtual void sendResponse(ParameterErrorResponse&& parameterErrorResponse) = 0;
+//
+//        virtual void sendResponse(ErrorMessageResponse&& errorMessageResponse) = 0;
 
         virtual void closeConnection() = 0;
     };

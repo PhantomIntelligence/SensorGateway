@@ -96,7 +96,6 @@ namespace TestFunctions {
 
         template<class AvailableParameters>
         static auto availableNames() noexcept {
-            using AllFakeParameters = Sensor::FakeParameter::AllFakeParameters;
             AvailableParameters availableParameters;
             ParameterNameList validParameters;
             auto validNames = availableParameters.getNames();
@@ -141,6 +140,12 @@ namespace Given {
     auto anInvalidGetParameterValueRequest() -> ServerCommunication::RequestTypes::GetParameterValue {
         auto invalidParameterName = TestFunctions::Parameters::nonAvailableNames<ParametersToChoseFrom>().front();
         return Assemble::ServerRequestAssembler::getParameterValueRequest(invalidParameterName);
+    }
+
+    template<typename ParametersToChoseFrom>
+    auto aValidParameter() {
+        auto validParameterName = TestFunctions::Parameters::availableNames<ParametersToChoseFrom>().front();
+        return Assemble::ServerRequestAssembler::getParameterValueRequest(validParameterName);
     }
 
     template<typename ParametersToChoseFrom>

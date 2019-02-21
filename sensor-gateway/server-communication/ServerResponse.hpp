@@ -74,10 +74,8 @@ namespace ServerCommunication {
 
         static ServerResponse const& returnDefaultData() noexcept;
 
-        bool isSuccess() const {
-            auto badRequest = request.isBadRequest();
-            auto error = request.hasCausedAnError();
-            bool success = !badRequest && !error;
+        static constexpr bool isSuccess() noexcept {
+            bool success = ResponsePayload::isSuccess();
             return success;
         }
 
@@ -112,23 +110,24 @@ namespace ServerCommunication {
 
         namespace Details {
             template<typename ParameterResponsePayload>
-            using ParameterValueResponse = ServerResponse<ParameterResponsePayload, PayloadTypes::StringPayload>;
+            using ParameterValueResponse = ServerResponse<ParameterResponsePayload, PayloadTypes::MessagePayload>;
 
-            template<typename Request>
-            using StringRequestResponse = ServerResponse<PayloadTypes::StringPayload, Request>;
+            template<typename ParameterResponsePayload>
+            using ParameterErrorResponse = ServerResponse<ParameterResponsePayload, PayloadTypes::ErrorPayload>;
         }
-
 
         using UnsignedIntegerParameterResponse = Details::ParameterValueResponse<PayloadTypes::UnsignedIntegerParameterPayload>;
         using SignedIntegerParameterResponse = Details::ParameterValueResponse<PayloadTypes::SignedIntegerParameterPayload>;
         using RealNumberParameterResponse = Details::ParameterValueResponse<PayloadTypes::RealNumberParameterPayload>;
         using BooleanParameterResponse = Details::ParameterValueResponse<PayloadTypes::BooleanParameterPayload>;
-        using ErrorResponse = Details::StringRequestResponse<PayloadTypes::ErrorPayload>;
+        using ParameterErrorResponse = Details::ParameterErrorResponse<PayloadTypes::ParameterErrorPayload>;
+        using ErrorMessageResponse = ServerResponse<PayloadTypes::ErrorPayload, PayloadTypes::ErrorPayload>;
 
     }
 
     namespace ResponseMessage {
         using BadRequest = StringLiteral<decltype("Bad request"_ToString)>;
+        using ParameterError = StringLiteral<decltype("Parameter error"_ToString)>;
         using NoPayload = StringLiteral<decltype(" - "_ToString)>;
     }
 }

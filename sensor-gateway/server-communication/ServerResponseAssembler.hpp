@@ -22,22 +22,42 @@
 namespace Assemble {
     namespace ServerResponse {
 
-        using ServerCommunication::ResponseType::StringRequestResponse;
-        using ServerCommunication::PayloadTypes::StringPayload;
+        using ServerCommunication::ResponseType::ParameterErrorResponse;
+        using ServerCommunication::ResponseType::ErrorMessageResponse;
+        using ServerCommunication::PayloadTypes::ParameterErrorPayload;
+        using ServerCommunication::PayloadTypes::ErrorPayload;
+        using ServerCommunication::PayloadTypes::MessagePayload;
+
 
         template<typename Request>
-        static auto createBadRequestResponseFrom(Request&& request) -> StringRequestResponse<Request> {
+        static auto createErrorResponseFromBadRequest(Request&& request) -> ErrorMessageResponse {
             using ServerCommunication::ResponseMessage::BadRequest;
-            StringPayload payload(BadRequest::toString());
-            StringRequestResponse<Request> response(payload, std::forward<Request>(request));
+            ErrorPayload responseBadRequestPayload(BadRequest::toString());
+            ServerCommunication::PayloadTypes::ErrorPayload badRequestPayload(BadRequest::toString());
+            ErrorMessageResponse response(responseBadRequestPayload, badRequestPayload);
             return response;
         }
 
-        template<typename Request>
-        static auto createNoPayloadRequestResponseFrom(Request&& request) -> StringRequestResponse<Request> {
-            using ServerCommunication::ResponseMessage::NoPayload;
-            StringPayload payload(NoPayload::toString());
-            StringRequestResponse<Request> response(payload, std::forward<Request>(request));
+        namespace Details {
+
+            template<typename Data>
+            static auto createParameterErrorPayload(Data const& data) -> ParameterErrorPayload {
+                // TODO : change this for eventual actual response from sensor
+                ErrorPayload errorMessage("...");
+
+                ParameterErrorPayload parameterErrorPayload(
+                        std::make_tuple(data.name, errorMessage, data.unit)
+                );
+                return parameterErrorPayload;
+            };
+        }
+
+        template<typename Data, typename Request>
+        static auto createParameterErrorResponse(Data const& data, Request&& request) -> ParameterErrorResponse {
+            using ServerCommunication::ResponseMessage::ParameterError;
+            ParameterErrorPayload const parameterErrorPayload = Details::createParameterErrorPayload(data);
+            ErrorPayload const errorMessage(ParameterError::toString());
+            ParameterErrorResponse response(parameterErrorPayload, errorMessage);
             return response;
         }
 

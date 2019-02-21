@@ -64,7 +64,7 @@ protected:
     auto givenABadRequestResponse() const {
         auto badRequest = Given::anInvalidGetParameterValueRequest<ParameterListForThisTestCase>();
         badRequest.markAsBadRequest();
-        auto badRequestResponse = Assemble::ServerResponse::createBadRequestResponseFrom(std::move(badRequest));
+        auto badRequestResponse = Assemble::ServerResponse::createErrorResponseFromBadRequest(std::move(badRequest));
         return badRequestResponse;
     }
 

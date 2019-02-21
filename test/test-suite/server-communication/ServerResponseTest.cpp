@@ -43,18 +43,20 @@ private:
 TEST_F(ServerResponseTest, given_aBadRequestResponse_when_isSuccess_then_returnsFalse) {
     auto invalidRequest = Given::anInvalidGetParameterValueRequest<AvailableParameters>();
     invalidRequest.markAsBadRequest();
-    auto response = Assemble::ServerResponse::createBadRequestResponseFrom(std::move(invalidRequest));
+    auto response = Assemble::ServerResponse::createErrorResponseFromBadRequest(std::move(invalidRequest));
 
-    auto success = response.isSuccess();
+    auto success = decltype(response)::isSuccess();
     ASSERT_FALSE(success);
 }
 
 TEST_F(ServerResponseTest, given_aGoodRequestResponseThatCausedAnError_when_isSuccess_then_returnsFalse) {
     auto validRequest = Given::aValidGetParameterValueRequest<AvailableParameters>();
     validRequest.markAsErrorCause();
-    auto response = Assemble::ServerResponse::createNoPayloadRequestResponseFrom(std::move(validRequest));
+    AvailableParameters availableParameters;
+    auto metadata = availableParameters.getMetadataFor((validRequest.getPayloadName()));
+    auto response = Assemble::ServerResponse::createParameterErrorResponse(metadata, std::move(validRequest));
 
-    auto success = response.isSuccess();
+    auto success = decltype(response)::isSuccess();
     ASSERT_FALSE(success);
 }
 

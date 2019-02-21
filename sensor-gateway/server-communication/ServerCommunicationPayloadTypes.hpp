@@ -32,6 +32,7 @@ namespace ServerCommunication {
             };
         }
 
+        template<bool success = true>
         class StringPayload {
 
         public:
@@ -79,21 +80,27 @@ namespace ServerCommunication {
                 return value;
             }
 
+            static constexpr bool isSuccess() noexcept {
+                return success;
+            }
+
         private:
 
             std::string value;
         };
 
         namespace Defaults {
-            StringPayload const DEFAULT_STRING_PAYLOAD("");
+            template<bool success>
+            StringPayload<success> const DEFAULT_STRING_PAYLOAD("");
         }
 
-        inline StringPayload const& StringPayload::returnDefaultData() noexcept {
-            return Defaults::DEFAULT_STRING_PAYLOAD;
+        template<bool success>
+        inline StringPayload<success> const& StringPayload<success>::returnDefaultData() noexcept {
+            return Defaults::DEFAULT_STRING_PAYLOAD<success>;
         }
 
         namespace Details {
-            template<typename T>
+            template<typename T, bool success = true>
             class SimplePayload {
 
             public:
@@ -143,22 +150,26 @@ namespace ServerCommunication {
                     return value;
                 }
 
+                static constexpr bool isSuccess() noexcept {
+                    return success;
+                }
+
             private:
 
                 Type value;
             };
 
             namespace Defaults {
-                template<typename T>
+                template<typename T, bool success>
                 T const DEFAULT_SIMPLE_PAYLOAD_VALUE{};
 
-                template<typename T>
-                SimplePayload<T> const DEFAULT_SIMPLE_PAYLOAD(DEFAULT_SIMPLE_PAYLOAD_VALUE<T>);
+                template<typename T, bool success>
+                SimplePayload<T, success> const DEFAULT_SIMPLE_PAYLOAD(DEFAULT_SIMPLE_PAYLOAD_VALUE<T, success>);
             }
 
-            template<typename T>
-            inline SimplePayload<T> const& SimplePayload<T>::returnDefaultData() noexcept {
-                return Defaults::DEFAULT_SIMPLE_PAYLOAD<T>;
+            template<typename T, bool success>
+            inline SimplePayload<T, success> const& SimplePayload<T, success>::returnDefaultData() noexcept {
+                return Defaults::DEFAULT_SIMPLE_PAYLOAD<T, success>;
             }
         }
 
@@ -166,10 +177,12 @@ namespace ServerCommunication {
             template<typename T>
             using ParameterType = std::tuple<std::string, T, std::string>;
             using UnsignedIntegerParameterPayload = SimplePayload<ParameterType<uint64_t>>;
-            using SignedIntegerParameterPayload = Details::SimplePayload<ParameterType<int64_t>>;
-            using RealNumberParameterPayload = Details::SimplePayload<ParameterType<double_t>>;
-            using BooleanParameterPayload = Details::SimplePayload<ParameterType<bool>>;
-            using ParameterErrorPayload = Details::SimplePayload<ParameterType<StringPayload>>;
+            using SignedIntegerParameterPayload = SimplePayload<ParameterType<int64_t>>;
+            using RealNumberParameterPayload = SimplePayload<ParameterType<double_t>>;
+            using BooleanParameterPayload = SimplePayload<ParameterType<bool>>;
+            using MessagePayload = StringPayload<true>;
+            using ErrorPayload = StringPayload<false>;
+            using ParameterErrorPayload = SimplePayload<ParameterType<ErrorPayload>, false>;
         }
 
         using Details::UnsignedIntegerParameterPayload;
@@ -177,7 +190,8 @@ namespace ServerCommunication {
         using Details::RealNumberParameterPayload;
         using Details::BooleanParameterPayload;
         using Details::ParameterErrorPayload;
-        using ErrorPayload = StringPayload;
+        using Details::MessagePayload;
+        using Details::ErrorPayload;
     }
 }
 
