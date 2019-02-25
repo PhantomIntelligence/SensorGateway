@@ -59,8 +59,8 @@ namespace ServerCommunication {
 //        virtual void sendResponse(RealNumberParameterResponse&& realNumberParameterResponse) = 0;
 //
 //        virtual void sendResponse(BooleanParameterResponse&& booleanParameterResponse) = 0;
-//
-//        virtual void sendResponse(ParameterErrorResponse&& parameterErrorResponse) = 0;
+
+        virtual void sendResponse(ParameterErrorResponse&& parameterErrorResponse) = 0;
 
         virtual void sendResponse(ErrorMessageResponse&& errorMessageResponse) = 0;
 

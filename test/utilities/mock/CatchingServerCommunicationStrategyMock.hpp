@@ -37,6 +37,7 @@ namespace Mock {
         using GetParameterValueContents = typename super::GetParameterValueContents;
         using GetParameterValueContentList = std::list<GetParameterValueContent>;
 //        using SetParameterValueBooleanContent = std::list<super::SetParameterValueBooleanContent>;
+        using ParameterErrorResponse = typename super::ParameterErrorResponse;
         using ErrorMessageResponse = typename super::ErrorMessageResponse;
 
     public:
@@ -44,6 +45,7 @@ namespace Mock {
                 openConnectionCalled(false),
                 sendMessageCalled(false),
                 sendRawDataCalled(false),
+                sendParameterErrorResponseCalled(false),
                 sendErrorMessageResponseCalled(false),
                 closeConnectionCalled(false),
                 fetchGetParameterValueContentsCalled(false),
@@ -86,6 +88,11 @@ namespace Mock {
             receivedRawData.push_back(rawData);
         }
 
+        void sendResponse(ParameterErrorResponse&& parameterErrorResponse) override {
+            sendParameterErrorResponseCalled.store(true);
+            sentParameterErrorResponse = parameterErrorResponse;
+        }
+
         void sendResponse(ErrorMessageResponse&& errorMessageResponse) override {
             sendErrorMessageResponseCalled.store(true);
             sentErrorMessageResponse = errorMessageResponse;
@@ -110,6 +117,10 @@ namespace Mock {
         bool hasSendRawDataBeenCalled() const {
             return sendRawDataCalled.load();
         }
+
+        bool hasSendParameterErrorResponseBeenCalled() const {
+            return sendParameterErrorResponseCalled.load();
+        };
 
         bool hasSendErrorMessageResponseBeenCalled() const {
             return sendErrorMessageResponseCalled.load();
@@ -141,9 +152,13 @@ namespace Mock {
             return receivedRawData;
         }
 
+        ParameterErrorResponse const& getSentParameterErrorResponse() const {
+            return sentParameterErrorResponse;
+        }
+
         ErrorMessageResponse const& getSentErrorMessageResponse() const {
             return sentErrorMessageResponse;
-        };
+        }
 
         void waitUntilFetchGetParameterValueContentsIsCalled() {
             if (!hasFetchGetParameterValueContentsBeenCalled()) {
@@ -170,6 +185,7 @@ namespace Mock {
         AtomicFlag openConnectionCalled;
         AtomicFlag sendMessageCalled;
         AtomicFlag sendRawDataCalled;
+        AtomicFlag sendParameterErrorResponseCalled;
         AtomicFlag sendErrorMessageResponseCalled;
         AtomicFlag closeConnectionCalled;
 
@@ -190,6 +206,7 @@ namespace Mock {
 //        bool hasToReturnSpecificSetParameterValueContents;
 //        SetParameterValueContentList setParameterValueContentsToReturn;
 
+        ParameterErrorResponse sentParameterErrorResponse;
         ErrorMessageResponse sentErrorMessageResponse;
     };
 }

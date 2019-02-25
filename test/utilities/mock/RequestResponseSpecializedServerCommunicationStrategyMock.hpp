@@ -40,6 +40,7 @@ namespace Mock {
         using GetParameterValueContents = typename super::GetParameterValueContents;
         using GetParameterValueContentList = std::list<GetParameterValueContent>;
 //        using SetParameterValueBooleanContent = std::list<super::SetParameterValueBooleanContent>;
+        using ParameterErrorResponse = typename super::ParameterErrorResponse;
         using ErrorMessageResponse = typename super::ErrorMessageResponse;
 
         using ParameterNames = std::list<std::string>;
@@ -124,6 +125,9 @@ namespace Mock {
         }
 
         void sendRawData(typename super::RawData&& rawData) override {
+        }
+
+        void sendResponse(ParameterErrorResponse&& parameterErrorResponse) override {
         }
 
         void sendResponse(ErrorMessageResponse&& errorMessageResponse) override {

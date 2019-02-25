@@ -41,7 +41,8 @@ namespace Mock {
                 throwOnClose(false),
                 throwOnSendMessage(false),
                 throwOnSendRawData(false),
-                throwOnSendResponse(false),
+                throwOnSendParameterErrorResponse(false),
+                throwOnSendErrorMessageResponse(false),
                 openConnectionCalled(false),
                 closeConnectionCalled(false) {
         }
@@ -98,8 +99,13 @@ namespace Mock {
             errorToThrow = expectedErrorRequiringOpenConnection();
         }
 
-        void throwOpenConnectionRequiredErrorWhenSendResponseIsCalled() noexcept {
-            throwOnSendResponse.store(true);
+        void throwOpenConnectionRequiredErrorWhenSendParameterErrorResponseIsCalled() noexcept {
+            throwOnSendParameterErrorResponse.store(true);
+            errorToThrow = expectedErrorRequiringOpenConnection();
+        }
+
+        void throwOpenConnectionRequiredErrorWhenSendErrorMessageResponseIsCalled() noexcept {
+            throwOnSendErrorMessageResponse.store(true);
             errorToThrow = expectedErrorRequiringOpenConnection();
         }
 
@@ -123,8 +129,13 @@ namespace Mock {
             errorToThrow = expectedErrorRequiringCloseConnection();
         }
 
-        void throwCloseConnectionRequiredErrorWhenSendResponseIsCalled() noexcept {
-            throwOnSendResponse.store(true);
+        void throwCloseConnectionRequiredErrorWhenSendParameterErrorResponseIsCalled() noexcept {
+            throwOnSendParameterErrorResponse.store(true);
+            errorToThrow = expectedErrorRequiringCloseConnection();
+        }
+
+        void throwCloseConnectionRequiredErrorWhenSendErrorMessageResponseIsCalled() noexcept {
+            throwOnSendErrorMessageResponse.store(true);
             errorToThrow = expectedErrorRequiringCloseConnection();
         }
 
@@ -196,16 +207,25 @@ namespace Mock {
             errorToThrow = expectedErrorWhenSendRawDataIsCalled();
         }
 
-        ErrorHandling::SensorAccessLinkError expectedErrorWhenSendResponseIsCalled() noexcept {
+        ErrorHandling::SensorAccessLinkError expectedErrorWhenSendResponseIsCalled(std::string const& errorMessage) noexcept {
             return ErrorHandling::SensorAccessLinkError(ORIGIN,
                                                         ErrorHandling::Category::COMMUNICATION_ERROR,
                                                         ErrorHandling::Severity::ERROR,
                                                         ERROR_CODE,
-                                                        SEND_RESPONSE);
+                                                        errorMessage);
         }
 
-        void throwErrorWhenSendResponseIsCalled() noexcept {
-            throwOnSendResponse.store(true);
+        ErrorHandling::SensorAccessLinkError expectedErrorWhenSendResponseIsCalled() noexcept {
+            return expectedErrorWhenSendResponseIsCalled(SEND_RESPONSE);
+        }
+
+        void throwErrorWhenSendParameterErrorResponseIsCalled() noexcept {
+            throwOnSendParameterErrorResponse.store(true);
+            errorToThrow = expectedErrorWhenSendResponseIsCalled();
+        }
+
+        void throwErrorWhenSendErrorMessageResponseIsCalled() noexcept {
+            throwOnSendErrorMessageResponse.store(true);
             errorToThrow = expectedErrorWhenSendResponseIsCalled();
         }
 
@@ -215,15 +235,8 @@ namespace Mock {
                 std::this_thread::sleep_for(std::chrono::milliseconds(5));
                 yield();
             }
-            if (!errorThrown.load()) {
-                if (throwOnFetchGetParameterValueContents.load()) {
-                    throwOnFetchGetParameterValueContents.store(false); // We only throw once to allow the test to pass
-                    openConnectionCalled.store(false);
-                    closeConnectionCalled.store(false);
-                    errorThrown.store(true);
-                    throw errorToThrow;
-                }
-            }
+
+            handleThrowConfirmation(&throwOnFetchGetParameterValueContents);
             GetParameterValueContents getParameterValueContents{{" "}};
             return getParameterValueContents;
         }
@@ -247,39 +260,19 @@ namespace Mock {
         }
 
         void sendMessage(typename super::Message&& message) override {
-            if (!errorThrown.load()) {
-                if (throwOnSendMessage.load()) {
-                    throwOnSendMessage.store(false); // We only throw once to allow the test to pass
-                    openConnectionCalled.store(false);
-                    closeConnectionCalled.store(false);
-                    errorThrown.store(true);
-                    throw errorToThrow;
-                }
-            }
+            handleThrowConfirmation(&throwOnSendMessage);
         }
 
         void sendRawData(typename super::RawData&& rawData) override {
-            if (!errorThrown.load()) {
-                if (throwOnSendRawData.load()) {
-                    throwOnSendRawData.store(false); // We only throw once to allow the test to pass
-                    openConnectionCalled.store(false);
-                    closeConnectionCalled.store(false);
-                    errorThrown.store(true);
-                    throw errorToThrow;
-                }
-            }
+            handleThrowConfirmation(&throwOnSendRawData);
+        }
+
+        void sendResponse(typename super::ParameterErrorResponse&& parameterErrorResponse) override {
+            handleThrowConfirmation(&throwOnSendParameterErrorResponse);
         }
 
         void sendResponse(typename super::ErrorMessageResponse&& errorMessageResponse) override {
-            if (!errorThrown.load()) {
-                if (throwOnSendResponse.load()) {
-                    throwOnSendResponse.store(false); // We only throw once to allow the test to pass
-                    openConnectionCalled.store(false);
-                    closeConnectionCalled.store(false);
-                    errorThrown.store(true);
-                    throw errorToThrow;
-                }
-            }
+            handleThrowConfirmation(&throwOnSendErrorMessageResponse);
         }
 
         bool hasCloseConnectionBeenCalledAfterThrowingFunction() const noexcept {
@@ -322,6 +315,18 @@ namespace Mock {
 
     private:
 
+        void handleThrowConfirmation(AtomicFlag* throwOnCallFlag) {
+            if (!errorThrown.load()) {
+                if (throwOnCallFlag->load()) {
+                    throwOnCallFlag->store(false); // We only throw once to allow the test to pass
+                    openConnectionCalled.store(false);
+                    closeConnectionCalled.store(false);
+                    errorThrown.store(true);
+                    throw errorToThrow;
+                }
+            }
+        }
+
         bool hasErrorBeenThrown() const noexcept {
             return errorThrown.load();
         }
@@ -337,7 +342,8 @@ namespace Mock {
         AtomicFlag throwOnFetchGetParameterValueContents;
         AtomicFlag throwOnSendMessage;
         AtomicFlag throwOnSendRawData;
-        AtomicFlag throwOnSendResponse;
+        AtomicFlag throwOnSendParameterErrorResponse;
+        AtomicFlag throwOnSendErrorMessageResponse;
 
     };
 }
