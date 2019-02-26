@@ -31,26 +31,28 @@ namespace SensorAccessLinkElement {
         using RequestHandler = SensorAccessLinkElement::RequestHandler<SENSOR_STRUCTURES, SERVER_STRUCTURES>;
         using DataTranslator = SensorAccessLinkElement::DataTranslator<SENSOR_STRUCTURES, SERVER_STRUCTURES>;
 
-        using ThisClass = SensorParameterController<SENSOR_STRUCTURES, SERVER_STRUCTURES>;
-
         using SensorControlMessage = typename SENSOR_STRUCTURES::ControlMessage;
-
+        using ThisClass = SensorParameterController<SENSOR_STRUCTURES, SERVER_STRUCTURES>;
         using ResponseControlMessageScheduler = DataFlow::DataProcessingScheduler<SensorControlMessage, ThisClass, 1>;
 
         using ErrorSource = DataFlow::DataSource<ErrorHandling::SensorAccessLinkError>;
 
-        static size_t const ARBITRARILY_BIG_ENOUGH_NUMBER_OF_CONCURRENT_REQUESTS = 128;
+        static size_t const ARBITRARILY_BIG_ENOUGH_NUMBER_OF_CONCURRENT_REQUESTS = 256;
         using SensorControlMessages = std::array<SensorControlMessage, ARBITRARILY_BIG_ENOUGH_NUMBER_OF_CONCURRENT_REQUESTS>;
         using SensorControlMessagePointers = Container::ConstantSizedPointerList<SensorControlMessage, ARBITRARILY_BIG_ENOUGH_NUMBER_OF_CONCURRENT_REQUESTS>;
+
 
     public:
 
         explicit SensorParameterController(RequestHandler* requestHandler,
                                            DataTranslator* dataTranslator) :
                 requestHandler(requestHandler),
-                dataTranslator(dataTranslator) {}
+                dataTranslator(dataTranslator),
+                responseControlMessageScheduler(this) {}
 
-        ~SensorParameterController() noexcept {};
+        ~SensorParameterController() noexcept {
+            terminateAndJoin();
+        };
 
         SensorParameterController(SensorParameterController const& other) = delete;
 
@@ -60,17 +62,31 @@ namespace SensorAccessLinkElement {
 
         SensorParameterController& operator=(SensorParameterController&& other)& noexcept = delete;
 
-        virtual void consume(SensorControlMessage&& sensorControlMessageResponse) override {
+        void linkElements() {
+            dataTranslator->linkConsumer(&responseControlMessageScheduler);
+
+            // TODO: implement a while(!allUpAndRunning()) {...
+            // Yield and sleep to allow correct connection
+            std::this_thread::yield();
+            std::this_thread::sleep_for(std::chrono::milliseconds(50));
+            // TODO: implement }
+        }
+
+        void terminateAndJoin() {
+            responseControlMessageScheduler.terminateAndJoin();
+        }
+
+        void consume(SensorControlMessage&& sensorControlMessageResponse) override {
             /**
              *  TODO:
              *  - Create schedulers and link'em in SensorAccessLink
              *  - receive and process ControlMessage // from sensor
              *  - transmit to server w/ ServerCommunicator*
              */
-
         }
 
         using ErrorSource::linkConsumer;
+
 
     private:
 
@@ -79,6 +95,8 @@ namespace SensorAccessLinkElement {
 
         SensorControlMessages sensorControlMessageRequests;
         SensorControlMessagePointers sensorControlMessageRequestPointers;
+
+        ResponseControlMessageScheduler responseControlMessageScheduler;
     };
 }
 

@@ -62,30 +62,30 @@ namespace Sensor {
                 Metrics::TimeTrackingDefinition<
                         Constants::NUMBER_OF_SENSOR_TIME_POINTS,
                         Constants::NUMBER_OF_GATEWAY_TIME_POINTS
-                > StubTimeTrackingDefinition;
+                > TimeTrackingDefinition;
 
                 typedef typename
                 Sensor::SensorMessageDefinition<
                         Constants::NUMBER_OF_PIXELS,
-                        StubTimeTrackingDefinition
-                > StubMessageDefinition;
+                        TimeTrackingDefinition
+                > MessageDefinition;
 
                 typedef typename
                 Sensor::RawDataDefinition<
                         Constants::STUB_SENSOR_DATA_TYPE,
                         Constants::NUMBER_OF_CHANNELS,
                         Constants::RAW_DATA_SAMPLING_LENGTH
-                > StubRawDataDefinition;
+                > RawDataDefinition;
 
                 typedef typename
                 Sensor::ControlMessageDefinition<
                         Constants::STUB_SENSOR_DATA_TYPE,
                         Constants::MAX_COMMAND_PAYLOAD_SIZE
-                > StubControlMessageDefinition;
+                > ControlMessageDefinition;
 
-                typedef typename DataFlow::SensorMessage<StubMessageDefinition> Message;
-                typedef typename DataFlow::RawData<StubRawDataDefinition> RawData;
-                typedef typename DataFlow::ControlMessage<StubControlMessageDefinition> ControlMessage;
+                typedef typename DataFlow::SensorMessage<MessageDefinition> Message;
+                typedef typename DataFlow::RawData<RawDataDefinition> RawData;
+                typedef typename DataFlow::ControlMessage<ControlMessageDefinition> ControlMessage;
                 using Parameters = Sensor::FakeParameter::FruitBasketParameters;
 
                 static size_t const MAX_NUMBER_OF_BULK_FETCHABLE_MESSAGES = 2;

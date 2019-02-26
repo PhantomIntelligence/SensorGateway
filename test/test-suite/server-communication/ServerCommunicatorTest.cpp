@@ -36,6 +36,7 @@ class ServerCommunicatorTest : public ::testing::Test {
 public:
 
     using RequestAssembler = Assemble::ServerRequestAssembler;
+    using ResponseAssembler = Assemble::ServerResponseAssembler;
 
     using DataStructures = Sensor::Test::Simple::Structures;
     using ParameterListForThisTestCase = DataStructures::Parameters;
@@ -56,6 +57,7 @@ protected:
 
     using GetParameterValueRequest = ServerCommunication::RequestTypes::GetParameterValue;
     using HandleGetParameterValueRequest = std::function<void(GetParameterValueRequest&&)>;
+    using NoAction = StringLiteral<decltype(""_ToString)>;
 
     ServerCommunicatorTest() = default;
 
@@ -64,7 +66,7 @@ protected:
     auto givenAnErrorMessageResponse() const {
         auto badRequest = Given::anInvalidGetParameterValueRequest<ParameterListForThisTestCase>();
         badRequest.markAsBadRequest();
-        auto badRequestResponse = Assemble::ServerResponse::createErrorResponseFromBadRequest(std::move(badRequest));
+        auto badRequestResponse = ResponseAssembler::createErrorMessageResponseFromRequest<NoAction>(std::move(badRequest));
         return badRequestResponse;
     }
 
@@ -73,8 +75,9 @@ protected:
         validRequest.markAsErrorCause();
         ParameterListForThisTestCase availableParameters;
         auto metadata = availableParameters.getMetadataFor((validRequest.payloadToString()));
-        auto parameterErrorResponse = Assemble::ServerResponse::createParameterErrorResponse(metadata,
-                                                                                             std::move(validRequest));
+        auto parameterErrorResponse = Assemble::ServerResponseAssembler::createParameterErrorResponse(metadata,
+                                                                                                      std::move(
+                                                                                                              validRequest));
         return parameterErrorResponse;
     }
 
@@ -112,7 +115,9 @@ protected:
     };
 
     template<typename Response>
-    testing::AssertionResult closeConnectionIsCalledAfterStrategyThrowsOnSendResponse(ThrowingServerCommunicationStrategy* throwingStrategy, Response&& response) noexcept {
+    testing::AssertionResult
+    closeConnectionIsCalledAfterStrategyThrowsOnSendResponse(ThrowingServerCommunicationStrategy* throwingStrategy,
+                                                             Response&& response) noexcept {
 
         ServerCommunicator serverCommunicator(throwingStrategy, ignoreHandleGetParameterValue());
 
@@ -131,7 +136,9 @@ protected:
     }
 
     template<typename Response>
-    testing::AssertionResult openConnectionIsCalledAfterStrategyThrowsOnSendResponse(ThrowingServerCommunicationStrategy* throwingStrategy, Response&& response) noexcept {
+    testing::AssertionResult
+    openConnectionIsCalledAfterStrategyThrowsOnSendResponse(ThrowingServerCommunicationStrategy* throwingStrategy,
+                                                            Response&& response) noexcept {
 
         ServerCommunicator serverCommunicator(throwingStrategy, ignoreHandleGetParameterValue());
 
@@ -607,7 +614,7 @@ TEST_F(ServerCommunicatorTest,
     MockRequestHandler mockRequestHandler;
     mockRequestHandler.setExpectedNumberOfGetParameterValueRequest(expectedNumberOfRequest);
     RequestResponseServerCommunicationStrategy requestResponseStrategy;
-    requestResponseStrategy.setNumberOfUniqueValidGetParameterValueContentsToReturn(expectedNumberOfRequest);
+    requestResponseStrategy.increaseNumberOfUniqueValidGetParameterValueContentsToReturnBy(expectedNumberOfRequest);
     ServerCommunicator serverCommunicator(&requestResponseStrategy,
                                           bindHandlerGetParameterValueTo(&mockRequestHandler));
 
@@ -623,7 +630,7 @@ TEST_F(ServerCommunicatorTest,
     MockRequestHandler mockRequestHandler;
     mockRequestHandler.setExpectedNumberOfGetParameterValueRequest(expectedNumberOfRequest);
     RequestResponseServerCommunicationStrategy requestResponseStrategy;
-    requestResponseStrategy.setNumberOfUniqueValidGetParameterValueContentsToReturn(expectedNumberOfRequest);
+    requestResponseStrategy.increaseNumberOfUniqueValidGetParameterValueContentsToReturnBy(expectedNumberOfRequest);
 
     ServerCommunicator serverCommunicator(&requestResponseStrategy,
                                           bindHandlerGetParameterValueTo(&mockRequestHandler));
@@ -643,8 +650,8 @@ TEST_F(ServerCommunicatorTest,
     MockRequestHandler mockRequestHandler;
     mockRequestHandler.setExpectedNumberOfGetParameterValueRequest(expectedNumberOfRequest);
     RequestResponseServerCommunicationStrategy requestResponseStrategy;
-    requestResponseStrategy.setNumberOfUniqueValidGetParameterValueContentsToReturn(numberOfUniqueRequest);
-    requestResponseStrategy.setNumberOfDuplicateValidGetParameterValueContentsToReturn(numberOfDuplicateRequest);
+    requestResponseStrategy.increaseNumberOfUniqueValidGetParameterValueContentsToReturnBy(numberOfUniqueRequest);
+    requestResponseStrategy.increaseNumberOfDuplicateValidGetParameterValueContentsToReturnBy(numberOfDuplicateRequest);
 
     ServerCommunicator serverCommunicator(&requestResponseStrategy,
                                           bindHandlerGetParameterValueTo(&mockRequestHandler));

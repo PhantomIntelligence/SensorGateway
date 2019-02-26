@@ -17,8 +17,8 @@
 #ifndef SENSORGATEWAY_REQUESTHANDLER_HPP
 #define SENSORGATEWAY_REQUESTHANDLER_HPP
 
-#include "ServerRequest.hpp"
-#include "RequestHandlingErrorFactory.h"
+#include "ServerResponseAssembler.hpp"
+#include "ServerRequestAssembler.hpp"
 
 namespace SensorAccessLinkElement {
 
@@ -44,6 +44,8 @@ namespace SensorAccessLinkElement {
         using ErrorSource = DataFlow::DataSource<ErrorHandling::SensorAccessLinkError>;
 
         using GetParameterValueRequest = ServerCommunication::RequestTypes::GetParameterValue;
+
+        using GetParameter = StringLiteral<decltype("get parameter"_ToString)>;
 
     public:
         explicit RequestHandler(ServerCommunicator* serverCommunicator,
@@ -72,11 +74,13 @@ namespace SensorAccessLinkElement {
         }
 
         virtual void handleGetParameterValueRequest(GetParameterValueRequest&& getParameterValueRequest) {
+            std::string const& parameterName = getParameterValueRequest.payloadToString();
             try {
-                ensureParameterIsAvailable(getParameterValueRequest.payloadToString());
-            } catch(ErrorHandling::SensorAccessLinkError& error) {
-
+                ensureParameterIsAvailable(parameterName);
+            } catch (ErrorHandling::SensorAccessLinkError& error) {
                 ErrorSource::produce(std::move(error));
+                getParameterValueRequest.markAsBadRequest();
+                writeAndSendErrorMessageResponse<GetParameter>(std::move(getParameterValueRequest));
             }
 
             // TODO : If request.isBadRequest() ->
@@ -92,6 +96,15 @@ namespace SensorAccessLinkElement {
         using ErrorSource::linkConsumer;
 
     private:
+
+        using ResponseAssembler = Assemble::ServerResponseAssembler;
+
+        template<typename AttemptedAction, typename Request>
+        void writeAndSendErrorMessageResponse(Request&& request) {
+            auto errorMessageResponse =
+                    ResponseAssembler::createErrorMessageResponseFromRequest<AttemptedAction>(request);
+            serverCommunicator->sendResponse(std::move(errorMessageResponse));
+        }
 
         ServerCommunicator* serverCommunicator;
         SensorParameterController* sensorParameterController;

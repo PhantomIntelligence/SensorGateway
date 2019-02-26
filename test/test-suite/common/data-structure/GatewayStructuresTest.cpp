@@ -71,15 +71,15 @@ TEST_F(GatewayStructuresTest,
             GatewayStructureTest::Param<LaserControlDefinition>
     >;
 
-    using GatewayTestSturctures = Sensor::Gateway::Structures<
-            RealisticTestStructures::StubMessageDefinition,
-            RealisticTestStructures::StubRawDataDefinition,
-            RealisticTestStructures::StubControlMessageDefinition,
+    using GatewayTestStructures = Sensor::Gateway::Structures<
+            RealisticTestStructures::MessageDefinition,
+            RealisticTestStructures::RawDataDefinition,
+            RealisticTestStructures::ControlMessageDefinition,
             FakeGatewayParametersList
     >;
 
     FakeGatewayParametersList fakeGatewayParametersList;
-    GatewayTestSturctures::Parameters parameters;
+    GatewayTestStructures::Parameters parameters;
 
     auto expectedParametersNames = fakeGatewayParametersList.getNames();
     auto actualParametersNames = parameters.getNames();

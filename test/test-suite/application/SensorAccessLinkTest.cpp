@@ -246,7 +246,7 @@ TEST_F(SensorAccessLinkTest,
                                       &mockSensorCommunicationStrategy);
 
     sensorAccessLink.start(FAKE_SERVER_ADDRESS);
-    std::this_thread::yield();
+    yield();
     sensorAccessLink.terminateAndJoin();
 
     auto sensorCloseConnectionHasBeenCalled = mockSensorCommunicationStrategy.hasCloseConnectionBeenCalled();

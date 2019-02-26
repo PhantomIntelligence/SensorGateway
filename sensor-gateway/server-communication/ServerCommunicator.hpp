@@ -19,8 +19,6 @@
 
 #include "RequestHandler.hpp"
 #include "ServerCommunicationStrategy.hpp"
-#include "ServerRequestAssembler.hpp"
-#include "ServerResponseAssembler.hpp"
 
 namespace SensorAccessLinkElement {
 
@@ -59,6 +57,7 @@ namespace SensorAccessLinkElement {
                 serverConnected(false), // TODO: add logic not to send anything until server is connected
                 terminateOrderReceived(false),
                 requestReceptionThread(JoinableThread(doNothing)) {
+            requestReceptionThread.exitSafely();
         };
 
         ~ServerCommunicator() noexcept = default;

@@ -54,7 +54,7 @@ namespace Mock {
                 numberOfDuplicateValidGetParameterValueContentsToReturn(0),
                 numberOfUniqueInvalidGetParameterValueContentsToReturn(0),
                 numberOfDuplicateInvalidGetParameterValueContentsToReturn(0),
-                sendGetParameterValueResponseCalled(false)
+                sendResponseErrorMessageCalled(false)
         // SetParameterValue
         {}
 
@@ -65,61 +65,75 @@ namespace Mock {
 
         GetParameterValueContents fetchGetParameterValueContents() override {
             LockGuard guard(getParameterValueMutex);
-            acknowledgeGetParameterValueContentsHasBeenCalled();
 
             GetParameterValueContents getParameterValueContents;
 
-            std::string name;
+            // Fix the number of request to return so it won't be changed mid-operation (thread safety)
+            auto numberOfUniqueValid = loadMockSetting(&numberOfUniqueValidGetParameterValueContentsToReturn);
+            auto numberOfDuplicateValid = loadMockSetting(&numberOfDuplicateValidGetParameterValueContentsToReturn);
+            auto numberOfUniqueInvalid = loadMockSetting(&numberOfUniqueInvalidGetParameterValueContentsToReturn);
+            auto numberOfDuplicateInvalid = loadMockSetting(&numberOfDuplicateInvalidGetParameterValueContentsToReturn);
 
-            auto totalNumberOfRequestToReturn = numberOfUniqueValidGetParameterValueContentsToReturn +
-                                                numberOfDuplicateValidGetParameterValueContentsToReturn +
-                                                numberOfUniqueInvalidGetParameterValueContentsToReturn +
-                                                numberOfDuplicateInvalidGetParameterValueContentsToReturn;
+            auto totalNumberOfRequestToReturn = numberOfUniqueValid + numberOfDuplicateValid +
+                                                numberOfUniqueInvalid + numberOfDuplicateInvalid;
             assert(totalNumberOfRequestToReturn <= T::MAX_NUMBER_OF_CONCURRENT_REQUEST_OF_ONE_KIND);
 
             auto returnedContentStartIterator = getParameterValueContents.begin();
 
-            // Valid unique requests
-            std::copy_n(validParameterNames.begin(), numberOfUniqueValidGetParameterValueContentsToReturn, returnedContentStartIterator);
+            if (numberOfUniqueValid > 0) {
+                std::copy_n(validParameterNames.begin(), numberOfUniqueValid, returnedContentStartIterator);
 
-            for (auto counter = 0u; counter < numberOfUniqueValidGetParameterValueContentsToReturn; ++counter) {
-                returnedContentStartIterator++;
+                for (auto counter = 0u; counter < numberOfUniqueValid; ++counter) {
+                    returnedContentStartIterator++;
+
+                    // Reset after request are "Received" by the SensorGateway
+                    decrementMockSetting(&numberOfUniqueValidGetParameterValueContentsToReturn);
+                }
             }
 
-            // Valid duplicate requests
-            uint16_t duplicateValidRequestCounter = 0;
-            while (duplicateValidRequestCounter != numberOfDuplicateValidGetParameterValueContentsToReturn) {
-                std::copy_n(validParameterNames.begin(), 1, returnedContentStartIterator);
-                returnedContentStartIterator++;
-                duplicateValidRequestCounter++;
+            if (numberOfDuplicateValid > 0) {
+                uint16_t duplicateValidRequestCounter = 0;
+                while (duplicateValidRequestCounter != numberOfDuplicateValid) {
+                    std::copy_n(validParameterNames.begin(), 1, returnedContentStartIterator);
+                    returnedContentStartIterator++;
+                    duplicateValidRequestCounter++;
+
+                    // Reset after request are "Received" by the SensorGateway
+                    decrementMockSetting(&numberOfDuplicateValidGetParameterValueContentsToReturn);
+                }
             }
 
-            // Invalid unique requests
-            std::copy_n(invalidParameterNames.begin(), numberOfUniqueInvalidGetParameterValueContentsToReturn, returnedContentStartIterator);
+            if (numberOfUniqueInvalid > 0) {
+                std::copy_n(invalidParameterNames.begin(), numberOfUniqueInvalid, returnedContentStartIterator);
 
-            for (auto counter = 0u; counter < numberOfUniqueInvalidGetParameterValueContentsToReturn; ++counter) {
-                returnedContentStartIterator++;
+                for (auto counter = 0u; counter < numberOfUniqueInvalid; ++counter) {
+                    returnedContentStartIterator++;
+
+                    // Reset after request are "Received" by the SensorGateway
+                    decrementMockSetting(&numberOfUniqueInvalidGetParameterValueContentsToReturn);
+                }
             }
 
             // Invalid duplicate requests
-            uint16_t duplicateInvalidRequestCounter = 0;
-            while (duplicateInvalidRequestCounter != numberOfDuplicateInvalidGetParameterValueContentsToReturn) {
-                std::copy_n(invalidParameterNames.begin(), 1, returnedContentStartIterator);
-                returnedContentStartIterator++;
-                duplicateInvalidRequestCounter++;
+            if (numberOfDuplicateInvalid > 0) {
+                uint16_t duplicateInvalidRequestCounter = 0;
+                while (duplicateInvalidRequestCounter != numberOfDuplicateInvalid) {
+                    std::copy_n(invalidParameterNames.begin(), 1, returnedContentStartIterator);
+                    returnedContentStartIterator++;
+                    duplicateInvalidRequestCounter++;
+
+                    // Reset after request are "Received" by the SensorGateway
+                    decrementMockSetting(&numberOfDuplicateInvalidGetParameterValueContentsToReturn);
+                }
             }
 
 
             // Backup for test validation
-            std::copy_n(getParameterValueContents.cbegin(), totalNumberOfRequestToReturn, returnedGetParameterValueContents.begin());
+            std::copy_n(getParameterValueContents.cbegin(), totalNumberOfRequestToReturn,
+                        returnedGetParameterValueContents.begin());
 
             return getParameterValueContents;
         };
-
-// TODO :
-//        void sendGetParameterValueResponse(Response&& response) override {
-//        sendGetParameterValueResponseCalled.store(true);
-//        }
 
         void sendMessage(typename super::Message&& message) override {
         }
@@ -131,31 +145,40 @@ namespace Mock {
         }
 
         void sendResponse(ErrorMessageResponse&& errorMessageResponse) override {
+            acknowledgeSendResponseErrorMessageHasBeenCalled();
         }
 
         void closeConnection() override {
         }
 
-        void waitUntilSendGetParameterValueResponseIsCalled() {
-            if (!hasSendGetParameterValueResponseBeenCalled()) {
-                sendGetParameterValueResponseCalledAcknowledgement.get_future().wait();
+        void waitUntilSendResponseErrorMessageIsCalled() {
+            if (!hasSendResponseErrorMessageBeenCalled()) {
+                sendResponseErrorMessageCalledAcknowledgement.get_future().wait();
             }
         }
 
-        void setNumberOfUniqueValidGetParameterValueContentsToReturn(uint16_t newNumberToReturn) {
-            numberOfUniqueValidGetParameterValueContentsToReturn = newNumberToReturn;
+        void increaseNumberOfUniqueValidGetParameterValueContentsToReturnBy(uint16_t newNumberToReturn) {
+            for (auto i = 0u; i < newNumberToReturn; ++i) {
+                incrementMockSetting(&numberOfUniqueValidGetParameterValueContentsToReturn);
+            }
         }
 
-        void setNumberOfDuplicateValidGetParameterValueContentsToReturn(uint16_t newNumberToReturn) {
-            numberOfDuplicateValidGetParameterValueContentsToReturn = newNumberToReturn;
+        void increaseNumberOfDuplicateValidGetParameterValueContentsToReturnBy(uint16_t newNumberToReturn) {
+            for (auto i = 0u; i < newNumberToReturn; ++i) {
+                incrementMockSetting(&numberOfDuplicateValidGetParameterValueContentsToReturn);
+            }
         }
 
-        void setNumberOfUniqueInvalidGetParameterValueContentsToReturn(uint16_t newNumberToReturn) {
-            numberOfUniqueInvalidGetParameterValueContentsToReturn = newNumberToReturn;
+        void increaseNumberOfUniqueInvalidGetParameterValueContentsToReturnBy(uint16_t newNumberToReturn) {
+            for (auto i = 0u; i < newNumberToReturn; ++i) {
+                incrementMockSetting(&numberOfUniqueInvalidGetParameterValueContentsToReturn);
+            }
         }
 
-        void setNumberOfDuplicateInvalidGetParameterValueContentsToReturn(uint16_t newNumberToReturn) {
-            numberOfDuplicateInvalidGetParameterValueContentsToReturn = newNumberToReturn;
+        void increaseNumberOfDuplicateInvalidGetParameterValueContentsToReturnBy(uint16_t newNumberToReturn) {
+            for (auto i = 0u; i < newNumberToReturn; ++i) {
+                incrementMockSetting(&numberOfDuplicateInvalidGetParameterValueContentsToReturn);
+            }
         }
 
         GetParameterValueContents const& getReturnedGetParameterValueRequest() noexcept {
@@ -163,33 +186,49 @@ namespace Mock {
             return returnedGetParameterValueContents;
         }
 
+        bool hasSendResponseErrorMessageBeenCalled() const {
+            return sendResponseErrorMessageCalled.load();
+        }
+
     private:
 
-        void acknowledgeGetParameterValueContentsHasBeenCalled() {
-            LockGuard guard(sendGetParameterValueResponseAckMutex);
-            if (!hasSendGetParameterValueResponseBeenCalled()) {
-                sendGetParameterValueResponseCalled.store(true);
-                sendGetParameterValueResponseCalledAcknowledgement.set_value(true);
+        void incrementMockSetting(AtomicCounter* atomicCounter) {
+            LockGuard guard(mockSettingsMutex);
+            ++(*atomicCounter);
+        }
+
+        void decrementMockSetting(AtomicCounter* atomicCounter) {
+            LockGuard guard(mockSettingsMutex);
+            --(*atomicCounter);
+        }
+
+        auto loadMockSetting(AtomicCounter* atomicCounter) {
+            LockGuard guard(mockSettingsMutex);
+            return atomicCounter->load();
+        }
+
+        void acknowledgeSendResponseErrorMessageHasBeenCalled() {
+            LockGuard guard(sendGetResponseErrorMessageAckMutex);
+            if (!hasSendResponseErrorMessageBeenCalled()) {
+                sendResponseErrorMessageCalled.store(true);
+                sendResponseErrorMessageCalledAcknowledgement.set_value(true);
             }
         }
 
 
-        bool hasSendGetParameterValueResponseBeenCalled() const {
-            return sendGetParameterValueResponseCalled.load();
-        }
-
         ParameterNames validParameterNames;
         ParameterNames invalidParameterNames;
 
-        AtomicFlag sendGetParameterValueResponseCalled;
-        Mutex sendGetParameterValueResponseAckMutex;
-        mutable BooleanPromise sendGetParameterValueResponseCalledAcknowledgement;
+        AtomicFlag sendResponseErrorMessageCalled;
+        Mutex sendGetResponseErrorMessageAckMutex;
+        mutable BooleanPromise sendResponseErrorMessageCalledAcknowledgement;
 
         Mutex getParameterValueMutex;
-        uint16_t numberOfUniqueValidGetParameterValueContentsToReturn;
-        uint16_t numberOfDuplicateValidGetParameterValueContentsToReturn;
-        uint16_t numberOfUniqueInvalidGetParameterValueContentsToReturn;
-        uint16_t numberOfDuplicateInvalidGetParameterValueContentsToReturn;
+        Mutex mockSettingsMutex;
+        AtomicCounter numberOfUniqueValidGetParameterValueContentsToReturn;
+        AtomicCounter numberOfDuplicateValidGetParameterValueContentsToReturn;
+        AtomicCounter numberOfUniqueInvalidGetParameterValueContentsToReturn;
+        AtomicCounter numberOfDuplicateInvalidGetParameterValueContentsToReturn;
         GetParameterValueContents returnedGetParameterValueContents;
     };
 }

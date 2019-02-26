@@ -41,9 +41,10 @@ private:
 };
 
 TEST_F(ServerResponseTest, given_aBadRequestResponse_when_isSuccess_then_returnsFalse) {
+    using NoAction = StringLiteral<decltype(""_ToString)>;
     auto invalidRequest = Given::anInvalidGetParameterValueRequest<AvailableParameters>();
     invalidRequest.markAsBadRequest();
-    auto response = Assemble::ServerResponse::createErrorResponseFromBadRequest(std::move(invalidRequest));
+    auto response = Assemble::ServerResponseAssembler::createErrorMessageResponseFromRequest<NoAction>(std::move(invalidRequest));
 
     auto success = decltype(response)::isSuccess();
     ASSERT_FALSE(success);
@@ -54,7 +55,7 @@ TEST_F(ServerResponseTest, given_aGoodRequestResponseThatCausedAnError_when_isSu
     validRequest.markAsErrorCause();
     AvailableParameters availableParameters;
     auto metadata = availableParameters.getMetadataFor((validRequest.payloadToString()));
-    auto response = Assemble::ServerResponse::createParameterErrorResponse(metadata, std::move(validRequest));
+    auto response = Assemble::ServerResponseAssembler::createParameterErrorResponse(metadata, std::move(validRequest));
 
     auto success = decltype(response)::isSuccess();
     ASSERT_FALSE(success);

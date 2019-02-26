@@ -22,6 +22,7 @@
 
 #include "test/utilities/data-model/DataModelFixture.h"
 #include "test/utilities/mock/DevNullDataTranslationStrategyMock.hpp"
+#include "test/utilities/mock/DevNullServerCommunicationStrategyMock.hpp"
 #include "test/utilities/assertion/ErrorAssertion.hpp"
 
 #include "sensor-gateway/parameter-control/SensorParameterController.hpp"
@@ -80,23 +81,24 @@ namespace RequestHandlerTestMock {
         DevNullTranslationStrategy devNullTranslationStrategy;
     };
 
-    class RequestLoopBackDataTranslatorMock final : public DataTranslator {
+    using ServerCommunicator = SensorAccessLinkElement::ServerCommunicator<RealisticDataStructures>;
+    using DevNullCommunicationStrategy = Mock::DevNullServerCommunicationStrategyMock<RealisticDataStructures>;
+
+    class DevNullServerCommunicatorMock final : public ServerCommunicator {
 
     protected:
 
-        using super = DataTranslator;
-
-        using super::SensorControlMessage;
+        using super = ServerCommunicator;
 
     public:
 
-        explicit RequestLoopBackDataTranslatorMock() :
-                DataTranslator(&devNullTranslationStrategy) {
+        explicit DevNullServerCommunicatorMock() :
+                ServerCommunicator(&devNullCommunicationStrategy, nullptr) {
         }
 
     private:
 
-        DevNullTranslationStrategy devNullTranslationStrategy;
+        DevNullCommunicationStrategy devNullCommunicationStrategy;
     };
 }
 
@@ -106,7 +108,9 @@ TEST_F(RequestHandlerTest, given_anInvalidGetParameterValueRequest_when_handle_t
     ErrorSinkMock sink(numberOfErrorToReceive);
     ErrorProcessingScheduler scheduler(&sink);
 
-    RequestHandler requestHandler(nullptr, nullptr);
+    RequestHandlerTestMock::DevNullServerCommunicatorMock serverCommunicatorMock;
+
+    RequestHandler requestHandler(&serverCommunicatorMock, nullptr);
     requestHandler.linkConsumer(&scheduler);
 
     auto invalidRequest = Given::anInvalidGetParameterValueRequest<AvailableParameters>();
@@ -122,32 +126,6 @@ TEST_F(RequestHandlerTest, given_anInvalidGetParameterValueRequest_when_handle_t
 
     ASSERT_TRUE(Assert::errorHasBeenThrown(&sink, expectedError));
 }
-
-
-TEST_F(RequestHandlerTest, given_anInvalidGetParameterValueRequest_when_handle_then_asksTheServerCommunicationStrategyReceives) {
-    auto invalidRequest = Given::anInvalidGetParameterValueRequest<AvailableParameters>();
-    auto expectedBadRequest = ServerCommunication::RequestTypes::GetParameterValue(invalidRequest);
-    expectedBadRequest.markAsBadRequest();
-
-//    ASSERT_TRUE(hasThrownError);
-
-
-// TODO : complete this test
-
-//    using Sensor::Gateway::Parameters;
-//    using ImpossibleParameter = Sensor::FakeParameter::Impossible;
-//    using ImpossibleParameters = Parameters<ImpossibleParameter>;
-//    auto hasThrownError = false;
-//    try {
-//        Assemble::ServerRequestAssembler<ImpossibleParameters>::ensureParameterIsAvailable(
-//                ImpossibleParameter::getStringifiedName());
-//    } catch (ErrorHandling::SensorAccessLinkError& strategyError) {
-//        hasThrownError = true;
-//    }
-//    ASSERT_EQ(expectedBadRequest, actualRequest);
-    SUCCEED();
-}
-
 
 #endif //SENSORGATEWAY_REQUESTHANDLERTEST_CPP
 

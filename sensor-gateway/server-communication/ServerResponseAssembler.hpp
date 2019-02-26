@@ -20,48 +20,69 @@
 #include "ServerResponse.hpp"
 
 namespace Assemble {
-    namespace ServerResponse {
 
-        using ServerCommunication::ResponseType::ParameterErrorResponse;
-        using ServerCommunication::ResponseType::ErrorMessageResponse;
-        using ServerCommunication::PayloadTypes::ParameterErrorPayload;
-        using ServerCommunication::PayloadTypes::ErrorPayload;
-        using ServerCommunication::PayloadTypes::MessagePayload;
+    /**
+     * @note This is not tested by purpose, it is essentially a Factory.
+     */
+    class ServerResponseAssembler {
 
+        using ParameterErrorResponse =  ServerCommunication::ResponseType::ParameterErrorResponse;
+        using ErrorMessageResponse =  ServerCommunication::ResponseType::ErrorMessageResponse;
+        using ParameterErrorPayload =  ServerCommunication::PayloadTypes::ParameterErrorPayload;
+        using ErrorPayload =  ServerCommunication::PayloadTypes::ErrorPayload;
+        using MessagePayload =  ServerCommunication::PayloadTypes::MessagePayload;
+
+
+    public:
+
+        explicit ServerResponseAssembler() = delete;
+
+        ~ServerResponseAssembler() = delete;
 
         template<typename Request>
-        static auto createErrorResponseFromBadRequest(Request&& request) -> ErrorMessageResponse {
+        static auto createErrorMessageResponseFromBadRequest(Request const& request,
+                                                             std::string const& attemptedActionString) -> ErrorMessageResponse {
             using ServerCommunication::ResponseMessage::BadRequest;
             ErrorPayload responseBadRequestPayload(BadRequest::toString());
-            ServerCommunication::PayloadTypes::ErrorPayload badRequestPayload(request.payloadToString());
+            ServerCommunication::PayloadTypes::ErrorPayload badRequestPayload(
+                    attemptedActionString + " : " + request.payloadToString());
             ErrorMessageResponse response(responseBadRequestPayload, badRequestPayload);
             return response;
         }
 
-        namespace Details {
+        template<typename AttemptedAction, typename Request>
+        static auto createErrorMessageResponseFromRequest(Request const& request) -> ErrorMessageResponse {
+            ErrorMessageResponse errorMessageResponse;
+            if (request.isBadRequest()) {
+                errorMessageResponse = createErrorMessageResponseFromBadRequest(request, AttemptedAction::toString());
+            }
 
-            template<typename Data>
-            static auto createParameterErrorPayload(Data const& data) -> ParameterErrorPayload {
-                // TODO : change this for eventual actual response from sensor
-                ErrorPayload errorMessage("...");
-
-                ParameterErrorPayload parameterErrorPayload(
-                        std::make_tuple(data.name, errorMessage, data.unit)
-                );
-                return parameterErrorPayload;
-            };
+            return errorMessageResponse;
         }
+
 
         template<typename Data, typename Request>
         static auto createParameterErrorResponse(Data const& data, Request&& request) -> ParameterErrorResponse {
             using ServerCommunication::ResponseMessage::ParameterError;
-            ParameterErrorPayload const parameterErrorPayload = Details::createParameterErrorPayload(data);
+            ParameterErrorPayload const parameterErrorPayload = createParameterErrorPayload(data);
             ErrorPayload const errorMessage(request.payloadToString());
             ParameterErrorResponse response(parameterErrorPayload, errorMessage);
             return response;
         }
 
-    }
+    private:
+        template<typename Data>
+        static auto createParameterErrorPayload(Data const& data) -> ParameterErrorPayload {
+            // TODO : change this for eventual actual parameter error message from sensor
+            ErrorPayload errorMessage("...");
+
+            ParameterErrorPayload parameterErrorPayload(
+                    std::make_tuple(data.name, errorMessage, data.unit)
+            );
+            return parameterErrorPayload;
+        }
+
+    };
 }
 
 

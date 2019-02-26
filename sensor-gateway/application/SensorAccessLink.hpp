@@ -90,12 +90,6 @@ namespace SensorGateway {
         void start(std::string const& serverAddress) {
             linkElements();
 
-            // TODO: implement a while(!allUpAndRunning()) {...
-            // Yield and sleep to allow correct connection
-            std::this_thread::yield();
-            std::this_thread::sleep_for(std::chrono::milliseconds(50));
-            // TODO: implement }
-
             serverCommunicator.openConnection(serverAddress);
             sensorCommunicator.start();
         };
@@ -104,6 +98,7 @@ namespace SensorGateway {
             sensorCommunicator.terminateAndJoin();
             translatorMessageScheduler.terminateAndJoin();
             translatorRawDataScheduler.terminateAndJoin();
+            sensorParameterController.terminateAndJoin();
             serverCommunicatorMessageScheduler.terminateAndJoin();
             serverCommunicatorRawDataScheduler.terminateAndJoin();
             serverCommunicator.terminateAndJoin();
@@ -138,12 +133,19 @@ namespace SensorGateway {
             dataTranslationStrategy->linkConsumer(&serverCommunicatorRawDataScheduler);
             sensorCommunicator.linkConsumer(&translatorMessageScheduler);
             sensorCommunicator.linkConsumer(&translatorRawDataScheduler);
+            sensorParameterController.linkElements();
 
             sensorCommunicator.linkConsumer(&errorScheduler);
             dataTranslator.linkConsumer(&errorScheduler);
             serverCommunicator.linkConsumer(&errorScheduler);
             requestHandler.linkConsumer(&errorScheduler);
             sensorParameterController.linkConsumer(&errorScheduler);
+
+            // TODO: implement a while(!allUpAndRunning()) {...
+            // Yield and sleep to allow correct connection
+            std::this_thread::yield();
+            std::this_thread::sleep_for(std::chrono::milliseconds(50));
+            // TODO: implement }
         }
 
         ServerCommunicationStrategy* serverCommunicationStrategy;
