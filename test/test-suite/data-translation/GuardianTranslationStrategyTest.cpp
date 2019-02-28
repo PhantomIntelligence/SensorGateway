@@ -32,14 +32,14 @@ using Defaults::Track::DEFAULT_SPEED;
 
 using DataTranslation::GuardianTranslationStrategy;
 using DataTranslation::GuardianStructures;
-using DataTranslation::GuardianSpiritStructures;
+using DataTranslation::GuardianGatewayStructures;
 
 using GuardianMessage = GuardianStructures::Message;
 using GuardianRawData = GuardianStructures::RawData;
-using SpiritMessage = GuardianSpiritStructures::Message;
-using SpiritRawData = GuardianSpiritStructures::RawData;
+using GatewayMessage = GuardianGatewayStructures::Message;
+using GatewayRawData = GuardianGatewayStructures::RawData;
 
-using PixelsArray = typename SpiritMessage::Pixels;
+using PixelsArray = typename GatewayMessage::Pixels;
 using DataFlow::PixelId;
 
 
@@ -47,19 +47,19 @@ class GuardianTranslationStrategyTest : public ::testing::Test {
 
 protected:
 
-    using SpiritMessageSinkMock = Mock::ArbitraryDataSinkMock<SpiritMessage>;
-    using SpiritRawDataSinkMock = Mock::ArbitraryDataSinkMock<SpiritRawData>;
-    using SpiritMessageProcessingScheduler = DataFlow::DataProcessingScheduler<SpiritMessage, SpiritMessageSinkMock, 1>;
-    using SpiritRawDataProcessingScheduler = DataFlow::DataProcessingScheduler<SpiritRawData, SpiritRawDataSinkMock, 1>;
+    using GatewayMessageSinkMock = Mock::ArbitraryDataSinkMock<GatewayMessage>;
+    using GatewayRawDataSinkMock = Mock::ArbitraryDataSinkMock<GatewayRawData>;
+    using GatewayMessageProcessingScheduler = DataFlow::DataProcessingScheduler<GatewayMessage, GatewayMessageSinkMock, 1>;
+    using GatewayRawDataProcessingScheduler = DataFlow::DataProcessingScheduler<GatewayRawData, GatewayRawDataSinkMock, 1>;
 
     PixelId const SOME_PIXEL_ID = 11;
-    SpiritMessage const BASE_FRAME = SpiritMessage(64829, 16, PixelsArray());
-    SpiritMessage const FRAME_AFTER_END_OF_FRAME_MESSAGE_TRANSLATION = BASE_FRAME;
-    SpiritMessage const FRAME_AFTER_DETECTION_TRACK_AND_END_OF_FRAME_MESSAGES_TRANSLATION =
-            addTrackToSpiritMessage(BASE_FRAME,
+    GatewayMessage const BASE_FRAME = GatewayMessage(64829, 16, PixelsArray());
+    GatewayMessage const FRAME_AFTER_END_OF_FRAME_MESSAGE_TRANSLATION = BASE_FRAME;
+    GatewayMessage const FRAME_AFTER_DETECTION_TRACK_AND_END_OF_FRAME_MESSAGES_TRANSLATION =
+            addTrackToGatewayMessage(BASE_FRAME,
                                     Track(14291, 96, 379, DEFAULT_ACCELERATION, DEFAULT_DISTANCE, DEFAULT_SPEED));
-    SpiritMessage const FRAME_AFTER_DETECTION_TRACK_AND_VELOCITY_TRACK_AND_END_OF_FRAME_MESSAGES_TRANSLATION =
-            addTrackToSpiritMessage(BASE_FRAME, Track(14291, 96, 379, 256, 106, 0));
+    GatewayMessage const FRAME_AFTER_DETECTION_TRACK_AND_VELOCITY_TRACK_AND_END_OF_FRAME_MESSAGES_TRANSLATION =
+            addTrackToGatewayMessage(BASE_FRAME, Track(14291, 96, 379, 256, 106, 0));
 
     GuardianMessage const SOME_DETECTION_TRACK_AWL_MESSAGE = GuardianMessage(10, 2188169, 8,
                                                                              {211, 55, 0, 11, 0, 96, 123, 1});
@@ -107,83 +107,83 @@ protected:
     }
 
 private:
-    SpiritMessage const addTrackToSpiritMessage(SpiritMessage sensorMessage, Track track) const {
-        SpiritMessage sensorMessageCopy = SpiritMessage(std::move(sensorMessage));
+    GatewayMessage const addTrackToGatewayMessage(GatewayMessage sensorMessage, Track track) const {
+        GatewayMessage sensorMessageCopy = GatewayMessage(std::move(sensorMessage));
         sensorMessageCopy.addTrackToPixelWithId(SOME_PIXEL_ID, std::move(track));
         return sensorMessageCopy;
     }
 };
 
 TEST_F(GuardianTranslationStrategyTest,
-       given_someEndOfSpiritMessageAWLMessage_when_translatingOnlyThisMessage_then_buildsSpiritMessageWithValidAttributes) {
+       given_someEndOfGatewayMessageAWLMessage_when_translatingOnlyThisMessage_then_buildsGatewayMessageWithValidAttributes) {
 
-    auto endOfSpiritMessageAWLMessage = SOME_END_FRAME_AWL_MESSAGE;
-    auto expectedSpiritMessage = FRAME_AFTER_END_OF_FRAME_MESSAGE_TRANSLATION;
+    auto endOfGatewayMessageAWLMessage = SOME_END_FRAME_AWL_MESSAGE;
+    auto expectedGatewayMessage = FRAME_AFTER_END_OF_FRAME_MESSAGE_TRANSLATION;
     GuardianTranslationStrategy translationStrategy;
-    SpiritMessageSinkMock sensorMessageSinkMock(1);
-    SpiritMessageProcessingScheduler scheduler(&sensorMessageSinkMock);
+    GatewayMessageSinkMock sensorMessageSinkMock(1);
+    GatewayMessageProcessingScheduler scheduler(&sensorMessageSinkMock);
     translationStrategy.linkConsumer(&scheduler);
 
-    translationStrategy.translateMessage(std::move(endOfSpiritMessageAWLMessage));
+    translationStrategy.translateMessage(std::move(endOfGatewayMessageAWLMessage));
 
     scheduler.terminateAndJoin();
     sensorMessageSinkMock.waitConsumptionToBeReached();
-    auto actualSpiritMessage = sensorMessageSinkMock.getConsumedData().front();
-    ASSERT_EQ(expectedSpiritMessage, actualSpiritMessage);
+    auto actualGatewayMessage = sensorMessageSinkMock.getConsumedData().front();
+    ASSERT_EQ(expectedGatewayMessage, actualGatewayMessage);
 }
 
 TEST_F(GuardianTranslationStrategyTest,
-       given_someDetectionTrackAndEndOfSpiritMessageAWLMessages_when_translatingThoseMessagesInGivenOrder_then_buildsSpiritMessageWithValidAttribute) {
+       given_someDetectionTrackAndEndOfGatewayMessageAWLMessages_when_translatingThoseMessagesInGivenOrder_then_buildsGatewayMessageWithValidAttribute) {
 
     auto detectionTrackAWLMessage = SOME_DETECTION_TRACK_AWL_MESSAGE;
-    auto endOfSpiritMessageAWLMessage = SOME_END_FRAME_AWL_MESSAGE;
-    auto expectedSpiritMessage = FRAME_AFTER_DETECTION_TRACK_AND_END_OF_FRAME_MESSAGES_TRANSLATION;
+    auto endOfGatewayMessageAWLMessage = SOME_END_FRAME_AWL_MESSAGE;
+    auto expectedGatewayMessage = FRAME_AFTER_DETECTION_TRACK_AND_END_OF_FRAME_MESSAGES_TRANSLATION;
     GuardianTranslationStrategy translationStrategy;
-    SpiritMessageSinkMock sensorMessageSinkMock(1);
-    SpiritMessageProcessingScheduler scheduler(&sensorMessageSinkMock);
+    GatewayMessageSinkMock sensorMessageSinkMock(1);
+    GatewayMessageProcessingScheduler scheduler(&sensorMessageSinkMock);
     translationStrategy.linkConsumer(&scheduler);
 
     translationStrategy.translateMessage(std::move(detectionTrackAWLMessage));
-    translationStrategy.translateMessage(std::move(endOfSpiritMessageAWLMessage));
+    translationStrategy.translateMessage(std::move(endOfGatewayMessageAWLMessage));
 
     scheduler.terminateAndJoin();
     sensorMessageSinkMock.waitConsumptionToBeReached();
-    auto actualSpiritMessage = sensorMessageSinkMock.getConsumedData().front();
-    ASSERT_EQ(expectedSpiritMessage, actualSpiritMessage);
+    auto actualGatewayMessage = sensorMessageSinkMock.getConsumedData().front();
+    ASSERT_EQ(expectedGatewayMessage, actualGatewayMessage);
 }
 
 TEST_F(GuardianTranslationStrategyTest,
-       given_someDetectionTrackAndDetectionVelocityAndEndOfSpiritMessageAWLMessages_when_translatingThoseMessagesInGivenOrder_then_buildsSpiritMessageWithValidAttribute) {
+       given_someDetectionTrackAndDetectionVelocityAndEndOfGatewayMessageAWLMessages_when_translatingThoseMessagesInGivenOrder_then_buildsGatewayMessageWithValidAttribute) {
 
     auto detectionTrackAWLMessage = SOME_DETECTION_TRACK_AWL_MESSAGE;
     auto detectionVelocityAWLMessage = SOME_VELOCITY_TRACK_AWL_MESSAGE;
-    auto endOfSpiritMessageAWLMessage = SOME_END_FRAME_AWL_MESSAGE;
-    auto expectedSpiritMessage = FRAME_AFTER_DETECTION_TRACK_AND_VELOCITY_TRACK_AND_END_OF_FRAME_MESSAGES_TRANSLATION;
+    auto endOfGatewayMessageAWLMessage = SOME_END_FRAME_AWL_MESSAGE;
+    auto expectedGatewayMessage = FRAME_AFTER_DETECTION_TRACK_AND_VELOCITY_TRACK_AND_END_OF_FRAME_MESSAGES_TRANSLATION;
     GuardianTranslationStrategy translationStrategy;
-    SpiritMessageSinkMock sensorMessageSinkMock(1);
-    SpiritMessageProcessingScheduler scheduler(&sensorMessageSinkMock);
+    GatewayMessageSinkMock sensorMessageSinkMock(1);
+    GatewayMessageProcessingScheduler scheduler(&sensorMessageSinkMock);
     translationStrategy.linkConsumer(&scheduler);
 
     translationStrategy.translateMessage(std::move(detectionTrackAWLMessage));
     translationStrategy.translateMessage(std::move(detectionVelocityAWLMessage));
-    translationStrategy.translateMessage(std::move(endOfSpiritMessageAWLMessage));
+    translationStrategy.translateMessage(std::move(endOfGatewayMessageAWLMessage));
 
     scheduler.terminateAndJoin();
     sensorMessageSinkMock.waitConsumptionToBeReached();
-    auto actualSpiritMessage = sensorMessageSinkMock.getConsumedData().front();
-    ASSERT_EQ(expectedSpiritMessage, actualSpiritMessage);
+    auto actualGatewayMessage = sensorMessageSinkMock.getConsumedData().front();
+    ASSERT_EQ(expectedGatewayMessage, actualGatewayMessage);
 }
 
 TEST_F(GuardianTranslationStrategyTest,
-       given_someEndOfSpiritMessageAWLMessage_when_translatingThisMessage_then_callsProduceOneTime) {
+       given_someEndOfGatewayMessageAWLMessage_when_translatingThisMessage_then_callsProduceOneTime) {
 
-    auto endOfSpiritMessageAWLMessage = SOME_END_FRAME_AWL_MESSAGE;
+    auto endOfGatewayMessageAWLMessage = SOME_END_FRAME_AWL_MESSAGE;
     GuardianTranslationStrategy translationStrategy;
-    SpiritMessageSinkMock sensorMessageSinkMock(1);
-    SpiritMessageProcessingScheduler scheduler(&sensorMessageSinkMock);
+    GatewayMessageSinkMock sensorMessageSinkMock(1);
+    GatewayMessageProcessingScheduler scheduler(&sensorMessageSinkMock);
     translationStrategy.linkConsumer(&scheduler);
 
-    translationStrategy.translateMessage(std::move(endOfSpiritMessageAWLMessage));
+    translationStrategy.translateMessage(std::move(endOfGatewayMessageAWLMessage));
 
     scheduler.terminateAndJoin();
     ASSERT_EQ(sensorMessageSinkMock.hasBeenCalledExpectedNumberOfTimes(), 1);
@@ -195,16 +195,16 @@ TEST_F(GuardianTranslationStrategyTest,
     auto rawData = createOrdinalGuardianRawData();
 
     GuardianTranslationStrategy translationStrategy;
-    SpiritRawDataSinkMock spiritRawDataSink(numberOfDataToProduce);
-    SpiritRawDataProcessingScheduler scheduler(&spiritRawDataSink);
+    GatewayRawDataSinkMock gatewayRawDataSink(numberOfDataToProduce);
+    GatewayRawDataProcessingScheduler scheduler(&gatewayRawDataSink);
     translationStrategy.linkConsumer(&scheduler);
 
     translationStrategy.translateRawData(std::move(rawData));
 
-    spiritRawDataSink.waitConsumptionToBeReached();
+    gatewayRawDataSink.waitConsumptionToBeReached();
     scheduler.terminateAndJoin();
 
-    auto numberOfProducedData = spiritRawDataSink.getNumberOfConsumptions();
+    auto numberOfProducedData = gatewayRawDataSink.getNumberOfConsumptions();
     ASSERT_EQ(numberOfProducedData, numberOfDataToProduce);
 }
 
@@ -215,20 +215,20 @@ TEST_F(GuardianTranslationStrategyTest,
     auto contentCopy = GuardianRawData::Definitions::Data(guardianRawData.content);
 
     GuardianTranslationStrategy translationStrategy;
-    SpiritRawDataSinkMock spiritRawDataSink(numberOfData);
-    SpiritRawDataProcessingScheduler scheduler(&spiritRawDataSink);
+    GatewayRawDataSinkMock gatewayRawDataSink(numberOfData);
+    GatewayRawDataProcessingScheduler scheduler(&gatewayRawDataSink);
     translationStrategy.linkConsumer(&scheduler);
 
     translationStrategy.translateRawData(std::move(guardianRawData));
 
     auto reversedContent = reverseDefinitionsEndianness(std::move(contentCopy));
-    auto expectedSpiritRawData = SpiritRawData(reversedContent);
+    auto expectedGatewayRawData = GatewayRawData(reversedContent);
 
-    spiritRawDataSink.waitConsumptionToBeReached();
+    gatewayRawDataSink.waitConsumptionToBeReached();
     scheduler.terminateAndJoin();
 
-    auto translatedRawData = spiritRawDataSink.getConsumedData().back();
-    ASSERT_EQ(translatedRawData, expectedSpiritRawData);
+    auto translatedRawData = gatewayRawDataSink.getConsumedData().back();
+    ASSERT_EQ(translatedRawData, expectedGatewayRawData);
 }
 
 TEST_F(GuardianTranslationStrategyTest,
@@ -238,21 +238,21 @@ TEST_F(GuardianTranslationStrategyTest,
     auto contentCopy = GuardianRawData::Definitions::Data(ordinalRawData.content);
 
     GuardianTranslationStrategy translationStrategy;
-    SpiritRawDataSinkMock spiritRawDataSink(numberOfData);
-    SpiritRawDataProcessingScheduler scheduler(&spiritRawDataSink);
+    GatewayRawDataSinkMock gatewayRawDataSink(numberOfData);
+    GatewayRawDataProcessingScheduler scheduler(&gatewayRawDataSink);
     translationStrategy.linkConsumer(&scheduler);
 
     translationStrategy.translateRawData(std::move(ordinalRawData));
 
     auto reversedContent = reverseDefinitionsEndianness(std::move(contentCopy));
     auto orderedContent = orderRawDataAccordingToGuardianChannelPositions(std::move(reversedContent));
-    auto expectedSpiritRawData = SpiritRawData(orderedContent);
+    auto expectedGatewayRawData = GatewayRawData(orderedContent);
 
-    spiritRawDataSink.waitConsumptionToBeReached();
+    gatewayRawDataSink.waitConsumptionToBeReached();
     scheduler.terminateAndJoin();
 
-    auto translatedRawData = spiritRawDataSink.getConsumedData().back();
-    ASSERT_EQ(translatedRawData, expectedSpiritRawData);
+    auto translatedRawData = gatewayRawDataSink.getConsumedData().back();
+    ASSERT_EQ(translatedRawData, expectedGatewayRawData);
 }
 
 #endif //SENSORGATEWAY_GUARDIANTRANSLATIONSTRATEGYTEST_CPP

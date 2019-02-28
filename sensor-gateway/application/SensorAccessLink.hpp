@@ -1,5 +1,5 @@
 /**
-	Copyright 2014-2018 Phantom Intelligence Inc.
+	Copyright 2014-2019 Phantom Intelligence Inc.
 
 	Licensed under the Apache License, Version 2.0 (the "License");
 	you may not use this file except in compliance with the License.
@@ -14,10 +14,10 @@
 	limitations under the License.
 */
 
-#ifndef SENSORGATEWAY_SENSORACCESSLINK_H
-#define SENSORGATEWAY_SENSORACCESSLINK_H
+#ifndef SENSORGATEWAY_SENSORACCESSLINK_HPP
+#define SENSORGATEWAY_SENSORACCESSLINK_HPP
 
-#include "sensor-gateway/server-communication/ServerCommunicator.hpp"
+#include "sensor-gateway/parameter-control/SensorParameterController.hpp"
 
 namespace SensorGateway {
 
@@ -44,12 +44,15 @@ namespace SensorGateway {
         using TranslatorMessageScheduler = DataFlow::DataProcessingScheduler<SensorMessage, DataTranslator, 1>;
         using TranslatorRawDataScheduler = DataFlow::DataProcessingScheduler<SensorRawData, DataTranslator, 1>;
 
+        using SensorParameterController = SensorAccessLinkElement::SensorParameterController<SENSOR_STRUCTURES, SERVER_STRUCTURES>;
+        using RequestHandler = SensorAccessLinkElement::RequestHandler<SENSOR_STRUCTURES, SERVER_STRUCTURES>;
+
         using SensorCommunicator = SensorAccessLinkElement::SensorCommunicator<SENSOR_STRUCTURES>;
         using SensorCommunicationStrategy = SensorCommunication::SensorCommunicationStrategy<SENSOR_STRUCTURES>;
 
         using Error = ErrorHandling::SensorAccessLinkError;
         using ThisClass = SensorAccessLink<SENSOR_STRUCTURES, SERVER_STRUCTURES>;
-        using ErrorScheduler = DataFlow::DataProcessingScheduler<Error, ThisClass, 3>;
+        using ErrorScheduler = DataFlow::DataProcessingScheduler<Error, ThisClass, 5>;
 
     public:
         explicit SensorAccessLink(ServerCommunicationStrategy* serverCommunicationStrategy,
@@ -58,7 +61,11 @@ namespace SensorGateway {
                 serverCommunicationStrategy(serverCommunicationStrategy),
                 dataTranslationStrategy(dataTranslationStrategy),
                 sensorCommunicationStrategy(sensorCommunicationStrategy),
-                serverCommunicator(serverCommunicationStrategy),
+                serverCommunicator(serverCommunicationStrategy,
+                                   std::bind(&RequestHandler::handleGetParameterValueRequest, &requestHandler,
+                                             std::placeholders::_1)),
+                requestHandler(&serverCommunicator, &sensorParameterController),
+                sensorParameterController(&requestHandler, &dataTranslator),
                 dataTranslator(dataTranslationStrategy),
                 sensorCommunicator(sensorCommunicationStrategy),
                 translatorMessageScheduler(&dataTranslator),
@@ -83,12 +90,6 @@ namespace SensorGateway {
         void start(std::string const& serverAddress) {
             linkElements();
 
-            // TODO: implement a while(!allUpAndRunning()) {...
-            // Yield and sleep to allow correct connection
-            std::this_thread::yield();
-            std::this_thread::sleep_for(std::chrono::milliseconds(50));
-            // TODO: implement }
-
             serverCommunicator.openConnection(serverAddress);
             sensorCommunicator.start();
         };
@@ -97,9 +98,10 @@ namespace SensorGateway {
             sensorCommunicator.terminateAndJoin();
             translatorMessageScheduler.terminateAndJoin();
             translatorRawDataScheduler.terminateAndJoin();
+            sensorParameterController.terminateAndJoin();
             serverCommunicatorMessageScheduler.terminateAndJoin();
             serverCommunicatorRawDataScheduler.terminateAndJoin();
-            serverCommunicator.closeConnection();
+            serverCommunicator.terminateAndJoin();
 
             errorScheduler.terminateAndJoin();
         }
@@ -107,10 +109,10 @@ namespace SensorGateway {
         // TODO : extract this in a SensorAccessLinkErrorHandler, test behavior then.
         void consume(Error&& error) override {
 
-            // NOTE: To allow Spirit stability on RP3, this is good enough, but untested.
+            // NOTE: To allow Gateway stability on RP3, this is good enough, but untested.
             // TODO: THE ARCHITECTURAL LOCATION WILL HAVE TO BE RETHOUGHT WHEN IMPLEMENTING SPIRIT PROTOCOL
 
-            std::cout << error.fetchDetailedMessage() << std::endl;
+            std::cout << "Error handling (SensorAccessLink) : " << error.fetchDetailedMessage() << std::endl;
             if (error.isFatalForGateway()) {
                 // TODO : shutdown SensorAccessLink instance + kill whole gateway, throw
                 DetachableThread(&SensorAccessLink::terminateAndJoin, this);
@@ -131,10 +133,19 @@ namespace SensorGateway {
             dataTranslationStrategy->linkConsumer(&serverCommunicatorRawDataScheduler);
             sensorCommunicator.linkConsumer(&translatorMessageScheduler);
             sensorCommunicator.linkConsumer(&translatorRawDataScheduler);
+            sensorParameterController.linkElements();
 
             sensorCommunicator.linkConsumer(&errorScheduler);
             dataTranslator.linkConsumer(&errorScheduler);
             serverCommunicator.linkConsumer(&errorScheduler);
+            requestHandler.linkConsumer(&errorScheduler);
+            sensorParameterController.linkConsumer(&errorScheduler);
+
+            // TODO: implement a while(!allUpAndRunning()) {...
+            // Yield and sleep to allow correct connection
+            std::this_thread::yield();
+            std::this_thread::sleep_for(std::chrono::milliseconds(50));
+            // TODO: implement }
         }
 
         ServerCommunicationStrategy* serverCommunicationStrategy;
@@ -147,6 +158,9 @@ namespace SensorGateway {
         TranslatorMessageScheduler translatorMessageScheduler;
         TranslatorRawDataScheduler translatorRawDataScheduler;
 
+        SensorParameterController sensorParameterController;
+        RequestHandler requestHandler;
+
         SensorCommunicationStrategy* sensorCommunicationStrategy;
         SensorCommunicator sensorCommunicator;
 
@@ -154,4 +168,4 @@ namespace SensorGateway {
     };
 }
 
-#endif //SENSORGATEWAY_SENSORACCESSLINK_H
+#endif //SENSORGATEWAY_SENSORACCESSLINK_HPP

@@ -17,7 +17,8 @@
 #ifndef SENSORGATEWAY_TESTDATASTRUCTURES_H
 #define SENSORGATEWAY_TESTDATASTRUCTURES_H
 
-#include "SimpleRawData.h"
+#include "SimpleControlMessage.h"
+#include "FakeParameterConstants.hpp"
 
 namespace Sensor {
     namespace Test {
@@ -28,9 +29,69 @@ namespace Sensor {
 
                 typedef typename DataModel::SimpleMessage Message;
                 typedef typename DataModel::SimpleRawData RawData;
+                typedef typename DataModel::SimpleControlMessage ControlMessage;
+                using Parameters = Sensor::FakeParameter::FruitBasketParameters;
 
                 static size_t const MAX_NUMBER_OF_BULK_FETCHABLE_MESSAGES = 1; // IMPORTANT: this has to stay = 1!
                 static size_t const MAX_NUMBER_OF_BULK_FETCHABLE_RAW_DATA_CYCLES = 1;
+
+                static size_t const MAX_NUMBER_OF_CONCURRENT_REQUEST_OF_ONE_KIND = 16;
+            };
+        }
+
+        namespace RealisticImplementation {
+
+            namespace Constants {
+
+                static size_t const NUMBER_OF_SENSOR_TIME_POINTS = 0;
+                static size_t const NUMBER_OF_GATEWAY_TIME_POINTS = 2;
+
+                static size_t const NUMBER_OF_PIXELS = 4;
+                static size_t const NUMBER_OF_CHANNELS = 2;
+                static size_t const RAW_DATA_SAMPLING_LENGTH = 16;
+                static size_t const MAX_COMMAND_PAYLOAD_SIZE = FakeParameter::PARAMETER_CONTROL_MESSAGE_PAYLOAD_LENGTH;
+
+                typedef Byte STUB_SENSOR_DATA_TYPE;
+            }
+
+            class Structures final : public Sensor::Communication::DataStructures {
+
+            public :
+
+                typedef typename
+                Metrics::TimeTrackingDefinition<
+                        Constants::NUMBER_OF_SENSOR_TIME_POINTS,
+                        Constants::NUMBER_OF_GATEWAY_TIME_POINTS
+                > TimeTrackingDefinition;
+
+                typedef typename
+                Sensor::SensorMessageDefinition<
+                        Constants::NUMBER_OF_PIXELS,
+                        TimeTrackingDefinition
+                > MessageDefinition;
+
+                typedef typename
+                Sensor::RawDataDefinition<
+                        Constants::STUB_SENSOR_DATA_TYPE,
+                        Constants::NUMBER_OF_CHANNELS,
+                        Constants::RAW_DATA_SAMPLING_LENGTH
+                > RawDataDefinition;
+
+                typedef typename
+                Sensor::ControlMessageDefinition<
+                        Constants::STUB_SENSOR_DATA_TYPE,
+                        Constants::MAX_COMMAND_PAYLOAD_SIZE
+                > ControlMessageDefinition;
+
+                typedef typename DataFlow::SensorMessage<MessageDefinition> Message;
+                typedef typename DataFlow::RawData<RawDataDefinition> RawData;
+                typedef typename DataFlow::ControlMessage<ControlMessageDefinition> ControlMessage;
+                using Parameters = Sensor::FakeParameter::FruitBasketParameters;
+
+                static size_t const MAX_NUMBER_OF_BULK_FETCHABLE_MESSAGES = 2;
+                static size_t const MAX_NUMBER_OF_BULK_FETCHABLE_RAW_DATA_CYCLES = 2;
+
+                static size_t const MAX_NUMBER_OF_CONCURRENT_REQUEST_OF_ONE_KIND = 16;
             };
         }
     }

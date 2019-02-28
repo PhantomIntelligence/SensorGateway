@@ -1,9 +1,12 @@
 /**
 	Copyright 2014-2018 Phantom Intelligence Inc.
+
 	Licensed under the Apache License, Version 2.0 (the "License");
 	you may not use this file except in compliance with the License.
 	You may obtain a copy of the License at
+
 		http://www.apache.org/licenses/LICENSE-2.0
+
 	Unless required by applicable law or agreed to in writing, software
 	distributed under the License is distributed on an "AS IS" BASIS,
 	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -14,9 +17,26 @@
 #ifndef SENSORGATEWAY_CONSTANTVALUESDEFINITION_H
 #define SENSORGATEWAY_CONSTANTVALUESDEFINITION_H
 
-#include "TypeDefinition.h"
+#include "StringLiteralType.h"
+
 namespace ConversionUnits {
-    int const NUMBER_OF_CENTIMETERS_IN_A_METER = 100;
+    uint8_t const NUMBER_OF_CENTIMETERS_IN_A_METER = 100;
+}
+
+namespace NumberOfBit {
+    uint8_t const ZERO = 0;
+    uint8_t const ONE = 1;
+    uint8_t const TWO = 2;
+    uint8_t const THREE = 3;
+    uint8_t const FOUR = 4;
+    uint8_t const FIVE = 5;
+    uint8_t const SIX = 6;
+    uint8_t const SEVEN = 7;
+    uint8_t const EIGHT = 8;
+
+    uint8_t const IN_HALF_A_BYTE = FOUR;
+    uint8_t const IN_A_BYTE = EIGHT;
+    uint8_t const IN_TWO_BYTES = 2 * IN_A_BYTE;
 }
 
 namespace Metrics {
@@ -26,7 +46,7 @@ namespace Metrics {
 namespace DataFlow {
     uint8_t const NUMBER_OF_CONCURRENT_INPUT_FOR_SENSOR_ACCESS_LINK_ELEMENTS = 1;
     size_t const RING_BUFFER_SIZE = 256;
-};
+}
 
 namespace CommandId {
     using CommandId = uint16_t;
@@ -41,7 +61,7 @@ namespace CommandId {
     CommandId const DEBUG_DUMP = 0xF0;
     CommandId const DEBUG_VERBOSE = 0xF1;
     CommandId const DEBUG_FORCE_REFRESH = 0xF2;
-};
+}
 
 namespace CommandType {
     using CommandType = uint16_t;
@@ -116,7 +136,7 @@ namespace Sensor {
             int const NUMBER_OF_PIXELS = 16;
             int const NUMBER_OF_LAYERS = 2;
             int const NUMBER_OF_PIXELS_PER_LAYER = 8;
-            int const NUMBER_OF_TRACKS_IN_PIXEL = 16;
+            int const NUMBER_OF_TRACKS_IN_PIXEL = 2;
             int const ANGLE_RANGE = HORIZONTAL_FIELD_OF_VIEW / NUMBER_OF_PIXELS_PER_LAYER;
             SensorId const SENSOR_ID = 0x0010;
         }

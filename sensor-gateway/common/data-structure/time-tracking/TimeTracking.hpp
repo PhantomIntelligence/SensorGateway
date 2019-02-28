@@ -61,8 +61,8 @@ namespace Metrics {
                 TimeTracking(other.sensorTimestamps, other.gatewayTimestamps) {}
 
         TimeTracking(TimeTracking&& other) noexcept :
-                sensorTimestamps(std::move(sensorTimestamps)),
-                gatewayTimestamps(std::move(gatewayTimestamps)) {
+                sensorTimestamps(std::move(other.sensorTimestamps)),
+                gatewayTimestamps(std::move(other.gatewayTimestamps)) {
         }
 
         TimeTracking& operator=(TimeTracking const& other)& {

@@ -17,7 +17,8 @@
 #ifndef SENSORGATEWAY_SERVERCOMMUNICATIONPROTOCOLSTRATEGY_HPP
 #define SENSORGATEWAY_SERVERCOMMUNICATIONPROTOCOLSTRATEGY_HPP
 
-#include "sensor-gateway/common/data-structure/spirit/SensorMessage.hpp"
+#include "ServerRequest.hpp"
+#include "ServerResponse.hpp"
 
 namespace ServerCommunication {
 
@@ -29,13 +30,39 @@ namespace ServerCommunication {
         using Message = typename T::Message;
         using RawData = typename T::RawData;
 
+        using GetParameterValueContent = std::string;
+        using GetParameterValueContents = std::array<GetParameterValueContent, T::MAX_NUMBER_OF_CONCURRENT_REQUEST_OF_ONE_KIND>;
+
+        using UnsignedIntegerParameterResponse = ResponseType::UnsignedIntegerParameterResponse;
+        using SignedIntegerParameterResponse = ResponseType::SignedIntegerParameterResponse;
+        using RealNumberParameterResponse = ResponseType::RealNumberParameterResponse;
+        using BooleanParameterResponse = ResponseType::BooleanParameterResponse;
+        using ParameterErrorResponse = ResponseType::ParameterErrorResponse;
+        using ErrorMessageResponse = ResponseType::ErrorMessageResponse;
+
+        using SetParameterValueBooleanContent = typename std::pair<GetParameterValueContent, bool>;
+
         virtual ~ServerCommunicationStrategy() noexcept = default;
 
         virtual void openConnection(std::string const& serverAddress) = 0;
 
+        virtual GetParameterValueContents fetchGetParameterValueContents() = 0;
+
         virtual void sendMessage(Message&& message) = 0;
 
         virtual void sendRawData(RawData&& rawData) = 0;
+
+//        virtual void sendResponse(UnsignedIntegerParameterResponse&& unsignedIntegerParameterResponse) = 0;
+//
+//        virtual void sendResponse(SignedIntegerParameterResponse&& signedIntegerParameterResponse) = 0;
+//
+//        virtual void sendResponse(RealNumberParameterResponse&& realNumberParameterResponse) = 0;
+//
+//        virtual void sendResponse(BooleanParameterResponse&& booleanParameterResponse) = 0;
+
+        virtual void sendResponse(ParameterErrorResponse&& parameterErrorResponse) = 0;
+
+        virtual void sendResponse(ErrorMessageResponse&& errorMessageResponse) = 0;
 
         virtual void closeConnection() = 0;
     };

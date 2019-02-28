@@ -1,5 +1,5 @@
 /**
-	Copyright 2014-2018 Phantom Intelligence Inc.
+	Copyright 2014-2019 Phantom Intelligence Inc.
 
 	Licensed under the Apache License, Version 2.0 (the "License");
 	you may not use this file except in compliance with the License.
@@ -15,14 +15,13 @@
 
 */
 
-#ifndef SPIRITSENSORGATEWAY_SENSORCOMMUNICATORTEST_CPP
-#define SPIRITSENSORGATEWAY_SENSORCOMMUNICATORTEST_CPP
+#ifndef SPIRITSENSORGATEWAY_SENSORACCESSLINKTEST_CPP
+#define SPIRITSENSORGATEWAY_SENSORACCESSLINKTEST_CPP
 
 #include <gtest/gtest.h>
-#include <list>
-#include <test/utilities/mock/ErrorThrowingSensorCommunicationStrategyMock.hpp>
 
 #include "sensor-gateway/application/SensorAccessLink.hpp"
+#include "test/utilities/mock/CatchingServerCommunicationStrategyMock.hpp"
 #include "test/utilities/mock/ErrorThrowingServerCommunicationStrategyMock.hpp"
 #include "test/utilities/mock/ErrorThrowingDataTranslationStrategyMock.hpp"
 #include "test/utilities/mock/ErrorThrowingSensorCommunicationStrategyMock.hpp"
@@ -208,62 +207,20 @@ namespace SensorAccessLinkTestMock {
             sensorRawData.inverseContent();
             super::RawDataSource::produce(std::move(sensorRawData));
         }
+
+        super::SensorMessage
+        translateControlMessageToSensorMessageRequest(
+                super::ParameterControlMessage&& parameterControlMessage) override {
+            return super::SensorMessage::returnDefaultData();
+        }
+
+        super::ParameterControlMessage
+        translateSensorMessageToControlMessageResult(super::SensorMessage&& sensorMessage) override {
+            return super::ParameterControlMessage::returnDefaultData();
+        }
     };
 
-    using SimpleServerCommunicationStrategy = ServerCommunication::ServerCommunicationStrategy<Sensor::Test::Simple::Structures>;
-
-    class MockServerCommunicationStrategy final : public SimpleServerCommunicationStrategy {
-    protected:
-        using super = SimpleServerCommunicationStrategy;
-
-        using Messages = std::list<super::Message>;
-        using RawDataCycles = std::list<super::RawData>;
-
-    public:
-        MockServerCommunicationStrategy() :
-                openConnectionCalled(false),
-                closeConnectionCalled(false) {}
-
-        ~MockServerCommunicationStrategy() noexcept override = default;
-
-        void openConnection(std::string const& serverAddress) override {
-            openConnectionCalled.store(true);
-        }
-
-        bool hasOpenConnectionBeenCalled() const {
-            return openConnectionCalled.load();
-        }
-
-        void closeConnection() override {
-            closeConnectionCalled.store(true);
-        }
-
-        bool hasCloseConnectionBeenCalled() const {
-            return closeConnectionCalled.load();
-        }
-
-        void sendMessage(super::Message&& message) override {
-            receivedMessages.push_back(message);
-        }
-
-        void sendRawData(super::RawData&& rawData) override {
-            receivedRawData.push_back(rawData);
-        }
-
-        Messages const& getReceivedMessages() const {
-            return receivedMessages;
-        }
-
-        RawDataCycles const& getReceivedRawData() const {
-            return receivedRawData;
-        }
-
-    private:
-        Messages receivedMessages;
-        RawDataCycles receivedRawData;
-        AtomicFlag openConnectionCalled;
-        AtomicFlag closeConnectionCalled;
-    };
+    using MockServerCommunicationStrategy = Mock::CatchingServerCommunicationStrategyMock<Sensor::Test::Simple::Structures>;
 }
 
 TEST_F(SensorAccessLinkTest,
@@ -300,7 +257,7 @@ TEST_F(SensorAccessLinkTest,
                                       &mockSensorCommunicationStrategy);
 
     sensorAccessLink.start(FAKE_SERVER_ADDRESS);
-    std::this_thread::yield();
+    yield();
     sensorAccessLink.terminateAndJoin();
 
     auto sensorCloseConnectionHasBeenCalled = mockSensorCommunicationStrategy.hasCloseConnectionBeenCalled();
@@ -468,6 +425,6 @@ TEST_F(SensorAccessLinkTest,
 
 // TODO: add *MEDIUM* test to check the integration of the SensorAccessLinkErrorHandler;
 
-#endif //SPIRITSENSORGATEWAY_SENSORCOMMUNICATORTEST_CPP
+#endif //SPIRITSENSORGATEWAY_SENSORACCESSLINKTEST_CPP
 
 

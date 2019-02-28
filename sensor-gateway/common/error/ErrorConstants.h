@@ -32,13 +32,19 @@ namespace ErrorHandling {
 
         std::string const SERVER_COMMUNICATOR_OPEN_CONNECTION = "open server connection";
         std::string const SERVER_COMMUNICATOR_CLOSE_CONNECTION = "close server connection";
+        std::string const SERVER_COMMUNICATOR_FETCH_GET_PARAMETER_VALUE = "fetch get parameter value content for requests";
         std::string const SERVER_COMMUNICATOR_SEND_MESSAGE = "send message";
         std::string const SERVER_COMMUNICATOR_SEND_RAWDATA = "send rawdata";
+        std::string const SERVER_COMMUNICATOR_SEND_RESPONSE = "send response";
+
+        std::string const SERVER_REQUEST_HANDLING_PARAMETER = "sensor parameter value";
     }
 
     namespace Message {
         std::string const SEPARATOR = " - ";
         std::string const EMPTY_MESSAGE = "";
+
+        std::string const PARAMETER_NOT_AVAILABLE = "Parameter is not available";
     }
 
     enum Severity : int32_t {
@@ -85,7 +91,7 @@ namespace ErrorHandling {
          */
                 EMPTY_CODE = 10042,
 
-        // 10100-10199 Spirit Protocol error code
+        // 10100-10199 Gateway Protocol error code
 
         PIXEL_ALREADY_HAS_MAXIMUM_TRACK = 10110,
 
@@ -100,7 +106,19 @@ namespace ErrorHandling {
         UNRECOGNIZED_GUARDIAN_MESSAGE_ID = 10300,
         CANNOT_FIND_GUARDIAN_LIBUSB_DEVICE = 10305,
 
-    };
-}
 
+        // 20000-20099 Server Communication error code
+
+
+        // 20100-20199 Request Handling error code
+
+        BAD_REQUEST = 20100,
+        REQUEST_NOT_SUPPORTED = 20101,
+
+        INVALID_PARAMETER_NAME = 20110,
+
+        INVALID_PARAMETER_VALUE = 20120,
+
+    };
+};
 #endif //SENSORGATEWAY_ERRORCONSTANTS_H

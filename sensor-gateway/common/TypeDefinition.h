@@ -53,7 +53,7 @@ namespace {
     typedef std::chrono::high_resolution_clock HighResolutionClock;
     typedef std::chrono::time_point<HighResolutionClock> HighResolutionTimePoint;
     typedef std::chrono::duration<double, std::nano> DurationInNanoseconds;
-};
+}
 
 namespace DataFlow {
 
@@ -77,6 +77,6 @@ namespace DataFlow {
     typedef double_t Speed;
     typedef uint16_t SensorId;
     typedef uint16_t TrackId;
-};
+}
 
 #endif //SENSORGATEWAY_TYPEDEFINITION_H

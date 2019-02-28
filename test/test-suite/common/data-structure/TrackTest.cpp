@@ -13,7 +13,7 @@
 
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
-#include "sensor-gateway/common/data-structure/spirit/Pixel.h"
+#include "sensor-gateway/common/data-structure/gateway/Pixel.h"
 
 using DataFlow::TrackId;
 using DataFlow::ConfidenceLevel;

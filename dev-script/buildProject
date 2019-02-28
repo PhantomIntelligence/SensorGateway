@@ -7,10 +7,7 @@ mkdir -p $BUILD_FOLDER
 
 
 echo "---- Have CMake build initial folders..."
-cmake -G "CodeBlocks - Unix Makefiles" -DCMAKE_BUILD_TYPE=Debug --build $BUILD_FOLDER --target all
-
-echo "---- Makes conan install external dependencies..."
-./dev-script/conanUpdateDependencies
+cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Debug --build $BUILD_FOLDER .
 
 echo "---- Finalize CMake build after conan update"
-cmake --build $BUILD_FOLDER --target all
+cmake --build $BUILD_FOLDER

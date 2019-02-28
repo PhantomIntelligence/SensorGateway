@@ -1,10 +1,10 @@
-#ifndef SENSORGATEWAY_FRAMETEST_CPP
-#define SENSORGATEWAY_FRAMETEST_CPP
+#ifndef SENSORGATEWAY_SENSORMESSAGETEST_CPP
+#define SENSORGATEWAY_SENSORMESSAGETEST_CPP
 
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 #include "sensor-gateway/common/data-structure/sensor/AWLStructures.h"
-#include "sensor-gateway/common/data-structure/spirit/SensorMessage.hpp"
+#include "sensor-gateway/common/data-structure/gateway/SensorMessage.hpp"
 
 using SensorMessage = typename DataFlow::SensorMessage<Sensor::AWL::Structures::AWLMessageDefinition>;
 using DataFlow::PixelId;
@@ -91,4 +91,4 @@ TEST_F(SensorMessageTest,
     ASSERT_TRUE(sensorMessagesAreNotEqual);
 }
 
-#endif //SENSORGATEWAY_FRAMETEST_H
+#endif //SENSORGATEWAY_SENSORMESSAGETEST_H

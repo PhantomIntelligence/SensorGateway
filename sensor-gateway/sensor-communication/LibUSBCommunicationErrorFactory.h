@@ -1,5 +1,5 @@
 /**
-	Copyright 2014-2018 Phantom Intelligence Inc.
+	Copyright 2014-2019 Phantom Intelligence Inc.
 
 	Licensed under the Apache License, Version 2.0 (the "License");
 	you may not use this file except in compliance with the License.
@@ -12,7 +12,9 @@
 	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 	See the License for the specific language governing permissions and
 	limitations under the License.
-*/#ifndef SENSORGATEWAY_GUARDIANUSBCOMMUNICATIONERROR_H
+*/
+
+#ifndef SENSORGATEWAY_GUARDIANUSBCOMMUNICATIONERROR_H
 #define SENSORGATEWAY_GUARDIANUSBCOMMUNICATIONERROR_H
 
 #include "sensor-gateway/common/error/SensorAccessLinkError.h"
@@ -20,13 +22,12 @@
 
 namespace ErrorHandling {
     std::string const LIBUSB_NAME = "LibUSB";
-    std::string const LIBUSB_EMPTY_PREPARED_MESSAGE = "";
 
     [[noreturn]] static void
     throwGuardianUSBCommunicationError(enum libusb_error const& errorCode,
                                        std::string const& callOrigin,
-                                       std::string const& preparedMessage = LIBUSB_EMPTY_PREPARED_MESSAGE) {
-        auto messageHasBeenPrepared = preparedMessage != LIBUSB_EMPTY_PREPARED_MESSAGE;
+                                       std::string const& preparedMessage = Message::EMPTY_MESSAGE) {
+        auto messageHasBeenPrepared = preparedMessage != Message::EMPTY_MESSAGE;
         std::string message;
         if (messageHasBeenPrepared) {
             message = libusb_strerror(errorCode);
@@ -34,7 +35,7 @@ namespace ErrorHandling {
             message = preparedMessage;
         }
 
-        std::string origin = LIBUSB_NAME + " " + callOrigin;
+        std::string origin = LIBUSB_NAME + Message::SEPARATOR + callOrigin;
         ErrorHandling::Category category;
         ErrorHandling::Severity severity;
         std::string errorMessage;
@@ -82,16 +83,15 @@ namespace ErrorHandling {
             severity = CRITICAL;
             errorMessage = "Error unknown for " + LIBUSB_NAME;
         }
-        SensorAccessLinkError error(origin, category, severity, errorCode, errorMessage);
-        throw error;
+        throw SensorAccessLinkError(origin, category, severity, errorCode, errorMessage);
     }
 
     [[noreturn]] static void throwLibUSBDeviceNotFound() {
-        throw ErrorHandling::SensorAccessLinkError(LIBUSB_NAME,
-                                                   ErrorHandling::Category::CONNECTION_ERROR,
-                                                   ErrorHandling::Severity::ERROR,
-                                                   ErrorHandling::GatewayErrorCode::CANNOT_FIND_GUARDIAN_LIBUSB_DEVICE,
-                                                   "Guardian device not found!");
+        throw SensorAccessLinkError(LIBUSB_NAME,
+                                    ErrorHandling::Category::CONNECTION_ERROR,
+                                    ErrorHandling::Severity::ERROR,
+                                    ErrorHandling::GatewayErrorCode::CANNOT_FIND_GUARDIAN_LIBUSB_DEVICE,
+                                    "Guardian device not found!");
     }
 }
-#endif //SENSORGATEWAY_KVASERCOMMUNICATIONERROR_H
+#endif //SENSORGATEWAY_GUARDIANUSBCOMMUNICATIONERROR_H

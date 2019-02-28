@@ -1,5 +1,5 @@
 /**
-	Copyright 2014-2018 Phantom Intelligence Inc.
+	Copyright 2014-2019 Phantom Intelligence Inc.
 
 	Licensed under the Apache License, Version 2.0 (the "License");
 	you may not use this file except in compliance with the License.
@@ -24,17 +24,17 @@
 namespace SensorGateway {
 
     using AWL16Structures = Sensor::AWL::Structures;
-    using AWL16SpiritStructures = Sensor::Spirit::Structures<
+    using AWL16GatewayStructures = Sensor::Gateway::Structures<
             AWL16Structures::AWLMessageDefinition,
             AWL16Structures::AWLRawDataDefinition,
-            AWL16Structures::AWLCommandDefinition
+            AWL16Structures::AWLControlMessageDefinition
             >;
 
-    class AWL16AccessLink final : public SensorAccessLink<AWL16Structures, AWL16SpiritStructures> {
+    class AWL16AccessLink final : public SensorAccessLink<AWL16Structures, AWL16GatewayStructures> {
 
     protected:
 
-        using super = SensorAccessLink<AWL16Structures, AWL16SpiritStructures>;
+        using super = SensorAccessLink<AWL16Structures, AWL16GatewayStructures>;
 
         using super::ServerCommunicationStrategy;
 

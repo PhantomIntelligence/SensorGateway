@@ -253,8 +253,7 @@ namespace ErrorHandling {
             severity = CRITICAL;
             errorMessage = "Unknown error for canlib";
         }
-        SensorAccessLinkError error(origin, category, severity, errorCode, errorMessage);
-        throw error;
+        throw SensorAccessLinkError(origin, category, severity, errorCode, errorMessage);
     }
 
 }

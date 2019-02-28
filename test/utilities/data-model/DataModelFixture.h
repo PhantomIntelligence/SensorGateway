@@ -1,5 +1,5 @@
 /**
-	Copyright 2014-2018 Phantom Intelligence Inc.
+	Copyright 2014-2019 Phantom Intelligence Inc.
 
 	Licensed under the Apache License, Version 2.0 (the "License");
 	you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 #ifndef SENSORGATEWAY_DATAMODELFIXTURE_H
 #define SENSORGATEWAY_DATAMODELFIXTURE_H
 
+#include <sensor-gateway/server-communication/ServerRequestAssembler.hpp>
 #include "TestDataStructures.h"
 
 namespace TestFunctions {
@@ -89,6 +90,69 @@ namespace TestFunctions {
         }
 
     };
+
+    namespace Parameters {
+        using ParameterNameList = std::list<std::string>;
+
+        template<class AvailableParameters>
+        static auto availableNames() noexcept {
+            AvailableParameters availableParameters;
+            ParameterNameList validParameters;
+            auto validNames = availableParameters.getNames();
+
+            ParameterNameList validParameterNames;
+            std::string name;
+            for (auto validNameIndex = 0u;
+                 validNameIndex < AvailableParameters::NUMBER_OF_AVAILABLE_PARAMETERS; ++validNameIndex) {
+                name = validNames[validNameIndex];
+                validParameterNames.push_front(name);
+            }
+
+            return validParameterNames;
+        }
+
+        template<class AvailableParameters>
+        static auto nonAvailableNames() noexcept {
+            using AllFakeParameters = Sensor::FakeParameter::AllFakeParameters;
+            // Ensure we have AT LEAST 1 invalid parameter name
+            AvailableParameters availableParameters;
+            AllFakeParameters allFakeParameters;
+            auto allNames = allFakeParameters.getNames();
+
+            ParameterNameList invalidParameterNames = {TestFunctions::DataTestUtil::createRandomStringOfLength(100)};
+            for (uint16_t nameIndex = 0;
+                 nameIndex < AllFakeParameters::NUMBER_OF_AVAILABLE_PARAMETERS; ++nameIndex) {
+                auto parameterName = allNames[nameIndex];
+                if (!availableParameters.isAvailable(parameterName)) {
+                    invalidParameterNames.push_front(parameterName);
+                }
+            }
+            return invalidParameterNames;
+        }
+
+    }
+
+}
+
+namespace Given {
+
+    template<typename ParametersToChoseFrom>
+    auto anInvalidGetParameterValueRequest() -> ServerCommunication::RequestTypes::GetParameterValue {
+        auto invalidParameterName = TestFunctions::Parameters::nonAvailableNames<ParametersToChoseFrom>().front();
+        return Assemble::ServerRequestAssembler::getParameterValueRequest(invalidParameterName);
+    }
+
+    template<typename ParametersToChoseFrom>
+    auto aValidParameter() {
+        auto validParameterName = TestFunctions::Parameters::availableNames<ParametersToChoseFrom>().front();
+        return Assemble::ServerRequestAssembler::getParameterValueRequest(validParameterName);
+    }
+
+    template<typename ParametersToChoseFrom>
+    auto aValidGetParameterValueRequest() -> ServerCommunication::RequestTypes::GetParameterValue {
+        auto validParameterName = TestFunctions::Parameters::availableNames<ParametersToChoseFrom>().front();
+        return Assemble::ServerRequestAssembler::getParameterValueRequest(validParameterName);
+    }
 
 }
 

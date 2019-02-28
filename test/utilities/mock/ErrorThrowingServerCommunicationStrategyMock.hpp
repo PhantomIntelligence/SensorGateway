@@ -14,8 +14,8 @@
 	limitations under the License.
 */
 
-#ifndef SENSORGATEWAY_ERRORTHROWINGSENSORCOMMUNICATIONSTRATEGYMOCK_HPP
-#define SENSORGATEWAY_ERRORTHROWINGSENSORCOMMUNICATIONSTRATEGYMOCK_HPP
+#ifndef SENSORGATEWAY_ERRORTHROWINGSERVERCOMMUNICATIONSTRATEGYMOCK_HPP
+#define SENSORGATEWAY_ERRORTHROWINGSERVERCOMMUNICATIONSTRATEGYMOCK_HPP
 
 #include "test/utilities/data-model/DataModelFixture.h"
 #include "sensor-gateway/server-communication/ServerCommunicationStrategy.hpp"
@@ -29,6 +29,8 @@ namespace Mock {
 
         using super = ServerCommunication::ServerCommunicationStrategy<T>;
 
+        using GetParameterValueContents = typename super::GetParameterValueContents;
+
     public:
 
         ErrorThrowingServerCommunicationStrategyMock() :
@@ -39,6 +41,8 @@ namespace Mock {
                 throwOnClose(false),
                 throwOnSendMessage(false),
                 throwOnSendRawData(false),
+                throwOnSendParameterErrorResponse(false),
+                throwOnSendErrorMessageResponse(false),
                 openConnectionCalled(false),
                 closeConnectionCalled(false) {
         }
@@ -88,13 +92,21 @@ namespace Mock {
         void throwOpenConnectionRequiredErrorWhenSendMessageIsCalled() noexcept {
             throwOnSendMessage.store(true);
             errorToThrow = expectedErrorRequiringOpenConnection();
-
         }
 
         void throwOpenConnectionRequiredErrorWhenSendRawDataIsCalled() noexcept {
             throwOnSendRawData.store(true);
             errorToThrow = expectedErrorRequiringOpenConnection();
+        }
 
+        void throwOpenConnectionRequiredErrorWhenSendParameterErrorResponseIsCalled() noexcept {
+            throwOnSendParameterErrorResponse.store(true);
+            errorToThrow = expectedErrorRequiringOpenConnection();
+        }
+
+        void throwOpenConnectionRequiredErrorWhenSendErrorMessageResponseIsCalled() noexcept {
+            throwOnSendErrorMessageResponse.store(true);
+            errorToThrow = expectedErrorRequiringOpenConnection();
         }
 
         void throwCloseConnectionRequiredErrorWhenOpenConnectionIsCalled() noexcept {
@@ -117,6 +129,17 @@ namespace Mock {
             errorToThrow = expectedErrorRequiringCloseConnection();
         }
 
+        void throwCloseConnectionRequiredErrorWhenSendParameterErrorResponseIsCalled() noexcept {
+            throwOnSendParameterErrorResponse.store(true);
+            errorToThrow = expectedErrorRequiringCloseConnection();
+        }
+
+        void throwCloseConnectionRequiredErrorWhenSendErrorMessageResponseIsCalled() noexcept {
+            throwOnSendErrorMessageResponse.store(true);
+            errorToThrow = expectedErrorRequiringCloseConnection();
+        }
+
+
         ErrorHandling::SensorAccessLinkError expectedErrorWhenOpenConnectionIsCalled() noexcept {
             return ErrorHandling::SensorAccessLinkError(ORIGIN,
                                                         ErrorHandling::Category::COMMUNICATION_ERROR,
@@ -137,6 +160,20 @@ namespace Mock {
                                                         ERROR_CODE,
                                                         CLOSE_ERROR_MESSAGE);
         }
+
+        void throwErrorWhenFetchGetParameterValueContentsIsCalled() noexcept {
+            throwOnFetchGetParameterValueContents.store(true);
+            errorToThrow = expectedErrorWhenFetchGetParameterValueContentsIsCalled();
+        }
+
+        ErrorHandling::SensorAccessLinkError expectedErrorWhenFetchGetParameterValueContentsIsCalled() noexcept {
+            return ErrorHandling::SensorAccessLinkError(ORIGIN,
+                                                        ErrorHandling::Category::COMMUNICATION_ERROR,
+                                                        ErrorHandling::Severity::ERROR,
+                                                        ERROR_CODE,
+                                                        FETCH_GET_PARAMETER_VALUE_CONTENT_ERROR_MESSAGE);
+        }
+
 
         void throwErrorWhenCloseConnectionIsCalled() noexcept {
             throwOnClose.store(true);
@@ -170,6 +207,40 @@ namespace Mock {
             errorToThrow = expectedErrorWhenSendRawDataIsCalled();
         }
 
+        ErrorHandling::SensorAccessLinkError expectedErrorWhenSendResponseIsCalled(std::string const& errorMessage) noexcept {
+            return ErrorHandling::SensorAccessLinkError(ORIGIN,
+                                                        ErrorHandling::Category::COMMUNICATION_ERROR,
+                                                        ErrorHandling::Severity::ERROR,
+                                                        ERROR_CODE,
+                                                        errorMessage);
+        }
+
+        ErrorHandling::SensorAccessLinkError expectedErrorWhenSendResponseIsCalled() noexcept {
+            return expectedErrorWhenSendResponseIsCalled(SEND_RESPONSE);
+        }
+
+        void throwErrorWhenSendParameterErrorResponseIsCalled() noexcept {
+            throwOnSendParameterErrorResponse.store(true);
+            errorToThrow = expectedErrorWhenSendResponseIsCalled();
+        }
+
+        void throwErrorWhenSendErrorMessageResponseIsCalled() noexcept {
+            throwOnSendErrorMessageResponse.store(true);
+            errorToThrow = expectedErrorWhenSendResponseIsCalled();
+        }
+
+        GetParameterValueContents fetchGetParameterValueContents() override {
+            if (hasCloseConnectionBeenCalled()) {
+                // WARNING! This mock implementation of readMessage needs to be slowed down because of the way gtest works. DO NOT REMOVE.
+                std::this_thread::sleep_for(std::chrono::milliseconds(5));
+                yield();
+            }
+
+            handleThrowConfirmation(&throwOnFetchGetParameterValueContents);
+            GetParameterValueContents getParameterValueContents{{" "}};
+            return getParameterValueContents;
+        }
+
         void openConnection(std::string const& serverAddress) override {
             if (throwOnOpen.load()) {
                 throwOnOpen.store(false); // We only throw once to allow the test to pass
@@ -189,27 +260,19 @@ namespace Mock {
         }
 
         void sendMessage(typename super::Message&& message) override {
-            if (!errorThrown.load()) {
-                if (throwOnSendMessage.load()) {
-                    throwOnSendMessage.store(false); // We only throw once to allow the test to pass
-                    openConnectionCalled.store(false);
-                    closeConnectionCalled.store(false);
-                    errorThrown.store(true);
-                    throw errorToThrow;
-                }
-            }
+            handleThrowConfirmation(&throwOnSendMessage);
         }
 
         void sendRawData(typename super::RawData&& rawData) override {
-            if (!errorThrown.load()) {
-                if (throwOnSendRawData.load()) {
-                    throwOnSendRawData.store(false); // We only throw once to allow the test to pass
-                    openConnectionCalled.store(false);
-                    closeConnectionCalled.store(false);
-                    errorThrown.store(true);
-                    throw errorToThrow;
-                }
-            }
+            handleThrowConfirmation(&throwOnSendRawData);
+        }
+
+        void sendResponse(typename super::ParameterErrorResponse&& parameterErrorResponse) override {
+            handleThrowConfirmation(&throwOnSendParameterErrorResponse);
+        }
+
+        void sendResponse(typename super::ErrorMessageResponse&& errorMessageResponse) override {
+            handleThrowConfirmation(&throwOnSendErrorMessageResponse);
         }
 
         bool hasCloseConnectionBeenCalledAfterThrowingFunction() const noexcept {
@@ -230,13 +293,13 @@ namespace Mock {
 
         void waitUntilOpenConnectionCallIsMadeAfterErrorIsThrown() {
             while (!hasOpenConnectionBeenCalledAfterThrowingFunction()) {
-                std::this_thread::yield();
+                yield();
             }
         }
 
         void waitUntilCloseConnectionCallIsMadeAfterErrorIsThrown() {
             while (!hasCloseConnectionBeenCalledAfterThrowingFunction()) {
-                std::this_thread::yield();
+                yield();
             }
         }
 
@@ -244,11 +307,25 @@ namespace Mock {
         ErrorHandling::ErrorCode const ERROR_CODE = ErrorHandling::GatewayErrorCode::EMPTY_CODE;
         std::string const OPEN_ERROR_MESSAGE = "Dust in the Wind";
         std::string const CLOSE_ERROR_MESSAGE = "By Kansas";
+        std::string const FETCH_GET_PARAMETER_VALUE_CONTENT_ERROR_MESSAGE = "  -  -  -  -  -  ";
         std::string const MESSAGE_ERROR_MESSAGE = "I close my eyes, only for a moment, and the moment's gone";
         std::string const RAW_DATA_ERROR_MESSAGE = "All my dreams pass before my eyes, a curiosity";
-        std::string const MESSAGE = "Dust in the wind; All they are is dust in the wind.";
+        std::string const MESSAGE = "Dust in the wind;";
+        std::string const SEND_RESPONSE = "All they are is dust in the wind.";
 
     private:
+
+        void handleThrowConfirmation(AtomicFlag* throwOnCallFlag) {
+            if (!errorThrown.load()) {
+                if (throwOnCallFlag->load()) {
+                    throwOnCallFlag->store(false); // We only throw once to allow the test to pass
+                    openConnectionCalled.store(false);
+                    closeConnectionCalled.store(false);
+                    errorThrown.store(true);
+                    throw errorToThrow;
+                }
+            }
+        }
 
         bool hasErrorBeenThrown() const noexcept {
             return errorThrown.load();
@@ -262,10 +339,13 @@ namespace Mock {
         AtomicFlag errorThrown;
         AtomicFlag throwOnOpen;
         AtomicFlag throwOnClose;
+        AtomicFlag throwOnFetchGetParameterValueContents;
         AtomicFlag throwOnSendMessage;
         AtomicFlag throwOnSendRawData;
+        AtomicFlag throwOnSendParameterErrorResponse;
+        AtomicFlag throwOnSendErrorMessageResponse;
 
     };
 }
 
-#endif //SENSORGATEWAY_ERRORTHROWINGSENSORCOMMUNICATIONSTRATEGYMOCK_HPP
+#endif //SENSORGATEWAY_ERRORTHROWINGSERVERCOMMUNICATIONSTRATEGYMOCK_HPP

@@ -54,7 +54,7 @@ namespace SensorCommunication {
         void closeConnection() final;
 
     private:
-        void throwErrorIfnecessary(canStatus const& errorCode, std::string const& callOrigin);
+        void throwErrorIfNecessary(canStatus const& errorCode, std::string const& callOrigin);
 
         typedef struct {
             int64_t id;

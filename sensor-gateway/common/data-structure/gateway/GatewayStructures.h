@@ -14,16 +14,16 @@
 	limitations under the License.
 */
 
-#ifndef SENSORGATEWAY_SPIRITSTRUCTURES_H
-#define SENSORGATEWAY_SPIRITSTRUCTURES_H
+#ifndef SENSORGATEWAY_GATEWAYSTRUCTURES_H
+#define SENSORGATEWAY_GATEWAYSTRUCTURES_H
 
 #include "sensor-gateway/common/data-structure/DataStructures.h"
-#include "SensorMessage.hpp"
+#include "sensor-gateway/common/data-structure/parameter/ParameterConstants.hpp"
 
 namespace Sensor {
-    namespace Spirit {
+    namespace Gateway {
 
-        template<typename SensorMessageDefinition, typename RawDataDefinition, typename CommandDefinition>
+        template<typename SensorMessageDefinition, typename RawDataDefinition, typename ControlMessageDefinition, typename ParametersList = NoGatewayParameters>
         class Structures final : public Communication::DataStructures {
 
         protected:
@@ -59,12 +59,16 @@ namespace Sensor {
 
             typedef typename DataFlow::SensorMessage<GatewaySensorMessageDefinition> Message;
             typedef typename DataFlow::RawData<RawDataDefinition> RawData;
-            typedef typename DataFlow::Command<CommandDefinition> Command;
+            typedef typename DataFlow::ControlMessage<ControlMessageDefinition> ControlMessage;
+            using Parameters = ParametersList;
 
             static size_t const MAX_NUMBER_OF_BULK_FETCHABLE_MESSAGES = 32;
             static size_t const MAX_NUMBER_OF_BULK_FETCHABLE_RAW_DATA_CYCLES = 8;
+
+            static size_t const MAX_NUMBER_OF_CONCURRENT_REQUEST_OF_ONE_KIND = 256;
+
         };
     }
 }
 
-#endif //SENSORGATEWAY_SPIRITSTRUCTURES_H
+#endif //SENSORGATEWAY_GATEWAYSTRUCTURES_H

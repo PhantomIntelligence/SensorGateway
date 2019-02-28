@@ -9,9 +9,11 @@ file(GLOB APPLICATION_FILES "${DOT}/application/*")
 file(GLOB COMMON_FILES "${DOT}/common/*")
 file(GLOB ERROR_FILES "${DOT}/common/error/*")
 file(GLOB DATA_STRUCTURE_FILES "${DOT}/common/data-structure/*")
+file(GLOB TIME_TRACKING_STRUCTURE_FILES "${DOT}/common/data-structure/time-tracking/*")
+file(GLOB PARAMETER_STRUCTURE_FILES "${DOT}/common/data-structure/parameter/*")
 file(GLOB SENSOR_STRUCTURE_FILES "${DOT}/common/data-structure/sensor/*")
-file(GLOB SPIRIT_STRUCTURE_FILES "${DOT}/common/data-structure/spirit/*")
-file(GLOB DOMAIN_FILES "${DOT}/domain/*")
+file(GLOB SPIRIT_STRUCTURE_FILES "${DOT}/common/data-structure/gateway/*")
+file(GLOB PARAMETER_CONTROL_FILES "${DOT}/parameter-control/*")
 file(GLOB SERVER_COMMUNICATION_FILES "${DOT}/server-communication/*")
 file(GLOB TRANSLATION_FILES "${DOT}/data-translation/*")
 file(GLOB SENSOR_COMMUNICATION_FILES "${DOT}/sensor-communication/*")
@@ -23,9 +25,11 @@ add_library(${PROJECT_NAME} SHARED
         ${COMMON_FILES}
         ${ERROR_FILES}
         ${DATA_STRUCTURE_FILES}
+        ${TIME_TRACKING_STRUCTURE_FILES}
+        ${PARAMETER_STRUCTURE_FILES}
         ${SPIRIT_STRUCTURE_FILES}
         ${SENSOR_STRUCTURE_FILES}
-        ${DOMAIN_FILES}
+        ${PARAMETER_CONTROL_FILES}
         ${SERVER_COMMUNICATION_FILES}
         ${TRANSLATION_FILES}
         ${SENSOR_COMMUNICATION_FILES}
@@ -38,6 +42,8 @@ target_link_libraries(${PROJECT_NAME} canlib)
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
         PUBLIC_HEADER "${HEADER_FILES};${CMAKE_CURRENT_BINARY_DIR}/config.h")
+
+set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 14)
 
 install(TARGETS ${PROJECT_NAME}
         # IMPORTANT: Add the library to the "export-set"

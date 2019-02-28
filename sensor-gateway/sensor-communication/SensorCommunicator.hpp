@@ -63,7 +63,7 @@ namespace SensorAccessLinkElement {
 
         void start() {
             openConnection();
-            std::this_thread::yield();
+            yield();
             communicatorThread = JoinableThread(&SensorCommunicator::run, this);
         };
 
@@ -105,8 +105,7 @@ namespace SensorAccessLinkElement {
             while (!terminateOrderHasBeenReceived()) {
                 handleIncomingMessages();
                 handleIncomingRawData();
-                // TODO : investigate the advantages of sleep and/or yield here.
-                std::this_thread::yield();
+                yield();
             }
         }
 

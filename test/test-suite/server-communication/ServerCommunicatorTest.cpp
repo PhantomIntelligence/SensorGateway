@@ -1,5 +1,5 @@
 /**
-	Copyright 2014-2018 Phantom Intelligence Inc.
+	Copyright 2014-2019 Phantom Intelligence Inc.
 
 	Licensed under the Apache License, Version 2.0 (the "License");
 	you may not use this file except in compliance with the License.
@@ -19,162 +19,158 @@
 #define SENSORGATEWAY_SERVERCOMMUNICATORTEST_CPP
 
 #include <gtest/gtest.h>
-#include <list>
 
 #include "sensor-gateway/server-communication/ServerCommunicator.hpp"
 #include "test/utilities/data-model/DataModelFixture.h"
-#include "test/utilities/mock/ArbitraryDataSinkMock.hpp"
+#include "test/utilities/assertion/ErrorAssertion.hpp"
+#include "test/utilities/mock/CatchingRequestHandlerMock.hpp"
+#include "test/utilities/mock/CatchingServerCommunicationStrategyMock.hpp"
 #include "test/utilities/mock/ErrorThrowingServerCommunicationStrategyMock.hpp"
+#include "test/utilities/mock/RequestResponseSpecializedServerCommunicationStrategyMock.hpp"
 #include "test/utilities/assertion/TimeAssertion.hpp"
 
 using TestFunctions::DataTestUtil;
 
-namespace ServerCommunicatorTestMock {
-
-    using ServerCommunication::ServerCommunicationStrategy;
-
-    class MockServerCommunicatorStrategy : public ServerCommunicationStrategy<Sensor::Test::Simple::Structures> {
-
-    protected:
-
-        using super = ServerCommunicationStrategy<Sensor::Test::Simple::Structures>;
-
-        using super::Message;
-        using super::RawData;
-
-    public:
-
-        MockServerCommunicatorStrategy() :
-                openConnectionCalled(false),
-                sendMessageCalled(false),
-                sendRawDataCalled(false),
-                closeConnectionCalled(false),
-                sentMessage(Message::returnDefaultData()),
-                sentRawData(RawData::returnDefaultData()) {
-
-        }
-
-        ~MockServerCommunicatorStrategy() noexcept override = default;
-
-        void sendMessage(Message&& message) override {
-            sendMessageCalled.store(true);
-            sentMessage = message;
-        }
-
-        void sendRawData(RawData&& rawData) override {
-            sendRawDataCalled.store(true);
-            sentRawData = rawData;
-        }
-
-        void openConnection(std::string const& serverAddress) override {
-            openConnectionCalled.store(true);
-        }
-
-        void closeConnection() override {
-            closeConnectionCalled.store(true);
-        }
-
-        bool hasOpenConnectionBeenCalled() const {
-            return openConnectionCalled.load();
-        }
-
-        bool hasCloseConnectionBeenCalled() const {
-            return closeConnectionCalled.load();
-        }
-
-        bool hasSendMessageBeenCalled() const {
-            return sendMessageCalled.load();
-        }
-
-        bool hasSendRawDataBeenCalled() const {
-            return sendRawDataCalled.load();
-        }
-
-        Message getSentMessage() const {
-            return sentMessage;
-        }
-
-        RawData getSentRawData() const {
-            return sentRawData;
-        }
-
-
-        AtomicFlag openConnectionCalled;
-        AtomicFlag sendMessageCalled;
-        AtomicFlag sendRawDataCalled;
-        AtomicFlag closeConnectionCalled;
-
-    protected:
-
-        Message sentMessage;
-        RawData sentRawData;
-    };
-}
-
 class ServerCommunicatorTest : public ::testing::Test {
+
 public:
-    using Error = ErrorHandling::SensorAccessLinkError;
-    using ErrorSinkMock = Mock::ArbitraryDataSinkMock<Error>;
-    using ErrorProcessingScheduler = DataFlow::DataProcessingScheduler<Error, ErrorSinkMock, 1>;
-    using ThrowingServerCommunicationStrategy = Mock::ErrorThrowingServerCommunicationStrategyMock<Sensor::Test::Simple::Structures>;
+
+    using RequestAssembler = Assemble::ServerRequestAssembler;
+    using ResponseAssembler = Assemble::ServerResponseAssembler;
+
+    using DataStructures = Sensor::Test::Simple::Structures;
+    using ParameterListForThisTestCase = DataStructures::Parameters;
+
+    using MockServerCommunicatorStrategy = Mock::CatchingServerCommunicationStrategyMock<DataStructures>;
+    using ThrowingServerCommunicationStrategy = Mock::ErrorThrowingServerCommunicationStrategyMock<DataStructures>;
+    using RequestResponseServerCommunicationStrategy = Mock::RequestResponseSpecializedServerCommunicationStrategyMock<DataStructures>;
 
 protected:
 
-    using ServerCommunicator = SensorAccessLinkElement::ServerCommunicator<Sensor::Test::Simple::Structures>;
+    using ServerCommunicator = SensorAccessLinkElement::ServerCommunicator<DataStructures>;
+    using MockRequestHandler = Mock::CatchingRequestHandlerMock<DataStructures, DataStructures>;
     using Message = Sensor::Test::Simple::Structures::Message;
     using RawData = Sensor::Test::Simple::Structures::RawData;
 
     std::string const SERVER_ADDRESS = "I like trains";
+    MockRequestHandler defaultRequestHandlerMock;
+
+    using GetParameterValueRequest = ServerCommunication::RequestTypes::GetParameterValue;
+    using HandleGetParameterValueRequest = std::function<void(GetParameterValueRequest&&)>;
+    using NoAction = StringLiteral<decltype(""_ToString)>;
 
     ServerCommunicatorTest() = default;
 
     virtual ~ServerCommunicatorTest() = default;
 
-    Error formatStrategyErrorWithCorrectOrigin(Error strategyIssuedError, std::string origin) const noexcept {
-        Error formattedError(origin + ErrorHandling::Message::SEPARATOR + strategyIssuedError.getOrigin(),
-                             strategyIssuedError.getCategory(),
-                             strategyIssuedError.getSeverity(),
-                             strategyIssuedError.getErrorCode(),
-                             strategyIssuedError.getMessage());
-        return formattedError;
+    auto givenAnErrorMessageResponse() const {
+        auto badRequest = Given::anInvalidGetParameterValueRequest<ParameterListForThisTestCase>();
+        badRequest.markAsBadRequest();
+        auto badRequestResponse = ResponseAssembler::createErrorMessageResponseFromRequest<NoAction>(std::move(badRequest));
+        return badRequestResponse;
     }
 
-    ::testing::AssertionResult expectedErrorHasBeenThrown(ErrorSinkMock* sink, Error expectedError) const noexcept {
+    auto givenAParameterErrorResponse() const {
+        auto validRequest = Given::aValidGetParameterValueRequest<ParameterListForThisTestCase>();
+        validRequest.markAsErrorCause();
+        ParameterListForThisTestCase availableParameters;
+        auto metadata = availableParameters.getMetadataFor((validRequest.payloadToString()));
+        auto parameterErrorResponse = Assemble::ServerResponseAssembler::createParameterErrorResponse(metadata,
+                                                                                                      std::move(
+                                                                                                              validRequest));
+        return parameterErrorResponse;
+    }
 
-        auto producedErrors = sink->getConsumedData();
-        bool expectedErrorPublished = true;
-        auto lastParsedError = ErrorHandling::SensorAccessLinkError::returnDefaultData();
-        for (auto t = 0; t < producedErrors.size() && expectedErrorPublished; ++t) {
-            lastParsedError = producedErrors.front();
-            expectedErrorPublished = lastParsedError == expectedError;
-            producedErrors.pop_front();
+    void
+    assertRequestHandlerReceivesExpectedNumberOfValidRequestsWithStrategy(MockRequestHandler* mockRequestHandler,
+                                                                          ServerCommunicator* serverCommunicator) {
+        serverCommunicator->openConnection(SERVER_ADDRESS);
+        mockRequestHandler->waitForExpectedNumberOfGetParameterValueRequest();
+        serverCommunicator->terminateAndJoin();
+
+        auto hasReceivedExpectedNumberOfCall = mockRequestHandler->hasReceivedExpectedNumberOfGetParameterValueRequest();
+
+        ASSERT_TRUE(hasReceivedExpectedNumberOfCall);
+    }
+
+    auto bindHandlerGetParameterValueTo(MockRequestHandler* handlerMock) -> HandleGetParameterValueRequest {
+        return std::bind(&MockRequestHandler::handleGetParameterValueRequest,
+                         handlerMock, std::placeholders::_1);
+    }
+
+    auto ignoreHandleGetParameterValue() -> HandleGetParameterValueRequest {
+        return bindHandlerGetParameterValueTo(&defaultRequestHandlerMock);
+    }
+
+    auto recreateGetParameterValueRequestFromName(
+            std::string const& content) const -> std::tuple<GetParameterValueRequest, bool> const {
+        GetParameterValueRequest getParameterRequest = RequestAssembler::getParameterValueRequest(content);
+        ParameterListForThisTestCase parameters;
+        bool requestIsValid = parameters.isAvailable(content);
+        if (!requestIsValid) {
+            getParameterRequest.markAsBadRequest();
         }
-        if (expectedErrorPublished) {
+        bool hasNonDefaultContent = getParameterRequest != GetParameterValueRequest::returnDefaultData();
+        return std::make_tuple(getParameterRequest, hasNonDefaultContent);
+    };
+
+    template<typename Response>
+    testing::AssertionResult
+    closeConnectionIsCalledAfterStrategyThrowsOnSendResponse(ThrowingServerCommunicationStrategy* throwingStrategy,
+                                                             Response&& response) noexcept {
+
+        ServerCommunicator serverCommunicator(throwingStrategy, ignoreHandleGetParameterValue());
+
+        serverCommunicator.sendResponse(std::forward<Response>(response));
+        throwingStrategy->waitUntilCloseConnectionCallIsMadeAfterErrorIsThrown();
+
+        auto closeConnectionCalled = throwingStrategy->hasCloseConnectionBeenCalledAfterThrowingFunction();
+        if (closeConnectionCalled) {
             return ::testing::AssertionSuccess();
         } else {
             return ::testing::AssertionFailure()
-                    << "\nExpected : \n"
-                    << expectedError.fetchDetailedMessage()
-                    << "\nGot : \n"
-                    << lastParsedError.fetchDetailedMessage()
+                    << "\nExpected closeConnection to be call in strategy as a reaction to the thrown error in `sendResponse`: \n"
+                    << "\nMake sure the error thrown is correctly formed (see SensorAccessLinkError), as it dictates further handling\n"
+                    << "\n";
+        }
+    }
+
+    template<typename Response>
+    testing::AssertionResult
+    openConnectionIsCalledAfterStrategyThrowsOnSendResponse(ThrowingServerCommunicationStrategy* throwingStrategy,
+                                                            Response&& response) noexcept {
+
+        ServerCommunicator serverCommunicator(throwingStrategy, ignoreHandleGetParameterValue());
+
+        serverCommunicator.sendResponse(std::forward<Response>(response));
+        throwingStrategy->waitUntilOpenConnectionCallIsMadeAfterErrorIsThrown();
+
+        auto closeConnectionCalled = throwingStrategy->hasOpenConnectionBeenCalledAfterThrowingFunction();
+        if (closeConnectionCalled) {
+            return ::testing::AssertionSuccess();
+        } else {
+            return ::testing::AssertionFailure()
+                    << "\nExpected openConnection to be call in strategy as a reaction to the thrown error in `sendResponse`: \n"
+                    << "\nMake sure the error thrown is correctly formed (see SensorAccessLinkError), as it dictates further handling\n"
                     << "\n";
         }
     }
 };
 
 TEST_F(ServerCommunicatorTest, given__when_connect_then_callsOpenConnectionInStrategy) {
-    ServerCommunicatorTestMock::MockServerCommunicatorStrategy mockStrategy;
-    ServerCommunicator serverCommunicator(&mockStrategy);
+    MockServerCommunicatorStrategy mockStrategy;
+    ServerCommunicator serverCommunicator(&mockStrategy, ignoreHandleGetParameterValue());
 
     serverCommunicator.openConnection(SERVER_ADDRESS);
-
     auto strategyHasBeenCalled = mockStrategy.hasOpenConnectionBeenCalled();
+    serverCommunicator.terminateAndJoin();
+
     ASSERT_TRUE(strategyHasBeenCalled);
 }
 
 TEST_F(ServerCommunicatorTest, given_aMessageToSend_when_consume_then_callsSendMessageInStrategy) {
-    ServerCommunicatorTestMock::MockServerCommunicatorStrategy mockStrategy;
-    ServerCommunicator serverCommunicator(&mockStrategy);
+    MockServerCommunicatorStrategy mockStrategy;
+    ServerCommunicator serverCommunicator(&mockStrategy, ignoreHandleGetParameterValue());
     auto message = DataTestUtil::createRandomSimpleMessageWithEmptyTimestamps();
 
     serverCommunicator.consume(std::move(message));
@@ -184,14 +180,13 @@ TEST_F(ServerCommunicatorTest, given_aMessageToSend_when_consume_then_callsSendM
 }
 
 TEST_F(ServerCommunicatorTest, given_aMessageToSend_when_consume_then_callsSendMessageInStrategyWithTheMessage) {
-    ServerCommunicatorTestMock::MockServerCommunicatorStrategy mockStrategy;
-    ServerCommunicator serverCommunicator(&mockStrategy);
+    MockServerCommunicatorStrategy mockStrategy;
+    ServerCommunicator serverCommunicator(&mockStrategy, ignoreHandleGetParameterValue());
     auto message = DataTestUtil::createRandomSimpleMessageWithEmptyTimestamps();
     auto copy = Message(message);
 
     serverCommunicator.consume(std::move(message));
-
-    auto receivedMessage = mockStrategy.getSentMessage();
+    auto receivedMessage = mockStrategy.getFirstSentMessage();
     ASSERT_EQ(copy, receivedMessage);
 }
 
@@ -199,14 +194,14 @@ TEST_F(ServerCommunicatorTest, given_aMessageToSend_when_consume_then_callsSendM
  * @metric-test : timestamps
  */
 TEST_F(ServerCommunicatorTest, given_aMessageToSend_when_consume_then_sendsItAfterHavingTimestampedIt) {
-    ServerCommunicatorTestMock::MockServerCommunicatorStrategy mockStrategy;
-    ServerCommunicator serverCommunicator(&mockStrategy);
+    MockServerCommunicatorStrategy mockStrategy;
+    ServerCommunicator serverCommunicator(&mockStrategy, ignoreHandleGetParameterValue());
     auto message = DataTestUtil::createRandomSimpleMessageWithEmptyTimestamps();
 
     auto now = HighResolutionClock::now();
     serverCommunicator.consume(std::move(message));
 
-    auto receivedMessage = mockStrategy.getSentMessage();
+    auto receivedMessage = mockStrategy.getFirstSentMessage();
 
     auto timePoint = receivedMessage.getGatewayTimestamps().getTimePoints()[0];
     auto timePointLocation = timePoint.location;
@@ -218,8 +213,8 @@ TEST_F(ServerCommunicatorTest, given_aMessageToSend_when_consume_then_sendsItAft
 }
 
 TEST_F(ServerCommunicatorTest, given_aRawDataCycleToSend_when_consume_then_callsSendRawDataInStrategy) {
-    ServerCommunicatorTestMock::MockServerCommunicatorStrategy mockStrategy;
-    ServerCommunicator serverCommunicator(&mockStrategy);
+    MockServerCommunicatorStrategy mockStrategy;
+    ServerCommunicator serverCommunicator(&mockStrategy, ignoreHandleGetParameterValue());
     auto rawData = DataTestUtil::createRandomSimpleRawData();
 
     serverCommunicator.consume(std::move(rawData));
@@ -228,23 +223,24 @@ TEST_F(ServerCommunicatorTest, given_aRawDataCycleToSend_when_consume_then_calls
     ASSERT_TRUE(strategyHasBeenCalled);
 }
 
-TEST_F(ServerCommunicatorTest, given_aRawDataCycleToSend_when_consume_then_callsSendRawDataInStrategyWithTheRawData) {
-    ServerCommunicatorTestMock::MockServerCommunicatorStrategy mockStrategy;
-    ServerCommunicator serverCommunicator(&mockStrategy);
+TEST_F(ServerCommunicatorTest,
+       given_aRawDataCycleToSend_when_consume_then_callsSendRawDataInStrategyWithTheRawData) {
+    MockServerCommunicatorStrategy mockStrategy;
+    ServerCommunicator serverCommunicator(&mockStrategy, ignoreHandleGetParameterValue());
     auto rawData = DataTestUtil::createRandomSimpleRawData();
     auto copy = RawData(rawData);
 
     serverCommunicator.consume(std::move(rawData));
 
-    auto receivedRawData = mockStrategy.getSentRawData();
+    auto receivedRawData = mockStrategy.getFirstSentRawData();
     ASSERT_EQ(copy, receivedRawData);
 }
 
-TEST_F(ServerCommunicatorTest, given__when_disconnect_then_callsCloseConnectionInStrategy) {
-    ServerCommunicatorTestMock::MockServerCommunicatorStrategy mockStrategy;
-    ServerCommunicator serverCommunicator(&mockStrategy);
+TEST_F(ServerCommunicatorTest, given__when_terminateAndJoin_then_callsCloseConnectionInStrategy) {
+    MockServerCommunicatorStrategy mockStrategy;
+    ServerCommunicator serverCommunicator(&mockStrategy, ignoreHandleGetParameterValue());
 
-    serverCommunicator.closeConnection();
+    serverCommunicator.terminateAndJoin();
 
     auto strategyHasBeenCalled = mockStrategy.hasCloseConnectionBeenCalled();
     ASSERT_TRUE(strategyHasBeenCalled);
@@ -255,11 +251,12 @@ TEST_F(ServerCommunicatorTest,
     ThrowingServerCommunicationStrategy throwingMockStrategy;
     throwingMockStrategy.throwCloseConnectionRequiredErrorWhenOpenConnectionIsCalled();
 
-    ServerCommunicator serverCommunicator(&throwingMockStrategy);
+    ServerCommunicator serverCommunicator(&throwingMockStrategy, ignoreHandleGetParameterValue());
     serverCommunicator.openConnection(SERVER_ADDRESS);
     throwingMockStrategy.waitUntilCloseConnectionCallIsMadeAfterErrorIsThrown();
 
     auto closeConnectionCalled = throwingMockStrategy.hasCloseConnectionBeenCalledAfterThrowingFunction();
+    serverCommunicator.terminateAndJoin();
 
     ASSERT_TRUE(closeConnectionCalled);
 }
@@ -269,11 +266,12 @@ TEST_F(ServerCommunicatorTest,
     ThrowingServerCommunicationStrategy throwingMockStrategy;
     throwingMockStrategy.throwOpenConnectionRequiredErrorWhenOpenConnectionIsCalled();
 
-    ServerCommunicator serverCommunicator(&throwingMockStrategy);
+    ServerCommunicator serverCommunicator(&throwingMockStrategy, ignoreHandleGetParameterValue());
     serverCommunicator.openConnection(SERVER_ADDRESS);
     throwingMockStrategy.waitUntilOpenConnectionCallIsMadeAfterErrorIsThrown();
 
     auto openConnectionCalled = throwingMockStrategy.hasOpenConnectionBeenCalledAfterThrowingFunction();
+    serverCommunicator.terminateAndJoin();
 
     ASSERT_TRUE(openConnectionCalled);
 }
@@ -283,8 +281,8 @@ TEST_F(ServerCommunicatorTest,
     ThrowingServerCommunicationStrategy throwingMockStrategy;
     throwingMockStrategy.throwCloseConnectionRequiredErrorWhenCloseConnectionIsCalled();
 
-    ServerCommunicator serverCommunicator(&throwingMockStrategy);
-    serverCommunicator.closeConnection();
+    ServerCommunicator serverCommunicator(&throwingMockStrategy, ignoreHandleGetParameterValue());
+    serverCommunicator.terminateAndJoin();
     throwingMockStrategy.waitUntilCloseConnectionCallIsMadeAfterErrorIsThrown();
 
     auto closeConnectionCalled = throwingMockStrategy.hasCloseConnectionBeenCalledAfterThrowingFunction();
@@ -297,8 +295,8 @@ TEST_F(ServerCommunicatorTest,
     ThrowingServerCommunicationStrategy throwingMockStrategy;
     throwingMockStrategy.throwOpenConnectionRequiredErrorWhenCloseConnectionIsCalled();
 
-    ServerCommunicator serverCommunicator(&throwingMockStrategy);
-    serverCommunicator.closeConnection();
+    ServerCommunicator serverCommunicator(&throwingMockStrategy, ignoreHandleGetParameterValue());
+    serverCommunicator.terminateAndJoin();
     throwingMockStrategy.waitUntilOpenConnectionCallIsMadeAfterErrorIsThrown();
 
     auto openConnectionCalled = throwingMockStrategy.hasOpenConnectionBeenCalledAfterThrowingFunction();
@@ -311,7 +309,7 @@ TEST_F(ServerCommunicatorTest,
     ThrowingServerCommunicationStrategy throwingMockStrategy;
     throwingMockStrategy.throwCloseConnectionRequiredErrorWhenSendMessageIsCalled();
 
-    ServerCommunicator serverCommunicator(&throwingMockStrategy);
+    ServerCommunicator serverCommunicator(&throwingMockStrategy, ignoreHandleGetParameterValue());
     auto message = DataTestUtil::createRandomSimpleMessageWithEmptyTimestamps();
     serverCommunicator.consume(std::move(message));
     throwingMockStrategy.waitUntilCloseConnectionCallIsMadeAfterErrorIsThrown();
@@ -326,7 +324,7 @@ TEST_F(ServerCommunicatorTest,
     ThrowingServerCommunicationStrategy throwingMockStrategy;
     throwingMockStrategy.throwOpenConnectionRequiredErrorWhenSendMessageIsCalled();
 
-    ServerCommunicator serverCommunicator(&throwingMockStrategy);
+    ServerCommunicator serverCommunicator(&throwingMockStrategy, ignoreHandleGetParameterValue());
     auto message = DataTestUtil::createRandomSimpleMessageWithEmptyTimestamps();
     serverCommunicator.consume(std::move(message));
     throwingMockStrategy.waitUntilOpenConnectionCallIsMadeAfterErrorIsThrown();
@@ -341,7 +339,7 @@ TEST_F(ServerCommunicatorTest,
     ThrowingServerCommunicationStrategy throwingMockStrategy;
     throwingMockStrategy.throwCloseConnectionRequiredErrorWhenSendRawDataIsCalled();
 
-    ServerCommunicator serverCommunicator(&throwingMockStrategy);
+    ServerCommunicator serverCommunicator(&throwingMockStrategy, ignoreHandleGetParameterValue());
     auto rawData = DataTestUtil::createRandomSimpleRawData();
     serverCommunicator.consume(std::move(rawData));
     throwingMockStrategy.waitUntilCloseConnectionCallIsMadeAfterErrorIsThrown();
@@ -356,7 +354,7 @@ TEST_F(ServerCommunicatorTest,
     ThrowingServerCommunicationStrategy throwingMockStrategy;
     throwingMockStrategy.throwOpenConnectionRequiredErrorWhenSendRawDataIsCalled();
 
-    ServerCommunicator serverCommunicator(&throwingMockStrategy);
+    ServerCommunicator serverCommunicator(&throwingMockStrategy, ignoreHandleGetParameterValue());
     auto rawData = DataTestUtil::createRandomSimpleRawData();
     serverCommunicator.consume(std::move(rawData));
     throwingMockStrategy.waitUntilOpenConnectionCallIsMadeAfterErrorIsThrown();
@@ -364,6 +362,42 @@ TEST_F(ServerCommunicatorTest,
     auto openConnectionCalled = throwingMockStrategy.hasOpenConnectionBeenCalledAfterThrowingFunction();
 
     ASSERT_TRUE(openConnectionCalled);
+}
+
+TEST_F(ServerCommunicatorTest,
+       given_anErrorThatRequiresToCloseThrownOnSendParameterErrorResponseCall_when_isCaught_then_callsCloseConnectionInStrategy) {
+    ThrowingServerCommunicationStrategy throwingMockStrategy;
+    throwingMockStrategy.throwCloseConnectionRequiredErrorWhenSendParameterErrorResponseIsCalled();
+    auto response = givenAParameterErrorResponse();
+
+    ASSERT_TRUE(closeConnectionIsCalledAfterStrategyThrowsOnSendResponse(&throwingMockStrategy, std::move(response)));
+}
+
+TEST_F(ServerCommunicatorTest,
+       given_anErrorThatRequiresToOpenThrownOnSendParameterErrorResponseCall_when_isCaught_then_callsOpenConnectionInStrategy) {
+    ThrowingServerCommunicationStrategy throwingMockStrategy;
+    throwingMockStrategy.throwOpenConnectionRequiredErrorWhenSendParameterErrorResponseIsCalled();
+    auto response = givenAParameterErrorResponse();
+
+    ASSERT_TRUE(openConnectionIsCalledAfterStrategyThrowsOnSendResponse(&throwingMockStrategy, std::move(response)));
+}
+
+TEST_F(ServerCommunicatorTest,
+       given_anErrorThatRequiresToCloseThrownOnSendErrorMessageResponseCall_when_isCaught_then_callsCloseConnectionInStrategy) {
+    ThrowingServerCommunicationStrategy throwingMockStrategy;
+    throwingMockStrategy.throwCloseConnectionRequiredErrorWhenSendErrorMessageResponseIsCalled();
+    auto response = givenAnErrorMessageResponse();
+
+    ASSERT_TRUE(closeConnectionIsCalledAfterStrategyThrowsOnSendResponse(&throwingMockStrategy, std::move(response)));
+}
+
+TEST_F(ServerCommunicatorTest,
+       given_anErrorThatRequiresToOpenThrownOnSendErrorMessageResponseCall_when_isCaught_then_callsOpenConnectionInStrategy) {
+    ThrowingServerCommunicationStrategy throwingMockStrategy;
+    throwingMockStrategy.throwOpenConnectionRequiredErrorWhenSendErrorMessageResponseIsCalled();
+    auto response = givenAnErrorMessageResponse();
+
+    ASSERT_TRUE(openConnectionIsCalledAfterStrategyThrowsOnSendResponse(&throwingMockStrategy, std::move(response)));
 }
 
 TEST_F(ServerCommunicatorTest,
@@ -377,7 +411,7 @@ TEST_F(ServerCommunicatorTest,
     auto numberOfErrorToReceive = 1;
     ErrorSinkMock sink(numberOfErrorToReceive);
     ErrorProcessingScheduler scheduler(&sink);
-    ServerCommunicator serverCommunicator(&throwingMockStrategy);
+    ServerCommunicator serverCommunicator(&throwingMockStrategy, ignoreHandleGetParameterValue());
 
     serverCommunicator.linkConsumer(&scheduler);
 
@@ -386,7 +420,7 @@ TEST_F(ServerCommunicatorTest,
 
     scheduler.terminateAndJoin();
 
-    ASSERT_TRUE(expectedErrorHasBeenThrown(&sink, expectedError));
+    ASSERT_TRUE(Assert::errorHasBeenThrown(&sink, expectedError));
 }
 
 TEST_F(ServerCommunicatorTest,
@@ -399,20 +433,20 @@ TEST_F(ServerCommunicatorTest,
     auto numberOfErrorToReceive = 1;
     ErrorSinkMock sink(numberOfErrorToReceive);
     ErrorProcessingScheduler scheduler(&sink);
-    ServerCommunicator serverCommunicator(&throwingMockStrategy);
+    ServerCommunicator serverCommunicator(&throwingMockStrategy, ignoreHandleGetParameterValue());
 
     serverCommunicator.linkConsumer(&scheduler);
 
-    serverCommunicator.closeConnection();
+    serverCommunicator.terminateAndJoin();
     sink.waitConsumptionToBeReached();
 
     scheduler.terminateAndJoin();
 
-    ASSERT_TRUE(expectedErrorHasBeenThrown(&sink, expectedError));
+    ASSERT_TRUE(Assert::errorHasBeenThrown(&sink, expectedError));
 }
 
 TEST_F(ServerCommunicatorTest,
-       given_aStrategyThrowingErrorOnFetchMessagesCall_when_errorIsCaught_then_producesTheErrorWithCorrectOrigin) {
+       given_aStrategyThrowingErrorOnSendMessagesCall_when_errorIsCaught_then_producesTheErrorWithCorrectOrigin) {
     ThrowingServerCommunicationStrategy throwingMockStrategy;
     throwingMockStrategy.throwErrorWhenSendMessageIsCalled();
     Error expectedError = throwingMockStrategy.expectedErrorWhenSendMessageIsCalled();
@@ -421,7 +455,7 @@ TEST_F(ServerCommunicatorTest,
     auto numberOfErrorToReceive = 1;
     ErrorSinkMock sink(numberOfErrorToReceive);
     ErrorProcessingScheduler scheduler(&sink);
-    ServerCommunicator serverCommunicator(&throwingMockStrategy);
+    ServerCommunicator serverCommunicator(&throwingMockStrategy, ignoreHandleGetParameterValue());
 
     serverCommunicator.linkConsumer(&scheduler);
 
@@ -431,11 +465,11 @@ TEST_F(ServerCommunicatorTest,
 
     scheduler.terminateAndJoin();
 
-    ASSERT_TRUE(expectedErrorHasBeenThrown(&sink, expectedError));
+    ASSERT_TRUE(Assert::errorHasBeenThrown(&sink, expectedError));
 }
 
 TEST_F(ServerCommunicatorTest,
-       given_aStrategyThrowingErrorOnFetchRawDataCyclesCall_when_errorIsCaught_then_producesTheErrorWithCorrectOrigin) {
+       given_aStrategyThrowingErrorOnSendRawDataCyclesCall_when_errorIsCaught_then_producesTheErrorWithCorrectOrigin) {
     ThrowingServerCommunicationStrategy throwingMockStrategy;
     throwingMockStrategy.throwErrorWhenSendRawDataIsCalled();
     Error expectedError = throwingMockStrategy.expectedErrorWhenSendRawDataIsCalled();
@@ -444,7 +478,7 @@ TEST_F(ServerCommunicatorTest,
     auto numberOfErrorToReceive = 1;
     ErrorSinkMock sink(numberOfErrorToReceive);
     ErrorProcessingScheduler scheduler(&sink);
-    ServerCommunicator serverCommunicator(&throwingMockStrategy);
+    ServerCommunicator serverCommunicator(&throwingMockStrategy, ignoreHandleGetParameterValue());
 
     serverCommunicator.linkConsumer(&scheduler);
 
@@ -454,8 +488,217 @@ TEST_F(ServerCommunicatorTest,
 
     scheduler.terminateAndJoin();
 
-    ASSERT_TRUE(expectedErrorHasBeenThrown(&sink, expectedError));
+    ASSERT_TRUE(Assert::errorHasBeenThrown(&sink, expectedError));
 }
+
+TEST_F(ServerCommunicatorTest,
+       given_aStrategyThrowingErrorOnSendResponseCall_when_errorIsCaught_then_producesTheErrorWithCorrectOrigin) {
+    ThrowingServerCommunicationStrategy throwingMockStrategy;
+    throwingMockStrategy.throwErrorWhenSendErrorMessageResponseIsCalled();
+    Error expectedError = throwingMockStrategy.expectedErrorWhenSendResponseIsCalled();
+    expectedError = formatStrategyErrorWithCorrectOrigin(expectedError,
+                                                         ErrorHandling::Origin::SERVER_COMMUNICATOR_SEND_RESPONSE);
+    auto numberOfErrorToReceive = 1;
+    ErrorSinkMock sink(numberOfErrorToReceive);
+    ErrorProcessingScheduler scheduler(&sink);
+    ServerCommunicator serverCommunicator(&throwingMockStrategy, ignoreHandleGetParameterValue());
+
+    serverCommunicator.linkConsumer(&scheduler);
+
+    auto response = givenAnErrorMessageResponse();
+    serverCommunicator.sendResponse(std::move(response));
+    sink.waitConsumptionToBeReached();
+
+    scheduler.terminateAndJoin();
+
+    ASSERT_TRUE(Assert::errorHasBeenThrown(&sink, expectedError));
+}
+
+TEST_F(ServerCommunicatorTest, given__when_isServerConnected_then_returnFalse) {
+    MockServerCommunicatorStrategy mockStrategy;
+    ServerCommunicator serverCommunicator(&mockStrategy, ignoreHandleGetParameterValue());
+
+    auto serverConnected = serverCommunicator.isServerConnected();
+
+    ASSERT_FALSE(serverConnected);
+}
+
+TEST_F(ServerCommunicatorTest,
+       given_aConnectedServer_when_isServerConnected_then_returnTrueAfterStrategyHasBeenCalled) {
+    MockServerCommunicatorStrategy mockStrategy;
+    ServerCommunicator serverCommunicator(&mockStrategy, ignoreHandleGetParameterValue());
+
+    serverCommunicator.openConnection(SERVER_ADDRESS);
+
+    bool strategyHasBeenCalled = false;
+    do {
+        strategyHasBeenCalled = mockStrategy.hasOpenConnectionBeenCalled();
+    } while (!strategyHasBeenCalled);
+
+    auto serverConnected = serverCommunicator.isServerConnected();
+    serverCommunicator.terminateAndJoin();
+
+    ASSERT_TRUE(serverConnected);
+}
+
+TEST_F(ServerCommunicatorTest, given_anOpennedConnection_when_terminateAndJoin_then_serverIsNoLonguerConnected) {
+    MockServerCommunicatorStrategy mockStrategy;
+    ServerCommunicator serverCommunicator(&mockStrategy, ignoreHandleGetParameterValue());
+
+    serverCommunicator.openConnection(SERVER_ADDRESS);
+    serverCommunicator.terminateAndJoin();
+
+    auto serverConnected = serverCommunicator.isServerConnected();
+
+    ASSERT_FALSE(serverConnected);
+}
+
+
+TEST_F(ServerCommunicatorTest,
+       given_aThrowingStrategyOnConnection_when_isServerConnected_then_returnFalseAfterStrategyHasBeenCalled) {
+    ThrowingServerCommunicationStrategy throwingMockStrategy;
+    throwingMockStrategy.throwOpenConnectionRequiredErrorWhenOpenConnectionIsCalled();
+
+    ServerCommunicator serverCommunicator(&throwingMockStrategy, ignoreHandleGetParameterValue());
+    serverCommunicator.openConnection(SERVER_ADDRESS);
+    throwingMockStrategy.waitUntilOpenConnectionCallIsMadeAfterErrorIsThrown();
+
+    auto serverConnected = serverCommunicator.isServerConnected();
+    serverCommunicator.terminateAndJoin();
+
+    ASSERT_FALSE(serverConnected);
+}
+
+TEST_F(ServerCommunicatorTest,
+       given_aConnectedServer_when_openConnection_then_callsFetchGetParameterValueContentsInStrategy) {
+    MockServerCommunicatorStrategy mockStrategy;
+    ServerCommunicator serverCommunicator(&mockStrategy, ignoreHandleGetParameterValue());
+
+    serverCommunicator.openConnection(SERVER_ADDRESS);
+
+    mockStrategy.waitUntilFetchGetParameterValueContentsIsCalled();
+
+    serverCommunicator.terminateAndJoin();
+
+    auto fetchGetParameterValueContentsBeenCalled = mockStrategy.hasFetchGetParameterValueContentsBeenCalled();
+    ASSERT_TRUE(fetchGetParameterValueContentsBeenCalled);
+}
+
+TEST_F(ServerCommunicatorTest,
+       given_aStrategyThrowingErrorOnFetchGetParameterValueContentsCall_when_errorIsCaught_then_producesTheErrorWithCorrectOrigin) {
+    ThrowingServerCommunicationStrategy throwingMockStrategy;
+    throwingMockStrategy.throwErrorWhenFetchGetParameterValueContentsIsCalled();
+    Error expectedError = throwingMockStrategy.expectedErrorWhenFetchGetParameterValueContentsIsCalled();
+    expectedError = formatStrategyErrorWithCorrectOrigin(expectedError,
+                                                         ErrorHandling::Origin::SERVER_COMMUNICATOR_FETCH_GET_PARAMETER_VALUE);
+    auto numberOfErrorToReceive = 1;
+    ErrorSinkMock sink(numberOfErrorToReceive);
+    ErrorProcessingScheduler scheduler(&sink);
+    ServerCommunicator serverCommunicator(&throwingMockStrategy, ignoreHandleGetParameterValue());
+
+    serverCommunicator.linkConsumer(&scheduler);
+
+    serverCommunicator.openConnection(SERVER_ADDRESS);
+    sink.waitConsumptionToBeReached();
+
+    serverCommunicator.terminateAndJoin();
+    scheduler.terminateAndJoin();
+
+    ASSERT_TRUE(Assert::errorHasBeenThrown(&sink, expectedError));
+}
+
+TEST_F(ServerCommunicatorTest,
+       given_aServerStrategyThatReturnsOneValidGetParameterValueContent_when_openConnection_then_sendsTheRequestHandleOneGetParameterValidRequest) {
+    auto expectedNumberOfRequest = 1u;
+
+    MockRequestHandler mockRequestHandler;
+    mockRequestHandler.setExpectedNumberOfGetParameterValueRequest(expectedNumberOfRequest);
+    RequestResponseServerCommunicationStrategy requestResponseStrategy;
+    requestResponseStrategy.increaseNumberOfUniqueValidGetParameterValueContentsToReturnBy(expectedNumberOfRequest);
+    ServerCommunicator serverCommunicator(&requestResponseStrategy,
+                                          bindHandlerGetParameterValueTo(&mockRequestHandler));
+
+    assertRequestHandlerReceivesExpectedNumberOfValidRequestsWithStrategy(&mockRequestHandler,
+                                                                          &serverCommunicator);
+    serverCommunicator.terminateAndJoin();
+}
+
+TEST_F(ServerCommunicatorTest,
+       given_aServerStrategyThatReturnsANumberOfUniqueGetParameterValueContent_when_openConnection_then_sendsTheRequestHandleAllRequest) {
+    auto expectedNumberOfRequest = 3u; // Warning: do not expect a bigger *unique* number than the number of available parameter names
+
+    MockRequestHandler mockRequestHandler;
+    mockRequestHandler.setExpectedNumberOfGetParameterValueRequest(expectedNumberOfRequest);
+    RequestResponseServerCommunicationStrategy requestResponseStrategy;
+    requestResponseStrategy.increaseNumberOfUniqueValidGetParameterValueContentsToReturnBy(expectedNumberOfRequest);
+
+    ServerCommunicator serverCommunicator(&requestResponseStrategy,
+                                          bindHandlerGetParameterValueTo(&mockRequestHandler));
+
+    assertRequestHandlerReceivesExpectedNumberOfValidRequestsWithStrategy(&mockRequestHandler,
+                                                                          &serverCommunicator);
+    serverCommunicator.terminateAndJoin();
+}
+
+TEST_F(ServerCommunicatorTest,
+       given_aServerStrategyThatReturnsANumberOfDuplicateGetParameterValueContent_when_openConnection_then_sendsTheRequestHandleAllRequest) {
+    auto numberOfUniqueRequest = 2u;
+    auto numberOfDuplicateRequest = 3u;
+
+    auto expectedNumberOfRequest = numberOfUniqueRequest + numberOfDuplicateRequest;
+
+    MockRequestHandler mockRequestHandler;
+    mockRequestHandler.setExpectedNumberOfGetParameterValueRequest(expectedNumberOfRequest);
+    RequestResponseServerCommunicationStrategy requestResponseStrategy;
+    requestResponseStrategy.increaseNumberOfUniqueValidGetParameterValueContentsToReturnBy(numberOfUniqueRequest);
+    requestResponseStrategy.increaseNumberOfDuplicateValidGetParameterValueContentsToReturnBy(numberOfDuplicateRequest);
+
+    ServerCommunicator serverCommunicator(&requestResponseStrategy,
+                                          bindHandlerGetParameterValueTo(&mockRequestHandler));
+
+    assertRequestHandlerReceivesExpectedNumberOfValidRequestsWithStrategy(&mockRequestHandler,
+                                                                          &serverCommunicator);
+    serverCommunicator.terminateAndJoin();
+
+    auto sentRequestContent = requestResponseStrategy.getReturnedGetParameterValueRequest();
+    auto receivedRequests = mockRequestHandler.getReceivedGetParameterValueRequests();
+    auto requestCounter = 0u;
+    while (requestCounter < expectedNumberOfRequest) {
+        auto expectedRequestContent = sentRequestContent.at(requestCounter);
+        auto expectedRequest = Assemble::ServerRequestAssembler::getParameterValueRequest(expectedRequestContent);
+        auto receivedRequest = receivedRequests.front();
+        receivedRequests.pop_front();
+        requestCounter++;
+        ASSERT_EQ(expectedRequest, receivedRequest);
+    }
+}
+
+TEST_F(ServerCommunicatorTest,
+       given_aParameterErrorResponse_when_sendResponse_then_callsSendParameterErrorResponseInStrategy) {
+    MockServerCommunicatorStrategy mockStrategy;
+    ServerCommunicator serverCommunicator(&mockStrategy, ignoreHandleGetParameterValue());
+    auto response = givenAParameterErrorResponse();
+
+    serverCommunicator.sendResponse(std::move(response));
+
+    auto strategyHasBeenCalled = mockStrategy.hasSendParameterErrorResponseBeenCalled();
+    ASSERT_TRUE(strategyHasBeenCalled);
+}
+
+TEST_F(ServerCommunicatorTest,
+       given_anErrorMessageResponse_when_sendResponse_then_callsSendErrorMessageResponseInStrategy) {
+    MockServerCommunicatorStrategy mockStrategy;
+    ServerCommunicator serverCommunicator(&mockStrategy, ignoreHandleGetParameterValue());
+    auto response = givenAnErrorMessageResponse();
+
+    serverCommunicator.sendResponse(std::move(response));
+
+    auto strategyHasBeenCalled = mockStrategy.hasSendErrorMessageResponseBeenCalled();
+    ASSERT_TRUE(strategyHasBeenCalled);
+}
+
+
+// TODO : write test : when sendResponse(std::move(response)) -> calls strategy with output of `auto ServerResponse.formatForCommunicationOut const -> std::tuple<RequestResult, Request>`
 
 #endif //SENSORGATEWAY_SERVERCOMMUNICATORTEST_CPP
 

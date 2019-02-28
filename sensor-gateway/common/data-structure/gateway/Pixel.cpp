@@ -28,39 +28,39 @@ using Sensor::AWL::_16::ANGLE_RANGE;
 using Sensor::AWL::_16::NUMBER_OF_LAYERS;
 using Sensor::AWL::_16::MULTIPLICATIVE_CONSTANT;
 
-Pixel::Pixel(PixelId pixelId, TracksArray tracks, int currentNumberOfTracks) :
+Pixel::Pixel(PixelId const& pixelId, TracksArray tracks, int currentNumberOfTracks) :
         id(pixelId), tracks(std::move(tracks)), currentNumberOfTracksInPixel(currentNumberOfTracks) {
-};
+}
 
-Pixel::Pixel() : Pixel(Pixel::returnDefaultData()) {};
+Pixel::Pixel() : Pixel(Pixel::returnDefaultData()) {}
 
 Pixel::Pixel(Pixel const& other) :
         Pixel(other.id, other.tracks, other.currentNumberOfTracksInPixel) {
 
-};
+}
 
 Pixel::Pixel(Pixel&& other) noexcept: id(other.id),
                                       tracks(std::move(other.tracks)),
                                       currentNumberOfTracksInPixel(other.currentNumberOfTracksInPixel) {
 
-};
+}
 
 Pixel& Pixel::operator=(Pixel const& other)& {
     Pixel temporary(other);
     swap(*this, temporary);
     return *this;
-};
+}
 
 Pixel& Pixel::operator=(Pixel&& other)& noexcept {
     swap(*this, other);
     return *this;
-};
+}
 
 void Pixel::swap(Pixel& current, Pixel& other) noexcept {
     std::swap(current.id, other.id);
     std::swap(current.tracks, other.tracks);
     std::swap(current.currentNumberOfTracksInPixel, other.currentNumberOfTracksInPixel);
-};
+}
 
 bool Pixel::operator==(Pixel const& other) const {
     auto samePixelId = (id == other.id);
@@ -88,7 +88,7 @@ bool Pixel::doesTrackExist(TrackId const& trackId) {
         }
     }
     return trackExists;
-};
+}
 
 Track* Pixel::fetchTrackById(TrackId const& trackId) {
     for (auto trackIndex = 0; trackIndex < NUMBER_OF_TRACKS_IN_PIXEL; ++trackIndex) {
