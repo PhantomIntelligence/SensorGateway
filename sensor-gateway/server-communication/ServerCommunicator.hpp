@@ -157,6 +157,7 @@ namespace SensorAccessLinkElement {
             }
 
             // TODO: Add logic to handle requests in bulk instead of one by one
+            // TODO: This will be needed to avoid multiple & useless requests for adjacent parameters
             auto requestCount = 0u;
             bool handleRequest = false;
             GetParameterValueRequest request;

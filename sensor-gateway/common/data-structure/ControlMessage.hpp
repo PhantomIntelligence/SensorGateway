@@ -41,7 +41,6 @@ namespace Sensor {
 
 namespace DataFlow {
 
-
     template<typename ControlMessageDefinition>
     class ControlMessage {
 
@@ -102,6 +101,10 @@ namespace DataFlow {
         }
 
         static ControlMessage const& returnDefaultData() noexcept;
+
+        ControlMessageCode const& getControlMessageCode() const noexcept {
+            return controlMessageCode;
+        }
 
     private:
         ControlMessageCode controlMessageCode;

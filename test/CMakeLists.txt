@@ -44,6 +44,8 @@ add_executable(${RUNTEST}
 
 target_link_libraries(${RUNTEST} gtest gmock_main ${SensorGateway_LIBRARIES} ${CONAN_LIBS})
 
+set_property(TARGET ${RUNTEST} PROPERTY CXX_STANDARD 14)
+
 fetch_googletest(
         ${PROJECT_SOURCE_DIR}/cmake-module
         ${PROJECT_BINARY_DIR}/lib/googletest

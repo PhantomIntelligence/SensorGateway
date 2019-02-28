@@ -207,6 +207,17 @@ namespace SensorAccessLinkTestMock {
             sensorRawData.inverseContent();
             super::RawDataSource::produce(std::move(sensorRawData));
         }
+
+        super::SensorMessage
+        translateControlMessageToSensorMessageRequest(
+                super::ParameterControlMessage&& parameterControlMessage) override {
+            return super::SensorMessage::returnDefaultData();
+        }
+
+        super::ParameterControlMessage
+        translateSensorMessageToControlMessageResult(super::SensorMessage&& sensorMessage) override {
+            return super::ParameterControlMessage::returnDefaultData();
+        }
     };
 
     using MockServerCommunicationStrategy = Mock::CatchingServerCommunicationStrategyMock<Sensor::Test::Simple::Structures>;

@@ -59,6 +59,20 @@ void GuardianTranslationStrategy::translateRawData(SensorRawData&& sensorRawData
     RawDataSource::produce(std::move(translatedRawData));
 }
 
+GuardianTranslationStrategy::SensorMessage GuardianTranslationStrategy::translateControlMessageToSensorMessageRequest(
+        ParameterControlMessage&& parameterControlMessage) {
+    // TODO
+    GuardianTranslationStrategy::SensorMessage sensorMessage;
+    return sensorMessage;
+}
+
+GuardianTranslationStrategy::ParameterControlMessage
+GuardianTranslationStrategy::translateSensorMessageToControlMessageResult(SensorMessage&& sensorMessage) {
+    // TODO
+    GuardianTranslationStrategy::ParameterControlMessage parameterControlMessage;
+    return parameterControlMessage;
+}
+
 void GuardianTranslationStrategy::translateEndOfFrameMessage(SensorMessage&& sensorMessage) {
     MessageId messageId = convertTwoBytesToUnsignedBigEndian(sensorMessage.data[0], sensorMessage.data[1]);
     SensorId sensorId = convertTwoBytesToUnsignedBigEndian(sensorMessage.data[2], sensorMessage.data[3]);

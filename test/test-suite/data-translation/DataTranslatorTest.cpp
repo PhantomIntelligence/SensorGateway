@@ -80,6 +80,17 @@ namespace DataTranslatorTestMock {
             translateRawDataCalled.store(true);
         }
 
+        super::SensorMessage
+        translateControlMessageToSensorMessageRequest(
+                super::ParameterControlMessage&& parameterControlMessage) override {
+            return super::SensorMessage::returnDefaultData();
+        }
+
+        super::ParameterControlMessage
+        translateSensorMessageToControlMessageResult(super::SensorMessage&& sensorMessage) override {
+            return super::ParameterControlMessage::returnDefaultData();
+        }
+
         bool hasTranslateMessageBeenCalledWithRightSensorMessage(
                 super::SensorMessage const& expectedSensorMessage) const {
             return (translateMessageCalled.load() && (expectedSensorMessage == receivedSensorMessage));

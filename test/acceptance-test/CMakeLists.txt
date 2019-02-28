@@ -17,6 +17,8 @@ add_executable(${ACCEPTANCE_TEST}
 find_package(SensorGateway)
 target_link_libraries(${ACCEPTANCE_TEST} gtest gmock_main ${SensorGateway_LIBRARIES} ${CONAN_LIBS})
 
+set_property(TARGET ${ACCEPTANCE_TEST} PROPERTY CXX_STANDARD 14)
+
 install(TARGETS ${ACCEPTANCE_TEST}
         EXPORT ${PROJECT_NAME}Targets
         RUNTIME DESTINATION "${INSTALL_BIN_DIR}" COMPONENT bin)

@@ -14,16 +14,16 @@
 	limitations under the License.
 */
 
-#ifndef SENSORGATEWAY_DEVNULLSENSORCOMMUNICATIONSTRATEGYMOCK_HPP
-#define SENSORGATEWAY_DEVNULLSENSORCOMMUNICATIONSTRATEGYMOCK_HPP
+#ifndef SENSORGATEWAY_LOOPBACKSENSORCOMMUNICATIONSTRATEGYMOCK_HPP
+#define SENSORGATEWAY_LOOPBACKSENSORCOMMUNICATIONSTRATEGYMOCK_HPP
 
-#include "test/utilities/data-model/DataModelFixture.h"
+#include "Function.hpp"
 #include "sensor-gateway/sensor-communication/SensorCommunicationStrategy.hpp"
 
 namespace Mock {
-
+    
     template<typename T>
-    class DevNullSensorCommunicationStrategyMock final :
+    class LoopBackSensorCommunicationStrategyMock final :
             public SensorCommunication::SensorCommunicationStrategy<T> {
 
     protected:
@@ -37,9 +37,9 @@ namespace Mock {
 
     public:
 
-        DevNullSensorCommunicationStrategyMock() = default;
+        LoopBackSensorCommunicationStrategyMock() = default;
 
-        ~DevNullSensorCommunicationStrategyMock() noexcept = default;
+        ~LoopBackSensorCommunicationStrategyMock() noexcept = default;
 
         void openConnection() {};
 
@@ -57,4 +57,4 @@ namespace Mock {
     };
 }
 
-#endif //SENSORGATEWAY_DEVNULLSENSORCOMMUNICATIONSTRATEGYMOCK_HPP
+#endif //SENSORGATEWAY_LOOPBACKSENSORCOMMUNICATIONSTRATEGYMOCK_HPP

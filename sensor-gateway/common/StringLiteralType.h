@@ -36,18 +36,43 @@ namespace CustomType {
 
     template<char... elements>
     struct StringLiteral<StringType<elements...>> {
-        static char const* toString_internals() {
+        inline static char const* toString_internals() {
             static constexpr char stringValue[sizeof...(elements) + 1] = {elements..., '\0'};
             return stringValue;
         }
 
-        static std::string const& toString() {
+        inline static std::string const& toString() {
             static std::string const string = toString_internals();
             return string;
         }
+
+        inline constexpr auto lit() -> decltype(std::string{toString_internals(), sizeof...(elements)}){
+            return std::basic_string<char>{toString_internals(), sizeof...(elements) + 1};
+        }
+
+        template<char... otherElements>
+        constexpr StringLiteral<StringType<elements..., otherElements...>> operator+() const {
+            return {};
+        }
+
+
     };
+
+    template<typename T, T... chars, T... otherChars>
+    constexpr StringType<chars..., otherChars...> operator +(StringType<otherChars...> s) { return {}; }
+
+    template<typename T, T... chars, T... otherChars>
+    constexpr StringLiteral<StringType<chars..., otherChars...>> operator +(StringType<otherChars...> s) { return {}; }
+
+    template<typename T, T... chars, T... otherChars>
+    constexpr StringType<chars..., otherChars...> operator +(StringLiteral<StringType<otherChars...>> s) { return {}; }
+
+    template<typename T, T... chars, T... otherChars>
+    constexpr StringLiteral<StringType<chars..., otherChars...>> operator +(StringLiteral<StringType<otherChars...>> s) { return {}; }
+
 }
 
 using namespace CustomType;
+using namespace std::string_literals;
 
 #endif //SENSORGATEWAY_STRINGLITERALTYPE_H

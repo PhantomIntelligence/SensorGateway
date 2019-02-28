@@ -37,6 +37,7 @@ namespace DataTranslation {
         using SensorStructures = GuardianStructures;
         using super::SensorMessage;
         using super::SensorRawData;
+        using super::ParameterControlMessage;
 
         using super::ServerRawData;
 
@@ -52,6 +53,11 @@ namespace DataTranslation {
         void translateMessage(SensorMessage&& sensorMessage) override;
 
         void translateRawData(SensorRawData&& sensorRawData) override;
+
+        SensorMessage
+        translateControlMessageToSensorMessageRequest(ParameterControlMessage&& parameterControlMessage) override;
+
+        ParameterControlMessage translateSensorMessageToControlMessageResult(SensorMessage&& sensorMessage) override;
 
     private:
 

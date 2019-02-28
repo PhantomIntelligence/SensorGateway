@@ -17,7 +17,7 @@
 #ifndef SENSORGATEWAY_PARAMETERS_HPP
 #define SENSORGATEWAY_PARAMETERS_HPP
 
-#include "sensor-gateway/common/ConstantFunctionsDefinition.h"
+#include "sensor-gateway/common/data-structure/ControlMessage.hpp"
 
 namespace Sensor {
     namespace Gateway {
@@ -52,7 +52,10 @@ namespace Sensor {
             static uint8_t const sensorInternalTotalLengthInBits = SENSOR_INTERNAL_TOTAL_LENGTH_IN_BITS;
             static uint8_t const valueOffsetInBits = PARAMETER_VALUE_OFFSET_IN_BITS;
             static uint8_t const valueLengthInBits = PARAMETER_VALUE_LENGTH_IN_BITS;
+
+            using ControlMessagePayload = std::array<Byte, SENSOR_INTERNAL_TOTAL_LENGTH_IN_BITS>;
         };
+
 
         struct ParameterMetadata {
             std::string const name;
@@ -68,6 +71,7 @@ namespace Sensor {
             using Definition = SensorParameterDefinition;
             using Name = typename Definition::Name;
             using Unit = typename Definition::Unit;
+            using ControlMessagePayload = typename Definition::ControlMessagePayload;
 
         public:
 
@@ -89,6 +93,11 @@ namespace Sensor {
 
             auto extractMetadata() const noexcept -> ParameterMetadata {
                 return {.name = getStringifiedName(), .unit = getStringifiedUnit()};
+            }
+
+            auto createGetParameterValueControlMessagePayload() const noexcept -> ControlMessagePayload{
+                ControlMessagePayload controlMessagePayload;
+                return controlMessagePayload;
             }
 
         };
@@ -119,10 +128,15 @@ namespace Sensor {
             /**
              * @warning It is assumed that parameterName correspond to an existing name of parameter in this container
              */
-            auto createControlMessageFor(std::string const& parameterName) const {
+            auto createGetParameterValueControlMessageFor(std::string const& parameterName) const {
                 auto const index = getIndexFor(parameterName);
-                // TODO : return create ControlMessage from sensor @ index
-                return true;
+                auto const controlMessagePayloads = createGetParameterValueControlMessagePayloads();
+                auto const controlMessagePayload = controlMessagePayloads[index];
+                using MessagePayload = decltype(controlMessagePayload);
+                using ParameterControlMessage = typename DataFlow::ControlMessage<ControlMessageDefinition<typename MessagePayload::value_type, controlMessagePayload.size()>>;
+                auto code = ParameterControlMessage::ControlMessageCode::GET_VALUE;
+                ParameterControlMessage controlMessage(code, controlMessagePayload);
+                return controlMessage;
             }
 
             /**
@@ -180,6 +194,19 @@ namespace Sensor {
                             return std::make_tuple(std::get<Indices>(internalParameters).extractMetadata()...);
                         });
                 return typeTuple;
+            }
+
+            constexpr auto createGetParameterValueControlMessagePayloads() const noexcept {
+                auto controlMessages = convertTupleToArray(createGetParameterValueControlMessagesPayloadTuple());
+                return controlMessages;
+            }
+
+            constexpr auto createGetParameterValueControlMessagesPayloadTuple() const noexcept {
+                auto getParameterValueControlMessages = index_apply<NUMBER_OF_AVAILABLE_PARAMETERS>(
+                        [&](auto... Indices) {
+                            return std::make_tuple(std::get<Indices>(internalParameters).createGetParameterValueControlMessagePayload()...);
+                        });
+                return getParameterValueControlMessages;
             }
 
             Params internalParameters;

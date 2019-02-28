@@ -21,6 +21,8 @@
 
 namespace Sensor {
     namespace FakeParameter {
+
+        static size_t const PARAMETER_CONTROL_MESSAGE_PAYLOAD_LENGTH = 4;
         namespace Details {
             namespace NameLiterals {
                 using Impossible = StringLiteral<decltype("A Truth Saying Politician"_ToString)>;
@@ -36,7 +38,7 @@ namespace Sensor {
 
             template<typename N, typename T, typename V>
             struct MaskedParameter : public Sensor::Gateway::Parameter<Sensor::Gateway::SensorParameterDefinition<
-                    Sensor::Gateway::GatewayParameterDefinition<N, T, V>, 0x0, 0x0, 0x0, 0x0, 0x0> > {
+                    Sensor::Gateway::GatewayParameterDefinition<N, T, V>, 0x0, 0x0, PARAMETER_CONTROL_MESSAGE_PAYLOAD_LENGTH, 0x0, 0x0> > {
             };
 
             template<typename N>

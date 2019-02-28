@@ -112,7 +112,7 @@ namespace SensorGateway {
             // NOTE: To allow Gateway stability on RP3, this is good enough, but untested.
             // TODO: THE ARCHITECTURAL LOCATION WILL HAVE TO BE RETHOUGHT WHEN IMPLEMENTING SPIRIT PROTOCOL
 
-            std::cout << error.fetchDetailedMessage() << std::endl;
+            std::cout << "Error handling (SensorAccessLink) : " << error.fetchDetailedMessage() << std::endl;
             if (error.isFatalForGateway()) {
                 // TODO : shutdown SensorAccessLink instance + kill whole gateway, throw
                 DetachableThread(&SensorAccessLink::terminateAndJoin, this);

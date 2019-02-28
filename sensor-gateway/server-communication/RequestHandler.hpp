@@ -63,6 +63,7 @@ namespace SensorAccessLinkElement {
 
         RequestHandler& operator=(RequestHandler&& other)& noexcept = delete;
 
+        // TODO : move this in SensorParameterController
         void ensureParameterIsAvailable(std::string const& parameterName) {
             auto parameterAvailable = parameters.isAvailable(parameterName);
             if (!parameterAvailable) {

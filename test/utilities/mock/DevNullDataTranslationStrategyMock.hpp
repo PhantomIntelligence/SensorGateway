@@ -33,15 +33,28 @@ namespace Mock {
         using super::MessageSource;
         using super::RawDataSource;
 
+        using SensorMessage = typename super::SensorMessage;
+        using SensorRawData = typename super::SensorRawData;
+        using ParameterControlMessage = typename super::ParameterControlMessage;
+
     public:
 
         DevNullDataTranslationStrategyMock() = default;
 
         ~DevNullDataTranslationStrategyMock() noexcept = default;
 
-        void translateMessage(typename super::SensorMessage&& sensorMessage) override {};
+        void translateMessage(SensorMessage&& sensorMessage) override {};
 
-        void translateRawData(typename super::SensorRawData&& sensorRawData) override {}
+        void translateRawData(SensorRawData&& sensorRawData) override {}
+
+        SensorMessage
+        translateControlMessageToSensorMessageRequest(ParameterControlMessage&& parameterControlMessage) override {
+            return super::SensorMessage::returnDefaultData();
+        }
+
+        ParameterControlMessage translateSensorMessageToControlMessageResult(SensorMessage&& sensorMessage) override {
+            return super::ParameterControlMessage::returnDefaultData();
+        }
 
     };
 }

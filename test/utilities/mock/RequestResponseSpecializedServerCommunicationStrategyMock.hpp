@@ -54,9 +54,10 @@ namespace Mock {
                 numberOfDuplicateValidGetParameterValueContentsToReturn(0),
                 numberOfUniqueInvalidGetParameterValueContentsToReturn(0),
                 numberOfDuplicateInvalidGetParameterValueContentsToReturn(0),
-                sendResponseErrorMessageCalled(false)
-        // SetParameterValue
-        {}
+                // SetParameterValue
+                // Response
+                sendResponseParameterErrorCalled(false),
+                sendResponseErrorMessageCalled(false) {}
 
         ~RequestResponseSpecializedServerCommunicationStrategyMock() noexcept override = default;
 
@@ -142,6 +143,7 @@ namespace Mock {
         }
 
         void sendResponse(ParameterErrorResponse&& parameterErrorResponse) override {
+            acknowledgeSendResponseParameterErrorHasBeenCalled();
         }
 
         void sendResponse(ErrorMessageResponse&& errorMessageResponse) override {
@@ -149,6 +151,12 @@ namespace Mock {
         }
 
         void closeConnection() override {
+        }
+
+        void waitUntilSendResponseParameterErrorIsCalled() {
+            if (!hasSendResponseParameterErrorBeenCalled()) {
+                sendResponseParameterErrorCalledAcknowledgement.get_future().wait();
+            }
         }
 
         void waitUntilSendResponseErrorMessageIsCalled() {
@@ -186,6 +194,10 @@ namespace Mock {
             return returnedGetParameterValueContents;
         }
 
+        bool hasSendResponseParameterErrorBeenCalled() const {
+            return sendResponseParameterErrorCalled.load();
+        }
+
         bool hasSendResponseErrorMessageBeenCalled() const {
             return sendResponseErrorMessageCalled.load();
         }
@@ -207,20 +219,30 @@ namespace Mock {
             return atomicCounter->load();
         }
 
+        void acknowledgeSendResponseParameterErrorHasBeenCalled() {
+            LockGuard guard(sendResponseParameterErrorAckMutex);
+            if (!hasSendResponseErrorMessageBeenCalled()) {
+                sendResponseParameterErrorCalled.store(true);
+                sendResponseParameterErrorCalledAcknowledgement.set_value(true);
+            }
+        }
+
         void acknowledgeSendResponseErrorMessageHasBeenCalled() {
-            LockGuard guard(sendGetResponseErrorMessageAckMutex);
+            LockGuard guard(sendResponseErrorMessageAckMutex);
             if (!hasSendResponseErrorMessageBeenCalled()) {
                 sendResponseErrorMessageCalled.store(true);
                 sendResponseErrorMessageCalledAcknowledgement.set_value(true);
             }
         }
 
-
         ParameterNames validParameterNames;
         ParameterNames invalidParameterNames;
 
         AtomicFlag sendResponseErrorMessageCalled;
-        Mutex sendGetResponseErrorMessageAckMutex;
+        AtomicFlag sendResponseParameterErrorCalled;
+        Mutex sendResponseParameterErrorAckMutex;
+        Mutex sendResponseErrorMessageAckMutex;
+        mutable BooleanPromise sendResponseParameterErrorCalledAcknowledgement;
         mutable BooleanPromise sendResponseErrorMessageCalledAcknowledgement;
 
         Mutex getParameterValueMutex;

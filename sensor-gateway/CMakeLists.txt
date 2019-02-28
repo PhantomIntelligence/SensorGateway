@@ -43,6 +43,8 @@ target_link_libraries(${PROJECT_NAME} canlib)
 set_target_properties(${PROJECT_NAME} PROPERTIES
         PUBLIC_HEADER "${HEADER_FILES};${CMAKE_CURRENT_BINARY_DIR}/config.h")
 
+set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 14)
+
 install(TARGETS ${PROJECT_NAME}
         # IMPORTANT: Add the library to the "export-set"
         EXPORT ${PROJECT_NAME}Targets

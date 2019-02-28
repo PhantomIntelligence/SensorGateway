@@ -30,6 +30,7 @@ namespace DataTranslation {
 
         using ServerMessage = typename SERVER_STRUCTURES::Message;
         using ServerRawData = typename SERVER_STRUCTURES::RawData;
+        using ParameterControlMessage = typename SENSOR_STRUCTURES::ControlMessage;
 
         using MessageSource = DataFlow::DataSource<ServerMessage>;
         using RawDataSource = DataFlow::DataSource<ServerRawData>;
@@ -51,6 +52,10 @@ namespace DataTranslation {
         virtual void translateMessage(SensorMessage&& sensorMessage) = 0;
 
         virtual void translateRawData(SensorRawData&& sensorRawData) = 0;
+
+        virtual SensorMessage translateControlMessageToSensorMessageRequest(ParameterControlMessage&& parameterControlMessage) = 0;
+
+        virtual ParameterControlMessage translateSensorMessageToControlMessageResult(SensorMessage&& sensorMessage) = 0;
 
         using MessageSource::linkConsumer;
 
