@@ -17,154 +17,177 @@
 #ifndef SENSORGATEWAY_SENSORACCESSLINK_HPP
 #define SENSORGATEWAY_SENSORACCESSLINK_HPP
 
+#include "sensor-gateway/common/data-structure/gateway/GatewayStructures.h"
 #include "sensor-gateway/parameter-control/SensorParameterController.hpp"
 
 namespace SensorGateway {
 
-    // TODO: Use `type_index` to facilitate the mapping to the correct SensorAccessLink type : https://en.cppreference.com/w/cpp/types/type_index
-    // TODO: Using things like `enable_if<>, handle different sensors when there is or not RawData or fetching in bulk`
-    template<class SENSOR_STRUCTURES, class SERVER_STRUCTURES>
-    class SensorAccessLink : public DataFlow::DataSink<ErrorHandling::SensorAccessLinkError> {
+    namespace Details {
 
-    protected:
+        // TODO: Use `type_index` to facilitate the mapping to the correct SensorAccessLink type : https://en.cppreference.com/w/cpp/types/type_index
+        // TODO: Using things like `enable_if<>, handle different sensors when there is or not RawData or fetching in bulk`
+        template<class SENSOR_STRUCTURES, class SERVER_STRUCTURES>
+        class SensorAccessLink : public DataFlow::DataSink<ErrorHandling::SensorAccessLinkError> {
 
-        using SensorMessage = typename SENSOR_STRUCTURES::Message;
-        using SensorRawData = typename SENSOR_STRUCTURES::RawData;
+        protected:
 
-        using ServerMessage = typename SERVER_STRUCTURES::Message;
-        using ServerRawData = typename SERVER_STRUCTURES::RawData;
+            using SensorMessage = typename SENSOR_STRUCTURES::Message;
+            using SensorRawData = typename SENSOR_STRUCTURES::RawData;
 
-        using ServerCommunicator = SensorAccessLinkElement::ServerCommunicator<SERVER_STRUCTURES>;
-        using ServerCommunicationStrategy = ServerCommunication::ServerCommunicationStrategy<SERVER_STRUCTURES>;
-        using ServerCommunicatorMessageScheduler = DataFlow::DataProcessingScheduler<ServerMessage, ServerCommunicator, 1>;
-        using ServerCommunicatorRawDataScheduler = DataFlow::DataProcessingScheduler<ServerRawData, ServerCommunicator, 1>;
+            using ServerMessage = typename SERVER_STRUCTURES::Message;
+            using ServerRawData = typename SERVER_STRUCTURES::RawData;
 
-        using DataTranslator = SensorAccessLinkElement::DataTranslator<SENSOR_STRUCTURES, SERVER_STRUCTURES>;
-        using DataTranslationStrategy = DataTranslation::DataTranslationStrategy<SENSOR_STRUCTURES, SERVER_STRUCTURES>;
-        using TranslatorMessageScheduler = DataFlow::DataProcessingScheduler<SensorMessage, DataTranslator, 1>;
-        using TranslatorRawDataScheduler = DataFlow::DataProcessingScheduler<SensorRawData, DataTranslator, 1>;
+            using ServerCommunicator = SensorAccessLinkElement::ServerCommunicator<SERVER_STRUCTURES>;
+            using ServerCommunicationStrategy = ServerCommunication::ServerCommunicationStrategy<SERVER_STRUCTURES>;
+            using ServerCommunicatorMessageScheduler = DataFlow::DataProcessingScheduler<ServerMessage, ServerCommunicator, 1>;
+            using ServerCommunicatorRawDataScheduler = DataFlow::DataProcessingScheduler<ServerRawData, ServerCommunicator, 1>;
 
-        using SensorParameterController = SensorAccessLinkElement::SensorParameterController<SENSOR_STRUCTURES, SERVER_STRUCTURES>;
-        using RequestHandler = SensorAccessLinkElement::RequestHandler<SENSOR_STRUCTURES, SERVER_STRUCTURES>;
+            using DataTranslator = SensorAccessLinkElement::DataTranslator<SENSOR_STRUCTURES, SERVER_STRUCTURES>;
+            using DataTranslationStrategy = DataTranslation::DataTranslationStrategy<SENSOR_STRUCTURES, SERVER_STRUCTURES>;
+            using TranslatorMessageScheduler = DataFlow::DataProcessingScheduler<SensorMessage, DataTranslator, 1>;
+            using TranslatorRawDataScheduler = DataFlow::DataProcessingScheduler<SensorRawData, DataTranslator, 1>;
 
-        using SensorCommunicator = SensorAccessLinkElement::SensorCommunicator<SENSOR_STRUCTURES>;
-        using SensorCommunicationStrategy = SensorCommunication::SensorCommunicationStrategy<SENSOR_STRUCTURES>;
+            using SensorParameterController = SensorAccessLinkElement::SensorParameterController<SENSOR_STRUCTURES, SERVER_STRUCTURES>;
+            using RequestHandler = SensorAccessLinkElement::RequestHandler<SENSOR_STRUCTURES, SERVER_STRUCTURES>;
 
-        using Error = ErrorHandling::SensorAccessLinkError;
-        using ThisClass = SensorAccessLink<SENSOR_STRUCTURES, SERVER_STRUCTURES>;
-        using ErrorScheduler = DataFlow::DataProcessingScheduler<Error, ThisClass, 5>;
+            using SensorCommunicator = SensorAccessLinkElement::SensorCommunicator<SENSOR_STRUCTURES>;
+            using SensorCommunicationStrategy = SensorCommunication::SensorCommunicationStrategy<SENSOR_STRUCTURES>;
 
-    public:
-        explicit SensorAccessLink(ServerCommunicationStrategy* serverCommunicationStrategy,
-                                  DataTranslationStrategy* dataTranslationStrategy,
-                                  SensorCommunicationStrategy* sensorCommunicationStrategy) :
-                serverCommunicationStrategy(serverCommunicationStrategy),
-                dataTranslationStrategy(dataTranslationStrategy),
-                sensorCommunicationStrategy(sensorCommunicationStrategy),
-                serverCommunicator(serverCommunicationStrategy,
-                                   std::bind(&RequestHandler::handleGetParameterValueRequest, &requestHandler,
-                                             std::placeholders::_1)),
-                requestHandler(&serverCommunicator, &sensorParameterController),
-                sensorParameterController(&requestHandler, &dataTranslator),
-                dataTranslator(dataTranslationStrategy),
-                sensorCommunicator(sensorCommunicationStrategy),
-                translatorMessageScheduler(&dataTranslator),
-                translatorRawDataScheduler(&dataTranslator),
-                serverCommunicatorMessageScheduler(&serverCommunicator),
-                serverCommunicatorRawDataScheduler(&serverCommunicator),
-                errorScheduler(this) // TODO : Change "this" for the SensorAccessLinkErrorHandler
-        {}
+            using Error = ErrorHandling::SensorAccessLinkError;
+            using ThisClass = SensorAccessLink<SENSOR_STRUCTURES, SERVER_STRUCTURES>;
+            using ErrorScheduler = DataFlow::DataProcessingScheduler<Error, ThisClass, 5>;
 
-        ~SensorAccessLink() noexcept {
-            terminateAndJoin();
-        };
+        public:
+            explicit SensorAccessLink(ServerCommunicationStrategy* serverCommunicationStrategy,
+                                      DataTranslationStrategy* dataTranslationStrategy,
+                                      SensorCommunicationStrategy* sensorCommunicationStrategy) :
+                    serverCommunicationStrategy(serverCommunicationStrategy),
+                    dataTranslationStrategy(dataTranslationStrategy),
+                    sensorCommunicationStrategy(sensorCommunicationStrategy),
+                    serverCommunicator(serverCommunicationStrategy,
+                                       std::bind(&RequestHandler::handleGetParameterValueRequest, &requestHandler,
+                                                 std::placeholders::_1)),
+                    requestHandler(&serverCommunicator, &sensorParameterController),
+                    sensorParameterController(&requestHandler, &dataTranslator),
+                    dataTranslator(dataTranslationStrategy),
+                    sensorCommunicator(sensorCommunicationStrategy),
+                    translatorMessageScheduler(&dataTranslator),
+                    translatorRawDataScheduler(&dataTranslator),
+                    serverCommunicatorMessageScheduler(&serverCommunicator),
+                    serverCommunicatorRawDataScheduler(&serverCommunicator),
+                    errorScheduler(this) // TODO : Change "this" for the SensorAccessLinkErrorHandler
+            {}
 
-        SensorAccessLink(SensorAccessLink const& other) = delete;
+            ~SensorAccessLink() noexcept {
+                terminateAndJoin();
+            };
 
-        SensorAccessLink(SensorAccessLink&& other) noexcept = delete;
+            SensorAccessLink(SensorAccessLink const& other) = delete;
 
-        SensorAccessLink& operator=(SensorAccessLink const& other)& = delete;
+            SensorAccessLink(SensorAccessLink&& other) noexcept = delete;
 
-        SensorAccessLink& operator=(SensorAccessLink&& other)& noexcept = delete;
+            SensorAccessLink& operator=(SensorAccessLink const& other)& = delete;
 
-        void start(std::string const& serverAddress) {
-            linkElements();
+            SensorAccessLink& operator=(SensorAccessLink&& other)& noexcept = delete;
 
-            serverCommunicator.openConnection(serverAddress);
-            sensorCommunicator.start();
-        };
+            void start(std::string const& serverAddress) {
+                linkElements();
 
-        void terminateAndJoin() {
-            sensorCommunicator.terminateAndJoin();
-            translatorMessageScheduler.terminateAndJoin();
-            translatorRawDataScheduler.terminateAndJoin();
-            sensorParameterController.terminateAndJoin();
-            serverCommunicatorMessageScheduler.terminateAndJoin();
-            serverCommunicatorRawDataScheduler.terminateAndJoin();
-            serverCommunicator.terminateAndJoin();
+                serverCommunicator.openConnection(serverAddress);
+                sensorCommunicator.start();
+            };
 
-            errorScheduler.terminateAndJoin();
-        }
+            void terminateAndJoin() {
+                sensorCommunicator.terminateAndJoin();
+                translatorMessageScheduler.terminateAndJoin();
+                translatorRawDataScheduler.terminateAndJoin();
+                sensorParameterController.terminateAndJoin();
+                serverCommunicatorMessageScheduler.terminateAndJoin();
+                serverCommunicatorRawDataScheduler.terminateAndJoin();
+                serverCommunicator.terminateAndJoin();
 
-        // TODO : extract this in a SensorAccessLinkErrorHandler, test behavior then.
-        void consume(Error&& error) override {
-
-            // NOTE: To allow Gateway stability on RP3, this is good enough, but untested.
-            // TODO: THE ARCHITECTURAL LOCATION WILL HAVE TO BE RETHOUGHT WHEN IMPLEMENTING SPIRIT PROTOCOL
-
-            std::cout << "Error handling (SensorAccessLink) : " << error.fetchDetailedMessage() << std::endl;
-            if (error.isFatalForGateway()) {
-                // TODO : shutdown SensorAccessLink instance + kill whole gateway, throw
-                DetachableThread(&SensorAccessLink::terminateAndJoin, this);
-                // Avoid deadlock in errorScheduler::terminateAndJoin
-            } else if (error.isFatalForSensorAccess()) {
-                // TODO : sendMessage to server + shutdown SensorAccessLink instance
-                DetachableThread(&SensorAccessLink::terminateAndJoin, this);
-                // Avoid deadlock in errorScheduler::terminateAndJoin
-            } else {
-                // TODO : sendErrorMessageToServer();
+                errorScheduler.terminateAndJoin();
             }
-        }
 
-    private:
+            // TODO : extract this in a SensorAccessLinkErrorHandler, test behavior then.
+            void consume(Error&& error) override {
 
-        void linkElements() {
-            dataTranslationStrategy->linkConsumer(&serverCommunicatorMessageScheduler);
-            dataTranslationStrategy->linkConsumer(&serverCommunicatorRawDataScheduler);
-            sensorCommunicator.linkConsumer(&translatorMessageScheduler);
-            sensorCommunicator.linkConsumer(&translatorRawDataScheduler);
-            sensorParameterController.linkElements();
+                // NOTE: To allow Gateway stability on RP3, this is good enough, but untested.
+                // TODO: THE ARCHITECTURAL LOCATION WILL HAVE TO BE RETHOUGHT WHEN IMPLEMENTING SPIRIT PROTOCOL
 
-            sensorCommunicator.linkConsumer(&errorScheduler);
-            dataTranslator.linkConsumer(&errorScheduler);
-            serverCommunicator.linkConsumer(&errorScheduler);
-            requestHandler.linkConsumer(&errorScheduler);
-            sensorParameterController.linkConsumer(&errorScheduler);
+                std::cout << "Error handling (SensorAccessLink) : " << error.fetchDetailedMessage() << std::endl;
+                if (error.isFatalForGateway()) {
+                    // TODO : shutdown SensorAccessLink instance + kill whole gateway, throw
+                    DetachableThread(&SensorAccessLink::terminateAndJoin, this);
+                    // Avoid deadlock in errorScheduler::terminateAndJoin
+                } else if (error.isFatalForSensorAccess()) {
+                    // TODO : sendMessage to server + shutdown SensorAccessLink instance
+                    DetachableThread(&SensorAccessLink::terminateAndJoin, this);
+                    // Avoid deadlock in errorScheduler::terminateAndJoin
+                } else {
+                    // TODO : sendErrorMessageToServer();
+                }
+            }
 
-            // TODO: implement a while(!allUpAndRunning()) {...
-            // Yield and sleep to allow correct connection
-            std::this_thread::yield();
-            std::this_thread::sleep_for(std::chrono::milliseconds(50));
-            // TODO: implement }
-        }
+        private:
 
-        ServerCommunicationStrategy* serverCommunicationStrategy;
-        ServerCommunicator serverCommunicator;
-        ServerCommunicatorMessageScheduler serverCommunicatorMessageScheduler;
-        ServerCommunicatorRawDataScheduler serverCommunicatorRawDataScheduler;
+            void linkElements() {
+                dataTranslationStrategy->linkConsumer(&serverCommunicatorMessageScheduler);
+                dataTranslationStrategy->linkConsumer(&serverCommunicatorRawDataScheduler);
+                sensorCommunicator.linkConsumer(&translatorMessageScheduler);
+                sensorCommunicator.linkConsumer(&translatorRawDataScheduler);
+                sensorParameterController.linkElements();
 
-        DataTranslationStrategy* dataTranslationStrategy;
-        DataTranslator dataTranslator;
-        TranslatorMessageScheduler translatorMessageScheduler;
-        TranslatorRawDataScheduler translatorRawDataScheduler;
+                sensorCommunicator.linkConsumer(&errorScheduler);
+                dataTranslator.linkConsumer(&errorScheduler);
+                serverCommunicator.linkConsumer(&errorScheduler);
+                requestHandler.linkConsumer(&errorScheduler);
+                sensorParameterController.linkConsumer(&errorScheduler);
 
-        SensorParameterController sensorParameterController;
-        RequestHandler requestHandler;
+                // TODO: implement a while(!allUpAndRunning()) {...
+                // Yield and sleep to allow correct connection
+                std::this_thread::yield();
+                std::this_thread::sleep_for(std::chrono::milliseconds(50));
+                // TODO: implement }
+            }
 
-        SensorCommunicationStrategy* sensorCommunicationStrategy;
-        SensorCommunicator sensorCommunicator;
+            ServerCommunicationStrategy* serverCommunicationStrategy;
+            ServerCommunicator serverCommunicator;
+            ServerCommunicatorMessageScheduler serverCommunicatorMessageScheduler;
+            ServerCommunicatorRawDataScheduler serverCommunicatorRawDataScheduler;
 
-        ErrorScheduler errorScheduler;
+            DataTranslationStrategy* dataTranslationStrategy;
+            DataTranslator dataTranslator;
+            TranslatorMessageScheduler translatorMessageScheduler;
+            TranslatorRawDataScheduler translatorRawDataScheduler;
+
+            SensorParameterController sensorParameterController;
+            RequestHandler requestHandler;
+
+            SensorCommunicationStrategy* sensorCommunicationStrategy;
+            SensorCommunicator sensorCommunicator;
+
+            ErrorScheduler errorScheduler;
+        };
+    }
+
+    template<typename S>
+    struct SensorAccessLinkFactory {
+
+//        using Structures = typename Sensor::Gateway::Structures<
+//                typename S::MessageDefinition,
+//                typename S::RawDataDefinition,
+//                typename S::ControlMessageDefinition>;
+//        using AccessLink = Details::SensorAccessLink<S, Structures>;
+
+        typedef typename Sensor::Gateway::Structures<
+                typename S::MessageDefinition,
+                typename S::RawDataDefinition,
+                typename S::ControlMessageDefinition
+        > Structures;
+
+        typedef typename Details::SensorAccessLink<S, Structures> AccessLink;
+
     };
 }
 

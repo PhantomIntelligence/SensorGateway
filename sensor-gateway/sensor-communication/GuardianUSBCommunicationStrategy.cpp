@@ -19,17 +19,8 @@
 using SensorCommunication::GuardianUSBCommunicationStrategy;
 using DataFlow::AWLMessage;
 
-GuardianUSBCommunicationStrategy::GuardianUSBCommunicationStrategy() :
-// Guardian
-//        usbConnectionParameters({0x058b, 0x0050,
-//                                 (129),
-//                                 (2),
-//                                 3000}),
-// ADI
-        usbConnectionParameters({0x064b, 0x7823,
-                                 (129),
-                                 (1),
-                                 3000}),
+GuardianUSBCommunicationStrategy::GuardianUSBCommunicationStrategy(USBConnectionParameters usbConnectionParameters) :
+        usbConnectionParameters(usbConnectionParameters),
         usbContext(nullptr),
         usbDeviceHandle(nullptr),
         reconnectTime(SteadyClock::now()),

@@ -67,7 +67,7 @@ namespace SensorAccessLinkElement {
 
             // TODO: implement a while(!allUpAndRunning()) {...
             // Yield and sleep to allow correct connection
-            std::this_thread::yield();
+            yield();
             std::this_thread::sleep_for(std::chrono::milliseconds(50));
             // TODO: implement }
         }

@@ -27,51 +27,6 @@
 #include "sensor-gateway/common/data-structure/gateway/GatewayStructures.h"
 #include "sensor-gateway/application/SensorAccessLink.hpp"
 
-// TODO : Extract this in another file as soon as it is needed in another test file
-namespace GatewayRequestHandlingMock {
-
-
-    template<typename S>
-    struct AccessLink {
-
-        using SensorStubGatewayStructures = Sensor::Gateway::Structures<
-                typename S::MessageDefinition,
-                typename S::RawDataDefinition,
-                typename S::ControlMessageDefinition>;
-
-        class SensorStubAccessLink final : public SensorGateway::SensorAccessLink<S, SensorStubGatewayStructures> {
-
-        protected:
-
-            using super = SensorGateway::SensorAccessLink<S, SensorStubGatewayStructures>;
-
-            using typename super::ServerCommunicationStrategy;
-            using typename super::DataTranslationStrategy;
-            using typename super::SensorCommunicationStrategy;
-
-        public:
-
-            explicit SensorStubAccessLink(ServerCommunicationStrategy* serverCommunicationStrategy,
-                                          DataTranslationStrategy* dataTranslationStrategy,
-                                          SensorCommunicationStrategy* sensorCommunicationStrategy) :
-                    super(serverCommunicationStrategy,
-                          dataTranslationStrategy,
-                          sensorCommunicationStrategy) {}
-
-            ~SensorStubAccessLink() noexcept = default;
-
-            SensorStubAccessLink(SensorStubAccessLink const& other) = delete;
-
-            SensorStubAccessLink(SensorStubAccessLink&& other) noexcept = delete;
-
-            SensorStubAccessLink& operator=(SensorStubAccessLink const& other)& = delete;
-
-            SensorStubAccessLink& operator=(SensorStubAccessLink&& other)& noexcept = delete;
-
-        };
-    };
-
-}
 
 /**
  * @brief This acceptance test file includes *Gateway* only files (i.e. does not include sensor-specific translation and communication)
@@ -82,10 +37,11 @@ protected:
 
     std::string const SERVER_ADDRESS = "Die Potato!";
 
-    using DataStructures = Sensor::Test::RealisticImplementation::Structures;
-    using StructureAccessLink = GatewayRequestHandlingMock::AccessLink<DataStructures>;
-    using GatewayStructures = StructureAccessLink::SensorStubGatewayStructures;
 
+    using DataStructures = Sensor::Test::RealisticImplementation::Structures;
+    using Factory = SensorGateway::SensorAccessLinkFactory<DataStructures>;
+    using GatewayStructures = typename Factory::Structures;
+    using AccessLink = typename Factory::AccessLink;
     using AvailableParameters = DataStructures::Parameters;
     using FakeSensorMessage = DataStructures::Message;
 
@@ -93,7 +49,7 @@ protected:
     using DataTranslationStrategyMock = Mock::DataTranslationStrategyMock<DataStructures, GatewayStructures>;
     using SensorCommunicationStrategyMock = Mock::LoopBackSensorCommunicationStrategyMock<DataStructures>;
 
-    using TranslationStubbedAccessLink = StructureAccessLink::SensorStubAccessLink;
+    using TranslationStubbedAccessLink = Factory::AccessLink;
 
 };
 
@@ -104,7 +60,8 @@ TEST_F(GatewayRequestHandlingAcceptanceTest,
     serverCommunicationStrategyMock.increaseNumberOfUniqueInvalidGetParameterValueContentsToReturnBy(1);
     DataTranslationStrategyMock dataTranslationStrategyMock;
     SensorCommunicationStrategyMock sensorCommunicationStrategyMock;
-    TranslationStubbedAccessLink accessLink(&serverCommunicationStrategyMock, &dataTranslationStrategyMock, &sensorCommunicationStrategyMock);
+    TranslationStubbedAccessLink accessLink(&serverCommunicationStrategyMock, &dataTranslationStrategyMock,
+                                            &sensorCommunicationStrategyMock);
 
     accessLink.start(SERVER_ADDRESS);
     serverCommunicationStrategyMock.waitUntilSendResponseErrorMessageIsCalled();
@@ -131,10 +88,12 @@ TEST_F(GatewayRequestHandlingAcceptanceTest,
     fakeGetParameterRequest.sensorId = static_cast<decltype(fakeGetParameterRequest.sensorId)>(nameHash);
     fakeGetParameterRequest.messageId = expectedControlMessageRequest.getControlMessageCode();
 
-    dataTranslationStrategyMock.onTranslateControlMessageToSensorMessageRequest(std::move(expectedControlMessageRequest))->returnThisSensorMessage(fakeGetParameterRequest);
+    dataTranslationStrategyMock.onTranslateControlMessageToSensorMessageRequest(
+            std::move(expectedControlMessageRequest))->returnThisSensorMessage(fakeGetParameterRequest);
 
 //    sensorCommunicationStrategyMock.onSendRequestReturn
-    TranslationStubbedAccessLink accessLink(&serverCommunicationStrategyMock, &dataTranslationStrategyMock, &sensorCommunicationStrategyMock);
+    TranslationStubbedAccessLink accessLink(&serverCommunicationStrategyMock, &dataTranslationStrategyMock,
+                                            &sensorCommunicationStrategyMock);
 
     accessLink.start(SERVER_ADDRESS);
     serverCommunicationStrategyMock.waitUntilSendResponseParameterErrorIsCalled();

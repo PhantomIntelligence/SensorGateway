@@ -23,42 +23,16 @@
 
 namespace SensorGateway {
 
-    using AWL16Structures = Sensor::AWL::Structures;
-    using AWL16GatewayStructures = Sensor::Gateway::Structures<
-            AWL16Structures::AWLMessageDefinition,
-            AWL16Structures::AWLRawDataDefinition,
-            AWL16Structures::AWLControlMessageDefinition
-            >;
+    struct AWL16AccessLink {
 
-    class AWL16AccessLink final : public SensorAccessLink<AWL16Structures, AWL16GatewayStructures> {
+        using CommunicationStructures = Sensor::AWL::Structures;
+        using Factory = typename SensorGateway::SensorAccessLinkFactory<CommunicationStructures>;
+        using GatewayStructures = typename Factory::Structures;
+        using AccessLink = typename Factory::AccessLink;
 
-    protected:
-
-        using super = SensorAccessLink<AWL16Structures, AWL16GatewayStructures>;
-
-        using super::ServerCommunicationStrategy;
-
-    public:
-
-        explicit AWL16AccessLink(ServerCommunicationStrategy* serverCommunicationStrategy)
-                : super(serverCommunicationStrategy,
-                        &awlTranslationStrategy,
-                        &kvaserCanCommunicationStrategy) {}
-
-        ~AWL16AccessLink() noexcept = default;
-
-        AWL16AccessLink(AWL16AccessLink const& other) = delete;
-
-        AWL16AccessLink(AWL16AccessLink&& other) noexcept = delete;
-
-        AWL16AccessLink& operator=(AWL16AccessLink const& other)& = delete;
-
-        AWL16AccessLink& operator=(AWL16AccessLink&& other)& noexcept = delete;
-
-    private:
-
-        DataTranslation::AWLTranslationStrategy awlTranslationStrategy;
-        SensorCommunication::KvaserCanCommunicationStrategy kvaserCanCommunicationStrategy;
+        using ServerCommunicationStrategy = AccessLink::ServerCommunicationStrategy;
+        using DataTranslationStrategy = DataTranslation::AWLTranslationStrategy;
+        using SensorCommunicationStrategy = SensorCommunication::KvaserCanCommunicationStrategy;
     };
 }
 

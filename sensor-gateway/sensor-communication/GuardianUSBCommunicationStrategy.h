@@ -24,6 +24,14 @@
 
 namespace SensorCommunication {
 
+    typedef struct {
+        uint16_t vendorId;
+        uint16_t productId;
+        uint8_t endpointIn;
+        uint8_t endpointOut;
+        uint16_t timeout;
+    } USBConnectionParameters;
+
     using Sensor::AWL::NUMBER_OF_DATA_BYTES;
 
     /**
@@ -44,7 +52,7 @@ namespace SensorCommunication {
 
     public:
 
-        explicit GuardianUSBCommunicationStrategy();
+        explicit GuardianUSBCommunicationStrategy(USBConnectionParameters usbConnectionParameters);
 
         ~GuardianUSBCommunicationStrategy() noexcept override;
 
@@ -77,15 +85,6 @@ namespace SensorCommunication {
             Byte data[NUMBER_OF_DATA_BYTES];
             uint16_t padding;
         } USBSensorMessage;
-
-        typedef struct {
-            uint16_t vendorId;
-            uint16_t productId;
-            uint8_t endpointIn;
-            uint8_t endpointOut;
-            uint16_t timeout;
-        } USBConnectionParameters;
-
 
         enum VersionString {
             FIRMWARE_BUILD_DATE,

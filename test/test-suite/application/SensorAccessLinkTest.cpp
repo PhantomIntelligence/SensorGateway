@@ -27,7 +27,7 @@
 #include "test/utilities/mock/ErrorThrowingSensorCommunicationStrategyMock.hpp"
 
 using TestFunctions::DataTestUtil;
-using SensorAccessLink = SensorGateway::SensorAccessLink<Sensor::Test::Simple::Structures, Sensor::Test::Simple::Structures>;
+using SensorAccessLink = SensorGateway::Details::SensorAccessLink<Sensor::Test::Simple::Structures, Sensor::Test::Simple::Structures>;
 
 class SensorAccessLinkTest : public ::testing::Test {
 public:

@@ -14,8 +14,8 @@
 	limitations under the License.
 */
 
-#ifndef SENSORGATEWAY_GUARDIANACCESSLINK_H
-#define SENSORGATEWAY_GUARDIANACCESSLINK_H
+#ifndef SENSORGATEWAY_EVAL_ADAL6110_16_ACCESSLINK_H
+#define SENSORGATEWAY_EVAL_ADAL6110_16_ACCESSLINK_H
 
 #include "SensorAccessLink.hpp"
 
@@ -24,7 +24,7 @@
 
 namespace SensorGateway {
 
-    struct GuardianAccessLink {
+    struct EVAL_ADAL6110_16_AccessLink {
 
         using CommunicationStructures = Sensor::Guardian::Structures;
         using Factory = SensorAccessLinkFactory<CommunicationStructures>;
@@ -35,11 +35,11 @@ namespace SensorGateway {
         using DataTranslationStrategy = DataTranslation::GuardianTranslationStrategy;
         using SensorCommunicationStrategy = SensorCommunication::GuardianUSBCommunicationStrategy;
 
-        SensorCommunication::USBConnectionParameters sensorConnectionParameters{0x058b, 0x0050,
-                                                                                  (129),
-                                                                                  (2),
-                                                                                  3000};
+        SensorCommunication::USBConnectionParameters sensorConnectionParameters{0x064b, 0x7823,
+                                                                                (129),
+                                                                                (1),
+                                                                                3000};
     };
 }
 
-#endif //SENSORGATEWAY_GUARDIANACCESSLINK_H
+#endif //SENSORGATEWAY_EVAL_ADAL6110_16_ACCESSLINK_H
