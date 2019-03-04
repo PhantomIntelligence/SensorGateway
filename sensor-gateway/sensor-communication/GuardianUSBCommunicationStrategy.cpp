@@ -19,7 +19,7 @@
 using SensorCommunication::GuardianUSBCommunicationStrategy;
 using DataFlow::AWLMessage;
 
-GuardianUSBCommunicationStrategy::GuardianUSBCommunicationStrategy(USBConnectionParameters usbConnectionParameters) :
+GuardianUSBCommunicationStrategy::GuardianUSBCommunicationStrategy(USBConnectionParameters const& usbConnectionParameters) :
         usbConnectionParameters(usbConnectionParameters),
         usbContext(nullptr),
         usbDeviceHandle(nullptr),
@@ -47,6 +47,15 @@ void GuardianUSBCommunicationStrategy::openConnection() {
 
     setupCleanConnection();
 
+}
+
+void GuardianUSBCommunicationStrategy::closeConnection() {
+    LockGuard lockGuard(closingMutex);
+
+    libusb_close(usbDeviceHandle);
+    libusb_exit(usbContext);
+    usbDeviceHandle = nullptr;
+    reconnectTime = SteadyClock::now();
 }
 
 GuardianUSBCommunicationStrategy::super::Messages GuardianUSBCommunicationStrategy::fetchMessages() {
@@ -86,15 +95,6 @@ GuardianUSBCommunicationStrategy::fetchRawDataCycles() {
         rawDataCycles = fetchRawDataCyclesOnSensor(numberOfRawDataCyclesToFetch);
     }
     return rawDataCycles;
-}
-
-void GuardianUSBCommunicationStrategy::closeConnection() {
-    LockGuard lockGuard(closingMutex);
-
-    libusb_close(usbDeviceHandle);
-    libusb_exit(usbContext);
-    usbDeviceHandle = nullptr;
-    reconnectTime = SteadyClock::now();
 }
 
 void GuardianUSBCommunicationStrategy::throwDeviceNotFoundErrorIfNeeded() {
@@ -253,5 +253,8 @@ GuardianUSBCommunicationStrategy::fetchRawDataCyclesOnSensor(NumberOfDataToFetch
     }
 
     return fetchedRawDataCycles;
+}
+
+void GuardianUSBCommunicationStrategy::sendRequest(Request&& request) {
 }
 

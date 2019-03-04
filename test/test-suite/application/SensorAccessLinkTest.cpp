@@ -132,6 +132,10 @@ namespace SensorAccessLinkTestMock {
             return createdRawDataCycles;
         }
 
+        void sendRequest(typename super::Request&& request) override {
+            // TODO : Complete with test/utilities/mock/Function.hpp
+        }
+
         void waitUntilFetchMessagesHasBeenCalledEnough() {
             if (!hasCreatedMinimumNumberOfMessages()) {
                 minimumNumberOfMessageCreated.get_future().wait();

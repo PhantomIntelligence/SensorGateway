@@ -38,12 +38,10 @@ namespace SensorGateway {
             using ServerRawData = typename SERVER_STRUCTURES::RawData;
 
             using ServerCommunicator = SensorAccessLinkElement::ServerCommunicator<SERVER_STRUCTURES>;
-            using ServerCommunicationStrategy = ServerCommunication::ServerCommunicationStrategy<SERVER_STRUCTURES>;
             using ServerCommunicatorMessageScheduler = DataFlow::DataProcessingScheduler<ServerMessage, ServerCommunicator, 1>;
             using ServerCommunicatorRawDataScheduler = DataFlow::DataProcessingScheduler<ServerRawData, ServerCommunicator, 1>;
 
             using DataTranslator = SensorAccessLinkElement::DataTranslator<SENSOR_STRUCTURES, SERVER_STRUCTURES>;
-            using DataTranslationStrategy = DataTranslation::DataTranslationStrategy<SENSOR_STRUCTURES, SERVER_STRUCTURES>;
             using TranslatorMessageScheduler = DataFlow::DataProcessingScheduler<SensorMessage, DataTranslator, 1>;
             using TranslatorRawDataScheduler = DataFlow::DataProcessingScheduler<SensorRawData, DataTranslator, 1>;
 
@@ -51,13 +49,17 @@ namespace SensorGateway {
             using RequestHandler = SensorAccessLinkElement::RequestHandler<SENSOR_STRUCTURES, SERVER_STRUCTURES>;
 
             using SensorCommunicator = SensorAccessLinkElement::SensorCommunicator<SENSOR_STRUCTURES>;
-            using SensorCommunicationStrategy = SensorCommunication::SensorCommunicationStrategy<SENSOR_STRUCTURES>;
 
             using Error = ErrorHandling::SensorAccessLinkError;
             using ThisClass = SensorAccessLink<SENSOR_STRUCTURES, SERVER_STRUCTURES>;
             using ErrorScheduler = DataFlow::DataProcessingScheduler<Error, ThisClass, 5>;
 
         public:
+
+            using ServerCommunicationStrategy = ServerCommunication::ServerCommunicationStrategy<SERVER_STRUCTURES>;
+            using DataTranslationStrategy = DataTranslation::DataTranslationStrategy<SENSOR_STRUCTURES, SERVER_STRUCTURES>;
+            using SensorCommunicationStrategy = SensorCommunication::SensorCommunicationStrategy<SENSOR_STRUCTURES>;
+
             explicit SensorAccessLink(ServerCommunicationStrategy* serverCommunicationStrategy,
                                       DataTranslationStrategy* dataTranslationStrategy,
                                       SensorCommunicationStrategy* sensorCommunicationStrategy) :
@@ -174,19 +176,19 @@ namespace SensorGateway {
     template<typename S>
     struct SensorAccessLinkFactory {
 
-//        using Structures = typename Sensor::Gateway::Structures<
-//                typename S::MessageDefinition,
-//                typename S::RawDataDefinition,
-//                typename S::ControlMessageDefinition>;
-//        using AccessLink = Details::SensorAccessLink<S, Structures>;
-
-        typedef typename Sensor::Gateway::Structures<
+        using GatewayStructures = typename Sensor::Gateway::Structures<
                 typename S::MessageDefinition,
                 typename S::RawDataDefinition,
-                typename S::ControlMessageDefinition
-        > Structures;
+                typename S::ControlMessageDefinition>;
+        using AccessLink = Details::SensorAccessLink<S, GatewayStructures>;
 
-        typedef typename Details::SensorAccessLink<S, Structures> AccessLink;
+//        typedef typename Sensor::Gateway::Structures<
+//                typename S::MessageDefinition,
+//                typename S::RawDataDefinition,
+//                typename S::ControlMessageDefinition
+//        > GatewayStructures;
+//
+//        typedef typename Details::SensorAccessLink<S, GatewayStructures> AccessLink;
 
     };
 }

@@ -46,13 +46,14 @@ namespace SensorCommunication {
         using ReconnectTime = std::chrono::time_point<SteadyClock>;
 
         using super = SensorCommunicationStrategy<Sensor::Guardian::Structures>;
+        using Request = typename super::Request;
 
         const int INTERFACE_TO_CLAIM_FROM_DEVICE = 0;
         const int VERSION_STRING_MAX_LENGTH = 32;
 
     public:
 
-        explicit GuardianUSBCommunicationStrategy(USBConnectionParameters usbConnectionParameters);
+        explicit GuardianUSBCommunicationStrategy(USBConnectionParameters const& usbConnectionParameters);
 
         ~GuardianUSBCommunicationStrategy() noexcept override;
 
@@ -65,13 +66,15 @@ namespace SensorCommunication {
         GuardianUSBCommunicationStrategy&
         operator=(GuardianUSBCommunicationStrategy&& other)& noexcept = delete;
 
-        void openConnection() override;
+        void openConnection() final;
 
-        super::Messages fetchMessages() override;
+        void closeConnection() final;
 
-        super::RawDataCycles fetchRawDataCycles() override;
+        super::Messages fetchMessages() final;
 
-        void closeConnection() override;
+        super::RawDataCycles fetchRawDataCycles() final;
+
+        void sendRequest(Request&& request) final;
 
     private:
 

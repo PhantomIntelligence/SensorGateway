@@ -40,7 +40,7 @@ protected:
 
     using DataStructures = Sensor::Test::RealisticImplementation::Structures;
     using Factory = SensorGateway::SensorAccessLinkFactory<DataStructures>;
-    using GatewayStructures = typename Factory::Structures;
+    using GatewayStructures = typename Factory::GatewayStructures;
     using AccessLink = typename Factory::AccessLink;
     using AvailableParameters = DataStructures::Parameters;
     using FakeSensorMessage = DataStructures::Message;
@@ -91,15 +91,16 @@ TEST_F(GatewayRequestHandlingAcceptanceTest,
     dataTranslationStrategyMock.onTranslateControlMessageToSensorMessageRequest(
             std::move(expectedControlMessageRequest))->returnThisSensorMessage(fakeGetParameterRequest);
 
-//    sensorCommunicationStrategyMock.onSendRequestReturn
+
     TranslationStubbedAccessLink accessLink(&serverCommunicationStrategyMock, &dataTranslationStrategyMock,
                                             &sensorCommunicationStrategyMock);
 
     accessLink.start(SERVER_ADDRESS);
     serverCommunicationStrategyMock.waitUntilSendResponseParameterErrorIsCalled();
+    sensorCommunicationStrategyMock.waitUntilSendRequestIsCalled();
     accessLink.terminateAndJoin();
 
-    auto strategyCalled = serverCommunicationStrategyMock.hasSendResponseParameterErrorBeenCalled();
+    auto strategyCalled = sensorCommunicationStrategyMock.hasSendRequestBeenCalled();
 
     ASSERT_TRUE(strategyCalled);
 }

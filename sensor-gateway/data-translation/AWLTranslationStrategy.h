@@ -22,9 +22,9 @@ namespace DataTranslation {
 
     using AWLStructures = Sensor::AWL::Structures;
     using AWLGatewayStructures = Sensor::Gateway::Structures<
-            AWLStructures::AWLMessageDefinition,
-            AWLStructures::AWLRawDataDefinition,
-            AWLStructures::AWLControlMessageDefinition
+            AWLStructures::MessageDefinition,
+            AWLStructures::RawDataDefinition,
+            AWLStructures::ControlMessageDefinition
             >;
 
     class AWLTranslationStrategy final : public DataTranslationStrategy<AWLStructures, AWLGatewayStructures> {

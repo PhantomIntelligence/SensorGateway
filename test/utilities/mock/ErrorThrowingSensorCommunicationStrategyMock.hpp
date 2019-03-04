@@ -225,6 +225,10 @@ namespace Mock {
             return rawDataCycles;
         }
 
+        void sendRequest(typename super::Request&& request) override {
+            // TODO : Complete with test/utilities/mock/Function.hpp
+        }
+
         bool hasCloseConnectionBeenCalledAfterThrowingFunction() const noexcept {
             return hasCloseConnectionBeenCalled() && hasErrorBeenThrown();
         }
