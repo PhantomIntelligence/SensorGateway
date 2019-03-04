@@ -37,6 +37,8 @@ namespace SensorAccessLinkElement {
 
         using ErrorSource = DataFlow::DataSource<ErrorHandling::SensorAccessLinkError>;
 
+        using GetParameterValueRequest = ServerCommunication::RequestTypes::GetParameterValue;
+
         static size_t const ARBITRARILY_BIG_ENOUGH_NUMBER_OF_CONCURRENT_REQUESTS = 256;
         using SensorControlMessages = std::array<SensorControlMessage, ARBITRARILY_BIG_ENOUGH_NUMBER_OF_CONCURRENT_REQUESTS>;
         using SensorControlMessagePointers = Container::ConstantSizedPointerList<SensorControlMessage, ARBITRARILY_BIG_ENOUGH_NUMBER_OF_CONCURRENT_REQUESTS>;
@@ -83,6 +85,10 @@ namespace SensorAccessLinkElement {
              *  - receive and process ControlMessage // from sensor
              *  - transmit to server w/ ServerCommunicator*
              */
+        }
+
+        void process(GetParameterValueRequest&& getParameterValueRequest) noexcept {
+
         }
 
         using ErrorSource::linkConsumer;

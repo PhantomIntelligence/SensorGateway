@@ -21,6 +21,7 @@
 #include <gtest/gtest.h>
 
 #include "test/utilities/data-model/DataModelFixture.h"
+#include "test/utilities/mock/Function.hpp"
 #include "test/utilities/mock/DevNullDataTranslationStrategyMock.hpp"
 #include "test/utilities/mock/DevNullServerCommunicationStrategyMock.hpp"
 #include "test/utilities/assertion/ErrorAssertion.hpp"
@@ -52,15 +53,41 @@ private:
 
 namespace RequestHandlerTestMock {
 
-    using RealisticDataStructures = typename RequestHandlerTest::DataStructures;
+    using DataStructures = typename RequestHandlerTest::DataStructures;
 
     class SensorParameterControllerMock final
-            : public SensorAccessLinkElement::SensorParameterController<RealisticDataStructures, RealisticDataStructures> {
+            : public SensorAccessLinkElement::SensorParameterController<DataStructures, DataStructures> {
+
+        using super = SensorAccessLinkElement::SensorParameterController<DataStructures, DataStructures>;
+
+        using GetParameterValueRequest = typename super::GetParameterValueRequest;
+
+        using MockFunctionProcessGetParameterValueRequest = Mock::Function<StringLiteral<decltype("mock->translateControlMessageToSensorMessageRequest"_ToString)>, Mock::VoidType, GetParameterValueRequest>;
+
+    public:
+
+        explicit SensorParameterControllerMock() : super(nullptr, nullptr) {};
+
+        ~SensorParameterControllerMock() noexcept {};
+
+        void process(GetParameterValueRequest&& getParameterValueRequest) noexcept {
+            mockFunctionProcessGetParameterValueRequest.invokeVoidReturn(
+                    std::forward<GetParameterValueRequest>(getParameterValueRequest));
+        }
+
+        bool
+        hasProcessGetParameterValueRequestBeenCalledWith(GetParameterValueRequest const& getParameterValueRequest) {
+            return mockFunctionProcessGetParameterValueRequest.hasBeenInvokedWith(getParameterValueRequest);
+        }
+
+    private:
+
+        MockFunctionProcessGetParameterValueRequest mockFunctionProcessGetParameterValueRequest;
 
     };
 
-    using DevNullTranslationStrategy = Mock::DevNullDataTranslationStrategyMock<RealisticDataStructures>;
-    using DataTranslator = SensorAccessLinkElement::DataTranslator<RealisticDataStructures, RealisticDataStructures>;
+    using DevNullTranslationStrategy = Mock::DevNullDataTranslationStrategyMock<DataStructures>;
+    using DataTranslator = SensorAccessLinkElement::DataTranslator<DataStructures, DataStructures>;
 
     class CatchingDataTranslatorMock final : public DataTranslator {
 
@@ -81,8 +108,8 @@ namespace RequestHandlerTestMock {
         DevNullTranslationStrategy devNullTranslationStrategy;
     };
 
-    using ServerCommunicator = SensorAccessLinkElement::ServerCommunicator<RealisticDataStructures>;
-    using DevNullCommunicationStrategy = Mock::DevNullServerCommunicationStrategyMock<RealisticDataStructures>;
+    using ServerCommunicator = SensorAccessLinkElement::ServerCommunicator<DataStructures>;
+    using DevNullCommunicationStrategy = Mock::DevNullServerCommunicationStrategyMock<DataStructures>;
 
     class DevNullServerCommunicatorMock final : public ServerCommunicator {
 
@@ -125,6 +152,26 @@ TEST_F(RequestHandlerTest, given_anInvalidGetParameterValueRequest_when_handle_t
             ErrorHandling::Message::PARAMETER_NOT_AVAILABLE);
 
     ASSERT_TRUE(Assert::errorHasBeenThrown(&sink, expectedError));
+}
+
+TEST_F(RequestHandlerTest,
+       given_aValidGetParameterValueRequest_when_handle_then_forwardsTheRequestToTheSensorParameterController) {
+    RequestHandlerTestMock::DevNullServerCommunicatorMock serverCommunicatorMock;
+    using RequestHandlerTestMock::SensorParameterControllerMock;
+    SensorParameterControllerMock sensorParameterControllerMock;
+    RequestHandler requestHandler(&serverCommunicatorMock,
+                                  std::bind(&SensorParameterControllerMock::process, &sensorParameterControllerMock,
+                                            std::placeholders::_1));
+
+    auto validRequest = Given::aValidGetParameterValueRequest<AvailableParameters>();
+    auto requestCopy = ServerCommunication::RequestTypes::GetParameterValue(validRequest);
+
+    requestHandler.handleGetParameterValueRequest(std::move(validRequest));
+
+    auto hasReceivedRequest = sensorParameterControllerMock.hasProcessGetParameterValueRequestBeenCalledWith(
+            requestCopy);
+
+    ASSERT_TRUE(hasReceivedRequest);
 }
 
 #endif //SENSORGATEWAY_REQUESTHANDLERTEST_CPP

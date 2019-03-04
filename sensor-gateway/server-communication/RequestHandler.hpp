@@ -44,14 +44,15 @@ namespace SensorAccessLinkElement {
         using ErrorSource = DataFlow::DataSource<ErrorHandling::SensorAccessLinkError>;
 
         using GetParameterValueRequest = ServerCommunication::RequestTypes::GetParameterValue;
+        using ProcessGetParameterValueRequest = std::function<void(GetParameterValueRequest&&)>;
 
         using GetParameter = StringLiteral<decltype("get parameter"_ToString)>;
 
     public:
         explicit RequestHandler(ServerCommunicator* serverCommunicator,
-                                SensorParameterController* sensorParameterController) :
+                                ProcessGetParameterValueRequest processGetParameterValueRequest) :
                 serverCommunicator(serverCommunicator),
-                sensorParameterController(sensorParameterController) {}
+                processGetParameterValueRequest(processGetParameterValueRequest) {}
 
         ~RequestHandler() noexcept {};
 
@@ -75,23 +76,20 @@ namespace SensorAccessLinkElement {
         }
 
         virtual void handleGetParameterValueRequest(GetParameterValueRequest&& getParameterValueRequest) {
+            auto requestIsValid = true;
             std::string const& parameterName = getParameterValueRequest.payloadToString();
             try {
                 ensureParameterIsAvailable(parameterName);
             } catch (ErrorHandling::SensorAccessLinkError& error) {
+                requestIsValid = false;
                 ErrorSource::produce(std::move(error));
                 getParameterValueRequest.markAsBadRequest();
                 writeAndSendErrorMessageResponse<GetParameter>(std::move(getParameterValueRequest));
             }
 
-            // TODO : If request.isBadRequest() ->
-            /**
-             *  TODO:
-             *  - Give pointer to *this* to ServerCommunicator
-             *  - have SensorCommunicator call this function in `handleServerRequest`
-             *  - Story 3 -> Give `Request` to ResponseWriter and stop
-             *  - Story 4 -> Add Request parsing and send result to `DataTranslator`
-             */
+            if(requestIsValid) {
+                processGetParameterValueRequest(std::move(getParameterValueRequest));
+            }
         }
 
         using ErrorSource::linkConsumer;
@@ -108,7 +106,7 @@ namespace SensorAccessLinkElement {
         }
 
         ServerCommunicator* serverCommunicator;
-        SensorParameterController* sensorParameterController;
+        ProcessGetParameterValueRequest processGetParameterValueRequest;
 
         AvailableParameters parameters;
     };

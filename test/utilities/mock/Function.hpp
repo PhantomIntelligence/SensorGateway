@@ -32,7 +32,7 @@ namespace Mock {
      * @tparam R Return type of the function
      * @tparam P Parameter type of the function
      */
-    template<typename N, typename R, typename P>
+    template<typename N, class R, typename P>
     class Function final {
     protected:
 
@@ -56,30 +56,36 @@ namespace Mock {
         ~Function() noexcept = default;
 
         auto invoke(ParameterType&& parameter) -> ReturnType {
-            static_assert(!std::is_same<ReturnType, VoidType>::value, "MockFunction --> this function has a non void return type. `invokeVoidReturn` should be used instead.");
+            static_assert(!std::is_same<ReturnType, VoidType>::value,
+                          "MockFunction --> this function has a non void return type. `invokeVoidReturn` should be used instead.");
             ReturnType returnValue = useMappingIfSet(parameter, &invokeExpectations);
             invokeWithParameters(std::move(parameter));
             return returnValue;
         }
 
         void invokeVoidReturn(ParameterType&& parameter) {
-            static_assert(std::is_same<ReturnType, VoidType>::value, "MockFunction --> this function has a void return type. `invoke` should be used instead.");
+            static_assert(std::is_same<ReturnType, VoidType>::value,
+                          "MockFunction --> this function has a void return type. `invoke` should be used instead.");
             invokeWithParameters(std::forward<ParameterType>(parameter));
         }
 
         void onCall(ParameterType&& parameterValue) {
-            static_assert(!std::is_same<ReturnType, VoidType>::value, "MockFunction --> this function has a void return type. `expectCall` should be used instead.");
+            static_assert(!std::is_same<ReturnType, VoidType>::value,
+                          "MockFunction --> this function has a void return type. `expectCall` should be used instead.");
             assert(!mapping.load());
             mapping.store(true);
             temporaryParameterValueMapping = parameterValue;
         }
 
         void returnThis(ReturnType const& returnValue) {
-            static_assert(!std::is_same<ReturnType, VoidType>::value, "MockFunction --> this function has a void return type. This function cannot be called.");
+            static_assert(!std::is_same<ReturnType, VoidType>::value,
+                          "MockFunction --> this function has a void return type. This function cannot be called.");
             assert(mapping.load());
             mapping.store(false);
             invokeExpectations.remove_if(
-                    [&](InvokeExpectation expectation) { return getParameterValue(&expectation) == temporaryParameterValueMapping; }
+                    [&](InvokeExpectation expectation) {
+                        return getParameterValue(&expectation) == temporaryParameterValueMapping;
+                    }
             );
             invokeExpectations.emplace_back(temporaryParameterValueMapping, returnValue);
         }
@@ -160,11 +166,10 @@ namespace Mock {
         Mutex sendResponseParameterErrorAckMutex;
         mutable BooleanPromise invocationAcknowledgement;
 
-        Mutex parameterInvocationMutex;
+        mutable Mutex parameterInvocationMutex;
         ParametersReceivedWhenInvoked parametersReceivedWhenInvoked;
 
     };
-
 }
 
 #endif //SENSORGATEWAY_MOCKFUNCTIONMOCK_HPP
