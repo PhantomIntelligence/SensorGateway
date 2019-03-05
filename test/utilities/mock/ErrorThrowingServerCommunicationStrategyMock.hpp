@@ -267,6 +267,26 @@ namespace Mock {
             handleThrowConfirmation(&throwOnSendRawData);
         }
 
+        void sendResponse(typename super::UnsignedIntegerParameterResponse&& response) override {
+            // TODO :
+            // mockFunctionSendUnsignedIntegerParameterResponse.invokeThrow(std::forward<UnsignedIntegerParameterResponse>(response));
+        }
+
+        void sendResponse(typename super::SignedIntegerParameterResponse&& response) override {
+            // TODO :
+            // mockFunctionSendSignedIntegerParameterResponse.invokeThrow(std::forward<SignedIntegerParameterResponse>(response));
+        }
+
+        void sendResponse(typename super::RealNumberParameterResponse&& response) override {
+            // TODO :
+            // mockFunctionSendRealNumberParameterResponse.invokeThrow(std::forward<RealNumberParameterResponse>(response));
+        }
+
+        void sendResponse(typename super::BooleanParameterResponse&& response) override {
+            // TODO :
+            // mockFunctionSendBooleanParameterResponse.invokeThrow(std::forward<BooleanParameterResponse>(response));
+        }
+
         void sendResponse(typename super::ParameterErrorResponse&& parameterErrorResponse) override {
             handleThrowConfirmation(&throwOnSendParameterErrorResponse);
         }

@@ -62,7 +62,7 @@ namespace RequestHandlerTestMock {
 
         using GetParameterValueRequest = typename super::GetParameterValueRequest;
 
-        using MockFunctionProcessGetParameterValueRequest = Mock::Function<StringLiteral<decltype("mock->translateControlMessageToSensorMessageRequest"_ToString)>, Mock::VoidType, GetParameterValueRequest>;
+        using MockFunctionProcessGetParameterValueRequest = Mock::Function<StringLiteral<decltype("mock->processGetParameterValueRequest"_ToString)>, Mock::VoidType, GetParameterValueRequest>;
 
     public:
 

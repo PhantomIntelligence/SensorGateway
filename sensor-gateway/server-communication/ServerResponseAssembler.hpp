@@ -26,12 +26,21 @@ namespace Assemble {
      */
     class ServerResponseAssembler {
 
+    protected:
+
         using ParameterErrorResponse =  ServerCommunication::ResponseType::ParameterErrorResponse;
         using ErrorMessageResponse =  ServerCommunication::ResponseType::ErrorMessageResponse;
         using ParameterErrorPayload =  ServerCommunication::PayloadTypes::ParameterErrorPayload;
         using ErrorPayload =  ServerCommunication::PayloadTypes::ErrorPayload;
         using MessagePayload =  ServerCommunication::PayloadTypes::MessagePayload;
 
+        template<typename T>
+        using ParameterType = ServerCommunication::PayloadTypes::Details::ParameterType<T>;
+        template<typename T>
+        using ParameterValuePayload = ServerCommunication::PayloadTypes::Details::SimplePayload<ParameterType<T>>;
+
+        template<typename T>
+        using ParameterValueResponse = ServerCommunication::ServerResponse<ParameterValuePayload<T>, MessagePayload>;
 
     public:
 
@@ -60,13 +69,20 @@ namespace Assemble {
             return errorMessageResponse;
         }
 
-
         template<typename Data, typename Request>
         static auto createParameterErrorResponse(Data const& data, Request&& request) -> ParameterErrorResponse {
             using ServerCommunication::ResponseMessage::ParameterError;
             ParameterErrorPayload const parameterErrorPayload = createParameterErrorPayload(data);
             ErrorPayload const errorMessage(request.payloadToString());
             ParameterErrorResponse response(parameterErrorPayload, errorMessage);
+            return response;
+        }
+
+        template<typename Data, typename ValueType, typename Request>
+        static auto createParameterValueResponse(Data const& data, ValueType const& valueType, Request&& request)
+        -> ParameterValueResponse<ValueType> {
+            ParameterValuePayload<ValueType> responsePayload = createParameterValuePayload(data, valueType);
+            ParameterValueResponse<ValueType> response(responsePayload, request.toResponseMessagePayload());
             return response;
         }
 
@@ -82,7 +98,14 @@ namespace Assemble {
             return parameterErrorPayload;
         }
 
+        template<typename Data, typename T>
+        static ParameterValuePayload<T> createParameterValuePayload(Data const& data, T t) {
+            ParameterType<T> parameterValues = std::make_tuple(data.name, t, data.unit);
+            ParameterValuePayload<T> parameterValuePayload(parameterValues);
+            return parameterValuePayload;
+        }
     };
+
 }
 
 

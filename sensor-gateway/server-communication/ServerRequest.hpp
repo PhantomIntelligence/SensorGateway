@@ -21,7 +21,7 @@
 
 namespace ServerCommunication {
 
-    template<typename PayloadType>
+    template<typename N, typename PayloadType>
     class ServerRequest {
 
     public:
@@ -89,17 +89,22 @@ namespace ServerCommunication {
 
         static ServerRequest const& returnDefaultData() noexcept;
 
+        PayloadTypes::MessagePayload const& toResponseMessagePayload() const noexcept {
+            return responseMessagePayload;
+        }
+
         std::string const& payloadToString() const noexcept {
             return payload.toString();
         }
 
     private:
         ServerRequest(PayloadType const& payload, bool const& badRequest, bool const& causedAnError) noexcept :
-                payload(payload), badRequest(badRequest), causedAnError(causedAnError) {}
+                payload(payload), badRequest(badRequest), causedAnError(causedAnError) , responseMessagePayload(N::toString() + payloadToString()){}
 
         PayloadType payload;
         bool badRequest;
         bool causedAnError;
+        PayloadTypes::MessagePayload const responseMessagePayload;
 
     };
 
@@ -109,18 +114,21 @@ namespace ServerCommunication {
         template<typename PayloadType>
         PayloadType const DEFAULT_SERVER_REQUEST_PAYLOAD{};
 
-        template<typename PayloadType>
-        ServerRequest<PayloadType> const DEFAULT_SERVER_REQUEST = ServerRequest<PayloadType>(
+        template<typename N, typename PayloadType>
+        ServerRequest<N, PayloadType> const DEFAULT_SERVER_REQUEST = ServerRequest<N, PayloadType>(
                 DEFAULT_SERVER_REQUEST_PAYLOAD<PayloadType>);
     }
 
-    template<typename PayloadType>
-    ServerRequest<PayloadType> const& ServerRequest<PayloadType>::returnDefaultData() noexcept {
-        return Defaults::DEFAULT_SERVER_REQUEST<PayloadType>;
+    template<typename N, typename PayloadType>
+    ServerRequest<N, PayloadType> const& ServerRequest<N, PayloadType>::returnDefaultData() noexcept {
+        return Defaults::DEFAULT_SERVER_REQUEST<N, PayloadType>;
     }
 
     namespace RequestTypes {
-        using GetParameterValue = ServerRequest<PayloadTypes::MessagePayload>;
+        namespace Names {
+            using GetValueOfParameter = StringLiteral<decltype("get value of parameter "_ToString)>;
+        }
+        using GetParameterValue = ServerRequest<Names::GetValueOfParameter, PayloadTypes::MessagePayload>;
     }
 }
 

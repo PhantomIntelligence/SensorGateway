@@ -26,6 +26,10 @@ namespace Sensor {
         namespace Details {
             namespace NameLiterals {
                 using Impossible = StringLiteral<decltype("A Truth Saying Politician"_ToString)>;
+                using UnsignedInteger = StringLiteral<decltype("UnsignedInteger"_ToString)>;
+                using SignedInteger = StringLiteral<decltype("SignedInteger"_ToString)>;
+                using RealNumber = StringLiteral<decltype("RealNumber"_ToString)>;
+                using Boolean = StringLiteral<decltype("Boolean"_ToString)>;
                 using Apple = StringLiteral<decltype("Apple"_ToString)>;
                 using Pear = StringLiteral<decltype("Pear"_ToString)>;
                 using Banana = StringLiteral<decltype("Banana"_ToString)>;
@@ -49,6 +53,26 @@ namespace Sensor {
             > {
             };
         }
+        using MaskedUnsignedIntegerParameter = Details::MaskedParameter<
+                Details::NameLiterals::UnsignedInteger,
+                Sensor::Parameter::Types::UnsignedInteger,
+                Sensor::Parameter::Units::not_applicable
+        >;
+        using MaskedSignedIntegerParameter = Details::MaskedParameter<
+                Details::NameLiterals::SignedInteger,
+                Sensor::Parameter::Types::SignedInteger,
+                Sensor::Parameter::Units::not_applicable
+        >;
+        using MaskedRealNumberParameter = Details::MaskedParameter<
+                Details::NameLiterals::RealNumber,
+                Sensor::Parameter::Types::RealNumber,
+                Sensor::Parameter::Units::not_applicable
+        >;
+        using MaskedBooleanParameter = Details::MaskedParameter<
+                Details::NameLiterals::Boolean,
+                Sensor::Parameter::Types::Boolean,
+                Sensor::Parameter::Units::not_applicable
+        >;
 
         using Impossible = Details::NameOnlyParameter<Details::NameLiterals::Impossible>;
 
@@ -73,6 +97,10 @@ namespace Sensor {
         // IMPORTANT! : Keep this list up to date with declaration of FakeParameters. It MUST NOT be used in any Sensor::Communication::DataStructures declaration.
         using AllFakeParameters = Sensor::Gateway::Parameters<
                 Impossible,
+                MaskedUnsignedIntegerParameter,
+                MaskedSignedIntegerParameter,
+                MaskedRealNumberParameter,
+                MaskedBooleanParameter,
                 Apple,
                 Pear,
                 Banana,

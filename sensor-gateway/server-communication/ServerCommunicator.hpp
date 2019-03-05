@@ -107,6 +107,7 @@ namespace SensorAccessLinkElement {
             return serverConnected.load();
         }
 
+        // TODO : Add template specialization for non standard Response type so it always throws
         template<typename Response>
         void sendResponse(Response&& response) {
             try{

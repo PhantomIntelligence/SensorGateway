@@ -63,10 +63,51 @@ protected:
 
     virtual ~ServerCommunicatorTest() = default;
 
+    ServerCommunication::ResponseType::UnsignedIntegerParameterResponse givenAnUnsignedIntegerParameterValueResponse(uint64_t value) const {
+        using UnsignedIntegerParameter = Sensor::FakeParameter::MaskedUnsignedIntegerParameter;
+        UnsignedIntegerParameter unsignedIntegerParameter;
+        auto request = Assemble::ServerRequestAssembler::getParameterValueRequest(
+                UnsignedIntegerParameter::getStringifiedName());
+        auto response = ResponseAssembler::createParameterValueResponse(unsignedIntegerParameter.extractMetadata(), value,
+                                                                        std::move(request));
+        return response;
+    }
+
+    ServerCommunication::ResponseType::SignedIntegerParameterResponse givenASignedIntegerParameterValueResponse(int64_t value) const {
+        using SignedIntegerParameter = Sensor::FakeParameter::MaskedSignedIntegerParameter;
+        SignedIntegerParameter signedIntegerParameter;
+        auto request = Assemble::ServerRequestAssembler::getParameterValueRequest(
+                SignedIntegerParameter::getStringifiedName());
+        auto response = ResponseAssembler::createParameterValueResponse(signedIntegerParameter.extractMetadata(), value,
+                                                                        std::move(request));
+        return response;
+    }
+
+    ServerCommunication::ResponseType::RealNumberParameterResponse givenARealNumberParameterValueResponse(double_t value) const {
+        using RealNumberParameter = Sensor::FakeParameter::MaskedRealNumberParameter;
+        RealNumberParameter realNumberParameter;
+        auto request = Assemble::ServerRequestAssembler::getParameterValueRequest(
+                RealNumberParameter::getStringifiedName());
+        auto response = ResponseAssembler::createParameterValueResponse(realNumberParameter.extractMetadata(), value,
+                                                                        std::move(request));
+        return response;
+    }
+
+    ServerCommunication::ResponseType::BooleanParameterResponse givenABooleanParameterValueResponse(bool value) const {
+        using BooleanParameter = Sensor::FakeParameter::MaskedBooleanParameter;
+        BooleanParameter booleanParameter;
+        auto request = Assemble::ServerRequestAssembler::getParameterValueRequest(
+                BooleanParameter::getStringifiedName());
+        auto response = ResponseAssembler::createParameterValueResponse(booleanParameter.extractMetadata(), value,
+                                                                        std::move(request));
+        return response;
+    }
+
     auto givenAnErrorMessageResponse() const {
         auto badRequest = Given::anInvalidGetParameterValueRequest<ParameterListForThisTestCase>();
         badRequest.markAsBadRequest();
-        auto badRequestResponse = ResponseAssembler::createErrorMessageResponseFromRequest<NoAction>(std::move(badRequest));
+        auto badRequestResponse = ResponseAssembler::createErrorMessageResponseFromRequest<NoAction>(
+                std::move(badRequest));
         return badRequestResponse;
     }
 
@@ -672,28 +713,81 @@ TEST_F(ServerCommunicatorTest,
         ASSERT_EQ(expectedRequest, receivedRequest);
     }
 }
-
 TEST_F(ServerCommunicatorTest,
-       given_aParameterErrorResponse_when_sendResponse_then_callsSendParameterErrorResponseInStrategy) {
+       given_anUnsignedIntegerParameterValueResponse_when_sendResponse_then_asksTheStrategyToSendTheUnsignedIntegerParameterResponse) {
     MockServerCommunicatorStrategy mockStrategy;
     ServerCommunicator serverCommunicator(&mockStrategy, ignoreHandleGetParameterValue());
-    auto response = givenAParameterErrorResponse();
+    auto response = givenAnUnsignedIntegerParameterValueResponse(true);
+    auto responseCopy = decltype(givenAnUnsignedIntegerParameterValueResponse(true))(response);
 
     serverCommunicator.sendResponse(std::move(response));
 
-    auto strategyHasBeenCalled = mockStrategy.hasSendParameterErrorResponseBeenCalled();
+    auto strategyHasBeenCalled = mockStrategy.hasSendUnsignedParameterResponseBeenCalledWith(responseCopy);
     ASSERT_TRUE(strategyHasBeenCalled);
 }
 
 TEST_F(ServerCommunicatorTest,
-       given_anErrorMessageResponse_when_sendResponse_then_callsSendErrorMessageResponseInStrategy) {
+       given_aSignedIntegerParameterValueResponse_when_sendResponse_then_asksTheStrategyToSendTheSignedIntegerParameterResponse) {
     MockServerCommunicatorStrategy mockStrategy;
     ServerCommunicator serverCommunicator(&mockStrategy, ignoreHandleGetParameterValue());
-    auto response = givenAnErrorMessageResponse();
+    auto response = givenASignedIntegerParameterValueResponse(true);
+    auto responseCopy = decltype(givenASignedIntegerParameterValueResponse(true))(response);
 
     serverCommunicator.sendResponse(std::move(response));
 
-    auto strategyHasBeenCalled = mockStrategy.hasSendErrorMessageResponseBeenCalled();
+    auto strategyHasBeenCalled = mockStrategy.hasSendSignedParameterResponseBeenCalledWith(responseCopy);
+    ASSERT_TRUE(strategyHasBeenCalled);
+}
+
+TEST_F(ServerCommunicatorTest,
+       given_aRealNumberParameterValueResponse_when_sendResponse_then_asksTheStrategyToSendTheRealNumberParameterResponse) {
+    MockServerCommunicatorStrategy mockStrategy;
+    ServerCommunicator serverCommunicator(&mockStrategy, ignoreHandleGetParameterValue());
+    auto response = givenARealNumberParameterValueResponse(true);
+    auto responseCopy = decltype(givenARealNumberParameterValueResponse(true))(response);
+
+    serverCommunicator.sendResponse(std::move(response));
+
+    auto strategyHasBeenCalled = mockStrategy.hasSendRealNumberParameterResponseBeenCalledWith(responseCopy);
+    ASSERT_TRUE(strategyHasBeenCalled);
+}
+
+TEST_F(ServerCommunicatorTest,
+       given_aBooleanParameterValueResponse_when_sendResponse_then_asksTheStrategyToSendTheBooleanParameterResponse) {
+    MockServerCommunicatorStrategy mockStrategy;
+    ServerCommunicator serverCommunicator(&mockStrategy, ignoreHandleGetParameterValue());
+    auto response = givenABooleanParameterValueResponse(true);
+    auto responseCopy = decltype(givenABooleanParameterValueResponse(true))(response);
+
+    serverCommunicator.sendResponse(std::move(response));
+
+    auto strategyHasBeenCalled = mockStrategy.hasSendBooleanParameterResponseBeenCalledWith(responseCopy);
+    ASSERT_TRUE(strategyHasBeenCalled);
+}
+
+TEST_F(ServerCommunicatorTest,
+       given_aParameterErrorResponse_when_sendResponse_then_asksTheStrategyToSendTheParameterErrorResponse) {
+    MockServerCommunicatorStrategy mockStrategy;
+    ServerCommunicator serverCommunicator(&mockStrategy, ignoreHandleGetParameterValue());
+    auto response = givenAParameterErrorResponse();
+    auto responseCopy = decltype(givenAParameterErrorResponse())(response);
+
+    serverCommunicator.sendResponse(std::move(response));
+
+    auto strategyHasBeenCalled = mockStrategy.hasSendParameterErrorResponseBeenCalledWith(responseCopy);
+    ASSERT_TRUE(strategyHasBeenCalled);
+}
+
+TEST_F(ServerCommunicatorTest,
+       given_anErrorMessageResponse_when_sendResponse_then_asksTheStrategyToSendTheErrorMessageResponse) {
+    MockServerCommunicatorStrategy mockStrategy;
+    ServerCommunicator serverCommunicator(&mockStrategy, ignoreHandleGetParameterValue());
+    auto response = givenAnErrorMessageResponse();
+    auto responseCopy = decltype(givenAnErrorMessageResponse())(response);
+
+    serverCommunicator.sendResponse(std::move(response));
+
+    auto strategyHasBeenCalled = mockStrategy.hasSendErrorMessageResponseBeenCalledWith(responseCopy);
     ASSERT_TRUE(strategyHasBeenCalled);
 }
 
