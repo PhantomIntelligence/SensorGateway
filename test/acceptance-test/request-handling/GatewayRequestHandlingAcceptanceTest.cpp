@@ -72,6 +72,38 @@ TEST_F(GatewayRequestHandlingAcceptanceTest,
     ASSERT_TRUE(strategyCalled);
 }
 
+TEST_F(GatewayRequestHandlingAcceptanceTest,
+       given_aValidParameterName_when_getParameterValue_then_dataTranslatorIsAskedToTranslateASensorControlMessage) {
+    ServerCommunicationStrategyMock serverCommunicationStrategyMock;
+    DataTranslationStrategyMock dataTranslationStrategyMock;
+    SensorCommunicationStrategyMock sensorCommunicationStrategyMock;
+    AvailableParameters parameters;
+
+    serverCommunicationStrategyMock.increaseNumberOfUniqueValidGetParameterValueContentsToReturnBy(1);
+    auto validParameterRequestName = serverCommunicationStrategyMock.getReturnedGetParameterValueRequest()[0];
+    auto expectedControlMessageRequest = parameters.createGetParameterValueControlMessageFor(validParameterRequestName);
+    auto nameHash = std::hash<std::string>{}(validParameterRequestName);
+    FakeSensorMessage fakeGetParameterRequest;
+    fakeGetParameterRequest.sensorId = static_cast<decltype(fakeGetParameterRequest.sensorId)>(nameHash);
+    fakeGetParameterRequest.messageId = expectedControlMessageRequest.getControlMessageCode();
+
+    dataTranslationStrategyMock.onTranslateControlMessageToSensorMessageRequest(
+            std::move(expectedControlMessageRequest))->returnThisSensorMessage(fakeGetParameterRequest);
+
+
+    TranslationStubbedAccessLink accessLink(&serverCommunicationStrategyMock, &dataTranslationStrategyMock,
+                                            &sensorCommunicationStrategyMock);
+
+    accessLink.start(SERVER_ADDRESS);
+    serverCommunicationStrategyMock.waitUntilSendResponseParameterErrorIsCalled();
+    sensorCommunicationStrategyMock.waitUntilSendRequestIsCalled();
+    accessLink.terminateAndJoin();
+
+    auto strategyCalled = sensorCommunicationStrategyMock.hasSendRequestBeenCalled();
+
+    ASSERT_TRUE(strategyCalled);
+}
+
 // TODO: Write test : given a loop back data translation strategy and given a valid get parameter request -> receives response with loopback response and given request
 TEST_F(GatewayRequestHandlingAcceptanceTest,
        given_aValidParameterName_when_getParameterValueAndAnErrorHappensInTheSensor_then_sensorCommunicationStrategyReceivesCorresponingSensorControlMessage) {

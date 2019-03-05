@@ -22,11 +22,9 @@
 #include "ConsumerLink.hpp"
 #include "RingBufferPad.hpp"
 
-using DataFlow::RING_BUFFER_SIZE;
-
 namespace DataFlow {
 
-    template<class T>
+    template<class T, size_t N>
     class RingBuffer {
 
     protected:
@@ -38,6 +36,8 @@ namespace DataFlow {
         uint8_t const NUMBER_OF_CONSUMER_PER_BUFFER = 8;
 
     public:
+
+        static constexpr size_t const size = N;
 
         RingBuffer() : writerLocation(&buffer[0]) {
             consumerLocationsMap.reserve(NUMBER_OF_CONSUMER_PER_BUFFER);
@@ -92,12 +92,12 @@ namespace DataFlow {
             auto firstPad = &buffer[0];
             auto currentPad = firstPad;
             RingBufferPad<T>* nextPad;
-            for (size_t i = 1; i < RING_BUFFER_SIZE; ++i) {
+            for (size_t i = 1; i < size; ++i) {
                 nextPad = &buffer[i];
                 currentPad->setNext(nextPad);
                 currentPad = nextPad;
             }
-            buffer[RING_BUFFER_SIZE - 1].setNext(firstPad);
+            buffer[size - 1].setNext(firstPad);
         }
 
         void addLinkIfNoneExists(Consumer* consumer) {
@@ -155,10 +155,10 @@ namespace DataFlow {
 
         RingBufferPad<T>* writerLocation;
 
-        RingBufferPad<T> buffer[RING_BUFFER_SIZE];
+        RingBufferPad<T> buffer[size];
 
         ConsumerLocationsMap consumerLocationsMap;
-    };
 
+    };
 }
 #endif //SENSORGATEWAY_RINGBUFFER_H

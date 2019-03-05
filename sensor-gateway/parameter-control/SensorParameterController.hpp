@@ -39,8 +39,10 @@ namespace SensorAccessLinkElement {
 
         using GetParameterValueRequest = ServerCommunication::RequestTypes::GetParameterValue;
 
+        using Parameters = typename SERVER_STRUCTURES::Parameters;
+
         static size_t const ARBITRARILY_BIG_ENOUGH_NUMBER_OF_CONCURRENT_REQUESTS = 256;
-        using SensorControlMessages = std::array<SensorControlMessage, ARBITRARILY_BIG_ENOUGH_NUMBER_OF_CONCURRENT_REQUESTS>;
+        using SensorControlMessages = DataFlow::RingBuffer<SensorControlMessage, ARBITRARILY_BIG_ENOUGH_NUMBER_OF_CONCURRENT_REQUESTS>;
         using SensorControlMessagePointers = Container::ConstantSizedPointerList<SensorControlMessage, ARBITRARILY_BIG_ENOUGH_NUMBER_OF_CONCURRENT_REQUESTS>;
 
 
@@ -88,7 +90,9 @@ namespace SensorAccessLinkElement {
         }
 
         void process(GetParameterValueRequest&& getParameterValueRequest) noexcept {
-
+            auto parameterName = getParameterValueRequest.payloadToString();
+            auto sensorControlMessage = parameters.createGetParameterValueControlMessageFor(parameterName);
+            dataTranslator->
         }
 
         using ErrorSource::linkConsumer;
@@ -98,6 +102,8 @@ namespace SensorAccessLinkElement {
 
         RequestHandler* requestHandler;
         DataTranslator* dataTranslator;
+
+        Parameters parameters;
 
         SensorControlMessages sensorControlMessageRequests;
         SensorControlMessagePointers sensorControlMessageRequestPointers;

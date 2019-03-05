@@ -175,5 +175,3 @@ TEST_F(RequestHandlerTest,
 }
 
 #endif //SENSORGATEWAY_REQUESTHANDLERTEST_CPP
-
-

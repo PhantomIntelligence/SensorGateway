@@ -90,6 +90,7 @@ namespace Mock {
             invokeExpectations.emplace_back(temporaryParameterValueMapping, returnValue);
         }
 
+        // TODO : Add timeout and handle cases where fail to facilitate testing and avoid infinite test
         // Allow test thread to sleep until call done
         void waitUntilInvocation() {
             if (!hasBeenInvoked()) {

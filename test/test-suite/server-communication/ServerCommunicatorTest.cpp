@@ -63,17 +63,20 @@ protected:
 
     virtual ~ServerCommunicatorTest() = default;
 
-    ServerCommunication::ResponseType::UnsignedIntegerParameterResponse givenAnUnsignedIntegerParameterValueResponse(uint64_t value) const {
+    ServerCommunication::ResponseType::UnsignedIntegerParameterResponse
+    givenAnUnsignedIntegerParameterValueResponse(uint64_t value) const {
         using UnsignedIntegerParameter = Sensor::FakeParameter::MaskedUnsignedIntegerParameter;
         UnsignedIntegerParameter unsignedIntegerParameter;
         auto request = Assemble::ServerRequestAssembler::getParameterValueRequest(
                 UnsignedIntegerParameter::getStringifiedName());
-        auto response = ResponseAssembler::createParameterValueResponse(unsignedIntegerParameter.extractMetadata(), value,
+        auto response = ResponseAssembler::createParameterValueResponse(unsignedIntegerParameter.extractMetadata(),
+                                                                        value,
                                                                         std::move(request));
         return response;
     }
 
-    ServerCommunication::ResponseType::SignedIntegerParameterResponse givenASignedIntegerParameterValueResponse(int64_t value) const {
+    ServerCommunication::ResponseType::SignedIntegerParameterResponse
+    givenASignedIntegerParameterValueResponse(int64_t value) const {
         using SignedIntegerParameter = Sensor::FakeParameter::MaskedSignedIntegerParameter;
         SignedIntegerParameter signedIntegerParameter;
         auto request = Assemble::ServerRequestAssembler::getParameterValueRequest(
@@ -83,7 +86,8 @@ protected:
         return response;
     }
 
-    ServerCommunication::ResponseType::RealNumberParameterResponse givenARealNumberParameterValueResponse(double_t value) const {
+    ServerCommunication::ResponseType::RealNumberParameterResponse
+    givenARealNumberParameterValueResponse(double_t value) const {
         using RealNumberParameter = Sensor::FakeParameter::MaskedRealNumberParameter;
         RealNumberParameter realNumberParameter;
         auto request = Assemble::ServerRequestAssembler::getParameterValueRequest(
@@ -713,6 +717,7 @@ TEST_F(ServerCommunicatorTest,
         ASSERT_EQ(expectedRequest, receivedRequest);
     }
 }
+
 TEST_F(ServerCommunicatorTest,
        given_anUnsignedIntegerParameterValueResponse_when_sendResponse_then_asksTheStrategyToSendTheUnsignedIntegerParameterResponse) {
     MockServerCommunicatorStrategy mockStrategy;

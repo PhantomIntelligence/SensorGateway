@@ -75,7 +75,7 @@ namespace SensorAccessLinkElement {
             }
         }
 
-        virtual void handleGetParameterValueRequest(GetParameterValueRequest&& getParameterValueRequest) {
+        void handleGetParameterValueRequest(GetParameterValueRequest&& getParameterValueRequest) {
             auto requestIsValid = true;
             std::string const& parameterName = getParameterValueRequest.payloadToString();
             try {
@@ -87,9 +87,32 @@ namespace SensorAccessLinkElement {
                 writeAndSendErrorMessageResponse<GetParameter>(std::move(getParameterValueRequest));
             }
 
-            if(requestIsValid) {
+            if (requestIsValid) {
                 processGetParameterValueRequest(std::move(getParameterValueRequest));
             }
+        }
+
+// TODO : Test this and complete with actual value from Sensor --> integration test
+        template<typename P, typename Value, typename Request>
+        void writeAndSendParameterValueResponse(P* parameter, Value value, Request&& originalRequest) const {
+            auto parameterData = parameter->extractMetadata();
+            auto parameterValueResponse = ResponseAssembler::createParameterValueResponse(
+                    parameterData,
+                    value,
+                    std::forward<Request>(originalRequest)
+            );
+            serverCommunicator->sendResponse(std::move(parameterValueResponse));
+        }
+
+// TODO : Test this and complete with error value from Sensor --> integration test
+        template<typename P, typename Request>
+        void writeAndSendParameterErrorResponse(P* parameter, Request&& originalRequest) const {
+            auto parameterData = parameter->extractMetadata();
+            auto parameterErrorResponse = ResponseAssembler::createParameterErrorResponse(
+                    parameterData,
+                    std::forward<Request>(originalRequest)
+            );
+            serverCommunicator->sendResponse(std::move(parameterErrorResponse));
         }
 
         using ErrorSource::linkConsumer;
