@@ -63,50 +63,6 @@ protected:
 
     virtual ~ServerCommunicatorTest() = default;
 
-    ServerCommunication::ResponseType::UnsignedIntegerParameterResponse
-    givenAnUnsignedIntegerParameterValueResponse(uint64_t value) const {
-        using UnsignedIntegerParameter = Sensor::FakeParameter::MaskedUnsignedIntegerParameter;
-        UnsignedIntegerParameter unsignedIntegerParameter;
-        auto request = Assemble::ServerRequestAssembler::getParameterValueRequest(
-                UnsignedIntegerParameter::getStringifiedName());
-        auto response = ResponseAssembler::createParameterValueResponse(unsignedIntegerParameter.extractMetadata(),
-                                                                        value,
-                                                                        std::move(request));
-        return response;
-    }
-
-    ServerCommunication::ResponseType::SignedIntegerParameterResponse
-    givenASignedIntegerParameterValueResponse(int64_t value) const {
-        using SignedIntegerParameter = Sensor::FakeParameter::MaskedSignedIntegerParameter;
-        SignedIntegerParameter signedIntegerParameter;
-        auto request = Assemble::ServerRequestAssembler::getParameterValueRequest(
-                SignedIntegerParameter::getStringifiedName());
-        auto response = ResponseAssembler::createParameterValueResponse(signedIntegerParameter.extractMetadata(), value,
-                                                                        std::move(request));
-        return response;
-    }
-
-    ServerCommunication::ResponseType::RealNumberParameterResponse
-    givenARealNumberParameterValueResponse(double_t value) const {
-        using RealNumberParameter = Sensor::FakeParameter::MaskedRealNumberParameter;
-        RealNumberParameter realNumberParameter;
-        auto request = Assemble::ServerRequestAssembler::getParameterValueRequest(
-                RealNumberParameter::getStringifiedName());
-        auto response = ResponseAssembler::createParameterValueResponse(realNumberParameter.extractMetadata(), value,
-                                                                        std::move(request));
-        return response;
-    }
-
-    ServerCommunication::ResponseType::BooleanParameterResponse givenABooleanParameterValueResponse(bool value) const {
-        using BooleanParameter = Sensor::FakeParameter::MaskedBooleanParameter;
-        BooleanParameter booleanParameter;
-        auto request = Assemble::ServerRequestAssembler::getParameterValueRequest(
-                BooleanParameter::getStringifiedName());
-        auto response = ResponseAssembler::createParameterValueResponse(booleanParameter.extractMetadata(), value,
-                                                                        std::move(request));
-        return response;
-    }
-
     auto givenAnErrorMessageResponse() const {
         auto badRequest = Given::anInvalidGetParameterValueRequest<ParameterListForThisTestCase>();
         badRequest.markAsBadRequest();
@@ -722,8 +678,8 @@ TEST_F(ServerCommunicatorTest,
        given_anUnsignedIntegerParameterValueResponse_when_sendResponse_then_asksTheStrategyToSendTheUnsignedIntegerParameterResponse) {
     MockServerCommunicatorStrategy mockStrategy;
     ServerCommunicator serverCommunicator(&mockStrategy, ignoreHandleGetParameterValue());
-    auto response = givenAnUnsignedIntegerParameterValueResponse(true);
-    auto responseCopy = decltype(givenAnUnsignedIntegerParameterValueResponse(true))(response);
+    auto response = Given::anUnsignedIntegerParameterValueResponse(true);
+    auto responseCopy = decltype(Given::anUnsignedIntegerParameterValueResponse(true))(response);
 
     serverCommunicator.sendResponse(std::move(response));
 
@@ -735,8 +691,8 @@ TEST_F(ServerCommunicatorTest,
        given_aSignedIntegerParameterValueResponse_when_sendResponse_then_asksTheStrategyToSendTheSignedIntegerParameterResponse) {
     MockServerCommunicatorStrategy mockStrategy;
     ServerCommunicator serverCommunicator(&mockStrategy, ignoreHandleGetParameterValue());
-    auto response = givenASignedIntegerParameterValueResponse(true);
-    auto responseCopy = decltype(givenASignedIntegerParameterValueResponse(true))(response);
+    auto response = Given::aSignedIntegerParameterValueResponse(true);
+    auto responseCopy = decltype(Given::aSignedIntegerParameterValueResponse(true))(response);
 
     serverCommunicator.sendResponse(std::move(response));
 
@@ -748,8 +704,8 @@ TEST_F(ServerCommunicatorTest,
        given_aRealNumberParameterValueResponse_when_sendResponse_then_asksTheStrategyToSendTheRealNumberParameterResponse) {
     MockServerCommunicatorStrategy mockStrategy;
     ServerCommunicator serverCommunicator(&mockStrategy, ignoreHandleGetParameterValue());
-    auto response = givenARealNumberParameterValueResponse(true);
-    auto responseCopy = decltype(givenARealNumberParameterValueResponse(true))(response);
+    auto response = Given::aRealNumberParameterValueResponse(true);
+    auto responseCopy = decltype(Given::aRealNumberParameterValueResponse(true))(response);
 
     serverCommunicator.sendResponse(std::move(response));
 
@@ -761,8 +717,8 @@ TEST_F(ServerCommunicatorTest,
        given_aBooleanParameterValueResponse_when_sendResponse_then_asksTheStrategyToSendTheBooleanParameterResponse) {
     MockServerCommunicatorStrategy mockStrategy;
     ServerCommunicator serverCommunicator(&mockStrategy, ignoreHandleGetParameterValue());
-    auto response = givenABooleanParameterValueResponse(true);
-    auto responseCopy = decltype(givenABooleanParameterValueResponse(true))(response);
+    auto response = Given::aBooleanParameterValueResponse(true);
+    auto responseCopy = decltype(Given::aBooleanParameterValueResponse(true))(response);
 
     serverCommunicator.sendResponse(std::move(response));
 

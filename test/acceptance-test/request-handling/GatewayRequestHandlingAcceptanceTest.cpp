@@ -41,7 +41,6 @@ protected:
     using DataStructures = Sensor::Test::RealisticImplementation::Structures;
     using Factory = SensorGateway::SensorAccessLinkFactory<DataStructures>;
     using GatewayStructures = typename Factory::GatewayStructures;
-    using AccessLink = typename Factory::AccessLink;
     using AvailableParameters = DataStructures::Parameters;
     using FakeSensorMessage = DataStructures::Message;
 
@@ -49,7 +48,7 @@ protected:
     using DataTranslationStrategyMock = Mock::DataTranslationStrategyMock<DataStructures, GatewayStructures>;
     using SensorCommunicationStrategyMock = Mock::LoopBackSensorCommunicationStrategyMock<DataStructures>;
 
-    using TranslationStubbedAccessLink = Factory::AccessLink;
+    using TranslationStubbedAccessLink = typename Factory::AccessLink;
 
 };
 
@@ -90,12 +89,11 @@ TEST_F(GatewayRequestHandlingAcceptanceTest,
     dataTranslationStrategyMock.onTranslateControlMessageToSensorMessageRequest(
             std::move(expectedControlMessageRequest))->returnThisSensorMessage(fakeGetParameterRequest);
 
-
-    TranslationStubbedAccessLink accessLink(&serverCommunicationStrategyMock, &dataTranslationStrategyMock,
+    TranslationStubbedAccessLink accessLink(&serverCommunicationStrategyMock,
+                                            &dataTranslationStrategyMock,
                                             &sensorCommunicationStrategyMock);
 
     accessLink.start(SERVER_ADDRESS);
-    serverCommunicationStrategyMock.waitUntilSendResponseParameterErrorIsCalled();
     sensorCommunicationStrategyMock.waitUntilSendRequestIsCalled();
     accessLink.terminateAndJoin();
 
@@ -104,7 +102,6 @@ TEST_F(GatewayRequestHandlingAcceptanceTest,
     ASSERT_TRUE(strategyCalled);
 }
 
-// TODO: Write test : given a loop back data translation strategy and given a valid get parameter request -> receives response with loopback response and given request
 TEST_F(GatewayRequestHandlingAcceptanceTest,
        given_aValidParameterName_when_getParameterValueAndAnErrorHappensInTheSensor_then_sensorCommunicationStrategyReceivesCorresponingSensorControlMessage) {
     ServerCommunicationStrategyMock serverCommunicationStrategyMock;
@@ -124,19 +121,20 @@ TEST_F(GatewayRequestHandlingAcceptanceTest,
             std::move(expectedControlMessageRequest))->returnThisSensorMessage(fakeGetParameterRequest);
 
 
-    TranslationStubbedAccessLink accessLink(&serverCommunicationStrategyMock, &dataTranslationStrategyMock,
+    TranslationStubbedAccessLink accessLink(&serverCommunicationStrategyMock,
+                                            &dataTranslationStrategyMock,
                                             &sensorCommunicationStrategyMock);
 
     accessLink.start(SERVER_ADDRESS);
-    serverCommunicationStrategyMock.waitUntilSendResponseParameterErrorIsCalled();
-    sensorCommunicationStrategyMock.waitUntilSendRequestIsCalled();
+    dataTranslationStrategyMock.waitUntilTranslateControlMessageToSensorMessageRequestInvocation();
     accessLink.terminateAndJoin();
 
-    auto strategyCalled = sensorCommunicationStrategyMock.hasSendRequestBeenCalled();
+    auto strategyCalled = dataTranslationStrategyMock.hasTranslateControlMessageToSensorMessageRequestBeenCalled();
 
     ASSERT_TRUE(strategyCalled);
 }
 
+// TODO: Write test : given a loop back data translation strategy and given a valid get parameter request -> receives response with loopback response and given request
 //TEST_F(GatewayRequestHandlingAcceptanceTest,
 //       given_aParameterErrorSensorMessage_when_receivesResultFromSensor_then_serverCommunicationStrategyHasToSendResponseParameterError) {
 //    ServerCommunicationStrategyMock serverCommunicationStrategyMock;

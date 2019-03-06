@@ -136,17 +136,84 @@ namespace TestFunctions {
 }
 
 namespace Given {
+    using namespace Sensor::FakeParameter;
+    using ResponseAssembler = Assemble::ServerResponseAssembler;
+    using RequestAssembler = Assemble::ServerRequestAssembler;
 
     template<typename ParametersToChoseFrom>
     static auto anInvalidGetParameterValueRequest() -> ServerCommunication::RequestTypes::GetParameterValue {
         auto invalidParameterName = TestFunctions::Parameters::nonAvailableNames<ParametersToChoseFrom>().front();
-        return Assemble::ServerRequestAssembler::getParameterValueRequest(invalidParameterName);
+        return RequestAssembler::getParameterValueRequest(invalidParameterName);
     }
 
     template<typename ParametersToChoseFrom>
     static auto aValidGetParameterValueRequest() -> ServerCommunication::RequestTypes::GetParameterValue {
         auto validParameterName = TestFunctions::Parameters::availableNames<ParametersToChoseFrom>().front();
-        return Assemble::ServerRequestAssembler::getParameterValueRequest(validParameterName);
+        return RequestAssembler::getParameterValueRequest(validParameterName);
+    }
+
+    static auto aGetUnsignedIntegerParameterValueRequest()
+    -> ServerCommunication::RequestTypes::GetParameterValue {
+        ServerCommunication::RequestTypes::GetParameterValue request = RequestAssembler::getParameterValueRequest(
+                MaskedUnsignedIntegerParameter::getStringifiedName());
+        return request;
+    }
+
+    static auto anUnsignedIntegerParameterValueResponse(uint64_t value)
+    -> ServerCommunication::ResponseType::UnsignedIntegerParameterResponse {
+        auto request = aGetUnsignedIntegerParameterValueRequest();
+        MaskedUnsignedIntegerParameter parameter;
+        auto response = ResponseAssembler::createParameterValueResponse(
+                parameter.extractMetadata(), value, std::move(request));
+        return response;
+    }
+
+    static auto aGetSignedIntegerParameterValueRequest()
+    -> ServerCommunication::RequestTypes::GetParameterValue {
+        ServerCommunication::RequestTypes::GetParameterValue request = RequestAssembler::getParameterValueRequest(
+                MaskedSignedIntegerParameter::getStringifiedName());
+        return request;
+    }
+
+    static auto aSignedIntegerParameterValueResponse(int64_t value)
+    -> ServerCommunication::ResponseType::SignedIntegerParameterResponse {
+        auto request = aGetSignedIntegerParameterValueRequest();
+        MaskedSignedIntegerParameter parameter;
+        auto response = ResponseAssembler::createParameterValueResponse(
+                parameter.extractMetadata(), value, std::move(request));
+        return response;
+    }
+
+    static auto aGetRealNumberParameterValueRequest()
+    -> ServerCommunication::RequestTypes::GetParameterValue {
+        ServerCommunication::RequestTypes::GetParameterValue request = RequestAssembler::getParameterValueRequest(
+                MaskedRealNumberParameter::getStringifiedName());
+        return request;
+    }
+
+    static auto aRealNumberParameterValueResponse(double_t value)
+    -> ServerCommunication::ResponseType::RealNumberParameterResponse {
+        auto request = aGetRealNumberParameterValueRequest();
+        MaskedRealNumberParameter parameter;
+        auto response = ResponseAssembler::createParameterValueResponse(
+                parameter.extractMetadata(), value, std::move(request));
+        return response;
+    }
+
+    static auto aGetBooleanParameterValueRequest()
+    -> ServerCommunication::RequestTypes::GetParameterValue {
+        ServerCommunication::RequestTypes::GetParameterValue request = RequestAssembler::getParameterValueRequest(
+                MaskedBooleanParameter::getStringifiedName());
+        return request;
+    }
+
+    static auto aBooleanParameterValueResponse(bool value)
+    -> ServerCommunication::ResponseType::BooleanParameterResponse {
+        auto request = aGetBooleanParameterValueRequest();
+        MaskedBooleanParameter parameter;
+        auto response = ResponseAssembler::createParameterValueResponse(
+                parameter.extractMetadata(), value, std::move(request));
+        return response;
     }
 
 }

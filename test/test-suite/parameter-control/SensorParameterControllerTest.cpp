@@ -18,91 +18,98 @@
 #ifndef SENSORGATEWAY_SENSORPARAMETERCONTROLLERTEST_CPP
 #define SENSORGATEWAY_SENSORPARAMETERCONTROLLERTEST_CPP
 
+#include <gtest/gtest.h>
+
+#include "test/utilities/mock/Function.hpp"
+#include "test/utilities/assertion/ErrorAssertion.hpp"
+
+#include "sensor-gateway/parameter-control/SensorParameterController.hpp"
+
 namespace SensorParameterControllerTestMock {
 
-//    using RealisticDataStructures = Sensor::Test::RealisticImplementation::Structures;
-//    using DevNullTranslationStrategy = Mock::DevNullDataTranslationStrategyMock<RealisticDataStructures>;
-//
-//    using DataTranslator = SensorAccessLinkElement::DataTranslator<RealisticDataStructures, RealisticDataStructures>;
-//
-//    class RequestLoopBackDataTranslatorMock final : public DataTranslator {
-//
-//    protected:
-//
-//
-//        using super = DataTranslator;
-//
-//        using super::SensorControlMessage;
-//        using super::ResponseControlMessage;
-//
-//    public:
-//
-//        explicit RequestLoopBackDataTranslatorMock() :
-//                DataTranslator(&devNullTranslationStrategy) {
-//        }
-//
-//
-//    private:
-//
-//        DevNullTranslationStrategy devNullTranslationStrategy;
-//    };
-//
-//    using SimpleServerCommunicationStrategy = ServerCommunication::ServerCommunicationStrategy<Sensor::Test::Simple::Structures>;
-//
-//    class MockServerCommunicationStrategy final : public SimpleServerCommunicationStrategy {
-//    protected:
-//        using super = SimpleServerCommunicationStrategy;
-//
-//        using Messages = std::list<super::Message>;
-//        using RawDataCycles = std::list<super::RawData>;
-//
-//    public:
-//        MockServerCommunicationStrategy() :
-//                openConnectionCalled(false),
-//                closeConnectionCalled(false) {}
-//
-//        ~MockServerCommunicationStrategy() noexcept override = default;
-//
-//        void openConnection(std::string const& serverAddress) override {
-//            openConnectionCalled.store(true);
-//        }
-//
-//        bool hasOpenConnectionBeenCalled() const {
-//            return openConnectionCalled.load();
-//        }
-//
-//        void fetchGetParameterValueNames() override {};
-//
-//        void closeConnection() override {
-//            closeConnectionCalled.store(true);
-//        }
-//
-//        bool hasCloseConnectionBeenCalled() const {
-//            return closeConnectionCalled.load();
-//        }
-//
-//        void sendMessage(super::Message&& message) override {
-//            receivedMessages.push_back(message);
-//        }
-//
-//        void sendRawData(super::RawData&& rawData) override {
-//            receivedRawData.push_back(rawData);
-//        }
-//
-//        Messages const& getReceivedMessages() const {
-//            return receivedMessages;
-//        }
-//
-//        RawDataCycles const& getReceivedRawData() const {
-//            return receivedRawData;
-//        }
-//
-//    private:
-//        Messages receivedMessages;
-//        RawDataCycles receivedRawData;
-//        AtomicFlag openConnectionCalled;
-//        AtomicFlag closeConnectionCalled;
-//    };
+    using RealisticDataStructures = Sensor::Test::RealisticImplementation::Structures;
+    using DevNullTranslationStrategy = Mock::DevNullDataTranslationStrategyMock<RealisticDataStructures>;
+
+    using DataTranslator = SensorAccessLinkElement::DataTranslator<RealisticDataStructures, RealisticDataStructures>;
+
+    class RequestLoopBackDataTranslatorMock final : public DataTranslator {
+
+    protected:
+
+
+        using super = DataTranslator;
+
+        using super::SensorControlMessage;
+        using super::ResponseControlMessage;
+
+    public:
+
+        explicit RequestLoopBackDataTranslatorMock() :
+                DataTranslator(&devNullTranslationStrategy) {
+        }
+
+
+    private:
+
+        DevNullTranslationStrategy devNullTranslationStrategy;
+    };
+
+    using SimpleServerCommunicationStrategy = ServerCommunication::ServerCommunicationStrategy<Sensor::Test::Simple::Structures>;
+
+    class MockServerCommunicationStrategy final : public SimpleServerCommunicationStrategy {
+    protected:
+        using super = SimpleServerCommunicationStrategy;
+
+        using Messages = std::list<super::Message>;
+        using RawDataCycles = std::list<super::RawData>;
+
+    public:
+        MockServerCommunicationStrategy() :
+                openConnectionCalled(false),
+                closeConnectionCalled(false) {}
+
+        ~MockServerCommunicationStrategy() noexcept override = default;
+
+        void openConnection(std::string const& serverAddress) override {
+            openConnectionCalled.store(true);
+        }
+
+        bool hasOpenConnectionBeenCalled() const {
+            return openConnectionCalled.load();
+        }
+
+        void fetchGetParameterValueNames() override {};
+
+        void closeConnection() override {
+            closeConnectionCalled.store(true);
+        }
+
+        bool hasCloseConnectionBeenCalled() const {
+            return closeConnectionCalled.load();
+        }
+
+        void sendMessage(super::Message&& message) override {
+            receivedMessages.push_back(message);
+        }
+
+        void sendRawData(super::RawData&& rawData) override {
+            receivedRawData.push_back(rawData);
+        }
+
+        Messages const& getReceivedMessages() const {
+            return receivedMessages;
+        }
+
+        RawDataCycles const& getReceivedRawData() const {
+            return receivedRawData;
+        }
+
+    private:
+        Messages receivedMessages;
+        RawDataCycles receivedRawData;
+        AtomicFlag openConnectionCalled;
+        AtomicFlag closeConnectionCalled;
+    };
 }
 
 #endif //SENSORGATEWAY_SENSORPARAMETERCONTROLLERTEST_CPP

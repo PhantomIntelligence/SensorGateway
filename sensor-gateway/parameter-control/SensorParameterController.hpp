@@ -92,7 +92,7 @@ namespace SensorAccessLinkElement {
         void process(GetParameterValueRequest&& getParameterValueRequest) noexcept {
             auto parameterName = getParameterValueRequest.payloadToString();
             auto sensorControlMessage = parameters.createGetParameterValueControlMessageFor(parameterName);
-            dataTranslator->
+//            dataTranslator->
         }
 
         using ErrorSource::linkConsumer;

@@ -67,6 +67,7 @@ namespace Sensor {
     }
 
     namespace Communication {
+        // TODO : Find a way to create low-level, hand-made *concepts*, *constraints* and/or *layout* and use them here to define better prog int, compilation clear messages and actual guidance is using this lib.
         class DataStructures {
         public:
 

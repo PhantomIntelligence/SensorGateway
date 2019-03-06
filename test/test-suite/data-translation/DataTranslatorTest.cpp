@@ -15,13 +15,14 @@
 */
 
 #include <gtest/gtest.h>
+#include <sensor-gateway/application/SensorAccessLink.hpp>
 
 #include "sensor-gateway/data-translation/DataTranslator.hpp"
 #include "test/utilities/data-model/DataModelFixture.h"
 
 #include "test/utilities/mock/ArbitraryDataSinkMock.hpp"
+#include "test/utilities/mock/DataTranslationStrategyMock.hpp"
 #include "test/utilities/mock/ErrorThrowingDataTranslationStrategyMock.hpp"
-
 
 class DataTranslatorTest : public ::testing::Test {
 
@@ -202,4 +203,34 @@ TEST_F(DataTranslatorTest,
         ASSERT_EQ(producedErrors.front(), expectedError);
         producedErrors.pop_front();
     }
+}
+
+TEST_F(DataTranslatorTest,
+        given_aSensorControlMessage_when_translateAndSendToSensor_then_callsTranslationStrategyWithSensorControlMessage) {
+    using DataStructures = Sensor::Test::RealisticImplementation::Structures;
+    using GatewayStructures = typename SensorGateway::SensorAccessLinkFactory<DataStructures>::GatewayStructures;
+    using LoopBackDataTranslationStrategyMock = Mock::DataTranslationStrategyMock<DataStructures, GatewayStructures>;
+
+    LoopBackDataTranslationStrategyMock dataTranslationStrategyMock;
+
+    auto nameHash = std::hash<std::string>{}(validParameterRequestName);
+    FakeSensorMessage fakeGetParameterRequest;
+    fakeGetParameterRequest.sensorId = static_cast<decltype(fakeGetParameterRequest.sensorId)>(nameHash);
+    fakeGetParameterRequest.messageId = expectedControlMessageRequest.getControlMessageCode();
+
+    dataTranslationStrategyMock.onTranslateControlMessageToSensorMessageRequest(
+            std::move(expectedControlMessageRequest))->returnThisSensorMessage(fakeGetParameterRequest);
+
+
+    TranslationStubbedAccessLink accessLink(&serverCommunicationStrategyMock,
+                                            &dataTranslationStrategyMock,
+                                            &sensorCommunicationStrategyMock);
+
+    accessLink.start(SERVER_ADDRESS);
+    dataTranslationStrategyMock.waitUntilTranslateControlMessageToSensorMessageRequestInvocation();
+    accessLink.terminateAndJoin();
+
+    auto strategyCalled = dataTranslationStrategyMock.hasTranslateControlMessageToSensorMessageRequestBeenCalled();
+
+    ASSERT_TRUE(strategyCalled);
 }
