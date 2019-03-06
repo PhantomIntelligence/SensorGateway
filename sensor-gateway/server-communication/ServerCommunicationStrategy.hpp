@@ -52,13 +52,13 @@ namespace ServerCommunication {
 
         virtual void sendRawData(RawData&& rawData) = 0;
 
-//        virtual void sendResponse(UnsignedIntegerParameterResponse&& unsignedIntegerParameterResponse) = 0;
-//
-//        virtual void sendResponse(SignedIntegerParameterResponse&& signedIntegerParameterResponse) = 0;
-//
-//        virtual void sendResponse(RealNumberParameterResponse&& realNumberParameterResponse) = 0;
-//
-//        virtual void sendResponse(BooleanParameterResponse&& booleanParameterResponse) = 0;
+        virtual void sendResponse(UnsignedIntegerParameterResponse&& unsignedIntegerParameterResponse) = 0;
+
+        virtual void sendResponse(SignedIntegerParameterResponse&& signedIntegerParameterResponse) = 0;
+
+        virtual void sendResponse(RealNumberParameterResponse&& realNumberParameterResponse) = 0;
+
+        virtual void sendResponse(BooleanParameterResponse&& booleanParameterResponse) = 0;
 
         virtual void sendResponse(ParameterErrorResponse&& parameterErrorResponse) = 0;
 

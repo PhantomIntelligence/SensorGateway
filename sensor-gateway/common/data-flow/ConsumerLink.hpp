@@ -22,7 +22,7 @@
 
 namespace DataFlow {
 
-    template<class T>
+    template<class T, size_t N = RING_BUFFER_DEFAULT_SIZE>
     class RingBuffer;
 
     template<class T>

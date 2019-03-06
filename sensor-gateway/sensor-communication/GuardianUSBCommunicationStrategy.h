@@ -24,6 +24,14 @@
 
 namespace SensorCommunication {
 
+    typedef struct {
+        uint16_t vendorId;
+        uint16_t productId;
+        uint8_t endpointIn;
+        uint8_t endpointOut;
+        uint16_t timeout;
+    } USBConnectionParameters;
+
     using Sensor::AWL::NUMBER_OF_DATA_BYTES;
 
     /**
@@ -38,13 +46,14 @@ namespace SensorCommunication {
         using ReconnectTime = std::chrono::time_point<SteadyClock>;
 
         using super = SensorCommunicationStrategy<Sensor::Guardian::Structures>;
+        using Request = typename super::Request;
 
         const int INTERFACE_TO_CLAIM_FROM_DEVICE = 0;
         const int VERSION_STRING_MAX_LENGTH = 32;
 
     public:
 
-        explicit GuardianUSBCommunicationStrategy();
+        explicit GuardianUSBCommunicationStrategy(USBConnectionParameters const& usbConnectionParameters);
 
         ~GuardianUSBCommunicationStrategy() noexcept override;
 
@@ -57,13 +66,15 @@ namespace SensorCommunication {
         GuardianUSBCommunicationStrategy&
         operator=(GuardianUSBCommunicationStrategy&& other)& noexcept = delete;
 
-        void openConnection() override;
+        void openConnection() final;
 
-        super::Messages fetchMessages() override;
+        void closeConnection() final;
 
-        super::RawDataCycles fetchRawDataCycles() override;
+        super::Messages fetchMessages() final;
 
-        void closeConnection() override;
+        super::RawDataCycles fetchRawDataCycles() final;
+
+        void sendRequest(Request&& request) final;
 
     private:
 
@@ -77,15 +88,6 @@ namespace SensorCommunication {
             Byte data[NUMBER_OF_DATA_BYTES];
             uint16_t padding;
         } USBSensorMessage;
-
-        typedef struct {
-            uint16_t vendorId;
-            uint16_t productId;
-            uint8_t endpointIn;
-            uint8_t endpointOut;
-            uint16_t timeout;
-        } USBConnectionParameters;
-
 
         enum VersionString {
             FIRMWARE_BUILD_DATE,

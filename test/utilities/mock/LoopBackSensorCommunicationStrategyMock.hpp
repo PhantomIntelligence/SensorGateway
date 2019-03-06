@@ -30,10 +30,11 @@ namespace Mock {
 
         using super = SensorCommunication::SensorCommunicationStrategy<T>;
 
-        using typename super::Message;
-        using typename super::Messages;
-        using typename super::RawData;
-        using typename super::RawDataCycles;
+        using Message = typename super::Message;
+        using Request = typename super::Request;
+        using Messages = typename super::Messages;
+        using RawData = typename super::RawData;
+        using RawDataCycles = typename super::RawDataCycles;
 
     public:
 
@@ -41,19 +42,33 @@ namespace Mock {
 
         ~LoopBackSensorCommunicationStrategyMock() noexcept = default;
 
-        void openConnection() {};
+        void openConnection() override {};
 
-        Messages fetchMessages() {
+        void closeConnection() override {};
+
+        Messages fetchMessages() override {
             Messages messages;
             return messages;
         }
 
-        RawDataCycles fetchRawDataCycles() {
+        RawDataCycles fetchRawDataCycles() override {
             RawDataCycles rawDataCycles;
             return rawDataCycles;
         }
 
-        void closeConnection() {}
+        void sendRequest(Request&& request) override {
+            // TODO : Complete with test/utilities/mock/Function.hpp
+        }
+
+        void waitUntilSendRequestIsCalled() {
+                // TODO : Complete with test/utilities/mock/Function.hpp
+        };
+
+        bool hasSendRequestBeenCalled() const {
+            // TODO : Complete with test/utilities/mock/Function.hpp
+            return false;
+        };
+
     };
 }
 

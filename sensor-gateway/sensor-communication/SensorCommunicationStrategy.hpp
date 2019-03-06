@@ -29,6 +29,8 @@ namespace SensorCommunication {
         typedef typename DATA::Message Message;
         typedef typename DATA::RawData RawData;
 
+        using Request = Message;
+
         using Messages = std::array<Message, DATA::MAX_NUMBER_OF_BULK_FETCHABLE_MESSAGES>;
         using RawDataCycles = std::array<RawData, DATA::MAX_NUMBER_OF_BULK_FETCHABLE_RAW_DATA_CYCLES>;
 
@@ -36,11 +38,13 @@ namespace SensorCommunication {
 
         virtual void openConnection() = 0;
 
+        virtual void closeConnection() = 0;
+
         virtual Messages fetchMessages() = 0;
 
         virtual RawDataCycles fetchRawDataCycles() = 0;
 
-        virtual void closeConnection() = 0;
+        virtual void sendRequest(Request&& request) = 0;
 
     };
 }

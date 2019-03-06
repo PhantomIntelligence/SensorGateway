@@ -6,7 +6,7 @@
 #include "sensor-gateway/common/data-structure/sensor/AWLStructures.h"
 #include "sensor-gateway/common/data-structure/gateway/SensorMessage.hpp"
 
-using SensorMessage = typename DataFlow::SensorMessage<Sensor::AWL::Structures::AWLMessageDefinition>;
+using SensorMessage = typename DataFlow::SensorMessage<Sensor::AWL::Structures::MessageDefinition>;
 using DataFlow::PixelId;
 using DataFlow::MessageId;
 using DataFlow::SensorId;

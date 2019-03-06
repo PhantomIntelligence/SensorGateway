@@ -27,7 +27,7 @@
 #include "test/utilities/mock/ErrorThrowingSensorCommunicationStrategyMock.hpp"
 
 using TestFunctions::DataTestUtil;
-using SensorAccessLink = SensorGateway::SensorAccessLink<Sensor::Test::Simple::Structures, Sensor::Test::Simple::Structures>;
+using SensorAccessLink = SensorGateway::Details::SensorAccessLink<Sensor::Test::Simple::Structures, Sensor::Test::Simple::Structures>;
 
 class SensorAccessLinkTest : public ::testing::Test {
 public:
@@ -130,6 +130,10 @@ namespace SensorAccessLinkTestMock {
             std::this_thread::sleep_for(std::chrono::milliseconds(5));
             std::this_thread::yield();
             return createdRawDataCycles;
+        }
+
+        void sendRequest(typename super::Request&& request) override {
+            // TODO : Complete with test/utilities/mock/Function.hpp
         }
 
         void waitUntilFetchMessagesHasBeenCalledEnough() {

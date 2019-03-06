@@ -87,12 +87,6 @@ namespace SensorAccessLinkElement {
             }
         };
 
-
-        template<typename N>
-        SensorControlMessage createGetParameterValueControlMessage(N parameterName) const {
-
-        }
-
         using ResponseControlMessageSource::linkConsumer;
         using ErrorSource::linkConsumer;
 

@@ -84,6 +84,14 @@ namespace Mock {
             mockFunctionSensorMessageToControlMessageResult.returnThis(parameterControlMessageToMap);
         }
 
+        void waitUntilTranslateControlMessageToSensorMessageRequestInvocation() {
+            return mockFunctionControlMessageToSensorMessageRequest.waitUntilInvocation();
+        }
+
+        void hasTranslateControlMessageToSensorMessageRequestBeenCalled() {
+            return mockFunctionControlMessageToSensorMessageRequest.hasBeenInvoked();
+        }
+
     private:
 
         MockFunctionControlMessageToSensorMessageRequest mockFunctionControlMessageToSensorMessageRequest;

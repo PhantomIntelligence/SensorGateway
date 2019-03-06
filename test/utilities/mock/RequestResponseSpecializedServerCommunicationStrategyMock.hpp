@@ -17,9 +17,11 @@
 #ifndef SENSORGATEWAY_REQUESTRESPONSESPECIALIZEDSERVERCOMMUNICATIONSTRATEGYMOCK_HPP
 #define SENSORGATEWAY_REQUESTRESPONSESPECIALIZEDSERVERCOMMUNICATIONSTRATEGYMOCK_HPP
 
-#include <test/utilities/data-model/DataModelFixture.h>
 #include "sensor-gateway/server-communication/ServerCommunicationStrategy.hpp"
+
+#include "test/utilities/data-model/DataModelFixture.h"
 #include "test/utilities/data-model/FakeParameterConstants.hpp"
+#include "test/utilities/mock/Function.hpp"
 
 namespace Mock {
 
@@ -39,9 +41,18 @@ namespace Mock {
         using GetParameterValueContent = typename super::GetParameterValueContent;
         using GetParameterValueContents = typename super::GetParameterValueContents;
         using GetParameterValueContentList = std::list<GetParameterValueContent>;
-//        using SetParameterValueBooleanContent = std::list<super::SetParameterValueBooleanContent>;
+
+        using UnsignedIntegerParameterResponse = typename super::UnsignedIntegerParameterResponse;
+        using SignedIntegerParameterResponse = typename super::SignedIntegerParameterResponse;
+        using RealNumberParameterResponse = typename super::RealNumberParameterResponse;
+        using BooleanParameterResponse = typename super::BooleanParameterResponse;
         using ParameterErrorResponse = typename super::ParameterErrorResponse;
         using ErrorMessageResponse = typename super::ErrorMessageResponse;
+
+        using MockFunctionSendUnsignedIntegerParameterResponse = Mock::Function<StringLiteral<decltype("mock->sendParameter<UnsignedInteger>"_ToString)>, Mock::VoidType, UnsignedIntegerParameterResponse>;
+        using MockFunctionSendSignedIntegerParameterResponse = Mock::Function<StringLiteral<decltype("mock->sendParameter<SignedInteger>"_ToString)>, Mock::VoidType, SignedIntegerParameterResponse>;
+        using MockFunctionSendRealNumberParameterResponse = Mock::Function<StringLiteral<decltype("mock->sendParameter<RealNumber>"_ToString)>, Mock::VoidType, RealNumberParameterResponse>;
+        using MockFunctionSendBooleanParameterResponse = Mock::Function<StringLiteral<decltype("mock->sendParameter<Boolean>"_ToString)>, Mock::VoidType, BooleanParameterResponse>;
 
         using ParameterNames = std::list<std::string>;
 
@@ -140,6 +151,22 @@ namespace Mock {
         }
 
         void sendRawData(typename super::RawData&& rawData) override {
+        }
+
+        void sendResponse(UnsignedIntegerParameterResponse&& response) override {
+            mockFunctionSendUnsignedIntegerParameterResponse.invokeVoidReturn(std::forward<UnsignedIntegerParameterResponse>(response));
+        }
+
+        void sendResponse(SignedIntegerParameterResponse&& response) override {
+            mockFunctionSendSignedIntegerParameterResponse.invokeVoidReturn(std::forward<SignedIntegerParameterResponse>(response));
+        }
+
+        void sendResponse(RealNumberParameterResponse&& response) override {
+            mockFunctionSendRealNumberParameterResponse.invokeVoidReturn(std::forward<RealNumberParameterResponse>(response));
+        }
+
+        void sendResponse(BooleanParameterResponse&& response) override {
+            mockFunctionSendBooleanParameterResponse.invokeVoidReturn(std::forward<BooleanParameterResponse>(response));
         }
 
         void sendResponse(ParameterErrorResponse&& parameterErrorResponse) override {
@@ -252,6 +279,11 @@ namespace Mock {
         AtomicCounter numberOfUniqueInvalidGetParameterValueContentsToReturn;
         AtomicCounter numberOfDuplicateInvalidGetParameterValueContentsToReturn;
         GetParameterValueContents returnedGetParameterValueContents;
+
+        MockFunctionSendUnsignedIntegerParameterResponse mockFunctionSendUnsignedIntegerParameterResponse;
+        MockFunctionSendSignedIntegerParameterResponse  mockFunctionSendSignedIntegerParameterResponse;
+        MockFunctionSendRealNumberParameterResponse  mockFunctionSendRealNumberParameterResponse;
+        MockFunctionSendBooleanParameterResponse  mockFunctionSendBooleanParameterResponse;
     };
 }
 

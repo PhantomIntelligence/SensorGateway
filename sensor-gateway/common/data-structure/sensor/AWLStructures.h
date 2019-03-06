@@ -31,30 +31,30 @@ namespace Sensor {
             Metrics::TimeTrackingDefinition<
                     AWL::NUMBER_OF_SENSOR_TIME_POINTS,
                     AWL::NUMBER_OF_GATEWAY_TIME_POINTS
-            > AWLTimeTrackingDefinition;
+            > TimeTrackingDefinition;
 
             typedef typename
             Sensor::SensorMessageDefinition<
                     AWL::_16::NUMBER_OF_PIXELS,
-                    AWLTimeTrackingDefinition
-            > AWLMessageDefinition;
+                    TimeTrackingDefinition
+            > MessageDefinition;
 
             typedef typename
             Sensor::RawDataDefinition<
                     Sensor::RawDataTypes::AWL,
                     Sensor::AWL::_16::NUMBER_OF_CHANNELS,
                     Sensor::AWL::RAW_DATA_SAMPLING_LENGTH
-            > AWLRawDataDefinition;
+            > RawDataDefinition;
 
             typedef typename
             Sensor::ControlMessageDefinition<
                     Sensor::ControlMessagePayloadTypes::AWL,
                     Sensor::AWL::MAX_COMMAND_PAYLOAD_SIZE
-            > AWLControlMessageDefinition;
+            > ControlMessageDefinition;
 
-            typedef typename DataFlow::AWLMessage<AWLMessageDefinition> Message;
-            typedef typename DataFlow::RawData<AWLRawDataDefinition> RawData;
-            typedef typename DataFlow::ControlMessage<AWLControlMessageDefinition> ControlMessage;
+            typedef typename DataFlow::AWLMessage<MessageDefinition> Message;
+            typedef typename DataFlow::RawData<RawDataDefinition> RawData;
+            typedef typename DataFlow::ControlMessage<ControlMessageDefinition> ControlMessage;
 
             static size_t const MAX_NUMBER_OF_BULK_FETCHABLE_MESSAGES = 1;
             static size_t const MAX_NUMBER_OF_BULK_FETCHABLE_RAW_DATA_CYCLES = 1;

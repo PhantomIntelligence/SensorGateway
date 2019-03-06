@@ -1,5 +1,5 @@
 /**
-	Copyright 2014-2018 Phantom Intelligence Inc.
+	Copyright 2014-2019 Phantom Intelligence Inc.
 
 	Licensed under the Apache License, Version 2.0 (the "License");
 	you may not use this file except in compliance with the License.
@@ -24,41 +24,21 @@
 
 namespace SensorGateway {
 
-    using GuardianStructures = Sensor::Guardian::Structures;
-    using GuardianGatewayStructures = Sensor::Gateway::Structures<
-            GuardianStructures::GuardianMessageDefinition,
-            GuardianStructures::GuardianRawDataDefinition,
-            GuardianStructures::GuardianControlMessageDefinition>;
+    struct GuardianAccessLink {
 
-    class GuardianAccessLink final : public SensorAccessLink<GuardianStructures, GuardianGatewayStructures> {
+        using CommunicationStructures = Sensor::Guardian::Structures;
+        using Factory = SensorAccessLinkFactory<CommunicationStructures>;
+        using AccessLink = typename Factory::AccessLink;
+        using GatewayStructures = typename Factory::GatewayStructures;
 
-    protected:
+        using ServerCommunicationStrategy = AccessLink::ServerCommunicationStrategy;
+        using DataTranslationStrategy = DataTranslation::GuardianTranslationStrategy;
+        using SensorCommunicationStrategy = SensorCommunication::GuardianUSBCommunicationStrategy;
 
-        using super = SensorAccessLink<GuardianStructures, GuardianGatewayStructures>;
-
-        using super::ServerCommunicationStrategy;
-
-    public:
-
-        explicit GuardianAccessLink(ServerCommunicationStrategy* serverCommunicationStrategy)
-                : super(serverCommunicationStrategy,
-                        &guardianTranslationStrategy,
-                        &guardianUSBCommunicationStrategy) {}
-
-        ~GuardianAccessLink() noexcept = default;
-
-        GuardianAccessLink(GuardianAccessLink const& other) = delete;
-
-        GuardianAccessLink(GuardianAccessLink&& other) noexcept = delete;
-
-        GuardianAccessLink& operator=(GuardianAccessLink const& other)& = delete;
-
-        GuardianAccessLink& operator=(GuardianAccessLink&& other)& noexcept = delete;
-
-    private:
-
-        DataTranslation::GuardianTranslationStrategy guardianTranslationStrategy;
-        SensorCommunication::GuardianUSBCommunicationStrategy guardianUSBCommunicationStrategy;
+        SensorCommunication::USBConnectionParameters sensorConnectionParameters{0x058b, 0x0050,
+                                                                                  (129),
+                                                                                  (2),
+                                                                                  3000};
     };
 }
 

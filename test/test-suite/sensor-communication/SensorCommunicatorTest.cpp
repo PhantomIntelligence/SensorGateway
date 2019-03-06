@@ -46,6 +46,7 @@ namespace SensorCommunicatorTestMock {
     protected:
 
         using super = SensorCommunication::SensorCommunicationStrategy<Sensor::Test::Simple::Structures>;
+        using Request = typename super::Request;
 
     public:
 
@@ -120,6 +121,10 @@ namespace SensorCommunicatorTestMock {
 
         void closeConnection() override {
             closeConnectionCalled.store(true);
+        }
+
+        void sendRequest(Request&& request) override {
+            // TODO : complete this function with test/utilities/mock/Function.hpp
         }
 
         bool hasOpenConnectionBeenCalled() const {
@@ -220,6 +225,7 @@ public:
     using ErrorSinkMock = Mock::ArbitraryDataSinkMock<Error>;
     using ErrorProcessingScheduler = DataFlow::DataProcessingScheduler<Error, ErrorSinkMock, 1>;
     using ThrowingSensorCommunicationStrategyMock = Mock::ErrorThrowingSensorCommunicationStrategyMock<Sensor::Test::Simple::Structures>;
+
 protected:
 
     SensorCommunicatorTest() = default;

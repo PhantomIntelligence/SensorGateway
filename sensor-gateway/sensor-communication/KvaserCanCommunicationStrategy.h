@@ -31,8 +31,11 @@ namespace SensorCommunication {
         unsigned long const CANLIB_READ_WAIT_INFINITE_DELAY = -1; // WARNING !!! --> NEVER change -1 with infinity because the code CRASH
         using super = SensorCommunicationStrategy<Sensor::AWL::Structures>;
 
+        using Request = typename super::Message;
+
     public:
-        explicit KvaserCanCommunicationStrategy();
+
+        explicit KvaserCanCommunicationStrategy(int32_t const& channelId = 0);
 
         ~KvaserCanCommunicationStrategy() noexcept final;
 
@@ -47,11 +50,13 @@ namespace SensorCommunication {
 
         void openConnection() final;
 
+        void closeConnection() final;
+
         super::Messages fetchMessages() final;
 
         super::RawDataCycles fetchRawDataCycles() final;
 
-        void closeConnection() final;
+        void sendRequest(Request&& request) final;
 
     private:
         void throwErrorIfNecessary(canStatus const& errorCode, std::string const& callOrigin);

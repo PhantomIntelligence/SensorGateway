@@ -45,7 +45,7 @@ namespace Metrics {
 
 namespace DataFlow {
     uint8_t const NUMBER_OF_CONCURRENT_INPUT_FOR_SENSOR_ACCESS_LINK_ELEMENTS = 1;
-    size_t const RING_BUFFER_SIZE = 256;
+    size_t const RING_BUFFER_DEFAULT_SIZE = 256;
 }
 
 namespace CommandId {

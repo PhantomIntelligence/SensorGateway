@@ -135,7 +135,7 @@ TEST_F(RingBufferTest, given_aFullBuffer_when_writesOneNewData_then_overwritesTh
     auto firstData = createRandomSimpleData();
     auto firstDataCopy = SimpleMessage(firstData);
     simpleBuffer.write(std::move(firstData));
-    for (auto i = 0; i < RING_BUFFER_SIZE; ++i) {
+    for (auto i = 0; i < RING_BUFFER_DEFAULT_SIZE; ++i) {
         simpleBuffer.write(createRandomSimpleData());
     }
 
@@ -152,7 +152,7 @@ TEST_F(RingBufferTest, given_aFullBuffer_when_writesMoreThanOneData_then_overwri
     auto secondDataCopy = SimpleMessage(firstData);
     simpleBuffer.write(std::move(firstData));
     simpleBuffer.write(std::move(secondData));
-    for (auto i = 0; i < RING_BUFFER_SIZE; ++i) {
+    for (auto i = 0; i < RING_BUFFER_DEFAULT_SIZE; ++i) {
         simpleBuffer.write(createRandomSimpleData());
     }
 

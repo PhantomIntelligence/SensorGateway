@@ -28,9 +28,9 @@ namespace TestUtilities {
         static size_t const MAX_NUMBER_OF_SENSOR_MESSAGES_CURRENTLY_NEEDED_FOR_TEST = 2;
         using AWL16Structures = Sensor::AWL::Structures;
         using AWL16GatewayStructures = Sensor::Gateway::Structures<
-                AWL16Structures::AWLMessageDefinition,
-                AWL16Structures::AWLRawDataDefinition,
-                AWL16Structures::AWLControlMessageDefinition
+                AWL16Structures::MessageDefinition,
+                AWL16Structures::RawDataDefinition,
+                AWL16Structures::ControlMessageDefinition
         >;
         using Message = AWL16GatewayStructures::Message;
         using SensorMessages = std::array<Message, MAX_NUMBER_OF_SENSOR_MESSAGES_CURRENTLY_NEEDED_FOR_TEST>;

@@ -31,30 +31,30 @@ namespace Sensor {
             Metrics::TimeTrackingDefinition<
                     Guardian::NUMBER_OF_SENSOR_TIME_POINTS,
                     Guardian::NUMBER_OF_GATEWAY_TIME_POINTS
-            > GuardianTimeTrackingDefinition;
+            > TimeTrackingDefinition;
 
             typedef typename
             Sensor::SensorMessageDefinition<
                     Guardian::NUMBER_OF_PIXELS,
-                    GuardianTimeTrackingDefinition
-            > GuardianMessageDefinition;
+                    TimeTrackingDefinition
+            > MessageDefinition;
 
             typedef typename
             Sensor::RawDataDefinition<
                     RawDataTypes::GUARDIAN,
                     Guardian::NUMBER_OF_CHANNELS,
                     Guardian::RAW_DATA_SAMPLING_LENGTH
-            > GuardianRawDataDefinition;
+            > RawDataDefinition;
 
             typedef typename
             Sensor::ControlMessageDefinition<
                     ControlMessagePayloadTypes::GUARDIAN,
                     Guardian::MAX_COMMAND_PAYLOAD_SIZE
-            > GuardianControlMessageDefinition;
+            > ControlMessageDefinition;
 
-            typedef typename DataFlow::AWLMessage<GuardianMessageDefinition> Message;
-            typedef typename DataFlow::RawData<GuardianRawDataDefinition> RawData;
-            typedef typename DataFlow::ControlMessage<GuardianControlMessageDefinition> ControlMessage;
+            typedef typename DataFlow::AWLMessage<MessageDefinition> Message;
+            typedef typename DataFlow::RawData<RawDataDefinition> RawData;
+            typedef typename DataFlow::ControlMessage<ControlMessageDefinition> ControlMessage;
 
             static size_t const MAX_NUMBER_OF_BULK_FETCHABLE_MESSAGES = 32;
             static size_t const MAX_NUMBER_OF_BULK_FETCHABLE_RAW_DATA_CYCLES = 8;
