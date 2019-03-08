@@ -34,7 +34,7 @@ namespace DataTranslation {
         using super = DataTranslationStrategy<AWLStructures, AWLGatewayStructures>;
         using super::SensorMessage;
         using super::SensorRawData;
-        using super::ParameterControlMessage;
+        using super::SensorControlMessage;
 
         using super::MessageSource;
         using super::RawDataSource;
@@ -49,9 +49,9 @@ namespace DataTranslation {
 
         void translateRawData(SensorRawData&& serverRawData) override;
 
-        SensorMessage translateControlMessageToSensorMessageRequest(ParameterControlMessage&& parameterControlMessage) override;
+        SensorMessage translateControlMessageToSensorMessageRequest(SensorControlMessage&& sensorControlMessage) override;
 
-        ParameterControlMessage translateSensorMessageToControlMessageResult(SensorMessage&& sensorMessage) override;
+        SensorControlMessage translateSensorMessageToControlMessageResult(SensorMessage&& sensorMessage) override;
 
         static inline DataFlow::Intensity const convertIntensityToSNR(DataFlow::Intensity const& intensity) noexcept {
             DataFlow::Intensity const snr = (intensity / 2.0) - 21; // w+f

@@ -141,14 +141,26 @@ namespace Given {
     using RequestAssembler = Assemble::ServerRequestAssembler;
 
     template<typename ParametersToChoseFrom>
-    static auto anInvalidGetParameterValueRequest() -> ServerCommunication::RequestTypes::GetParameterValue {
+    static auto anInvalidParameterName() -> std::string {
         auto invalidParameterName = TestFunctions::Parameters::nonAvailableNames<ParametersToChoseFrom>().front();
+        return invalidParameterName;
+    }
+
+    template<typename ParametersToChoseFrom>
+    static auto anInvalidGetParameterValueRequest() -> ServerCommunication::RequestTypes::GetParameterValue {
+        auto invalidParameterName = anInvalidParameterName<ParametersToChoseFrom>();
         return RequestAssembler::getParameterValueRequest(invalidParameterName);
     }
 
     template<typename ParametersToChoseFrom>
-    static auto aValidGetParameterValueRequest() -> ServerCommunication::RequestTypes::GetParameterValue {
+    static auto aValidParameterName() -> std::string {
         auto validParameterName = TestFunctions::Parameters::availableNames<ParametersToChoseFrom>().front();
+        return validParameterName;
+    }
+
+    template<typename ParametersToChoseFrom>
+    static auto aValidGetParameterValueRequest() -> ServerCommunication::RequestTypes::GetParameterValue {
+        auto validParameterName = aValidParameterName<ParametersToChoseFrom>();
         return RequestAssembler::getParameterValueRequest(validParameterName);
     }
 

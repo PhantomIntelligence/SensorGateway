@@ -26,10 +26,11 @@ namespace SensorAccessLinkElement {
     class ServerCommunicator : public DataFlow::DataSink<typename T::Message>,
                                public DataFlow::DataSink<typename T::RawData>,
                                public DataFlow::DataSource<ErrorHandling::SensorAccessLinkError> {
-
-    protected:
+    public:
 
         using ServerCommunicationStrategy = ServerCommunication::ServerCommunicationStrategy<T>;
+
+    protected:
 
         using Message = typename T::Message;
         using RawData = typename T::RawData;

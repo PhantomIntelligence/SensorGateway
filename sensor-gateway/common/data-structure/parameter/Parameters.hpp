@@ -133,9 +133,9 @@ namespace Sensor {
                 auto const controlMessagePayloads = createGetParameterValueControlMessagePayloads();
                 auto const controlMessagePayload = controlMessagePayloads[index];
                 using MessagePayload = decltype(controlMessagePayload);
-                using ParameterControlMessage = typename DataFlow::ControlMessage<ControlMessageDefinition<typename MessagePayload::value_type, controlMessagePayload.size()>>;
-                auto code = ParameterControlMessage::ControlMessageCode::GET_VALUE;
-                ParameterControlMessage controlMessage(code, controlMessagePayload);
+                using SensorControlMessage = typename DataFlow::ControlMessage<ControlMessageDefinition<typename MessagePayload::value_type, controlMessagePayload.size()>>;
+                auto code = SensorControlMessage::ControlMessageCode::GET_VALUE;
+                SensorControlMessage controlMessage(code, controlMessagePayload);
                 return controlMessage;
             }
 

@@ -35,7 +35,7 @@ namespace Mock {
 
         using SensorMessage = typename super::SensorMessage;
         using SensorRawData = typename super::SensorRawData;
-        using ParameterControlMessage = typename super::ParameterControlMessage;
+        using SensorControlMessage = typename super::SensorControlMessage;
 
     public:
 
@@ -48,12 +48,12 @@ namespace Mock {
         void translateRawData(SensorRawData&& sensorRawData) override {}
 
         SensorMessage
-        translateControlMessageToSensorMessageRequest(ParameterControlMessage&& parameterControlMessage) override {
+        translateControlMessageToSensorMessageRequest(SensorControlMessage&& sensorControlMessage) override {
             return super::SensorMessage::returnDefaultData();
         }
 
-        ParameterControlMessage translateSensorMessageToControlMessageResult(SensorMessage&& sensorMessage) override {
-            return super::ParameterControlMessage::returnDefaultData();
+        SensorControlMessage translateSensorMessageToControlMessageResult(SensorMessage&& sensorMessage) override {
+            return super::SensorControlMessage::returnDefaultData();
         }
 
     };

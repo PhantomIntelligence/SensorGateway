@@ -66,8 +66,9 @@ namespace SensorAccessLinkElement {
 
         SensorParameterController& operator=(SensorParameterController&& other)& noexcept = delete;
 
-        void linkElements() {
-            dataTranslator->linkConsumer(&responseControlMessageScheduler);
+        template<typename ResponseSource>
+        void linkSensorControlMessageResponseSource(ResponseSource* responseSource) {
+            responseSource->linkConsumer(&responseControlMessageScheduler);
 
             // TODO: implement a while(!allUpAndRunning()) {...
             // Yield and sleep to allow correct connection

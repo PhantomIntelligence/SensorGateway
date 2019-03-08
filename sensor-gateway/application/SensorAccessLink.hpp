@@ -55,10 +55,13 @@ namespace SensorGateway {
             using ErrorScheduler = DataFlow::DataProcessingScheduler<Error, ThisClass, 5>;
 
         public:
+//            using ServerCommunicationStrategy = ServerCommunication::ServerCommunicationStrategy<SERVER_STRUCTURES>;
+//            using DataTranslationStrategy = DataTranslation::DataTranslationStrategy<SENSOR_STRUCTURES, SERVER_STRUCTURES>;
+//            using SensorCommunicationStrategy = SensorCommunication::SensorCommunicationStrategy<SENSOR_STRUCTURES>;
 
-            using ServerCommunicationStrategy = ServerCommunication::ServerCommunicationStrategy<SERVER_STRUCTURES>;
-            using DataTranslationStrategy = DataTranslation::DataTranslationStrategy<SENSOR_STRUCTURES, SERVER_STRUCTURES>;
-            using SensorCommunicationStrategy = SensorCommunication::SensorCommunicationStrategy<SENSOR_STRUCTURES>;
+            using ServerCommunicationStrategy = typename ServerCommunicator::ServerCommunicationStrategy;
+            using DataTranslationStrategy = typename DataTranslator::DataTranslationStrategy;
+            using SensorCommunicationStrategy = typename SensorCommunicator::SensorCommunicationStrategy;
 
             explicit SensorAccessLink(ServerCommunicationStrategy* serverCommunicationStrategy,
                                       DataTranslationStrategy* dataTranslationStrategy,
@@ -140,7 +143,7 @@ namespace SensorGateway {
                 dataTranslationStrategy->linkConsumer(&serverCommunicatorRawDataScheduler);
                 sensorCommunicator.linkConsumer(&translatorMessageScheduler);
                 sensorCommunicator.linkConsumer(&translatorRawDataScheduler);
-                sensorParameterController.linkElements();
+                sensorParameterController.linkSensorControlMessageResponseSource(dataTranslationStrategy);
 
                 sensorCommunicator.linkConsumer(&errorScheduler);
                 dataTranslator.linkConsumer(&errorScheduler);

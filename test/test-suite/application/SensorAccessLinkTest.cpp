@@ -214,13 +214,13 @@ namespace SensorAccessLinkTestMock {
 
         super::SensorMessage
         translateControlMessageToSensorMessageRequest(
-                super::ParameterControlMessage&& parameterControlMessage) override {
+                super::SensorControlMessage&& sensorControlMessage) override {
             return super::SensorMessage::returnDefaultData();
         }
 
-        super::ParameterControlMessage
+        super::SensorControlMessage
         translateSensorMessageToControlMessageResult(super::SensorMessage&& sensorMessage) override {
-            return super::ParameterControlMessage::returnDefaultData();
+            return super::SensorControlMessage::returnDefaultData();
         }
     };
 

@@ -72,7 +72,23 @@ namespace Mock {
             return consumedData;
         }
 
+        bool hasConsumed(T const& data) const& noexcept {
+            auto dataConsumed = std::any_of(consumedData.cbegin(), consumedData.cend(), SameDataInstance(data));
+            return dataConsumed;
+        }
+
     private:
+
+
+        struct SameDataInstance {
+            T const value;
+
+            SameDataInstance(T const& t) : value(t) {}
+
+            bool const operator()(T const& t) const {
+                return t == value;
+            }
+        };
 
         AtomicCounter actualNumberOfDataConsumed;
         AtomicCounter numberOfDataToConsume;

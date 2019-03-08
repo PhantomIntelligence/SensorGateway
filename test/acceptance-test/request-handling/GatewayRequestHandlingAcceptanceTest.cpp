@@ -94,10 +94,10 @@ TEST_F(GatewayRequestHandlingAcceptanceTest,
                                             &sensorCommunicationStrategyMock);
 
     accessLink.start(SERVER_ADDRESS);
-    sensorCommunicationStrategyMock.waitUntilSendRequestIsCalled();
+    sensorCommunicationStrategyMock.waitUntilSendRequestInvocation();
     accessLink.terminateAndJoin();
 
-    auto strategyCalled = sensorCommunicationStrategyMock.hasSendRequestBeenCalled();
+    auto strategyCalled = sensorCommunicationStrategyMock.hasSendRequestBeenInvoked();
 
     ASSERT_TRUE(strategyCalled);
 }

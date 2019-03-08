@@ -49,6 +49,7 @@ namespace DataTranslatorTestMock {
 
     using Structures = DataTranslatorTest::Structures;
     using DataTranslationStrategy = DataTranslation::DataTranslationStrategy<Structures, Structures>;
+
     class MockDataTranslationStrategy final :
             public DataTranslationStrategy {
 
@@ -83,13 +84,13 @@ namespace DataTranslatorTestMock {
 
         super::SensorMessage
         translateControlMessageToSensorMessageRequest(
-                super::ParameterControlMessage&& parameterControlMessage) override {
+                super::SensorControlMessage&& sensorControlMessage) override {
             return super::SensorMessage::returnDefaultData();
         }
 
-        super::ParameterControlMessage
+        super::SensorControlMessage
         translateSensorMessageToControlMessageResult(super::SensorMessage&& sensorMessage) override {
-            return super::ParameterControlMessage::returnDefaultData();
+            return super::SensorControlMessage::returnDefaultData();
         }
 
         bool hasTranslateMessageBeenCalledWithRightSensorMessage(
@@ -115,7 +116,7 @@ namespace DataTranslatorTestMock {
 }
 
 TEST_F(DataTranslatorTest,
-       given_aTranslationStrategy_when_consumingMessage_then_callsTranslateMessageInStrategyWithTheConsumedMessage) {
+       given_aTranslationStrategy_when_consumeMessage_then_callsTranslateMessageInStrategyWithTheConsumedMessage) {
     auto message = DataTestUtil::createRandomSimpleMessageWithEmptyTimestamps();
     auto copy = Structures::Message(message);
 
@@ -129,7 +130,7 @@ TEST_F(DataTranslatorTest,
 }
 
 TEST_F(DataTranslatorTest,
-       given_aTranslationStrategy_when_consumingRawData_then_callsTranslateRawDataInStrategyWithTheConsumedRawData) {
+       given_aTranslationStrategy_when_consumeRawData_then_callsTranslateRawDataInStrategyWithTheConsumedRawData) {
     auto data = DataTestUtil::createRandomSimpleRawData();
     auto copy = Structures::RawData(data);
 
@@ -143,7 +144,7 @@ TEST_F(DataTranslatorTest,
 }
 
 TEST_F(DataTranslatorTest,
-       given_aThrowingTranslationStrategy_when_consumingMessage_then_producesAnErrorCorrectlyFormatted) {
+       given_aThrowingTranslationStrategy_when_consumeMessage_then_producesAnErrorCorrectlyFormatted) {
     auto numberOfErrorToReceive = 1;
     Mock::ArbitraryDataSinkMock<Error> sink(numberOfErrorToReceive);
     DataFlow::DataProcessingScheduler<Error, ErrorSinkMock, 1> scheduler(&sink);
@@ -166,6 +167,7 @@ TEST_F(DataTranslatorTest,
             ErrorHandling::Severity::ERROR,
             throwingMockStrategy.ERROR_CODE,
             throwingMockStrategy.MESSAGE_ERROR_MESSAGE);
+
     for (auto t = 0; t < numberOfErrorToReceive; ++t) {
         ASSERT_EQ(producedErrors.front(), expectedError);
         producedErrors.pop_front();
@@ -173,7 +175,7 @@ TEST_F(DataTranslatorTest,
 }
 
 TEST_F(DataTranslatorTest,
-       given_aThrowingTranslationStrategy_when_consumingRawData_then_producesAnErrorCorrectlyFormatted) {
+       given_aThrowingTranslationStrategy_when_consumeRawData_then_producesAnErrorCorrectlyFormatted) {
     auto numberOfErrorToReceive = 1;
     Mock::ArbitraryDataSinkMock<Error> sink(numberOfErrorToReceive);
     DataFlow::DataProcessingScheduler<Error, ErrorSinkMock, 1> scheduler(&sink);
@@ -206,31 +208,74 @@ TEST_F(DataTranslatorTest,
 }
 
 TEST_F(DataTranslatorTest,
-        given_aSensorControlMessage_when_translateAndSendToSensor_then_callsTranslationStrategyWithSensorControlMessage) {
+       given_aSensorControlMessage_when_translateAndSendToSensor_then_callsTranslationStrategyWithSensorControlMessage) {
+    using AvailableParameters = Sensor::FakeParameter::FruitBasketParameters;
+    AvailableParameters availableParameters;
+    auto validParameterName = Given::aValidParameterName<AvailableParameters>();
+    auto sensorControlMessage = availableParameters.createGetParameterValueControlMessageFor(validParameterName);
+    auto messageCopy = decltype(availableParameters.createGetParameterValueControlMessageFor(validParameterName))(
+            sensorControlMessage);
+
     using DataStructures = Sensor::Test::RealisticImplementation::Structures;
     using GatewayStructures = typename SensorGateway::SensorAccessLinkFactory<DataStructures>::GatewayStructures;
     using LoopBackDataTranslationStrategyMock = Mock::DataTranslationStrategyMock<DataStructures, GatewayStructures>;
-
+    using LoopBackDataTranslator = SensorAccessLinkElement::DataTranslator<DataStructures, GatewayStructures>;
     LoopBackDataTranslationStrategyMock dataTranslationStrategyMock;
 
-    auto nameHash = std::hash<std::string>{}(validParameterRequestName);
-    FakeSensorMessage fakeGetParameterRequest;
-    fakeGetParameterRequest.sensorId = static_cast<decltype(fakeGetParameterRequest.sensorId)>(nameHash);
-    fakeGetParameterRequest.messageId = expectedControlMessageRequest.getControlMessageCode();
+    LoopBackDataTranslator dataTranslator(&dataTranslationStrategyMock);
 
-    dataTranslationStrategyMock.onTranslateControlMessageToSensorMessageRequest(
-            std::move(expectedControlMessageRequest))->returnThisSensorMessage(fakeGetParameterRequest);
+    dataTranslator.translateAndSendToSensor(std::move(sensorControlMessage));
 
-
-    TranslationStubbedAccessLink accessLink(&serverCommunicationStrategyMock,
-                                            &dataTranslationStrategyMock,
-                                            &sensorCommunicationStrategyMock);
-
-    accessLink.start(SERVER_ADDRESS);
     dataTranslationStrategyMock.waitUntilTranslateControlMessageToSensorMessageRequestInvocation();
-    accessLink.terminateAndJoin();
 
-    auto strategyCalled = dataTranslationStrategyMock.hasTranslateControlMessageToSensorMessageRequestBeenCalled();
+    auto strategyCalled = dataTranslationStrategyMock.hasTranslateControlMessageToSensorMessageRequestBeenCalledWith(
+            messageCopy);
+
+    ASSERT_TRUE(strategyCalled);
+}
+
+
+// Medium test
+TEST_F(DataTranslatorTest,
+       given_aSensorControlMessage_when_translateAndSendToSensor_then_producesTheResultOfTranslation) {
+    using AvailableParameters = Sensor::FakeParameter::FruitBasketParameters;
+    AvailableParameters availableParameters;
+    auto validParameterName = Given::aValidParameterName<AvailableParameters>();
+    auto sensorControlMessage = availableParameters.createGetParameterValueControlMessageFor(validParameterName);
+    auto messageCopy = decltype(availableParameters.createGetParameterValueControlMessageFor(validParameterName))(
+            sensorControlMessage);
+
+    using DataStructures = Sensor::Test::RealisticImplementation::Structures;
+    using GatewayStructures = typename SensorGateway::SensorAccessLinkFactory<DataStructures>::GatewayStructures;
+    using LoopBackDataTranslationStrategyMock = Mock::DataTranslationStrategyMock<DataStructures, GatewayStructures>;
+    using LoopBackDataTranslator = SensorAccessLinkElement::DataTranslator<DataStructures, GatewayStructures>;
+    LoopBackDataTranslationStrategyMock dataTranslationStrategyMock;
+    using FakeSensorMessage = typename DataStructures::Message;
+
+    LoopBackDataTranslator dataTranslator(&dataTranslationStrategyMock);
+
+    using FakeSensorMessageSinkMock =Mock::ArbitraryDataSinkMock<FakeSensorMessage>;
+    FakeSensorMessageSinkMock sink(1);
+    DataFlow::DataProcessingScheduler<FakeSensorMessage, FakeSensorMessageSinkMock, 1> scheduler(&sink);
+
+    dataTranslator.linkConsumer(&scheduler);
+
+    // TODO : generate a better "random" fakeTranslationResult, depending on the `Structure::Message` type
+    FakeSensorMessage fakeTranslationResult;
+    fakeTranslationResult.messageId = 42;
+    fakeTranslationResult.sensorId = 15;
+
+    dataTranslationStrategyMock
+            .onTranslateControlMessageToSensorMessageRequest(std::move(messageCopy))
+            ->returnThisSensorMessage(fakeTranslationResult);
+
+
+    dataTranslator.translateAndSendToSensor(std::move(sensorControlMessage));
+
+    sink.waitConsumptionToBeReached();
+    scheduler.terminateAndJoin();
+
+    auto strategyCalled = sink.hasConsumed(fakeTranslationResult);
 
     ASSERT_TRUE(strategyCalled);
 }

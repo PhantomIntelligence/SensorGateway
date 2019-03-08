@@ -49,6 +49,7 @@ namespace SensorAccessLinkElement {
         using GetParameter = StringLiteral<decltype("get parameter"_ToString)>;
 
     public:
+
         explicit RequestHandler(ServerCommunicator* serverCommunicator,
                                 ProcessGetParameterValueRequest processGetParameterValueRequest) :
                 serverCommunicator(serverCommunicator),
@@ -75,7 +76,7 @@ namespace SensorAccessLinkElement {
             }
         }
 
-        void handleGetParameterValueRequest(GetParameterValueRequest&& getParameterValueRequest) {
+        virtual void handleGetParameterValueRequest(GetParameterValueRequest&& getParameterValueRequest) {
             auto requestIsValid = true;
             std::string const& parameterName = getParameterValueRequest.payloadToString();
             try {

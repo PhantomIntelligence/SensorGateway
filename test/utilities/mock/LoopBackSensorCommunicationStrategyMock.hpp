@@ -36,6 +36,8 @@ namespace Mock {
         using RawData = typename super::RawData;
         using RawDataCycles = typename super::RawDataCycles;
 
+        using MockFunctionSendRequest = Mock::Function<StringLiteral<decltype("mock->sendRequest"_ToString)>, Mock::VoidType, Request>;
+
     public:
 
         LoopBackSensorCommunicationStrategyMock() = default;
@@ -57,17 +59,26 @@ namespace Mock {
         }
 
         void sendRequest(Request&& request) override {
-            // TODO : Complete with test/utilities/mock/Function.hpp
+            mockFunctionSendRequest.invokeVoidReturn(std::forward<Request>(request));
         }
 
-        void waitUntilSendRequestIsCalled() {
-                // TODO : Complete with test/utilities/mock/Function.hpp
+        void waitUntilSendRequestInvocation() {
+            mockFunctionSendRequest.waitUntilInvocation();
         };
 
-        bool hasSendRequestBeenCalled() const {
-            // TODO : Complete with test/utilities/mock/Function.hpp
+        bool hasSendRequestBeenInvoked() const {
+            mockFunctionSendRequest.hasBeenInvoked();
             return false;
         };
+
+        bool hasSendRequestBeenInvokedWith(Request const& request) const {
+            mockFunctionSendRequest.hasBeenInvokedWith(request);
+            return false;
+        };
+
+    private:
+
+        MockFunctionSendRequest mockFunctionSendRequest;
 
     };
 }

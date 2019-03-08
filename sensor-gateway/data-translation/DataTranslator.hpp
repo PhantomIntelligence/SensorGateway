@@ -24,20 +24,23 @@ namespace SensorAccessLinkElement {
     template<class SENSOR_STRUCTURES, class SERVER_STRUCTURES>
     class DataTranslator : public DataFlow::DataSink<typename SENSOR_STRUCTURES::Message>,
                            public DataFlow::DataSink<typename SENSOR_STRUCTURES::RawData>,
-                           public DataFlow::DataSource<typename SENSOR_STRUCTURES::ControlMessage>,
+                           public DataFlow::DataSource<typename SENSOR_STRUCTURES::Message>, // SensorRequests
                            public DataFlow::DataSource<ErrorHandling::SensorAccessLinkError> {
 
-    protected:
+    public:
 
         using DataTranslationStrategy = DataTranslation::DataTranslationStrategy<SENSOR_STRUCTURES, SERVER_STRUCTURES>;
+
+    protected:
 
         using SensorMessage = typename SENSOR_STRUCTURES::Message;
         using SensorRawData = typename SENSOR_STRUCTURES::RawData;
         using SensorControlMessage = typename SENSOR_STRUCTURES::ControlMessage;
+        using SensorRequest = typename SENSOR_STRUCTURES::Message;
 
         using MessageSink = DataFlow::DataSink<SensorMessage>;
         using RawDataSink = DataFlow::DataSink<SensorRawData>;
-        using ResponseControlMessageSource = DataFlow::DataSource<SensorControlMessage>;
+        using RequestSource = DataFlow::DataSource<SensorRequest>;
         using ErrorSource = DataFlow::DataSource<ErrorHandling::SensorAccessLinkError>;
 
     public:
@@ -69,7 +72,7 @@ namespace SensorAccessLinkElement {
                         translationError.getMessage());
                 ErrorSource::produce(std::move(error));
             }
-        };
+        }
 
         void consume(SensorRawData&& rawData) override {
             try {
@@ -85,9 +88,19 @@ namespace SensorAccessLinkElement {
                         translationError.getMessage());
                 ErrorSource::produce(std::move(error));
             }
-        };
+        }
 
-        using ResponseControlMessageSource::linkConsumer;
+        /**
+         * Translate SensorControlMessage to a RequestControlMessage in sensor-specific format.
+         * @note Though anything can receive the produced result, it is expected **AT LEAST** the `SensorCommunicator` receives it.
+         * @param sensorControlMessage request to translate
+         */
+        void translateAndSendToSensor(SensorControlMessage&& sensorControlMessage) {
+            auto requestToSend = dataTranslationStrategy->translateControlMessageToSensorMessageRequest(std::forward<SensorControlMessage>(sensorControlMessage));
+            RequestSource::produce(std::move(requestToSend));
+        }
+
+        using RequestSource::linkConsumer;
         using ErrorSource::linkConsumer;
 
     private:

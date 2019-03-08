@@ -27,9 +27,11 @@ namespace SensorAccessLinkElement {
                                public DataFlow::DataSource<typename T::RawData>,
                                public DataFlow::DataSource<ErrorHandling::SensorAccessLinkError> {
 
-    protected:
+    public:
 
         typedef SensorCommunication::SensorCommunicationStrategy<T> SensorCommunicationStrategy;
+
+    protected:
 
         using MESSAGE = typename T::Message;
         using RAW_DATA = typename T::RawData;

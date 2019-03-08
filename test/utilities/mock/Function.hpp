@@ -151,11 +151,12 @@ namespace Mock {
         void invokeWithParameters(ParameterType&& parameter) {
             LockGuard guard(parameterInvocationMutex);
             parametersReceivedWhenInvoked.push_back(parameter);
+            acknowledgeInvocation(); // TODO :add an acknowledgement for a specific parameter
         }
 
         // Confirmation of expected usage
         void acknowledgeInvocation() {
-            LockGuard guard(sendResponseParameterErrorAckMutex);
+            LockGuard guard(acknowledgementMutex);
             if (!hasBeenInvoked()) {
                 functionInvoked.store(true);
                 invocationAcknowledgement.set_value(true);
@@ -164,7 +165,7 @@ namespace Mock {
 
         AtomicFlag functionInvoked;
 
-        Mutex sendResponseParameterErrorAckMutex;
+        Mutex acknowledgementMutex;
         mutable BooleanPromise invocationAcknowledgement;
 
         mutable Mutex parameterInvocationMutex;

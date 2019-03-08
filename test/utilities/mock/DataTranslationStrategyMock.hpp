@@ -36,10 +36,10 @@ namespace Mock {
 
         using SensorMessage = typename super::SensorMessage;
         using SensorRawData = typename super::SensorRawData;
-        using ParameterControlMessage = typename super::ParameterControlMessage;
+        using SensorControlMessage = typename super::SensorControlMessage;
 
-        using MockFunctionControlMessageToSensorMessageRequest = Function<StringLiteral<decltype("mock->translateControlMessageToSensorMessageRequest"_ToString)>, SensorMessage, ParameterControlMessage>;
-        using MockFunctionSensorMessageToControlMessageResult = Function<StringLiteral<decltype("mock->translateSensorMessageToControlMessageResult"_ToString)>, ParameterControlMessage, SensorMessage>;
+        using MockFunctionControlMessageToSensorMessageRequest = Function<StringLiteral<decltype("mock->translateControlMessageToSensorMessageRequest"_ToString)>, SensorMessage, SensorControlMessage>;
+        using MockFunctionSensorMessageToControlMessageResult = Function<StringLiteral<decltype("mock->translateSensorMessageToControlMessageResult"_ToString)>, SensorControlMessage, SensorMessage>;
 
     public:
 
@@ -54,20 +54,20 @@ namespace Mock {
         void translateRawData(SensorRawData&& sensorRawData) override {}
 
         SensorMessage
-        translateControlMessageToSensorMessageRequest(ParameterControlMessage&& parameterControlMessage) override {
+        translateControlMessageToSensorMessageRequest(SensorControlMessage&& sensorControlMessage) override {
             SensorMessage sensorMessage = mockFunctionControlMessageToSensorMessageRequest.invoke(
-                    std::forward<ParameterControlMessage>(parameterControlMessage));
+                    std::forward<SensorControlMessage>(sensorControlMessage));
             return sensorMessage;
         }
 
-        ParameterControlMessage translateSensorMessageToControlMessageResult(SensorMessage&& sensorMessage) override {
-            ParameterControlMessage parameterControlMessage = mockFunctionSensorMessageToControlMessageResult.invoke(
+        SensorControlMessage translateSensorMessageToControlMessageResult(SensorMessage&& sensorMessage) override {
+            SensorControlMessage sensorControlMessage = mockFunctionSensorMessageToControlMessageResult.invoke(
                     std::forward<SensorMessage>(sensorMessage));
-            return parameterControlMessage;
+            return sensorControlMessage;
         }
 
-        ThisClass* onTranslateControlMessageToSensorMessageRequest(ParameterControlMessage&& parameterControlMessage) {
-            mockFunctionControlMessageToSensorMessageRequest.onCall(std::forward<ParameterControlMessage>(parameterControlMessage));
+        ThisClass* onTranslateControlMessageToSensorMessageRequest(SensorControlMessage&& sensorControlMessage) {
+            mockFunctionControlMessageToSensorMessageRequest.onCall(std::forward<SensorControlMessage>(sensorControlMessage));
             return this;
         }
 
@@ -80,16 +80,20 @@ namespace Mock {
             return this;
         }
 
-        void returnThisControlMessage(ParameterControlMessage const& parameterControlMessageToMap) {
-            mockFunctionSensorMessageToControlMessageResult.returnThis(parameterControlMessageToMap);
+        void returnThisControlMessage(SensorControlMessage const& sensorControlMessageToMap) {
+            mockFunctionSensorMessageToControlMessageResult.returnThis(sensorControlMessageToMap);
         }
 
         void waitUntilTranslateControlMessageToSensorMessageRequestInvocation() {
             return mockFunctionControlMessageToSensorMessageRequest.waitUntilInvocation();
         }
 
-        void hasTranslateControlMessageToSensorMessageRequestBeenCalled() {
+        bool hasTranslateControlMessageToSensorMessageRequestBeenCalled() {
             return mockFunctionControlMessageToSensorMessageRequest.hasBeenInvoked();
+        }
+
+        bool hasTranslateControlMessageToSensorMessageRequestBeenCalledWith(SensorControlMessage const& sensorControlMessage) {
+            return mockFunctionControlMessageToSensorMessageRequest.hasBeenInvokedWith(sensorControlMessage);
         }
 
     private:

@@ -31,7 +31,7 @@ namespace Mock {
         using super = DataTranslation::DataTranslationStrategy<T, T>;
         using SensorMessage = typename super::SensorMessage;
         using SensorRawData = typename super::SensorRawData;
-        using ParameterControlMessage = typename super::ParameterControlMessage;
+        using SensorControlMessage = typename super::SensorControlMessage;
 
         using MessageSource = typename super::MessageSource;
         using RawDataSource = typename super::RawDataSource;
@@ -59,20 +59,20 @@ namespace Mock {
         }
 
         SensorMessage
-        translateControlMessageToSensorMessageRequest(ParameterControlMessage&& parameterControlMessage) override {
-            std::cout << "\n\nFrom file : ErrorThrowingDatatTranslationStrategyMock... "
+        translateControlMessageToSensorMessageRequest(SensorControlMessage&& sensorControlMessage) override {
+            std::cout << "\n\nFrom file : ErrorThrowingDataTranslationStrategyMock... "
                       << "\n\n function : translateControlMessageToSensorMessageRequest... "
                       << "\n\n     TODO : have this function throw something and remove return --> do when needed in tests"
                       << "\n\n" << std::endl;
             return super::SensorMessage::returnDefaultData();
         }
 
-        ParameterControlMessage translateSensorMessageToControlMessageResult(SensorMessage&& sensorMessage) override {
-            std::cout << "\n\nFrom file : ErrorThrowingDatatTranslationStrategyMock... "
+        SensorControlMessage translateSensorMessageToControlMessageResult(SensorMessage&& sensorMessage) override {
+            std::cout << "\n\nFrom file : ErrorThrowingDataTranslationStrategyMock... "
                       << "\n\n function : translateSensorMessageToControlMessageResult... "
                       << "\n\n     TODO : have this function throw something and remove return --> do when needed in tests"
                       << "\n\n" << std::endl;
-            return super::ParameterControlMessage::returnDefaultData();
+            return super::SensorControlMessage::returnDefaultData();
         }
 
         std::string const ORIGIN = "from the throwing strategy";

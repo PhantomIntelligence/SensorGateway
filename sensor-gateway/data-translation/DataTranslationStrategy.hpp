@@ -22,7 +22,9 @@ namespace DataTranslation {
 
     template<class SENSOR_STRUCTURES, class SERVER_STRUCTURES>
     class DataTranslationStrategy : public DataFlow::DataSource<typename SERVER_STRUCTURES::Message>,
-                                    public DataFlow::DataSource<typename SERVER_STRUCTURES::RawData> {
+                                    public DataFlow::DataSource<typename SERVER_STRUCTURES::RawData>,
+                                    public DataFlow::DataSource<typename SENSOR_STRUCTURES::ControlMessage>
+    {
 
     protected:
         using SensorMessage = typename SENSOR_STRUCTURES::Message;
@@ -30,10 +32,11 @@ namespace DataTranslation {
 
         using ServerMessage = typename SERVER_STRUCTURES::Message;
         using ServerRawData = typename SERVER_STRUCTURES::RawData;
-        using ParameterControlMessage = typename SENSOR_STRUCTURES::ControlMessage;
+        using SensorControlMessage = typename SENSOR_STRUCTURES::ControlMessage;
 
         using MessageSource = DataFlow::DataSource<ServerMessage>;
         using RawDataSource = DataFlow::DataSource<ServerRawData>;
+        using ResponseControlMessageSource = DataFlow::DataSource<SensorControlMessage>;
 
     public:
         DataTranslationStrategy() :
@@ -53,13 +56,14 @@ namespace DataTranslation {
 
         virtual void translateRawData(SensorRawData&& sensorRawData) = 0;
 
-        virtual SensorMessage translateControlMessageToSensorMessageRequest(ParameterControlMessage&& parameterControlMessage) = 0;
+        virtual SensorMessage
+        translateControlMessageToSensorMessageRequest(SensorControlMessage&& sensorControlMessage) = 0;
 
-        virtual ParameterControlMessage translateSensorMessageToControlMessageResult(SensorMessage&& sensorMessage) = 0;
+        virtual SensorControlMessage translateSensorMessageToControlMessageResult(SensorMessage&& sensorMessage) = 0;
 
         using MessageSource::linkConsumer;
-
         using RawDataSource::linkConsumer;
+        using ResponseControlMessageSource::linkConsumer;
 
     protected:
 

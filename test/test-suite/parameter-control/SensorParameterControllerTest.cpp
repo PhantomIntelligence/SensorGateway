@@ -21,6 +21,7 @@
 #include <gtest/gtest.h>
 
 #include "test/utilities/mock/Function.hpp"
+#include "test/utilities/mock/DevNullDataTranslationStrategyMock.hpp"
 #include "test/utilities/assertion/ErrorAssertion.hpp"
 
 #include "sensor-gateway/parameter-control/SensorParameterController.hpp"
@@ -35,12 +36,10 @@ namespace SensorParameterControllerTestMock {
     class RequestLoopBackDataTranslatorMock final : public DataTranslator {
 
     protected:
-
-
         using super = DataTranslator;
 
-        using super::SensorControlMessage;
-        using super::ResponseControlMessage;
+        using SensorControlMessage = typename super::SensorControlMessage;
+//        using SensorResponseMessageSource
 
     public:
 
@@ -78,7 +77,10 @@ namespace SensorParameterControllerTestMock {
             return openConnectionCalled.load();
         }
 
-        void fetchGetParameterValueNames() override {};
+        typename super::GetParameterValueContents fetchGetParameterValueContents() override {
+            typename super::GetParameterValueContents contents;
+            return contents;
+        }
 
         void closeConnection() override {
             closeConnectionCalled.store(true);

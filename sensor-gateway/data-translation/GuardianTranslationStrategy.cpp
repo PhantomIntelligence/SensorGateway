@@ -60,17 +60,17 @@ void GuardianTranslationStrategy::translateRawData(SensorRawData&& sensorRawData
 }
 
 GuardianTranslationStrategy::SensorMessage GuardianTranslationStrategy::translateControlMessageToSensorMessageRequest(
-        ParameterControlMessage&& parameterControlMessage) {
+        SensorControlMessage&& sensorControlMessage) {
     // TODO
     GuardianTranslationStrategy::SensorMessage sensorMessage;
     return sensorMessage;
 }
 
-GuardianTranslationStrategy::ParameterControlMessage
+GuardianTranslationStrategy::SensorControlMessage
 GuardianTranslationStrategy::translateSensorMessageToControlMessageResult(SensorMessage&& sensorMessage) {
     // TODO
-    GuardianTranslationStrategy::ParameterControlMessage parameterControlMessage;
-    return parameterControlMessage;
+    GuardianTranslationStrategy::SensorControlMessage sensorControlMessage;
+    return sensorControlMessage;
 }
 
 void GuardianTranslationStrategy::translateEndOfFrameMessage(SensorMessage&& sensorMessage) {

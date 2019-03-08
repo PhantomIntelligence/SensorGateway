@@ -58,17 +58,17 @@ void AWLTranslationStrategy::translateRawData(SensorRawData&& serverRawData) {
 }
 
 AWLTranslationStrategy::SensorMessage AWLTranslationStrategy::translateControlMessageToSensorMessageRequest(
-        ParameterControlMessage&& parameterControlMessage) {
+        SensorControlMessage&& sensorControlMessage) {
     // TODO
     AWLTranslationStrategy::SensorMessage sensorMessage;
     return sensorMessage;
 }
 
-AWLTranslationStrategy::ParameterControlMessage
+AWLTranslationStrategy::SensorControlMessage
 AWLTranslationStrategy::translateSensorMessageToControlMessageResult(SensorMessage&& sensorMessage) {
     // TODO
-    AWLTranslationStrategy::ParameterControlMessage parameterControlMessage;
-    return parameterControlMessage;
+    AWLTranslationStrategy::SensorControlMessage sensorControlMessage;
+    return sensorControlMessage;
 }
 
 void AWLTranslationStrategy::translateEndOfFrameMessage(SensorMessage&& sensorMessage) {
