@@ -61,6 +61,8 @@ namespace SensorCommunication {
     private:
         void throwErrorIfNecessary(canStatus const& errorCode, std::string const& callOrigin);
 
+        int32_t const sensorChannelId;
+	    
         typedef struct {
             int64_t id;
             uint64_t timestamp;
