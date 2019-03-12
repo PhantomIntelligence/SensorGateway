@@ -24,8 +24,8 @@ namespace SensorGateway {
 
     namespace Details {
 
-        // TODO: Use `type_index` to facilitate the mapping to the correct SensorAccessLink type : https://en.cppreference.com/w/cpp/types/type_index
         // TODO: Using things like `enable_if<>, handle different sensors when there is or not RawData or fetching in bulk`
+        // TODO: Use `declval` to create a stream line for Message and RawData, abstracting what actual type is processed (scheduler, emplacement in each of SALE.) https://en.cppreference.com/w/cpp/utility/declval
         template<class SENSOR_STRUCTURES, class SERVER_STRUCTURES>
         class SensorAccessLink : public DataFlow::DataSink<ErrorHandling::SensorAccessLinkError> {
 
@@ -38,26 +38,24 @@ namespace SensorGateway {
             using ServerRawData = typename SERVER_STRUCTURES::RawData;
 
             using ServerCommunicator = SensorAccessLinkElement::ServerCommunicator<SERVER_STRUCTURES>;
-            using ServerCommunicatorMessageScheduler = DataFlow::DataProcessingScheduler<ServerMessage, ServerCommunicator, 1>;
-            using ServerCommunicatorRawDataScheduler = DataFlow::DataProcessingScheduler<ServerRawData, ServerCommunicator, 1>;
+            using ServerCommunicatorMessageScheduler = DataFlow::DataProcessingScheduler<ServerMessage, ServerCommunicator, ONLY_ONE_PRODUCER>;
+            using ServerCommunicatorRawDataScheduler = DataFlow::DataProcessingScheduler<ServerRawData, ServerCommunicator, ONLY_ONE_PRODUCER>;
 
             using DataTranslator = SensorAccessLinkElement::DataTranslator<SENSOR_STRUCTURES, SERVER_STRUCTURES>;
-            using TranslatorMessageScheduler = DataFlow::DataProcessingScheduler<SensorMessage, DataTranslator, 1>;
-            using TranslatorRawDataScheduler = DataFlow::DataProcessingScheduler<SensorRawData, DataTranslator, 1>;
+            using TranslatorMessageScheduler = DataFlow::DataProcessingScheduler<SensorMessage, DataTranslator, ONLY_ONE_PRODUCER>;
+            using TranslatorRawDataScheduler = DataFlow::DataProcessingScheduler<SensorRawData, DataTranslator, ONLY_ONE_PRODUCER>;
 
             using SensorParameterController = SensorAccessLinkElement::SensorParameterController<SENSOR_STRUCTURES, SERVER_STRUCTURES>;
             using RequestHandler = SensorAccessLinkElement::RequestHandler<SENSOR_STRUCTURES, SERVER_STRUCTURES>;
 
             using SensorCommunicator = SensorAccessLinkElement::SensorCommunicator<SENSOR_STRUCTURES>;
+            using SensorCommunicatorRequestScheduler = typename SensorCommunicator::RequestProcessingScheduler;
 
             using Error = ErrorHandling::SensorAccessLinkError;
             using ThisClass = SensorAccessLink<SENSOR_STRUCTURES, SERVER_STRUCTURES>;
             using ErrorScheduler = DataFlow::DataProcessingScheduler<Error, ThisClass, 5>;
 
         public:
-//            using ServerCommunicationStrategy = ServerCommunication::ServerCommunicationStrategy<SERVER_STRUCTURES>;
-//            using DataTranslationStrategy = DataTranslation::DataTranslationStrategy<SENSOR_STRUCTURES, SERVER_STRUCTURES>;
-//            using SensorCommunicationStrategy = SensorCommunication::SensorCommunicationStrategy<SENSOR_STRUCTURES>;
 
             using ServerCommunicationStrategy = typename ServerCommunicator::ServerCommunicationStrategy;
             using DataTranslationStrategy = typename DataTranslator::DataTranslationStrategy;
@@ -78,6 +76,7 @@ namespace SensorGateway {
                     sensorParameterController(&requestHandler, &dataTranslator),
                     dataTranslator(dataTranslationStrategy),
                     sensorCommunicator(sensorCommunicationStrategy),
+                    sensorCommunicatorRequestScheduler(&sensorCommunicator),
                     translatorMessageScheduler(&dataTranslator),
                     translatorRawDataScheduler(&dataTranslator),
                     serverCommunicatorMessageScheduler(&serverCommunicator),
@@ -105,6 +104,7 @@ namespace SensorGateway {
             };
 
             void terminateAndJoin() {
+                sensorCommunicatorRequestScheduler.terminateAndJoin();
                 sensorCommunicator.terminateAndJoin();
                 translatorMessageScheduler.terminateAndJoin();
                 translatorRawDataScheduler.terminateAndJoin();
@@ -120,7 +120,7 @@ namespace SensorGateway {
             void consume(Error&& error) override {
 
                 // NOTE: To allow Gateway stability on RP3, this is good enough, but untested.
-                // TODO: THE ARCHITECTURAL LOCATION WILL HAVE TO BE RETHOUGHT WHEN IMPLEMENTING SPIRIT PROTOCOL
+                // TODO: THE ARCHITECTURAL LOCATION WILL HAVE TO BE RETHOUGHT WHEN IMPLEMENTING GATEWAY PROTOCOL
 
                 std::cout << "Error handling (SensorAccessLink) : " << error.fetchDetailedMessage() << std::endl;
                 if (error.isFatalForGateway()) {
@@ -139,6 +139,7 @@ namespace SensorGateway {
         private:
 
             void linkElements() {
+                dataTranslator.linkConsumer(&sensorCommunicatorRequestScheduler);
                 dataTranslationStrategy->linkConsumer(&serverCommunicatorMessageScheduler);
                 dataTranslationStrategy->linkConsumer(&serverCommunicatorRawDataScheduler);
                 sensorCommunicator.linkConsumer(&translatorMessageScheduler);
@@ -173,6 +174,7 @@ namespace SensorGateway {
 
             SensorCommunicationStrategy* sensorCommunicationStrategy;
             SensorCommunicator sensorCommunicator;
+            SensorCommunicatorRequestScheduler sensorCommunicatorRequestScheduler;
 
             ErrorScheduler errorScheduler;
         };
@@ -184,16 +186,9 @@ namespace SensorGateway {
         using GatewayStructures = typename Sensor::Gateway::Structures<
                 typename S::MessageDefinition,
                 typename S::RawDataDefinition,
-                typename S::ControlMessageDefinition>;
+                typename S::ControlMessageDefinition,
+                typename S::Parameters>;
         using AccessLink = Details::SensorAccessLink<S, GatewayStructures>;
-
-//        typedef typename Sensor::Gateway::Structures<
-//                typename S::MessageDefinition,
-//                typename S::RawDataDefinition,
-//                typename S::ControlMessageDefinition
-//        > GatewayStructures;
-//
-//        typedef typename Details::SensorAccessLink<S, GatewayStructures> AccessLink;
 
     };
 }

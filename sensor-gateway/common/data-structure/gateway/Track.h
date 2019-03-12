@@ -22,8 +22,8 @@ namespace DataFlow {
 
     public:
 
-        explicit Track(TrackId trackId, ConfidenceLevel confidenceLevel, Intensity intensity,
-                       Acceleration acceleration, Distance distance, Speed speed);
+        explicit Track(TrackId trackId, Distance distance, Intensity intensity, Speed speed, Acceleration acceleration,
+                       ConfidenceLevel confidenceLevel);
 
         Track();
 
@@ -33,7 +33,7 @@ namespace DataFlow {
 
         Track(Track&& other) noexcept;
 
-        Track& operator=(Track const& other)& ;
+        Track& operator=(Track const& other)&;
 
         Track& operator=(Track&& other)& noexcept;
 
@@ -46,39 +46,37 @@ namespace DataFlow {
         static Track const& returnDefaultData() noexcept;
 
         TrackId id;
-        ConfidenceLevel confidenceLevel;
-        Intensity intensity;
-        Acceleration acceleration;
         Distance distance;
+        Intensity intensity;
         Speed speed;
+        Acceleration acceleration;
+        ConfidenceLevel confidenceLevel;
     };
-}
 
-namespace Defaults {
-    namespace Track {
-        using DataFlow::Track;
-        using DataFlow::TrackId;
-        using DataFlow::ConfidenceLevel;
-        using DataFlow::Intensity;
-        using DataFlow::Acceleration;
-        using DataFlow::Distance;
-        using DataFlow::Speed;
+    namespace Defaults {
+        namespace Track {
 
-        /**
-         * @warning Carelessly modifying these values WILL cause a huge performance drop.
-         * If a value is modified here, be sure its homologous value in the communication protocol schema file is too.
-         * @see https://github.com/PhantomIntelligence/GatewayProtocol.git
-         */
-        TrackId const UNDEFINED_ID = 65535;
-        TrackId const DEFAULT_ID = UNDEFINED_ID;
-        ConfidenceLevel const DEFAULT_CONFIDENCE_LEVEL = 0;
-        Intensity const DEFAULT_INTENSITY = 0;
-        Acceleration const DEFAULT_ACCELERATION = 0;
-        Distance const DEFAULT_DISTANCE = 0;
-        Speed const DEFAULT_SPEED = 0;
-        Track const DEFAULT_TRACK = Track(DEFAULT_ID, DEFAULT_CONFIDENCE_LEVEL, DEFAULT_INTENSITY, DEFAULT_ACCELERATION,
-                                          DEFAULT_DISTANCE, DEFAULT_SPEED);
+            /**
+             * @warning Carelessly modifying these values WILL cause a huge performance drop.
+             * If a value is modified here, be sure its homologous value in the communication protocol schema file is too.
+             * @see https://github.com/PhantomIntelligence/GatewayProtocol.git
+             */
+            TrackId const UNDEFINED_ID = 0;
+            TrackId const DEFAULT_ID = UNDEFINED_ID;
+            Distance const DEFAULT_DISTANCE = 0;
+            Intensity const DEFAULT_INTENSITY = 0;
+            Speed const DEFAULT_SPEED = 0;
+            Acceleration const DEFAULT_ACCELERATION = 0;
+            ConfidenceLevel const DEFAULT_CONFIDENCE_LEVEL = 0;
+            typename DataFlow::Track const DEFAULT_TRACK = typename DataFlow::Track(DEFAULT_ID,
+                                              DEFAULT_DISTANCE,
+                                              DEFAULT_INTENSITY,
+                                              DEFAULT_SPEED,
+                                              DEFAULT_ACCELERATION,
+                                              DEFAULT_CONFIDENCE_LEVEL);
+        }
     }
 }
+
 
 #endif //SENSORGATEWAY_TRACK_H

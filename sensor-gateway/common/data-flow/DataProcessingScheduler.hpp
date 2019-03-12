@@ -1,5 +1,5 @@
 /**
-	Copyright 2014-2018 Phantom Intelligence Inc.
+	Copyright 2014-2019 Phantom Intelligence Inc.
 
 	Licensed under the Apache License, Version 2.0 (the "License");
 	you may not use this file except in compliance with the License.
@@ -21,10 +21,10 @@
 
 namespace DataFlow {
 
-    template<class T, class SINK, size_t const NUMBER_OF_CONCURRENT_INPUTS>
-    class DataProcessingScheduler : public ConsumerLink<T> {
+    template<class T, class SINK, size_t const NUMBER_OF_CONCURRENT_INPUTS, size_t C = NUMBER_OF_CONSUMER_PER_BUFFER, size_t N = RING_BUFFER_DEFAULT_SIZE>
+    class DataProcessingScheduler : public ConsumerLink<T, N, C> {
 
-        typedef RingBuffer<T> InputBuffer;
+        typedef RingBuffer<T, N, C> InputBuffer;
         typedef Container::ConstantSizedPointerList<InputBuffer, NUMBER_OF_CONCURRENT_INPUTS> InputBuffers;
 
     public:

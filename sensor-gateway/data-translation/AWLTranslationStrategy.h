@@ -64,13 +64,13 @@ namespace DataTranslation {
 
         void addTrackInPixel(SensorMessage&& sensorMessage, DataFlow::PixelId pixelId);
 
-        Track* fetchTrack(DataFlow::TrackId const& trackId);
-
         void translateDetectionTrackMessage(SensorMessage&& sensorMessage);
 
         void translateDetectionVelocityMessage(SensorMessage&& sensorMessage);
 
         void translateEndOfFrameMessage(SensorMessage&& sensorMessage);
+
+        DataFlow::Track* fetchTrack(DataFlow::TrackId const& trackId);
     };
 }
 #endif //SENSORGATEWAY_AWLTRANSLATIONSTRATEGY_H

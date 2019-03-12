@@ -44,6 +44,7 @@ namespace Sensor {
             typedef typename
             Sensor::SensorMessageDefinition<
                     SensorMessageDefinition::NUMBER_OF_PIXELS,
+                    SensorMessageDefinition::NUMBER_OF_TRACKS_PER_PIXEL,
                     GatewayTimeTrackingDefinition
             > GatewaySensorMessageDefinition;
 

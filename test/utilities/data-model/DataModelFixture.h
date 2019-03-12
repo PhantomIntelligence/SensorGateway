@@ -82,7 +82,114 @@ namespace TestFunctions {
             return randomSimpleRawData;
         }
 
+        static auto const createRandomRealisticMessageWithEmptyTimestamps() {
+            using RealisticStructures = Sensor::Test::RealisticImplementation::Structures;
+            using RealisticMessage = typename RealisticStructures::Message;
+            using MessageDefinition = typename RealisticStructures::MessageDefinition;
+
+            RealisticMessage::Pixels pixels;
+            using Pixel = typename RealisticMessage::Pixels::value_type;
+            auto const numberOfPixels = pixels.size();
+
+            // Ugly A.F. but efficient way to not have to refind the Track type ;)
+            using Tracks = std::remove_reference<decltype(*std::get<0>(pixels).getTracks())>::type;
+            using Track = std::remove_reference<decltype(std::get<0>(std::declval<Tracks>()))>::type;
+
+            using MessageId = decltype(std::declval<RealisticMessage>().messageId);
+            using SensorId = decltype(std::declval<RealisticMessage>().sensorId);
+            using PixelId = decltype(std::declval<Pixel>().id);
+            using TrackId = decltype(std::declval<Track>().id);
+            using Distance = decltype(std::declval<Track>().distance);
+            using Intensity = decltype(std::declval<Track>().intensity);
+            using Speed = decltype(std::declval<Track>().speed);
+            using Acceleration = decltype(std::declval<Track>().acceleration);
+            using ConfidenceLevel = decltype(std::declval<Track>().confidenceLevel);
+
+            auto const numberOfTracksToCreatePerPixel = 4;
+
+            std::default_random_engine randomEngine(std::random_device{}());
+
+            using messageIdLimits = std::numeric_limits<MessageId>;
+            using sensorIdLimits = std::numeric_limits<SensorId>;
+            using distanceLimits = std::numeric_limits<Distance>;
+            using intensityLimits = std::numeric_limits<Intensity>;
+            using speedLimits = std::numeric_limits<Speed>;
+            using accelerationLimits = std::numeric_limits<Acceleration>;
+            using confidenceLevelLimits = std::numeric_limits<ConfidenceLevel>;
+
+            std::uniform_int_distribution<MessageId> messageIdDistribution(messageIdLimits::min(),
+                                                                           messageIdLimits::max() - 1);
+            std::uniform_int_distribution<SensorId> sensorIdDistribution(sensorIdLimits::min(),
+                                                                         sensorIdLimits::max() - 1);
+            std::uniform_real_distribution<Distance> distanceDistribution(distanceLimits::min(),
+                                                                          distanceLimits::max() - 1);
+            std::uniform_real_distribution<Intensity> intensityDistribution(intensityLimits::min(),
+                                                                            intensityLimits::max() - 1);
+            std::uniform_real_distribution<Speed> speedDistribution(speedLimits::min(),
+                                                                    speedLimits::max() - 1);
+            std::uniform_real_distribution<Acceleration> accelerationDistribution(accelerationLimits::min(),
+                                                                                  accelerationLimits::max() - 1);
+            std::uniform_int_distribution<ConfidenceLevel> confidenceLevelDistribution(confidenceLevelLimits::min(),
+                                                                                       confidenceLevelLimits::max() -
+                                                                                       1);
+
+            // TODO : create template to std::initializer_list<int> digits {1, 2, 3, 4, 5}; for array
+            for (PixelId pixelId = 0; pixelId < numberOfPixels; ++pixelId) {
+                Tracks tracks;
+                for (TrackId trackId = 0;
+                     trackId < numberOfTracksToCreatePerPixel; ++trackId) {
+                    Track track(
+                            trackId,
+                            distanceDistribution(randomEngine),
+                            intensityDistribution(randomEngine),
+                            speedDistribution(randomEngine),
+                            accelerationDistribution(randomEngine),
+                            confidenceLevelDistribution(randomEngine));
+                    tracks[trackId] = track;
+                }
+                Pixel pixel(
+                        pixelId,
+                        tracks,
+                        numberOfTracksToCreatePerPixel
+                );
+                pixels[pixelId] = pixel;
+            }
+
+            auto randomSensorId = sensorIdDistribution(randomEngine);
+            auto randomMessageId = messageIdDistribution(randomEngine);
+
+            RealisticMessage randomSensorMessage(randomMessageId, randomSensorId, pixels);
+
+            return randomSensorMessage;
+        }
+
+        static auto const createRandomRealisticRawData() {
+            auto const maximalValue = 9001;
+
+            std::default_random_engine randomEngine(std::random_device{}());
+            std::uniform_int_distribution<unsigned int> distribution(0, maximalValue);
+
+            using SensorRawData = Sensor::Test::RealisticImplementation::Structures::RawData;
+            Sensor::Test::RealisticImplementation::Structures::RawDataDefinition::Data content;
+            auto const numberOfDataToCreate = content.size();
+            for (auto i = 0u; i < numberOfDataToCreate; ++i) {
+                content.at(i) = distribution(randomEngine);
+            }
+            SensorRawData randomSensorRawData(content);
+
+            return randomSensorRawData;
+        }
+
+        static auto const createRandomRealisticSensorRequest() {
+            return createRandomRealisticMessageWithEmptyTimestamps();
+        }
+
     private:
+
+        static std::string createRandomSensorId() {
+            auto const lengthOfMessageId = 10;
+            return createRandomStringOfLength(lengthOfMessageId);
+        }
 
         static std::string drawRandomString(size_t length, std::function<char(void)> const& pickRandomChar) {
             std::string randomString(length, 0);

@@ -1,5 +1,5 @@
 /**
-	Copyright 2014-2018 Phantom Intelligence Inc.
+	Copyright 2014-2019 Phantom Intelligence Inc.
 
 	Licensed under the Apache License, Version 2.0 (the "License");
 	you may not use this file except in compliance with the License.
@@ -20,46 +20,50 @@
 
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
+
 #include "test/utilities/mock/ArbitraryDataSinkMock.hpp"
-#include "sensor-gateway/data-translation/GuardianTranslationStrategy.h"
 #include "test/utilities/mock/ArbitraryDataSinkMock.hpp"
 
+#include "sensor-gateway/data-translation/GuardianTranslationStrategy.h"
 #include "sensor-gateway/common/data-structure/sensor/GuardianStructures.h"
 
-using Defaults::Track::DEFAULT_ACCELERATION;
-using Defaults::Track::DEFAULT_DISTANCE;
-using Defaults::Track::DEFAULT_SPEED;
-
-using DataTranslation::GuardianTranslationStrategy;
-using DataTranslation::GuardianStructures;
-using DataTranslation::GuardianGatewayStructures;
-
-using GuardianMessage = GuardianStructures::Message;
-using GuardianRawData = GuardianStructures::RawData;
-using GatewayMessage = GuardianGatewayStructures::Message;
-using GatewayRawData = GuardianGatewayStructures::RawData;
-
-using PixelsArray = typename GatewayMessage::Pixels;
-using DataFlow::PixelId;
-
+using DataFlow::Defaults::Track::DEFAULT_ACCELERATION;
+using DataFlow::Defaults::Track::DEFAULT_DISTANCE;
+using DataFlow::Defaults::Track::DEFAULT_SPEED;
 
 class GuardianTranslationStrategyTest : public ::testing::Test {
 
 protected:
 
+    using Track = DataFlow::Track;
+
+    using DataStructures = Sensor::Guardian::Structures;
+    using GatewayStructures = Sensor::Gateway::Structures<
+            DataStructures::MessageDefinition,
+            DataStructures::RawDataDefinition,
+            DataStructures::ControlMessageDefinition
+    >;
+
+    using GuardianMessage = DataStructures::Message;
+    using GuardianRawData = DataStructures::RawData;
+    using GatewayMessage = GatewayStructures::Message;
+    using GatewayRawData = GatewayStructures::RawData;
+
+    using PixelsArray = typename GatewayMessage::Pixels;
+
     using GatewayMessageSinkMock = Mock::ArbitraryDataSinkMock<GatewayMessage>;
     using GatewayRawDataSinkMock = Mock::ArbitraryDataSinkMock<GatewayRawData>;
-    using GatewayMessageProcessingScheduler = DataFlow::DataProcessingScheduler<GatewayMessage, GatewayMessageSinkMock, 1>;
-    using GatewayRawDataProcessingScheduler = DataFlow::DataProcessingScheduler<GatewayRawData, GatewayRawDataSinkMock, 1>;
+    using GatewayMessageProcessingScheduler = DataFlow::DataProcessingScheduler<GatewayMessage, GatewayMessageSinkMock, ONLY_ONE_PRODUCER>;
+    using GatewayRawDataProcessingScheduler = DataFlow::DataProcessingScheduler<GatewayRawData, GatewayRawDataSinkMock, ONLY_ONE_PRODUCER>;
 
-    PixelId const SOME_PIXEL_ID = 11;
+    DataFlow::PixelId const SOME_PIXEL_ID = 11;
     GatewayMessage const BASE_FRAME = GatewayMessage(64829, 16, PixelsArray());
     GatewayMessage const FRAME_AFTER_END_OF_FRAME_MESSAGE_TRANSLATION = BASE_FRAME;
     GatewayMessage const FRAME_AFTER_DETECTION_TRACK_AND_END_OF_FRAME_MESSAGES_TRANSLATION =
             addTrackToGatewayMessage(BASE_FRAME,
-                                    Track(14291, 96, 379, DEFAULT_ACCELERATION, DEFAULT_DISTANCE, DEFAULT_SPEED));
+                                     Track(14291, DEFAULT_DISTANCE, 379, DEFAULT_SPEED, DEFAULT_ACCELERATION, 96));
     GatewayMessage const FRAME_AFTER_DETECTION_TRACK_AND_VELOCITY_TRACK_AND_END_OF_FRAME_MESSAGES_TRANSLATION =
-            addTrackToGatewayMessage(BASE_FRAME, Track(14291, 96, 379, 256, 106, 0));
+            addTrackToGatewayMessage(BASE_FRAME, Track(14291, 106, 379, 0, 256, 96));
 
     GuardianMessage const SOME_DETECTION_TRACK_AWL_MESSAGE = GuardianMessage(10, 2188169, 8,
                                                                              {211, 55, 0, 11, 0, 96, 123, 1});
@@ -96,7 +100,7 @@ protected:
         GuardianRawData orderedRawData;
         GuardianRawData::Definitions::Data orderedContent = orderedRawData.content;
         for (auto ordinalChannelIndex = 0u; ordinalChannelIndex < NUMBER_OF_CHANNELS; ++ordinalChannelIndex) {
-            auto channelPositionIndex = GuardianStructures::CHANNEL_POSITIONS[ordinalChannelIndex];
+            auto channelPositionIndex = DataStructures::CHANNEL_POSITIONS[ordinalChannelIndex];
             auto originStartPosition = content.begin() + channelPositionIndex * NUMBER_OF_SAMPLES_PER_CHANNEL;
             auto destinationStartPosition =
                     orderedContent.begin() + ordinalChannelIndex * NUMBER_OF_SAMPLES_PER_CHANNEL;
@@ -119,7 +123,7 @@ TEST_F(GuardianTranslationStrategyTest,
 
     auto endOfGatewayMessageAWLMessage = SOME_END_FRAME_AWL_MESSAGE;
     auto expectedGatewayMessage = FRAME_AFTER_END_OF_FRAME_MESSAGE_TRANSLATION;
-    GuardianTranslationStrategy translationStrategy;
+    DataTranslation::GuardianTranslationStrategy translationStrategy;
     GatewayMessageSinkMock sensorMessageSinkMock(1);
     GatewayMessageProcessingScheduler scheduler(&sensorMessageSinkMock);
     translationStrategy.linkConsumer(&scheduler);
@@ -138,7 +142,7 @@ TEST_F(GuardianTranslationStrategyTest,
     auto detectionTrackAWLMessage = SOME_DETECTION_TRACK_AWL_MESSAGE;
     auto endOfGatewayMessageAWLMessage = SOME_END_FRAME_AWL_MESSAGE;
     auto expectedGatewayMessage = FRAME_AFTER_DETECTION_TRACK_AND_END_OF_FRAME_MESSAGES_TRANSLATION;
-    GuardianTranslationStrategy translationStrategy;
+    DataTranslation::GuardianTranslationStrategy translationStrategy;
     GatewayMessageSinkMock sensorMessageSinkMock(1);
     GatewayMessageProcessingScheduler scheduler(&sensorMessageSinkMock);
     translationStrategy.linkConsumer(&scheduler);
@@ -159,7 +163,7 @@ TEST_F(GuardianTranslationStrategyTest,
     auto detectionVelocityAWLMessage = SOME_VELOCITY_TRACK_AWL_MESSAGE;
     auto endOfGatewayMessageAWLMessage = SOME_END_FRAME_AWL_MESSAGE;
     auto expectedGatewayMessage = FRAME_AFTER_DETECTION_TRACK_AND_VELOCITY_TRACK_AND_END_OF_FRAME_MESSAGES_TRANSLATION;
-    GuardianTranslationStrategy translationStrategy;
+    DataTranslation::GuardianTranslationStrategy translationStrategy;
     GatewayMessageSinkMock sensorMessageSinkMock(1);
     GatewayMessageProcessingScheduler scheduler(&sensorMessageSinkMock);
     translationStrategy.linkConsumer(&scheduler);
@@ -178,7 +182,7 @@ TEST_F(GuardianTranslationStrategyTest,
        given_someEndOfGatewayMessageAWLMessage_when_translatingThisMessage_then_callsProduceOneTime) {
 
     auto endOfGatewayMessageAWLMessage = SOME_END_FRAME_AWL_MESSAGE;
-    GuardianTranslationStrategy translationStrategy;
+    DataTranslation::GuardianTranslationStrategy translationStrategy;
     GatewayMessageSinkMock sensorMessageSinkMock(1);
     GatewayMessageProcessingScheduler scheduler(&sensorMessageSinkMock);
     translationStrategy.linkConsumer(&scheduler);
@@ -194,7 +198,7 @@ TEST_F(GuardianTranslationStrategyTest,
     auto numberOfDataToProduce = 1u;
     auto rawData = createOrdinalGuardianRawData();
 
-    GuardianTranslationStrategy translationStrategy;
+    DataTranslation::GuardianTranslationStrategy translationStrategy;
     GatewayRawDataSinkMock gatewayRawDataSink(numberOfDataToProduce);
     GatewayRawDataProcessingScheduler scheduler(&gatewayRawDataSink);
     translationStrategy.linkConsumer(&scheduler);
@@ -214,7 +218,7 @@ TEST_F(GuardianTranslationStrategyTest,
     auto guardianRawData = createIdenticalNonNullValuedGuardianRawData();
     auto contentCopy = GuardianRawData::Definitions::Data(guardianRawData.content);
 
-    GuardianTranslationStrategy translationStrategy;
+    DataTranslation::GuardianTranslationStrategy translationStrategy;
     GatewayRawDataSinkMock gatewayRawDataSink(numberOfData);
     GatewayRawDataProcessingScheduler scheduler(&gatewayRawDataSink);
     translationStrategy.linkConsumer(&scheduler);
@@ -237,7 +241,7 @@ TEST_F(GuardianTranslationStrategyTest,
     auto ordinalRawData = createOrdinalGuardianRawData();
     auto contentCopy = GuardianRawData::Definitions::Data(ordinalRawData.content);
 
-    GuardianTranslationStrategy translationStrategy;
+    DataTranslation::GuardianTranslationStrategy translationStrategy;
     GatewayRawDataSinkMock gatewayRawDataSink(numberOfData);
     GatewayRawDataProcessingScheduler scheduler(&gatewayRawDataSink);
     translationStrategy.linkConsumer(&scheduler);

@@ -206,8 +206,8 @@ namespace Mock {
             if (!hasFetchGetParameterValueContentsBeenCalled()) {
                 fetchGetParameterValueContentsCalled.store(true);
                 fetchGetParameterValueContentsCalledAcknowledgement.set_value(true);
-//                if (!hasFetchRawDataCyclesBeenCalled()) {
-//                    fetchMessagesCalledBeforeFetchRawDataCycles.store(true);
+//                if (!hasFetchRawDataCyclesBeenInvoked()) {
+//                    fetchMessagesInvokedBeforeFetchRawDataCycles.store(true);
 //                }
             }
         }

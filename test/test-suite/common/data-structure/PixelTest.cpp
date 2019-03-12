@@ -3,17 +3,21 @@
 
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
-#include "sensor-gateway/common/data-structure/gateway/Pixel.h"
-
-using DataFlow::Pixel;
-using DataFlow::PixelId;
-using DataFlow::TracksArray;
+#include "sensor-gateway/common/data-structure/gateway/Pixel.hpp"
 
 class PixelTest : public ::testing::Test {
 
 protected:
-    Track const SOME_TRACK = Track(2, 0, 135, 0, 110, 0);
-    Track const SOME_OTHER_TRACK = Track(14286, 0, 125, 0, 105, 0);
+
+    static constexpr auto const NUMBER_OF_PIXEL = 2;
+    using Pixel = DataFlow::Pixel<NUMBER_OF_PIXEL>;
+
+    using PixelId = decltype(Pixel::id);
+    using Track = typename Pixel::Track;
+    using TracksArray = typename Pixel::TracksArray;
+
+    Track const SOME_TRACK = Track(2, 110, 135, 0, 0, 0);
+    Track const SOME_OTHER_TRACK = Track(14286, 105, 125, 0, 0, 0);
     PixelId const SOME_ID = 1;
     PixelId const SOME_OTHER_ID = 2;
     TracksArray const SOME_TRACKS_ARRAY = TracksArray({SOME_TRACK});
@@ -73,7 +77,7 @@ TEST_F(PixelTest,
 TEST_F(PixelTest,
        given_aPixelWithAFullTracksArrayAndATrack_when_addingTheTrackToThePixel_then_throwsATrackArrayIllegalStoreFullException) {
     Pixel pixel;
-    for (auto trackIndex = 0; trackIndex < NUMBER_OF_TRACKS_IN_PIXEL; ++trackIndex) {
+    for (auto trackIndex = 0u; trackIndex < Pixel::numberOfTracksPerPixel; ++trackIndex) {
         auto trackCopy = Track(SOME_TRACK);
         pixel.addTrack(std::move(trackCopy));
     }

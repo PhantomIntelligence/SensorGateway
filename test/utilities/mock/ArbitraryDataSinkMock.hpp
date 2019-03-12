@@ -21,6 +21,7 @@
 #include "sensor-gateway/common/data-flow/DataSink.hpp"
 
 namespace Mock {
+
     template<class T>
     class ArbitraryDataSinkMock final : public DataFlow::DataSink<T> {
 
@@ -32,7 +33,7 @@ namespace Mock {
         explicit ArbitraryDataSinkMock(uint8_t numberOfDataToConsume) :
                 actualNumberOfDataConsumed(0),
                 numberOfDataToConsume(numberOfDataToConsume) {
-
+            consumedData.clear();
         }
 
         ~ArbitraryDataSinkMock() noexcept = default;

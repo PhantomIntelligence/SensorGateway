@@ -6,21 +6,26 @@
 #include "sensor-gateway/common/data-structure/sensor/AWLStructures.h"
 #include "sensor-gateway/common/data-structure/gateway/SensorMessage.hpp"
 
-using SensorMessage = typename DataFlow::SensorMessage<Sensor::AWL::Structures::MessageDefinition>;
-using DataFlow::PixelId;
-using DataFlow::MessageId;
-using DataFlow::SensorId;
-using DataFlow::TracksArray;
-using DataFlow::TrackId;
 
 class SensorMessageTest : public ::testing::Test {
 
 protected:
+
+    using SensorMessage = typename DataFlow::SensorMessage<Sensor::AWL::Structures::MessageDefinition>;
+    using MessageId = decltype(SensorMessage::messageId);
+    using SensorId = decltype(SensorMessage::sensorId);
+    using Pixel = typename SensorMessage::PixelType;
+    using Pixels = typename SensorMessage::Pixels;
+    using Track = typename Pixel::Track;
+    using TracksArray = typename Pixel::TracksArray;
+    using PixelId = decltype(Pixel::id);
+    using TrackId = decltype(Track::id);
+
     TrackId const SOME_TRACK_ID = 2;
-    Track const SOME_TRACK = Track(SOME_TRACK_ID, 0, 135, 0, 110, 0);
+    Track const SOME_TRACK = Track(SOME_TRACK_ID, 110, 135, 0, 0, 0);
     PixelId const SOME_PIXEL_ID = 1;
-    DataFlow::Pixel const SOME_PIXEL = DataFlow::Pixel(SOME_PIXEL_ID, TracksArray({SOME_TRACK}), 1);
-    DataFlow::Pixel const SOME_OTHER_PIXEL = DataFlow::Pixel(2, TracksArray({SOME_TRACK}), 1);
+    Pixel const SOME_PIXEL = Pixel(SOME_PIXEL_ID, TracksArray({SOME_TRACK}), 1);
+    Pixel const SOME_OTHER_PIXEL = Pixel(2, TracksArray({SOME_TRACK}), 1);
     MessageId const SOME_MESSAGE_ID = 64830;
     MessageId const SOME_OTHER_MESSAGE_ID = 63830;
     SensorId const SOME_SENSOR_ID = 16;

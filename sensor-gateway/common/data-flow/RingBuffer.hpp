@@ -1,5 +1,5 @@
 /**
-	Copyright 2014-2018 Phantom Intelligence Inc.
+	Copyright 2014-2019 Phantom Intelligence Inc.
 
 	Licensed under the Apache License, Version 2.0 (the "License");
 	you may not use this file except in compliance with the License.
@@ -24,23 +24,22 @@
 
 namespace DataFlow {
 
-    template<class T, size_t N>
+    template<class T, size_t N, size_t C>
     class RingBuffer {
 
     protected:
 
-        typedef ConsumerLink<T> Consumer;
+        using Consumer = ConsumerLink<T, N, C>;
 
-        typedef std::unordered_map<Consumer*, RingBufferPad<T>*> ConsumerLocationsMap;
-
-        uint8_t const NUMBER_OF_CONSUMER_PER_BUFFER = 8;
+        using ConsumerLocationsMap = std::unordered_map<Consumer*, RingBufferPad<T>*>;
 
     public:
 
         static constexpr size_t const size = N;
+        static constexpr size_t const numberOfConsumers = C;
 
         RingBuffer() : writerLocation(&buffer[0]) {
-            consumerLocationsMap.reserve(NUMBER_OF_CONSUMER_PER_BUFFER);
+            consumerLocationsMap.reserve(numberOfConsumers);
             chainPadsInBuffer();
         }
 

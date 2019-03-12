@@ -89,7 +89,7 @@ void AWLTranslationStrategy::addTrackInPixel(SensorMessage&& sensorMessage, Pixe
     TrackId trackId = convertTwoBytesToUnsignedBigEndian(sensorMessage.data[0], sensorMessage.data[1]);
     ConfidenceLevel confidenceLevel = sensorMessage.data[5];
     Intensity intensity = convertTwoBytesToUnsignedBigEndian(sensorMessage.data[6], sensorMessage.data[7]);
-    Track track;
+    DataFlow::Track track;
     track.id = trackId;
     track.confidenceLevel = confidenceLevel;
     track.intensity = convertIntensityToSNR(intensity);
@@ -108,10 +108,10 @@ void AWLTranslationStrategy::translateDetectionVelocityMessage(SensorMessage&& s
 }
 
 
-Track* AWLTranslationStrategy::fetchTrack(TrackId const& trackId) {
+DataFlow::Track* AWLTranslationStrategy::fetchTrack(TrackId const& trackId) {
     auto pixels = currentOutputMessage.getPixels();
-    for (auto i = 0; i < NUMBER_OF_PIXELS; ++i) {
-        auto pixel = &pixels->at(static_cast<unsigned long>(i));
+    for (auto i = 0u; i < NUMBER_OF_PIXELS; ++i) {
+        auto pixel = &pixels->at(i);
         if (pixel->doesTrackExist(trackId)) {
             return pixel->fetchTrackById(trackId);
         }

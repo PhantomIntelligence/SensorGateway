@@ -32,7 +32,7 @@ using Stub::createSensorMessageStub;
 using DataTranslation::AWLTranslationStrategy;
 
 using SensorMessageSinkMock = Mock::ArbitraryDataSinkMock<SensorMessage>;
-using SensorMessageProcessingScheduler = DataFlow::DataProcessingScheduler<SensorMessage, SensorMessageSinkMock, 1>;
+using SensorMessageProcessingScheduler = DataFlow::DataProcessingScheduler<SensorMessage, SensorMessageSinkMock, ONLY_ONE_PRODUCER>;
 
 class AWLTranslationStrategyTest : public ::testing::Test {
 protected:

@@ -21,14 +21,14 @@
 
 namespace DataFlow {
 
-    template<class T>
+    template<class T, size_t N = RING_BUFFER_DEFAULT_SIZE, size_t C = NUMBER_OF_CONSUMER_PER_BUFFER>
     class DataSource {
 
     public:
 
         virtual ~DataSource() noexcept = default;
 
-        void linkConsumer(ConsumerLink<T>* consumer) {
+        void linkConsumer(ConsumerLink<T, N, C>* consumer) {
             consumer->linkWith(&outputBuffer);
         }
 
@@ -37,7 +37,8 @@ namespace DataFlow {
         }
 
     protected:
-        DataFlow::RingBuffer<T> outputBuffer;
+
+        DataFlow::RingBuffer<T, N, C> outputBuffer;
 
     };
 }

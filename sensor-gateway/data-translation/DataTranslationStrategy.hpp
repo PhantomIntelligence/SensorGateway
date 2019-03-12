@@ -68,6 +68,7 @@ namespace DataTranslation {
     protected:
 
         ServerMessage currentOutputMessage;
+
     };
 }
 

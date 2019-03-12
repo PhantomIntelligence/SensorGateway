@@ -55,73 +55,73 @@ namespace Stub {
     }
 
     SensorMessage createArbitrarySensorMessage() {
-        return createSensorMessage(42, 16, {TracksInPixel(0, {Track(14275, 0, 139, 0, 109, 0)}),
-                                        TracksInPixel(1, {Track(42, 0, 135, 0, 110, 0)}),
-                                        TracksInPixel(2, {Track(14286, 0, 125, 0, 105, 0)}),
-                                        TracksInPixel(3, {Track(14270, 0, 127, 0, 106, 1)}),
-                                        TracksInPixel(4, {Track(14301, 0, 122, 0, 104, 0)}),
-                                        TracksInPixel(5, {Track(14272, 0, 120, 0, 108, 0)}),
-                                        TracksInPixel(6, {Track(14316, 0, 114, 0, 114, 0)}),
-                                        TracksInPixel(7, {Track(14321, 0, 112, 0, 117, 1)}),
-                                        TracksInPixel(8, {Track(14284, 0, 126, 0, 111, 0)}),
-                                        TracksInPixel(9, {Track(14289, 0, 124, 0, 113, 0)}),
-                                        TracksInPixel(10, {Track(14290, 0, 125, 0, 107, 0)}),
-                                        TracksInPixel(11, {Track(14291, 0, 123, 0, 106, 0)}),
-                                        TracksInPixel(12, {Track(14324, 0, 91, 0, 109, 1)}),
-                                        TracksInPixel(13, {Track(14302, 0, 114, 0, 109, 0)}),
-                                        TracksInPixel(14, {Track(14322, 0, 109, 0, 116, -2)}),
-                                        TracksInPixel(15, {Track(14321, 0, 109, 0, 113, 0)})
+        return createSensorMessage(42, 16, {TracksInPixel(0, {Track(14275, 109, 139, 0, 0, 0)}),
+                                        TracksInPixel(1, {Track(42, 110, 135, 0, 0, 0)}),
+                                        TracksInPixel(2, {Track(14286, 105, 125, 0, 0, 0)}),
+                                        TracksInPixel(3, {Track(14270, 106, 127, 1, 0, 0)}),
+                                        TracksInPixel(4, {Track(14301, 104, 122, 0, 0, 0)}),
+                                        TracksInPixel(5, {Track(14272, 108, 120, 0, 0, 0)}),
+                                        TracksInPixel(6, {Track(14316, 114, 114, 0, 0, 0)}),
+                                        TracksInPixel(7, {Track(14321, 117, 112, 1, 0, 0)}),
+                                        TracksInPixel(8, {Track(14284, 111, 126, 0, 0, 0)}),
+                                        TracksInPixel(9, {Track(14289, 113, 124, 0, 0, 0)}),
+                                        TracksInPixel(10, {Track(14290, 107, 125, 0, 0, 0)}),
+                                        TracksInPixel(11, {Track(14291, 106, 123, 0, 0, 0)}),
+                                        TracksInPixel(12, {Track(14324, 109, 91, 1, 0, 0)}),
+                                        TracksInPixel(13, {Track(14302, 109, 114, 0, 0, 0)}),
+                                        TracksInPixel(14, {Track(14322, 116, 109, -2, 0, 0)}),
+                                        TracksInPixel(15, {Track(14321, 113, 109, 0, 0, 0)})
                 });
     }
     SensorMessage createRandomIdSensorMessage() {
         std::default_random_engine randomEngine(std::random_device{}());
         std::uniform_int_distribution<uint16_t> distribution(0, 1000);
         auto randomId = distribution(randomEngine);
-        return createSensorMessage(randomId, 16, {TracksInPixel(0, {Track(14275, 0, 139, 0, 109, 0)}),
-                                    TracksInPixel(1, {Track(42, 0, 135, 0, 110, 0)}),
-                                    TracksInPixel(2, {Track(14286, 0, 125, 0, 105, 0)}),
-                                    TracksInPixel(3, {Track(14270, 0, 127, 0, 106, 1)}),
-                                    TracksInPixel(4, {Track(14301, 0, 122, 0, 104, 0)}),
-                                    TracksInPixel(5, {Track(14272, 0, 120, 0, 108, 0)}),
-                                    TracksInPixel(6, {Track(14316, 0, 114, 0, 114, 0)}),
-                                    TracksInPixel(7, {Track(14321, 0, 112, 0, 117, 1)}),
-                                    TracksInPixel(8, {Track(14284, 0, 126, 0, 111, 0)}),
-                                    TracksInPixel(9, {Track(14289, 0, 124, 0, 113, 0)}),
-                                    TracksInPixel(10, {Track(14290, 0, 125, 0, 107, 0)}),
-                                    TracksInPixel(11, {Track(14291, 0, 123, 0, 106, 0)}),
-                                    TracksInPixel(12, {Track(14324, 0, 91, 0, 109, 1)}),
-                                    TracksInPixel(13, {Track(14302, 0, 114, 0, 109, 0)}),
-                                    TracksInPixel(14, {Track(14322, 0, 109, 0, 116, -2)}),
-                                    TracksInPixel(15, {Track(14321, 0, 109, 0, 113, 0)})
+        return createSensorMessage(randomId, 16, {TracksInPixel(0, {Track(14275, 109, 139, 0, 0, 0)}),
+                                    TracksInPixel(1, {Track(42, 110, 135, 0, 0, 0)}),
+                                    TracksInPixel(2, {Track(14286, 105, 125, 0, 0, 0)}),
+                                    TracksInPixel(3, {Track(14270, 106, 127, 1, 0, 0)}),
+                                    TracksInPixel(4, {Track(14301, 104, 122, 0, 0, 0)}),
+                                    TracksInPixel(5, {Track(14272, 108, 120, 0, 0, 0)}),
+                                    TracksInPixel(6, {Track(14316, 114, 114, 0, 0, 0)}),
+                                    TracksInPixel(7, {Track(14321, 117, 112, 1, 0, 0)}),
+                                    TracksInPixel(8, {Track(14284, 111, 126, 0, 0, 0)}),
+                                    TracksInPixel(9, {Track(14289, 113, 124, 0, 0, 0)}),
+                                    TracksInPixel(10, {Track(14290, 107, 125, 0, 0, 0)}),
+                                    TracksInPixel(11, {Track(14291, 106, 123, 0, 0, 0)}),
+                                    TracksInPixel(12, {Track(14324, 109, 91, 1, 0, 0)}),
+                                    TracksInPixel(13, {Track(14302, 109, 114, 0, 0, 0)}),
+                                    TracksInPixel(14, {Track(14322, 116, 109, -2, 0, 0)}),
+                                    TracksInPixel(15, {Track(14321, 113, 109, 0, 0, 0)})
         });
     }
 
     std::vector<SensorMessage> createSensorMessageStub() {
         std::vector<SensorMessage> SensorMessages = {
-                createSensorMessage(64829, 16, {TracksInPixel(11, {Track(14291, 0, 123, 0, 106, 0)}),
-                                        TracksInPixel(12, {Track(14324, 0, 93, 0, 109, 0)}),
-                                        TracksInPixel(13, {Track(14302, 0, 115, 0, 109, -1)}),
-                                        TracksInPixel(14, {Track(14322, 0, 104, 0, 115, -6)}),
-                                        TracksInPixel(15, {Track(14321, 0, 110, 0, 117, 0)})
+                createSensorMessage(64829, 16, {TracksInPixel(11, {Track(14291, 106, 123, 0, 0, 0)}),
+                                        TracksInPixel(12, {Track(14324, 109, 93, 0, 0, 0)}),
+                                        TracksInPixel(13, {Track(14302, 109, 115, -1, 0, 0)}),
+                                        TracksInPixel(14, {Track(14322, 115, 104, -6, 0, 0)}),
+                                        TracksInPixel(15, {Track(14321, 117, 110, 0, 0, 0)})
                             }
                 ),
 
-                createSensorMessage(64830, 16, {TracksInPixel(0, {Track(14275, 0, 139, 0, 109, 0)}),
-                                        TracksInPixel(1, {Track(2, 0, 135, 0, 110, 0)}),
-                                        TracksInPixel(2, {Track(14286, 0, 125, 0, 105, 0)}),
-                                        TracksInPixel(3, {Track(14270, 0, 127, 0, 106, 1)}),
-                                        TracksInPixel(4, {Track(14301, 0, 122, 0, 104, 0)}),
-                                        TracksInPixel(5, {Track(14272, 0, 120, 0, 108, 0)}),
-                                        TracksInPixel(6, {Track(14316, 0, 114, 0, 114, 0)}),
-                                        TracksInPixel(7, {Track(14320, 0, 110, 0, 117, 1)}),
-                                        TracksInPixel(8, {Track(14284, 0, 126, 0, 111, 0)}),
-                                        TracksInPixel(9, {Track(14289, 0, 124, 0, 111, 0)}),
-                                        TracksInPixel(10, {Track(14290, 0, 125, 0, 107, 0)}),
-                                        TracksInPixel(11, {Track(14291, 0, 123, 0, 106, 0)}),
-                                        TracksInPixel(12, {Track(14324, 0, 91, 0, 109, 1)}),
-                                        TracksInPixel(13, {Track(14302, 0, 114, 0, 109, 0)}),
-                                        TracksInPixel(14, {Track(14322, 0, 109, 0, 116, -2)}),
-                                        TracksInPixel(15, {Track(14321, 0, 109, 0, 117, 0)})
+                createSensorMessage(64830, 16, {TracksInPixel(0, {Track(14275, 109, 139, 0, 0, 0)}),
+                                        TracksInPixel(1, {Track(2, 110, 135, 0, 0, 0)}),
+                                        TracksInPixel(2, {Track(14286, 105, 125, 0, 0, 0)}),
+                                        TracksInPixel(3, {Track(14270, 106, 127, 1, 0, 0)}),
+                                        TracksInPixel(4, {Track(14301, 104, 122, 0, 0, 0)}),
+                                        TracksInPixel(5, {Track(14272, 108, 120, 0, 0, 0)}),
+                                        TracksInPixel(6, {Track(14316, 114, 114, 0, 0, 0)}),
+                                        TracksInPixel(7, {Track(14320, 117, 110, 1, 0, 0)}),
+                                        TracksInPixel(8, {Track(14284, 111, 126, 0, 0, 0)}),
+                                        TracksInPixel(9, {Track(14289, 111, 124, 0, 0, 0)}),
+                                        TracksInPixel(10, {Track(14290, 107, 125, 0, 0, 0)}),
+                                        TracksInPixel(11, {Track(14291, 106, 123, 0, 0, 0)}),
+                                        TracksInPixel(12, {Track(14324, 109, 91, 1, 0, 0)}),
+                                        TracksInPixel(13, {Track(14302, 109, 114, 0, 0, 0)}),
+                                        TracksInPixel(14, {Track(14322, 116, 109, -2, 0, 0)}),
+                                        TracksInPixel(15, {Track(14321, 117, 109, 0, 0, 0)})
                             }
                 )
         };

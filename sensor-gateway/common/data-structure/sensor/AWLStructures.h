@@ -36,6 +36,7 @@ namespace Sensor {
             typedef typename
             Sensor::SensorMessageDefinition<
                     AWL::_16::NUMBER_OF_PIXELS,
+                    AWL::_16::NUMBER_OF_TRACKS_PER_PIXEL,
                     TimeTrackingDefinition
             > MessageDefinition;
 
@@ -56,8 +57,9 @@ namespace Sensor {
             typedef typename DataFlow::RawData<RawDataDefinition> RawData;
             typedef typename DataFlow::ControlMessage<ControlMessageDefinition> ControlMessage;
 
-            static size_t const MAX_NUMBER_OF_BULK_FETCHABLE_MESSAGES = 1;
-            static size_t const MAX_NUMBER_OF_BULK_FETCHABLE_RAW_DATA_CYCLES = 1;
+            static constexpr size_t const MAX_NUMBER_OF_BULK_FETCHABLE_MESSAGES = 1;
+            static constexpr size_t const MAX_NUMBER_OF_BULK_FETCHABLE_RAW_DATA_CYCLES = 1;
+            static constexpr size_t const ASYNC_REQUEST_BUFFER_SIZE_BEFORE_TRANSMISSION_TO_SENSOR = 8;
         };
     }
 }

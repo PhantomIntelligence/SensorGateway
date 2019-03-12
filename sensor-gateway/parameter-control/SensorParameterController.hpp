@@ -22,6 +22,9 @@
 
 namespace SensorAccessLinkElement {
 
+    /**
+     * @note It is expected that Request entering in this class WILL NOT create any error in the SensorAccessLink execution
+     */
     template<class SENSOR_STRUCTURES, class SERVER_STRUCTURES>
     class SensorParameterController : public DataFlow::DataSink<typename SENSOR_STRUCTURES::ControlMessage>,
                                       public DataFlow::DataSource<ErrorHandling::SensorAccessLinkError> {
@@ -33,7 +36,7 @@ namespace SensorAccessLinkElement {
 
         using SensorControlMessage = typename SENSOR_STRUCTURES::ControlMessage;
         using ThisClass = SensorParameterController<SENSOR_STRUCTURES, SERVER_STRUCTURES>;
-        using ResponseControlMessageScheduler = DataFlow::DataProcessingScheduler<SensorControlMessage, ThisClass, 1>;
+        using ResponseControlMessageScheduler = DataFlow::DataProcessingScheduler<SensorControlMessage, ThisClass, ONLY_ONE_PRODUCER>;
 
         using ErrorSource = DataFlow::DataSource<ErrorHandling::SensorAccessLinkError>;
 
@@ -93,7 +96,7 @@ namespace SensorAccessLinkElement {
         void process(GetParameterValueRequest&& getParameterValueRequest) noexcept {
             auto parameterName = getParameterValueRequest.payloadToString();
             auto sensorControlMessage = parameters.createGetParameterValueControlMessageFor(parameterName);
-//            dataTranslator->
+            dataTranslator->translateAndSendToSensor(std::move(sensorControlMessage));
         }
 
         using ErrorSource::linkConsumer;

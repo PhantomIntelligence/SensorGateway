@@ -21,18 +21,24 @@
 #include <gtest/gtest.h>
 
 #include "sensor-gateway/application/SensorAccessLink.hpp"
+#include "test/utilities/assertion/SensorMessageAssertion.hpp"
+#include "test/utilities/mock/DataTranslationStrategyMock.hpp"
 #include "test/utilities/mock/CatchingServerCommunicationStrategyMock.hpp"
 #include "test/utilities/mock/ErrorThrowingServerCommunicationStrategyMock.hpp"
 #include "test/utilities/mock/ErrorThrowingDataTranslationStrategyMock.hpp"
 #include "test/utilities/mock/ErrorThrowingSensorCommunicationStrategyMock.hpp"
 
-using TestFunctions::DataTestUtil;
-using SensorAccessLink = SensorGateway::Details::SensorAccessLink<Sensor::Test::Simple::Structures, Sensor::Test::Simple::Structures>;
 
 class SensorAccessLinkTest : public ::testing::Test {
+
 public:
 
-    using ErrorThrowingSensorCommunicationStrategyMock = Mock::ErrorThrowingSensorCommunicationStrategyMock<Sensor::Test::Simple::Structures>;
+    using DataStructures = Sensor::Test::RealisticImplementation::Structures;
+    using SensorAccessLinkFactory = SensorGateway::SensorAccessLinkFactory<DataStructures>;
+    using SensorAccessLink = typename SensorAccessLinkFactory::AccessLink;
+    using GatewayStructures = typename SensorAccessLinkFactory::GatewayStructures;
+    using DataTranslationStrategyMock = Mock::DataTranslationStrategyMock<DataStructures, GatewayStructures>;
+    using ErrorThrowingSensorCommunicationStrategyMock = Mock::ErrorThrowingSensorCommunicationStrategyMock<DataStructures>;
 
 protected:
 
@@ -47,13 +53,17 @@ public:
 };
 
 namespace SensorAccessLinkTestMock {
-    using SimpleSensorCommunicationStrategy = SensorCommunication::SensorCommunicationStrategy<Sensor::Test::Simple::Structures>;
 
-    class MockSensorCommunicationStrategy final : public SimpleSensorCommunicationStrategy {
+    using TestFunctions::DataTestUtil;
+    using DataStructures = Sensor::Test::RealisticImplementation::Structures;
+    using GatewayStructures = typename SensorGateway::SensorAccessLinkFactory<DataStructures>::GatewayStructures;
+    using RealisticSensorCommunicationStrategy = SensorCommunication::SensorCommunicationStrategy<DataStructures>;
+
+    class MockSensorCommunicationStrategy final : public RealisticSensorCommunicationStrategy {
 
     protected:
 
-        using super = SensorCommunicationStrategy<Sensor::Test::Simple::Structures>;
+        using super = SensorCommunicationStrategy<Sensor::Test::RealisticImplementation::Structures>;
         using MessagesList = std::list<super::Messages>;
         using RawDataCyclesList = std::list<super::RawDataCycles>;
 
@@ -90,14 +100,15 @@ namespace SensorAccessLinkTestMock {
         super::Messages fetchMessages() override {
             super::Messages createdMessages;
 
-            for (auto i = 0u; i < Sensor::Test::Simple::Structures::MAX_NUMBER_OF_BULK_FETCHABLE_MESSAGES; ++i) {
-                auto createdData = DataTestUtil::createRandomSimpleMessageWithEmptyTimestamps();
+            for (auto i = 0u;
+                 i < Sensor::Test::RealisticImplementation::Structures::MAX_NUMBER_OF_BULK_FETCHABLE_MESSAGES; ++i) {
+                auto createdData = DataTestUtil::createRandomRealisticMessageWithEmptyTimestamps();
+                auto copy = super::Messages(createdMessages);
                 createdMessages[i] = createdData;
+                createdMessagesCopies.push_back(copy);
+                ++numberOfMessageCreated;
             }
-            auto copy = super::Messages(createdMessages);
-            createdMessagesCopies.push_back(copy);
 
-            ++numberOfMessageCreated;
             if (hasCreatedMinimumNumberOfMessages() && !messagePromiseFulfilled.load()) {
                 messagePromiseFulfilled.store(true);
                 minimumNumberOfMessageCreated.set_value(true);
@@ -105,7 +116,7 @@ namespace SensorAccessLinkTestMock {
 
             // WARNING! This mock implementation of readMessage needs to be slowed down because the way gtest works. DO NOT REMOVE.
             std::this_thread::sleep_for(std::chrono::milliseconds(5));
-            std::this_thread::yield();
+           yield();
 
             return createdMessages;
         }
@@ -113,14 +124,14 @@ namespace SensorAccessLinkTestMock {
         super::RawDataCycles fetchRawDataCycles() override {
             super::RawDataCycles createdRawDataCycles;
 
-            for (auto i = 0u; i < Sensor::Test::Simple::Structures::MAX_NUMBER_OF_BULK_FETCHABLE_RAW_DATA_CYCLES; ++i) {
-                auto createdRawData = DataTestUtil::createRandomSimpleRawData();
+            for (auto i = 0u; i < Sensor::Test::RealisticImplementation::Structures::MAX_NUMBER_OF_BULK_FETCHABLE_RAW_DATA_CYCLES; ++i) {
+                auto createdRawData = DataTestUtil::createRandomRealisticRawData();
+                auto copy = super::RawDataCycles(createdRawDataCycles);
                 createdRawDataCycles[i] = createdRawData;
+                createdRawDataCyclesCopies.push_back(copy);
+                ++numberOfRawDataCyclesCreated;
             }
-            auto copy = super::RawDataCycles(createdRawDataCycles);
-            createdRawDataCyclesCopies.push_back(copy);
 
-            ++numberOfRawDataCyclesCreated;
             if (hasCreatedMinimumNumberOfRawDataCycles() && !rawDataPromiseFulfilled.load()) {
                 rawDataPromiseFulfilled.store(true);
                 minimumNumberOfRawDataCycleCreated.set_value(true);
@@ -128,7 +139,7 @@ namespace SensorAccessLinkTestMock {
 
             // WARNING! This mock implementation of readMessage needs to be slowed down because the way gtest works. DO NOT REMOVE.
             std::this_thread::sleep_for(std::chrono::milliseconds(5));
-            std::this_thread::yield();
+            yield();
             return createdRawDataCycles;
         }
 
@@ -188,50 +199,80 @@ namespace SensorAccessLinkTestMock {
         RawDataCyclesList createdRawDataCyclesCopies;
     };
 
-    using SimpleTranslationStrategy = DataTranslation::DataTranslationStrategy<Sensor::Test::Simple::Structures, Sensor::Test::Simple::Structures>;
+    using TranslationStrategy = DataTranslation::DataTranslationStrategy<DataStructures, GatewayStructures>;
 
-    class MockTranslationStrategy final : public SimpleTranslationStrategy {
+    class MockTranslationStrategy final : public TranslationStrategy {
+
     protected:
-        using super = SimpleTranslationStrategy;
-        using super::SensorMessage;
-        using super::SensorRawData;
+
+        using super = TranslationStrategy;
+        using SensorMessage = typename super::SensorMessage;
+        using SensorRawData = typename super::SensorRawData;
+
+        using ServerMessage = typename super::ServerMessage;
+        using ServerRawData = typename super::ServerRawData;
 
         using super::MessageSource;
         using super::RawDataSource;
 
+        using TranslatedMessages = std::list<ServerMessage>;
+        using TranslatedRawData = std::list<ServerRawData>;
+
     public:
+
         MockTranslationStrategy() = default;
 
-        void translateMessage(super::SensorMessage&& sensorMessage) override {
-            sensorMessage.inverseContent();
-            super::MessageSource::produce(std::move(sensorMessage));
+        void translateMessage(SensorMessage&& sensorMessage) override {
+            sensorMessage.messageId *= 2;
+            auto newTranslatedMessage = ServerMessage(sensorMessage.messageId, sensorMessage.sensorId,
+                                                      *sensorMessage.getPixels());
+            auto copy = ServerMessage(newTranslatedMessage);
+            translatedMessages.push_back(std::move(copy));
+            super::MessageSource::produce(std::move(newTranslatedMessage));
         }
 
-        void translateRawData(super::SensorRawData&& sensorRawData) override {
-            sensorRawData.inverseContent();
-            super::RawDataSource::produce(std::move(sensorRawData));
+        void translateRawData(SensorRawData&& sensorRawData) override {
+            auto const numberOfData = sensorRawData.content.max_size();
+            for (auto index = 0u; index < numberOfData; ++index) {
+                sensorRawData.content[index] *= 2;
+            }
+            auto newTranslatedRawData = ServerRawData(sensorRawData.content);
+            auto copy = ServerRawData(newTranslatedRawData);
+            translatedRawData.push_back(std::move(copy));
+            super::RawDataSource::produce(std::move(newTranslatedRawData));
         }
 
-        super::SensorMessage
-        translateControlMessageToSensorMessageRequest(
-                super::SensorControlMessage&& sensorControlMessage) override {
-            return super::SensorMessage::returnDefaultData();
+        SensorMessage
+        translateControlMessageToSensorMessageRequest(SensorControlMessage&& sensorControlMessage) override {
+            return SensorMessage::returnDefaultData();
         }
 
-        super::SensorControlMessage
-        translateSensorMessageToControlMessageResult(super::SensorMessage&& sensorMessage) override {
-            return super::SensorControlMessage::returnDefaultData();
+        SensorControlMessage translateSensorMessageToControlMessageResult(SensorMessage&& sensorMessage) override {
+            return SensorControlMessage::returnDefaultData();
         }
+
+        TranslatedMessages const& getTranslatedMessages() const noexcept {
+            return translatedMessages;
+        }
+
+        TranslatedRawData const& getTranslatedRawData() const noexcept {
+            return translatedRawData;
+        }
+
+    private:
+
+        TranslatedMessages translatedMessages;
+        TranslatedRawData translatedRawData;
     };
 
-    using MockServerCommunicationStrategy = Mock::CatchingServerCommunicationStrategyMock<Sensor::Test::Simple::Structures>;
+    using MockServerCommunicationStrategy = Mock::CatchingServerCommunicationStrategyMock<GatewayStructures>;
 }
 
 TEST_F(SensorAccessLinkTest,
        given_strategies_when_start_then_bothSensorAndServerStrategiesReceiveOpenConnectionCall) {
     uint8_t numberOfDataToProcess = 0;
-    SensorAccessLinkTestMock::MockSensorCommunicationStrategy mockSensorCommunicationStrategy(
-            numberOfDataToProcess, numberOfDataToProcess);
+    SensorAccessLinkTestMock::MockSensorCommunicationStrategy mockSensorCommunicationStrategy(numberOfDataToProcess,
+                                                                                              numberOfDataToProcess);
     SensorAccessLinkTestMock::MockTranslationStrategy mockTranslationStrategy;
     SensorAccessLinkTestMock::MockServerCommunicationStrategy mockServerCommunicationStrategy;
     SensorAccessLink sensorAccessLink(&mockServerCommunicationStrategy,
@@ -350,31 +391,18 @@ TEST_F(SensorAccessLinkTest,
 
     sensorAccessLink.terminateAndJoin();
 
-    auto createdDataList = mockSensorCommunicationStrategy.getCreatedMessageCopies();
-    std::vector<SensorAccessLinkTestMock::SimpleSensorCommunicationStrategy::Message> flattenMessages;
-    auto const numberOfBulkMessages = createdDataList.size();
-    auto const numberOfMessagesPerBulk = Sensor::Test::Simple::Structures::MAX_NUMBER_OF_BULK_FETCHABLE_MESSAGES;
-    auto const totalNumberOfMessages = numberOfBulkMessages * numberOfMessagesPerBulk;
-    flattenMessages.reserve(totalNumberOfMessages);
-    for (uint32_t i = 0; i < numberOfBulkMessages; ++i) {
-        auto currentMessages = createdDataList.front();
-        createdDataList.pop_front();
-        for (uint32_t j = 0; j < numberOfMessagesPerBulk; ++j) {
-            flattenMessages.push_back(currentMessages.at(j));
-        }
-    }
+    auto translatedDataList = mockTranslationStrategy.getTranslatedMessages();
     auto receivedDataList = mockServerCommunicationStrategy.getReceivedMessages();
+    auto totalNumberOfMessages = translatedDataList.size();
 
     bool dataHasPassedThroughCorrectly = true;
-    for (uint32_t messageIndex = 0;
-         messageIndex < totalNumberOfMessages && dataHasPassedThroughCorrectly; ++messageIndex) {
-        auto createdMessage = flattenMessages.at(messageIndex);
-        auto receivedMessage = receivedDataList.front();
+    for (auto messageIndex = 0u; messageIndex < totalNumberOfMessages; ++messageIndex) {
+        auto expected = translatedDataList.front();
+        auto actual = receivedDataList.front();
+        ASSERT_EQ(expected, actual);
+        translatedDataList.pop_front();
         receivedDataList.pop_front();
-        dataHasPassedThroughCorrectly = createdMessage.isTheInverseOf(receivedMessage);
     }
-
-    ASSERT_TRUE(dataHasPassedThroughCorrectly);
 }
 
 /**
@@ -399,31 +427,18 @@ TEST_F(SensorAccessLinkTest,
 
     sensorAccessLink.terminateAndJoin();
 
-    auto createdRawDataList = mockSensorCommunicationStrategy.getCreatedRawDataCopies();
-    std::vector<SensorAccessLinkTestMock::SimpleSensorCommunicationStrategy::RawData> flattenRawDataCycles;
-    auto const numberOfBulkRawDataCycles = createdRawDataList.size();
-    auto const numberOfRawDataCyclesPerBulk = Sensor::Test::Simple::Structures::MAX_NUMBER_OF_BULK_FETCHABLE_RAW_DATA_CYCLES;
-    auto const totalNumberOfRawDataCycles = numberOfBulkRawDataCycles * numberOfRawDataCyclesPerBulk;
-    flattenRawDataCycles.reserve(totalNumberOfRawDataCycles);
-    for (uint32_t i = 0; i < numberOfBulkRawDataCycles; ++i) {
-        auto currentRawDataCycles = createdRawDataList.front();
-        createdRawDataList.pop_front();
-        for (uint32_t j = 0; j < numberOfRawDataCyclesPerBulk; ++j) {
-            flattenRawDataCycles.push_back(currentRawDataCycles.at(j));
-        }
-    }
+    auto translatedDataList = mockTranslationStrategy.getTranslatedRawData();
     auto receivedRawDataList = mockServerCommunicationStrategy.getReceivedRawData();
+    auto totalNumberOfMessages = translatedDataList.size();
 
     bool dataHasPassedThroughCorrectly = true;
-    for (uint32_t rawDataIndex = 0;
-         rawDataIndex < totalNumberOfRawDataCycles && dataHasPassedThroughCorrectly; ++rawDataIndex) {
-        auto createdRawData = flattenRawDataCycles.at(rawDataIndex);
-        auto receivedRawData = receivedRawDataList.front();
+    for (auto messageIndex = 0u; messageIndex < totalNumberOfMessages; ++messageIndex) {
+        auto expected = translatedDataList.front();
+        auto actual = receivedRawDataList.front();
+        ASSERT_EQ(expected, actual);
+        translatedDataList.pop_front();
         receivedRawDataList.pop_front();
-        dataHasPassedThroughCorrectly = createdRawData.isTheInverseOf(receivedRawData);
     }
-
-    ASSERT_TRUE(dataHasPassedThroughCorrectly);
 }
 
 

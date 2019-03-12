@@ -104,17 +104,17 @@ namespace DataFlow {
 
     namespace Defaults {
         using DataFlow::AWLMessage;
-        AWL::MessageId const DEFAULT_ID = 0;
-        AWL::MessageTimestamp const DEFAULT_TIMESTAMP = 0;
-        AWL::MessageLength const DEFAULT_LENGTH = 0;
-        AWL::MessageDataArray const DEFAULT_AWL_DATA = AWL::MessageDataArray();
+        AWL::MessageId const DEFAULT_AWL_MESSAGE_ID = 0;
+        AWL::MessageTimestamp const DEFAULT_AWL_MESSAGE_TIMESTAMP = 0;
+        AWL::MessageLength const DEFAULT_AWL_MESSAGE_LENGTH = 0;
+        AWL::MessageDataArray const DEFAULT_AWL_MESSAGE_DATA = AWL::MessageDataArray();
 
         template<class SensorMessageDefinition>
         AWLMessage<SensorMessageDefinition> const DEFAULT_AWL_MESSAGE = AWLMessage<SensorMessageDefinition>(
-                DEFAULT_ID,
-                DEFAULT_TIMESTAMP,
-                DEFAULT_LENGTH,
-                DEFAULT_AWL_DATA);
+                DEFAULT_AWL_MESSAGE_ID,
+                DEFAULT_AWL_MESSAGE_TIMESTAMP,
+                DEFAULT_AWL_MESSAGE_LENGTH,
+                DEFAULT_AWL_MESSAGE_DATA);
     }
 
     template<class SensorMessageDefinition>

@@ -24,7 +24,7 @@ namespace SensorAccessLinkElement {
     template<class SENSOR_STRUCTURES, class SERVER_STRUCTURES>
     class DataTranslator : public DataFlow::DataSink<typename SENSOR_STRUCTURES::Message>,
                            public DataFlow::DataSink<typename SENSOR_STRUCTURES::RawData>,
-                           public DataFlow::DataSource<typename SENSOR_STRUCTURES::Message>, // SensorRequests
+                           public DataFlow::DataSource<typename SENSOR_STRUCTURES::Message, SENSOR_STRUCTURES::ASYNC_REQUEST_BUFFER_SIZE_BEFORE_TRANSMISSION_TO_SENSOR, ONLY_ONE_CONSUMER>, // SensorRequests
                            public DataFlow::DataSource<ErrorHandling::SensorAccessLinkError> {
 
     public:
@@ -40,7 +40,7 @@ namespace SensorAccessLinkElement {
 
         using MessageSink = DataFlow::DataSink<SensorMessage>;
         using RawDataSink = DataFlow::DataSink<SensorRawData>;
-        using RequestSource = DataFlow::DataSource<SensorRequest>;
+        using RequestSource = DataFlow::DataSource<SensorRequest, SENSOR_STRUCTURES::ASYNC_REQUEST_BUFFER_SIZE_BEFORE_TRANSMISSION_TO_SENSOR, ONLY_ONE_CONSUMER>;
         using ErrorSource = DataFlow::DataSource<ErrorHandling::SensorAccessLinkError>;
 
     public:

@@ -1,9 +1,12 @@
 /**
-	Copyright 2014-2018 Phantom Intelligence Inc.
+	Copyright 2014-2019 Phantom Intelligence Inc.
+
 	Licensed under the Apache License, Version 2.0 (the "License");
 	you may not use this file except in compliance with the License.
 	You may obtain a copy of the License at
+
 		http://www.apache.org/licenses/LICENSE-2.0
+
 	Unless required by applicable law or agreed to in writing, software
 	distributed under the License is distributed on an "AS IS" BASIS,
 	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -91,12 +94,13 @@ void GuardianTranslationStrategy::addTrackInPixel(SensorMessage&& sensorMessage,
     TrackId trackId = convertTwoBytesToUnsignedBigEndian(sensorMessage.data[0], sensorMessage.data[1]);
     ConfidenceLevel confidenceLevel = sensorMessage.data[5];
     Intensity intensity = convertTwoBytesToUnsignedBigEndian(sensorMessage.data[6], sensorMessage.data[7]);
-    Track track;
+    DataFlow::Track track;
     track.id = trackId;
     track.confidenceLevel = confidenceLevel;
     track.intensity = intensity;
     currentOutputMessage.addTrackToPixelWithId(pixelId, std::move(track));
 };
+
 
 void GuardianTranslationStrategy::translateDetectionVelocityMessage(SensorMessage&& sensorMessage) {
     Distance distance = convertTwoBytesToUnsignedBigEndian(sensorMessage.data[2], sensorMessage.data[3]);
@@ -107,17 +111,6 @@ void GuardianTranslationStrategy::translateDetectionVelocityMessage(SensorMessag
     track->distance = distance;
     track->speed = speed;
     track->acceleration = acceleration;
-}
-
-Track* GuardianTranslationStrategy::fetchTrack(TrackId const& trackId) {
-    auto pixels = currentOutputMessage.getPixels();
-    for (auto i = 0; i < NUMBER_OF_PIXELS; ++i) {
-        auto pixel = &pixels->at(i);
-        if (pixel->doesTrackExist(trackId)) {
-            return pixel->fetchTrackById(trackId);
-        }
-    }
-    return nullptr;
 }
 
 void GuardianTranslationStrategy::reverseRawDataDefinitionEndianness(SensorRawData* sensorRawData) {
@@ -139,5 +132,16 @@ void GuardianTranslationStrategy::orderRawData(SensorRawData* sensorRawData) {
                 sensorRawData->content.begin() + ordinalChannelIndex * NUMBER_OF_SAMPLES_PER_CHANNEL;
         std::copy_n(originStartPosition, NUMBER_OF_SAMPLES_PER_CHANNEL, destinationStartPosition);
     }
+}
+
+DataFlow::Track* GuardianTranslationStrategy::fetchTrack(TrackId const& trackId) {
+    auto pixels = currentOutputMessage.getPixels();
+    for (auto i = 0; i < NUMBER_OF_PIXELS; ++i) {
+        auto pixel = &pixels->at(i);
+        if (pixel->doesTrackExist(trackId)) {
+           return pixel->fetchTrackById(trackId);
+        }
+    }
+    return nullptr;
 }
 

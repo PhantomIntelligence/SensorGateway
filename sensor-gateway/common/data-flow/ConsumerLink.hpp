@@ -20,12 +20,17 @@
 
 #include "sensor-gateway/common/container/ConstantSizedPointerList.hpp"
 
+namespace {
+    constexpr size_t const ONLY_ONE_CONSUMER = 1;
+    constexpr size_t const ONLY_ONE_PRODUCER = 1;
+}
+
 namespace DataFlow {
 
-    template<class T, size_t N = RING_BUFFER_DEFAULT_SIZE>
+    template<class T, size_t N = RING_BUFFER_DEFAULT_SIZE, size_t C = NUMBER_OF_CONSUMER_PER_BUFFER>
     class RingBuffer;
 
-    template<class T>
+    template<class T, size_t N = RING_BUFFER_DEFAULT_SIZE, size_t C = NUMBER_OF_CONSUMER_PER_BUFFER>
     class ConsumerLink {
 
     protected:
@@ -36,11 +41,12 @@ namespace DataFlow {
 
     public:
 
-        virtual void linkWith(RingBuffer<T>* buffer) = 0;
+        virtual void linkWith(RingBuffer<T, N, C>* buffer) = 0;
 
-        virtual void activateFor(RingBuffer<T>* buffer) = 0;
+        virtual void activateFor(RingBuffer<T, N, C>* buffer) = 0;
 
-        virtual void deactivateFor(RingBuffer<T>* buffer) = 0;
+        virtual void deactivateFor(RingBuffer<T, N, C>* buffer) = 0;
+
     };
 }
 

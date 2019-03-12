@@ -59,7 +59,8 @@ TEST_F(GatewayRequestHandlingAcceptanceTest,
     serverCommunicationStrategyMock.increaseNumberOfUniqueInvalidGetParameterValueContentsToReturnBy(1);
     DataTranslationStrategyMock dataTranslationStrategyMock;
     SensorCommunicationStrategyMock sensorCommunicationStrategyMock;
-    TranslationStubbedAccessLink accessLink(&serverCommunicationStrategyMock, &dataTranslationStrategyMock,
+    TranslationStubbedAccessLink accessLink(&serverCommunicationStrategyMock,
+                                            &dataTranslationStrategyMock,
                                             &sensorCommunicationStrategyMock);
 
     accessLink.start(SERVER_ADDRESS);
@@ -89,18 +90,20 @@ TEST_F(GatewayRequestHandlingAcceptanceTest,
     dataTranslationStrategyMock.onTranslateControlMessageToSensorMessageRequest(
             std::move(expectedControlMessageRequest))->returnThisSensorMessage(fakeGetParameterRequest);
 
+
     TranslationStubbedAccessLink accessLink(&serverCommunicationStrategyMock,
                                             &dataTranslationStrategyMock,
                                             &sensorCommunicationStrategyMock);
 
     accessLink.start(SERVER_ADDRESS);
-    sensorCommunicationStrategyMock.waitUntilSendRequestInvocation();
+    dataTranslationStrategyMock.waitUntilTranslateControlMessageToSensorMessageRequestInvocation();
     accessLink.terminateAndJoin();
 
-    auto strategyCalled = sensorCommunicationStrategyMock.hasSendRequestBeenInvoked();
+    auto strategyCalled = dataTranslationStrategyMock.hasTranslateControlMessageToSensorMessageRequestBeenCalled();
 
     ASSERT_TRUE(strategyCalled);
 }
+
 
 TEST_F(GatewayRequestHandlingAcceptanceTest,
        given_aValidParameterName_when_getParameterValueAndAnErrorHappensInTheSensor_then_sensorCommunicationStrategyReceivesCorresponingSensorControlMessage) {
@@ -120,16 +123,15 @@ TEST_F(GatewayRequestHandlingAcceptanceTest,
     dataTranslationStrategyMock.onTranslateControlMessageToSensorMessageRequest(
             std::move(expectedControlMessageRequest))->returnThisSensorMessage(fakeGetParameterRequest);
 
-
     TranslationStubbedAccessLink accessLink(&serverCommunicationStrategyMock,
                                             &dataTranslationStrategyMock,
                                             &sensorCommunicationStrategyMock);
 
     accessLink.start(SERVER_ADDRESS);
-    dataTranslationStrategyMock.waitUntilTranslateControlMessageToSensorMessageRequestInvocation();
+    sensorCommunicationStrategyMock.waitUntilSendRequestInvocation();
     accessLink.terminateAndJoin();
 
-    auto strategyCalled = dataTranslationStrategyMock.hasTranslateControlMessageToSensorMessageRequestBeenCalled();
+    auto strategyCalled = sensorCommunicationStrategyMock.hasSendRequestBeenInvoked();
 
     ASSERT_TRUE(strategyCalled);
 }

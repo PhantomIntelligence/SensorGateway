@@ -67,13 +67,11 @@ namespace Mock {
         };
 
         bool hasSendRequestBeenInvoked() const {
-            mockFunctionSendRequest.hasBeenInvoked();
-            return false;
+            return mockFunctionSendRequest.hasBeenInvoked();
         };
 
         bool hasSendRequestBeenInvokedWith(Request const& request) const {
-            mockFunctionSendRequest.hasBeenInvokedWith(request);
-            return false;
+            return mockFunctionSendRequest.hasBeenInvokedWith(request);
         };
 
     private:

@@ -16,44 +16,40 @@
 
 #include "Track.h"
 
-using DataFlow::Acceleration;
-using DataFlow::ConfidenceLevel;
-using DataFlow::Distance;
-using DataFlow::TrackId;
-using DataFlow::Speed;
-using DataFlow::Intensity;
 using DataFlow::Track;
-using Defaults::Track::DEFAULT_ID;
-using Defaults::Track::DEFAULT_ACCELERATION;
-using Defaults::Track::DEFAULT_SPEED;
-using Defaults::Track::DEFAULT_DISTANCE;
-using Defaults::Track::DEFAULT_CONFIDENCE_LEVEL;
-using Defaults::Track::DEFAULT_INTENSITY;
-using Defaults::Track::DEFAULT_TRACK;
+using DataFlow::Defaults::Track::DEFAULT_ID;
+using DataFlow::Defaults::Track::DEFAULT_ACCELERATION;
+using DataFlow::Defaults::Track::DEFAULT_SPEED;
+using DataFlow::Defaults::Track::DEFAULT_DISTANCE;
+using DataFlow::Defaults::Track::DEFAULT_CONFIDENCE_LEVEL;
+using DataFlow::Defaults::Track::DEFAULT_INTENSITY;
+using DataFlow::Defaults::Track::DEFAULT_TRACK;
 
 
-Track::Track(TrackId trackId, ConfidenceLevel confidenceLevel, Intensity intensity,
-             Acceleration acceleration, Distance distance, Speed speed) : id(trackId),
-                                                                          confidenceLevel(confidenceLevel),
-                                                                          intensity(intensity),
-                                                                          acceleration(acceleration),
-                                                                          distance(distance),
-                                                                          speed(speed) {
+Track::Track(TrackId trackId, Distance distance, Intensity intensity, Speed speed, Acceleration acceleration,
+             ConfidenceLevel confidenceLevel) :
+        id(trackId),
+        confidenceLevel(confidenceLevel),
+        intensity(intensity),
+        acceleration(acceleration),
+        distance(distance),
+        speed(speed) {
 
 }
 
-Track::Track() : Track(Track::returnDefaultData()) {}
+Track::Track() : Track(Track::returnDefaultData()) {
+}
 
-Track::Track(Track const& other) : Track(other.id, other.confidenceLevel, other.intensity,
-                                         other.acceleration, other.distance, other.speed) {
+Track::Track(Track const& other) : Track(other.id, other.distance, other.intensity, other.speed,
+                                         other.acceleration, other.confidenceLevel) {
 }
 
 Track::Track(Track&& other) noexcept: id(other.id),
-                                      confidenceLevel(other.confidenceLevel),
-                                      intensity(other.intensity),
-                                      acceleration(other.acceleration),
                                       distance(other.distance),
-                                      speed(other.speed) {
+                                      intensity(other.intensity),
+                                      speed(other.speed),
+                                      acceleration(other.acceleration),
+                                      confidenceLevel(other.confidenceLevel) {
 }
 
 Track& Track::operator=(Track const& other)& {
@@ -78,17 +74,17 @@ void Track::swap(Track& current, Track& other) noexcept {
 
 bool Track::operator==(Track const& other) const {
     auto sameTrackId = (id == other.id);
-    auto sameConfidenceLevel = (confidenceLevel == other.confidenceLevel);
-    auto sameIntensity = (intensity == other.intensity);
-    auto sameAcceleration = (acceleration == other.acceleration);
     auto sameDistance = (distance == other.distance);
+    auto sameIntensity = (intensity == other.intensity);
     auto sameSpeed = (speed == other.speed);
-    bool tracksAreEqual = (sameAcceleration &&
-                           sameConfidenceLevel &&
+    auto sameAcceleration = (acceleration == other.acceleration);
+    auto sameConfidenceLevel = (confidenceLevel == other.confidenceLevel);
+    bool tracksAreEqual = (sameTrackId &&
                            sameDistance &&
-                           sameTrackId &&
                            sameIntensity &&
-                           sameSpeed);
+                           sameSpeed &&
+                           sameAcceleration &&
+                           sameConfidenceLevel);
     return tracksAreEqual;
 }
 

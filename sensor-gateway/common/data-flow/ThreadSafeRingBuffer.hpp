@@ -25,9 +25,9 @@ namespace DataFlow {
     /**
      * @warning Use this class ONLY when more than one thread needs to write to the RingBuffer
      */
-    template<class T>
-    class ThreadSafeRingBuffer : public RingBuffer<T> {
-        using super = RingBuffer<T>;
+    template<class T, size_t N = RING_BUFFER_DEFAULT_SIZE, size_t C = NUMBER_OF_CONSUMER_PER_BUFFER>
+    class ThreadSafeRingBuffer : public RingBuffer<T, N, C> {
+        using super = RingBuffer<T, N, C>;
 
     public:
 

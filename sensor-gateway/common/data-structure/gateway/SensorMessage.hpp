@@ -1,5 +1,5 @@
 /**
-	Copyright 2014-2018 Phantom Intelligence Inc.
+	Copyright 2014-2019 Phantom Intelligence Inc.
 
 	Licensed under the Apache License, Version 2.0 (the "License");
 	you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 #ifndef SENSORGATEWAY_SENSORMESSAGE_HPP
 #define SENSORGATEWAY_SENSORMESSAGE_HPP
 
-#include "Pixel.h"
+#include "Pixel.hpp"
 
 namespace DataFlow {
 
@@ -30,7 +30,10 @@ namespace DataFlow {
 
     public:
 
-        using Pixels = typename SensorMessageDefinition::template Pixels<Pixel>::type;
+        static constexpr auto const NUMBER_OF_PIXEL = SensorMessageDefinition::NUMBER_OF_PIXELS;
+        static constexpr auto const NUMBER_OF_TRACKS_PER_PIXEL = SensorMessageDefinition::NUMBER_OF_TRACKS_PER_PIXEL;
+        using PixelType = DataFlow::Pixel<NUMBER_OF_TRACKS_PER_PIXEL>;
+        using Pixels = typename SensorMessageDefinition::template Pixels<PixelType>::type;
 
         explicit SensorMessage(MessageId messageId, SensorId sensorId, Pixels pixels) :
                 messageId(std::move(messageId)), sensorId(std::move(sensorId)), pixels(std::move(pixels)) {};
@@ -119,7 +122,7 @@ namespace DataFlow {
         SensorId const DEFAULT_SENSOR_ID = -1;
 
         template<typename SensorMessageDefinition>
-        typename SensorMessage<SensorMessageDefinition>::Pixels const DEFAULT_PIXELS_ARRAY;
+        typename SensorMessage<SensorMessageDefinition>::Pixels const DEFAULT_PIXELS_ARRAY = typename SensorMessage<SensorMessageDefinition>::Pixels();
 
         template<typename SensorMessageDefinition>
         SensorMessage<SensorMessageDefinition> const DEFAULT_SENSOR_MESSAGE = SensorMessage<SensorMessageDefinition>(

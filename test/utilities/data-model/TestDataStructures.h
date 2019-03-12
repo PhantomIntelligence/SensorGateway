@@ -32,8 +32,9 @@ namespace Sensor {
                 typedef typename DataModel::SimpleControlMessage ControlMessage;
                 using Parameters = Sensor::FakeParameter::FruitBasketParameters;
 
-                static size_t const MAX_NUMBER_OF_BULK_FETCHABLE_MESSAGES = 1; // IMPORTANT: this has to stay = 1!
-                static size_t const MAX_NUMBER_OF_BULK_FETCHABLE_RAW_DATA_CYCLES = 1;
+                static constexpr size_t const MAX_NUMBER_OF_BULK_FETCHABLE_MESSAGES = 1;
+                static constexpr size_t const MAX_NUMBER_OF_BULK_FETCHABLE_RAW_DATA_CYCLES = 1;
+                static constexpr size_t const ASYNC_REQUEST_BUFFER_SIZE_BEFORE_TRANSMISSION_TO_SENSOR = 2;
 
                 static size_t const MAX_NUMBER_OF_CONCURRENT_REQUEST_OF_ONE_KIND = 16;
             };
@@ -47,6 +48,7 @@ namespace Sensor {
                 static size_t const NUMBER_OF_GATEWAY_TIME_POINTS = 2;
 
                 static size_t const NUMBER_OF_PIXELS = 4;
+                static size_t const NUMBER_OF_TRACKS_PER_PIXEL = 2;
                 static size_t const NUMBER_OF_CHANNELS = 2;
                 static size_t const RAW_DATA_SAMPLING_LENGTH = 16;
                 static size_t const MAX_COMMAND_PAYLOAD_SIZE = FakeParameter::PARAMETER_CONTROL_MESSAGE_PAYLOAD_LENGTH;
@@ -67,6 +69,7 @@ namespace Sensor {
                 typedef typename
                 Sensor::SensorMessageDefinition<
                         Constants::NUMBER_OF_PIXELS,
+                        Constants::NUMBER_OF_TRACKS_PER_PIXEL,
                         TimeTrackingDefinition
                 > MessageDefinition;
 
@@ -88,10 +91,11 @@ namespace Sensor {
                 typedef typename DataFlow::ControlMessage<ControlMessageDefinition> ControlMessage;
                 using Parameters = Sensor::FakeParameter::FruitBasketParameters;
 
-                static size_t const MAX_NUMBER_OF_BULK_FETCHABLE_MESSAGES = 2;
-                static size_t const MAX_NUMBER_OF_BULK_FETCHABLE_RAW_DATA_CYCLES = 2;
+                static constexpr size_t const MAX_NUMBER_OF_BULK_FETCHABLE_MESSAGES = 2;
+                static constexpr size_t const MAX_NUMBER_OF_BULK_FETCHABLE_RAW_DATA_CYCLES = 2;
+                static constexpr size_t const ASYNC_REQUEST_BUFFER_SIZE_BEFORE_TRANSMISSION_TO_SENSOR = 8;
 
-                static size_t const MAX_NUMBER_OF_CONCURRENT_REQUEST_OF_ONE_KIND = 16;
+                static constexpr size_t const MAX_NUMBER_OF_CONCURRENT_REQUEST_OF_ONE_KIND = 16;
             };
         }
     }

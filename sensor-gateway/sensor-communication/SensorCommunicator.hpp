@@ -22,9 +22,20 @@
 
 namespace SensorAccessLinkElement {
 
+    namespace Details {
+
+        template<class T>
+        using AsyncRequestBuffer = DataFlow::RingBuffer<typename T::Message, T::ASYNC_REQUEST_BUFFER_SIZE_BEFORE_TRANSMISSION_TO_SENSOR, ONLY_ONE_CONSUMER>;
+
+        template<class T>
+        using AsyncRequestBufferLink = DataFlow::ConsumerLink<typename T::Message, T::ASYNC_REQUEST_BUFFER_SIZE_BEFORE_TRANSMISSION_TO_SENSOR, ONLY_ONE_CONSUMER>;
+    }
+
     template<class T>
     class SensorCommunicator : public DataFlow::DataSource<typename T::Message>,
                                public DataFlow::DataSource<typename T::RawData>,
+                               public DataFlow::DataSink<typename T::Message>, // SensorRequests
+                               public Details::AsyncRequestBufferLink<T>, // SensorRequests
                                public DataFlow::DataSource<ErrorHandling::SensorAccessLinkError> {
 
     public:
@@ -33,23 +44,33 @@ namespace SensorAccessLinkElement {
 
     protected:
 
-        using MESSAGE = typename T::Message;
-        using RAW_DATA = typename T::RawData;
-        using MESSAGES = typename SensorCommunicationStrategy::Messages;
-        using RAW_DATA_CYCLES = typename SensorCommunicationStrategy::RawDataCycles;
+        using Message = typename T::Message;
+        using RawData = typename T::RawData;
+        using Request = typename T::Message; //SensorRequests
+        using Messages = typename SensorCommunicationStrategy::Messages;
+        using RawDataCycles = typename SensorCommunicationStrategy::RawDataCycles;
 
-        using MessageSource = DataFlow::DataSource<MESSAGE>;
-        using RawDataSource = DataFlow::DataSource<RAW_DATA>;
+        using MessageSource = DataFlow::DataSource<Message>;
+        using RawDataSource = DataFlow::DataSource<RawData>;
+        using RequestSink = DataFlow::DataSink<Message>;
         using ErrorSource = DataFlow::DataSource<ErrorHandling::SensorAccessLinkError>;
 
-        MESSAGE const DEFAULT_MESSAGE = T::Message::returnDefaultData();
-        RAW_DATA const DEFAULT_RAW_DATA = T::RawData::returnDefaultData();
+        Message const DEFAULT_MESSAGE = T::Message::returnDefaultData();
+        RawData const DEFAULT_RAW_DATA = T::RawData::returnDefaultData();
+
+        using AsyncRequestBuffer = Details::AsyncRequestBuffer<T>;
+        using ThisClass = SensorCommunicator<T>;
 
     public:
+
+        using RequestProcessingScheduler = typename DataFlow::DataProcessingScheduler<typename T::Message, ThisClass, ONLY_ONE_PRODUCER, ONLY_ONE_CONSUMER, T::ASYNC_REQUEST_BUFFER_SIZE_BEFORE_TRANSMISSION_TO_SENSOR>;
+
         explicit SensorCommunicator(SensorCommunicationStrategy* sensorCommunicationStrategy) :
                 terminateOrderReceived(false),
                 sensorCommunicationStrategy(sensorCommunicationStrategy),
+                hasToSendRequest(false),
                 communicatorThread(JoinableThread(doNothing)) {
+            linkWith(&asyncRequestBuffer);
             communicatorThread.exitSafely();
         }
 
@@ -63,11 +84,32 @@ namespace SensorAccessLinkElement {
 
         SensorCommunicator& operator=(SensorCommunicator&& other)& noexcept = delete;
 
+        /**
+         * @warning It is important that this function remains not implemented
+         */
+        void linkWith(AsyncRequestBuffer* asyncRequestBuffer) override {
+            asyncRequestBuffer->linkWith(this);
+        }
+
+        void activateFor(AsyncRequestBuffer* asyncRequestBuffer) {
+            hasToSendRequest.store(true);
+        }
+
+        void deactivateFor(AsyncRequestBuffer* asyncRequestBuffer) {
+            hasToSendRequest.store(false);
+        }
+
         void start() {
             openConnection();
             yield();
             communicatorThread = JoinableThread(&SensorCommunicator::run, this);
         };
+
+        void consume(Request&& request) override {
+            if (!terminateOrderHasBeenReceived()) {
+                asyncRequestBuffer.write(std::forward<Request>(request));
+            }
+        }
 
         void terminateAndJoin() {
             closeConnection();
@@ -78,9 +120,7 @@ namespace SensorAccessLinkElement {
         };
 
         using MessageSource::linkConsumer;
-
         using RawDataSource::linkConsumer;
-
         using ErrorSource::linkConsumer;
 
     private:
@@ -107,12 +147,15 @@ namespace SensorAccessLinkElement {
             while (!terminateOrderHasBeenReceived()) {
                 handleIncomingMessages();
                 handleIncomingRawData();
+                if (hasToSendRequest.load()) {
+                    sendRequestsToSensor();
+                }
                 yield();
             }
         }
 
         void handleIncomingMessages() {
-            MESSAGES messages;
+            Messages messages;
             try {
                 messages = sensorCommunicationStrategy->fetchMessages();
             } catch (ErrorHandling::SensorAccessLinkError& strategyError) {
@@ -129,7 +172,7 @@ namespace SensorAccessLinkElement {
         }
 
         void handleIncomingRawData() {
-            RAW_DATA_CYCLES rawDataCycles;
+            RawDataCycles rawDataCycles;
             try {
                 rawDataCycles = sensorCommunicationStrategy->fetchRawDataCycles();
             } catch (ErrorHandling::SensorAccessLinkError& strategyError) {
@@ -143,6 +186,11 @@ namespace SensorAccessLinkElement {
                     RawDataSource::produce(std::move(rawDataCycle));
                 }
             }
+        }
+
+        void sendRequestsToSensor() {
+            auto requestToSend = asyncRequestBuffer.consumeNextDataFor(this);
+            sensorCommunicationStrategy->sendRequest(std::move(requestToSend));
         }
 
         void addOriginAndHandleError(ErrorHandling::SensorAccessLinkError&& error, std::string const& originToAdd) {
@@ -175,6 +223,9 @@ namespace SensorAccessLinkElement {
         AtomicFlag terminateOrderReceived;
 
         SensorCommunicationStrategy* sensorCommunicationStrategy;
+
+        AsyncRequestBuffer asyncRequestBuffer;
+        AtomicFlag hasToSendRequest;
     };
 }
 

@@ -68,7 +68,8 @@ namespace DataTranslatorTestMock {
                 translateMessageCalled(false),
                 translateRawDataCalled(false),
                 receivedSensorMessage(Structures::Message::returnDefaultData()),
-                receivedSensorRawData(Structures::RawData::returnDefaultData()) {};
+                receivedSensorRawData(Structures::RawData::returnDefaultData()) {
+        };
 
         ~MockDataTranslationStrategy() noexcept = default;
 
@@ -147,7 +148,7 @@ TEST_F(DataTranslatorTest,
        given_aThrowingTranslationStrategy_when_consumeMessage_then_producesAnErrorCorrectlyFormatted) {
     auto numberOfErrorToReceive = 1;
     Mock::ArbitraryDataSinkMock<Error> sink(numberOfErrorToReceive);
-    DataFlow::DataProcessingScheduler<Error, ErrorSinkMock, 1> scheduler(&sink);
+    DataFlow::DataProcessingScheduler<Error, ErrorSinkMock, ONLY_ONE_PRODUCER> scheduler(&sink);
 
     ThrowingDataTranslationStrategy throwingMockStrategy;
     DataTranslator dataTranslator(&throwingMockStrategy);
@@ -178,7 +179,7 @@ TEST_F(DataTranslatorTest,
        given_aThrowingTranslationStrategy_when_consumeRawData_then_producesAnErrorCorrectlyFormatted) {
     auto numberOfErrorToReceive = 1;
     Mock::ArbitraryDataSinkMock<Error> sink(numberOfErrorToReceive);
-    DataFlow::DataProcessingScheduler<Error, ErrorSinkMock, 1> scheduler(&sink);
+    DataFlow::DataProcessingScheduler<Error, ErrorSinkMock, ONLY_ONE_PRODUCER> scheduler(&sink);
 
     ThrowingDataTranslationStrategy throwingMockStrategy;
     DataTranslator dataTranslator(&throwingMockStrategy);
@@ -256,7 +257,8 @@ TEST_F(DataTranslatorTest,
 
     using FakeSensorMessageSinkMock =Mock::ArbitraryDataSinkMock<FakeSensorMessage>;
     FakeSensorMessageSinkMock sink(1);
-    DataFlow::DataProcessingScheduler<FakeSensorMessage, FakeSensorMessageSinkMock, 1> scheduler(&sink);
+    DataFlow::DataProcessingScheduler<FakeSensorMessage, FakeSensorMessageSinkMock, ONLY_ONE_PRODUCER, ONLY_ONE_CONSUMER, DataStructures::ASYNC_REQUEST_BUFFER_SIZE_BEFORE_TRANSMISSION_TO_SENSOR> scheduler(
+            &sink);
 
     dataTranslator.linkConsumer(&scheduler);
 

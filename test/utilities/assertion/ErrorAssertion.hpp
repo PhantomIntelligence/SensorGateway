@@ -23,7 +23,7 @@
 namespace {
     using Error = ErrorHandling::SensorAccessLinkError;
     using ErrorSinkMock = Mock::ArbitraryDataSinkMock<Error>;
-    using ErrorProcessingScheduler = DataFlow::DataProcessingScheduler<Error, ErrorSinkMock, 1>;
+    using ErrorProcessingScheduler = DataFlow::DataProcessingScheduler<Error, ErrorSinkMock, ONLY_ONE_PRODUCER>;
 
    Error formatStrategyErrorWithCorrectOrigin(Error const& strategyIssuedError, std::string const& origin) noexcept {
         Error formattedError(origin + ErrorHandling::Message::SEPARATOR + strategyIssuedError.getOrigin(),

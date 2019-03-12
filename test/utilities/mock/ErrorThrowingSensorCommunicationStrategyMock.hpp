@@ -220,8 +220,8 @@ namespace Mock {
                     throw errorToThrow;
                 }
             }
-            auto rawData = super::RawData::returnDefaultData();
-            typename super::RawDataCycles rawDataCycles = {rawData};
+            typename super::RawDataCycles rawDataCycles;
+            rawDataCycles.fill(super::RawData::returnDefaultData());
             return rawDataCycles;
         }
 
@@ -247,7 +247,7 @@ namespace Mock {
 
         void waitUntilOpenConnectionCallIsMadeAfterErrorIsThrown() {
             while (!hasOpenConnectionBeenCalledAfterThrowingFunction()) {
-                std::this_thread::yield();
+                yield();
             }
         }
 
