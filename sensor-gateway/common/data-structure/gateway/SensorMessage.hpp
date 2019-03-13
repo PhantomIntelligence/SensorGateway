@@ -120,8 +120,8 @@ namespace DataFlow {
          * If a value is modified here, be sure its homologous value in the communication protocol schema file is too.
          * @see https://github.com/PhantomIntelligence/GatewayProtocol.git
          */
-        static constexpr MessageId const DEFAULT_MESSAGE_ID = 0;
-        static constexpr SensorId const DEFAULT_SENSOR_ID = std::numeric_limits<SensorId>::max();
+        constexpr MessageId const DEFAULT_MESSAGE_ID = 0;
+        constexpr SensorId const DEFAULT_SENSOR_ID = std::numeric_limits<SensorId>::max();
 
         template<typename SensorMessageDefinition>
         typename SensorMessage<SensorMessageDefinition>::Pixels const DEFAULT_PIXELS_ARRAY{{}};

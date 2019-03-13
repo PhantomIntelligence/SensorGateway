@@ -47,23 +47,18 @@ namespace DataFlow {
                 data(data) {
         }
 
-
-        explicit AWLMessage() : AWLMessage(returnDefaultData()) {}
-
+        AWLMessage() noexcept;
 
         ~AWLMessage() noexcept = default;
 
         AWLMessage(AWLMessage const& other) :
-                AWLMessage(other.id, other.timestamp, other.length, other.data) {
-        }
-
-        AWLMessage(AWLMessage&& other) noexcept :
                 id(other.id),
                 timestamp(other.timestamp),
                 length(other.length),
                 data(other.data) {
-
         }
+
+        AWLMessage(AWLMessage&& other) noexcept;
 
         AWLMessage& operator=(AWLMessage const& other)& {
             AWLMessage temporary(other);
@@ -104,17 +99,37 @@ namespace DataFlow {
 
     namespace Defaults {
         using DataFlow::AWLMessage;
-        AWL::MessageId const DEFAULT_AWL_MESSAGE_ID = 0;
-        AWL::MessageTimestamp const DEFAULT_AWL_MESSAGE_TIMESTAMP = 0;
-        AWL::MessageLength const DEFAULT_AWL_MESSAGE_LENGTH = 0;
-        AWL::MessageDataArray const DEFAULT_AWL_MESSAGE_DATA = AWL::MessageDataArray();
+        constexpr AWL::MessageId const UNDEFINED_AWL_MESSAGE_ID = std::numeric_limits<AWL::MessageId>::min();
+        constexpr AWL::MessageId const DEFAULT_AWL_MESSAGE_ID = UNDEFINED_AWL_MESSAGE_ID;
+        constexpr AWL::MessageTimestamp const DEFAULT_AWL_MESSAGE_TIMESTAMP = 0;
+        constexpr AWL::MessageLength const DEFAULT_AWL_MESSAGE_LENGTH = 0;
+        constexpr AWL::MessageDataArray const DEFAULT_AWL_MESSAGE_DATA{{}};
 
         template<class SensorMessageDefinition>
-        AWLMessage<SensorMessageDefinition> const DEFAULT_AWL_MESSAGE = AWLMessage<SensorMessageDefinition>(
-                DEFAULT_AWL_MESSAGE_ID,
-                DEFAULT_AWL_MESSAGE_TIMESTAMP,
-                DEFAULT_AWL_MESSAGE_LENGTH,
-                DEFAULT_AWL_MESSAGE_DATA);
+        AWLMessage<SensorMessageDefinition> const DEFAULT_AWL_MESSAGE(DEFAULT_AWL_MESSAGE_ID,
+                                                                      DEFAULT_AWL_MESSAGE_TIMESTAMP,
+                                                                      DEFAULT_AWL_MESSAGE_LENGTH,
+                                                                      DEFAULT_AWL_MESSAGE_DATA);
+    }
+
+    template<class SensorMessageDefinition>
+    AWLMessage<SensorMessageDefinition>::AWLMessage() noexcept :
+            id(Defaults::DEFAULT_AWL_MESSAGE_ID),
+            timestamp(Defaults::DEFAULT_AWL_MESSAGE_TIMESTAMP),
+            length(Defaults::DEFAULT_AWL_MESSAGE_LENGTH),
+            data(Defaults::DEFAULT_AWL_MESSAGE_DATA) {
+    }
+
+    template<class SensorMessageDefinition>
+    AWLMessage<SensorMessageDefinition>::AWLMessage(AWLMessage<SensorMessageDefinition>&& other) noexcept :
+            id(std::move(other.id)),
+            timestamp(std::move(other.timestamp)),
+            length(std::move(other.length)),
+            data(std::move(other.data)) {
+        id = Defaults::DEFAULT_AWL_MESSAGE_ID;
+        timestamp = Defaults::DEFAULT_AWL_MESSAGE_TIMESTAMP;
+        length = Defaults::DEFAULT_AWL_MESSAGE_LENGTH;
+        data = Defaults::DEFAULT_AWL_MESSAGE_DATA;
     }
 
     template<class SensorMessageDefinition>

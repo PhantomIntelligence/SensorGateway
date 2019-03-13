@@ -163,8 +163,8 @@ namespace DataFlow {
         constexpr int const DEFAULT_CURRENT_NUMBER_OF_TRACKS = 0;
 
         template<size_t N>
-        static Pixel<N> const DEFAULT_PIXEL = Pixel<N>(DEFAULT_ID<N>, DEFAULT_TRACKS_ARRAY<N>,
-                                                       DEFAULT_CURRENT_NUMBER_OF_TRACKS);
+        Pixel<N> const DEFAULT_PIXEL = Pixel<N>(DEFAULT_ID<N>, DEFAULT_TRACKS_ARRAY<N>,
+                                                DEFAULT_CURRENT_NUMBER_OF_TRACKS);
     }
 
 

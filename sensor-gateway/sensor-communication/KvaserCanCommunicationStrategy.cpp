@@ -60,8 +60,9 @@ void KvaserCanCommunicationStrategy::closeConnection() {
 
 KvaserCanCommunicationStrategy::super::Messages KvaserCanCommunicationStrategy::fetchMessages() {
     CanMessage canMessage{};
-    auto returnCode =canReadWait(communicationChannel, &canMessage.id, &canMessage.data, &canMessage.length, &canMessage.flags,
-                &canMessage.timestamp, CANLIB_READ_WAIT_INFINITE_DELAY);
+    auto returnCode = canReadWait(communicationChannel, &canMessage.id, &canMessage.data, &canMessage.length,
+                                  &canMessage.flags,
+                                  &canMessage.timestamp, CANLIB_READ_WAIT_INFINITE_DELAY);
 
     throwErrorIfNecessary(returnCode, "canReadWait");
     auto message = convertCanMessageToSensorMessage(canMessage);
@@ -88,6 +89,17 @@ KvaserCanCommunicationStrategy::convertCanMessageToSensorMessage(CanMessage canM
 }
 
 void KvaserCanCommunicationStrategy::sendRequest(Request&& request) {
+    CanMessage canMessage;
+}
+
+void KvaserCanCommunicationStrategy::writeMessage(CanMessage const& message) {
+    auto returnCode = canWriteWait(communicationChannel,
+                                   message.id,
+                                   (void*) message.data,
+                                   message.length,
+                                   0, // Why? --> Need to confirm with JY
+//                                   &message.flags,
+                                   CANLIB_READ_WAIT_INFINITE_DELAY);
 }
 
 void KvaserCanCommunicationStrategy::throwErrorIfNecessary(canStatus const& errorCode, std::string const& callOrigin) {

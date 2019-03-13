@@ -213,28 +213,28 @@ namespace Assert {
             return ::testing::AssertionSuccess();
         }
 
+        bool sameMessage = true;
+        Details::MessageDifferencesForPrinting messageDifferencesForPrinting;
+
         auto expectedMessageId = expected.messageId;
         auto actualMessageId = actual.messageId;
 
+        Details::addDiffTitle(&messageDifferencesForPrinting, "Sensor Message ");
         if (expectedMessageId != actualMessageId) {
-            return ::testing::AssertionFailure()
-                    << "\n SensorMessages have ... \n"
-                    << "\t | --> different message id \n"
-                    << "\t | --> expected  : " << expectedMessageId << "\n"
-                    << "\t | --> actual    : " << actualMessageId << "\n"
-                    << "\t | -----------------------" << std::endl;
+            Details::addDiff(&messageDifferencesForPrinting, "Message id:", expectedMessageId, actualMessageId);
+            sameMessage = false;
         }
 
         auto expectedSensorId = expected.sensorId;
         auto actualSensorId = actual.sensorId;
 
         if (expectedSensorId != actualSensorId) {
-            return ::testing::AssertionFailure()
-                    << "\n SensorMessages have ... \n"
-                    << "\t | --> different sensor id \n"
-                    << "\t | --> expected  : " << expectedSensorId << "\n"
-                    << "\t | --> actual    : " << actualSensorId << "\n"
-                    << "\t | -----------------------" << std::endl;
+            Details::addDiff(&messageDifferencesForPrinting, "Sensor id:", expectedSensorId, actualSensorId);
+            sameMessage = false;
+        }
+
+        if(!sameMessage) {
+            return formatFailureMessage(&messageDifferencesForPrinting);
         }
 
         return sensorMessageHaveSameContent(expected, actual);

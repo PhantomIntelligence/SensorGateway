@@ -86,9 +86,9 @@ void AWLTranslationStrategy::translateDetectionTrackMessage(SensorMessage&& sens
 }
 
 void AWLTranslationStrategy::addTrackInPixel(SensorMessage&& sensorMessage, PixelId pixelId) {
-    TrackId trackId = convertTwoBytesToUnsignedBigEndian(sensorMessage.data[0], sensorMessage.data[1]);
-    ConfidenceLevel confidenceLevel = sensorMessage.data[5];
-    Intensity intensity = convertTwoBytesToUnsignedBigEndian(sensorMessage.data[6], sensorMessage.data[7]);
+    TrackId const trackId = convertTwoBytesToUnsignedBigEndian(sensorMessage.data[0], sensorMessage.data[1]);
+    ConfidenceLevel const confidenceLevel = sensorMessage.data[5];
+    Intensity const intensity = convertTwoBytesToUnsignedBigEndian(sensorMessage.data[6], sensorMessage.data[7]);
     DataFlow::Track track;
     track.id = trackId;
     track.confidenceLevel = confidenceLevel;
@@ -97,10 +97,10 @@ void AWLTranslationStrategy::addTrackInPixel(SensorMessage&& sensorMessage, Pixe
 };
 
 void AWLTranslationStrategy::translateDetectionVelocityMessage(SensorMessage&& sensorMessage) {
-    Distance distance = convertTwoBytesToUnsignedBigEndian(sensorMessage.data[2], sensorMessage.data[3]);
-    Speed speed = convertTwoBytesToSignedBigEndian(sensorMessage.data[4], sensorMessage.data[5]);
-    Acceleration acceleration = convertTwoBytesToSignedBigEndian(sensorMessage.data[6], sensorMessage.data[7]);
-    TrackId trackId = convertTwoBytesToUnsignedBigEndian(sensorMessage.data[0], sensorMessage.data[1]);
+    Distance const distance = convertTwoBytesToUnsignedBigEndian(sensorMessage.data[2], sensorMessage.data[3]);
+    Speed const speed = convertTwoBytesToSignedBigEndian(sensorMessage.data[4], sensorMessage.data[5]);
+    Acceleration const acceleration = convertTwoBytesToSignedBigEndian(sensorMessage.data[6], sensorMessage.data[7]);
+    TrackId const trackId = convertTwoBytesToUnsignedBigEndian(sensorMessage.data[0], sensorMessage.data[1]);
     auto track = fetchTrack(trackId);
     track->distance = distance / ConversionUnits::NUMBER_OF_CENTIMETERS_IN_A_METER;
     track->speed = speed / ConversionUnits::NUMBER_OF_CENTIMETERS_IN_A_METER;

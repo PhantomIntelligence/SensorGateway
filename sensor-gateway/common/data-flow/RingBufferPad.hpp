@@ -68,7 +68,7 @@ namespace DataFlow {
         }
 
         void write(T&& dataToWrite) {
-            currentData = dataToWrite;
+            currentData = std::forward<T>(dataToWrite);
         }
 
         auto read() const -> T const& {

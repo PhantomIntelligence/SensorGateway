@@ -111,7 +111,7 @@ protected:
     }
 
 private:
-    GatewayMessage const addTrackToGatewayMessage(GatewayMessage const& sensorMessage, Track track) const {
+    GatewayMessage const addTrackToGatewayMessage(GatewayMessage sensorMessage, Track track) const {
         GatewayMessage sensorMessageCopy = GatewayMessage(sensorMessage);
         sensorMessageCopy.addTrackToPixelWithId(SOME_PIXEL_ID, std::move(track));
         return sensorMessageCopy;
@@ -121,8 +121,8 @@ private:
 TEST_F(GuardianTranslationStrategyTest,
        given_someEndOfGatewayMessageAWLMessage_when_translatingOnlyThisMessage_then_buildsGatewayMessageWithValidAttributes) {
 
-    auto endOfGatewayMessageAWLMessage = SOME_END_FRAME_AWL_MESSAGE;
-    auto expectedGatewayMessage = FRAME_AFTER_END_OF_FRAME_MESSAGE_TRANSLATION;
+    auto endOfGatewayMessageAWLMessage = GuardianMessage(SOME_END_FRAME_AWL_MESSAGE);
+    auto expectedGatewayMessage = GatewayMessage(FRAME_AFTER_END_OF_FRAME_MESSAGE_TRANSLATION);
     DataTranslation::GuardianTranslationStrategy translationStrategy;
     GatewayMessageSinkMock sensorMessageSinkMock(1);
     GatewayMessageProcessingScheduler scheduler(&sensorMessageSinkMock);
@@ -139,9 +139,9 @@ TEST_F(GuardianTranslationStrategyTest,
 TEST_F(GuardianTranslationStrategyTest,
        given_someDetectionTrackAndEndOfGatewayMessageAWLMessages_when_translatingThoseMessagesInGivenOrder_then_buildsGatewayMessageWithValidAttribute) {
 
-    auto detectionTrackAWLMessage = SOME_DETECTION_TRACK_AWL_MESSAGE;
-    auto endOfGatewayMessageAWLMessage = SOME_END_FRAME_AWL_MESSAGE;
-    auto expectedGatewayMessage = FRAME_AFTER_DETECTION_TRACK_AND_END_OF_FRAME_MESSAGES_TRANSLATION;
+    auto detectionTrackAWLMessage = GuardianMessage(SOME_DETECTION_TRACK_AWL_MESSAGE);
+    auto endOfGatewayMessageAWLMessage = GuardianMessage(SOME_END_FRAME_AWL_MESSAGE);
+    auto expectedGatewayMessage = GatewayMessage(FRAME_AFTER_DETECTION_TRACK_AND_END_OF_FRAME_MESSAGES_TRANSLATION);
     DataTranslation::GuardianTranslationStrategy translationStrategy;
     GatewayMessageSinkMock sensorMessageSinkMock(1);
     GatewayMessageProcessingScheduler scheduler(&sensorMessageSinkMock);
@@ -159,10 +159,10 @@ TEST_F(GuardianTranslationStrategyTest,
 TEST_F(GuardianTranslationStrategyTest,
        given_someDetectionTrackAndDetectionVelocityAndEndOfGatewayMessageAWLMessages_when_translatingThoseMessagesInGivenOrder_then_buildsGatewayMessageWithValidAttribute) {
 
-    auto detectionTrackAWLMessage = SOME_DETECTION_TRACK_AWL_MESSAGE;
-    auto detectionVelocityAWLMessage = SOME_VELOCITY_TRACK_AWL_MESSAGE;
-    auto endOfGatewayMessageAWLMessage = SOME_END_FRAME_AWL_MESSAGE;
-    auto expectedGatewayMessage = FRAME_AFTER_DETECTION_TRACK_AND_VELOCITY_TRACK_AND_END_OF_FRAME_MESSAGES_TRANSLATION;
+    auto detectionTrackAWLMessage = GuardianMessage(SOME_DETECTION_TRACK_AWL_MESSAGE);
+    auto detectionVelocityAWLMessage = GuardianMessage(SOME_VELOCITY_TRACK_AWL_MESSAGE);
+    auto endOfGatewayMessageAWLMessage = GuardianMessage(SOME_END_FRAME_AWL_MESSAGE);
+    auto expectedGatewayMessage = GatewayMessage(FRAME_AFTER_DETECTION_TRACK_AND_VELOCITY_TRACK_AND_END_OF_FRAME_MESSAGES_TRANSLATION);
     DataTranslation::GuardianTranslationStrategy translationStrategy;
     GatewayMessageSinkMock sensorMessageSinkMock(1);
     GatewayMessageProcessingScheduler scheduler(&sensorMessageSinkMock);
@@ -181,7 +181,7 @@ TEST_F(GuardianTranslationStrategyTest,
 TEST_F(GuardianTranslationStrategyTest,
        given_someEndOfGatewayMessageAWLMessage_when_translatingThisMessage_then_callsProduceOneTime) {
 
-    auto endOfGatewayMessageAWLMessage = SOME_END_FRAME_AWL_MESSAGE;
+    auto endOfGatewayMessageAWLMessage = GuardianMessage(SOME_END_FRAME_AWL_MESSAGE);
     DataTranslation::GuardianTranslationStrategy translationStrategy;
     GatewayMessageSinkMock sensorMessageSinkMock(1);
     GatewayMessageProcessingScheduler scheduler(&sensorMessageSinkMock);

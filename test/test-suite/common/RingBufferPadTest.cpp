@@ -77,11 +77,13 @@ TEST_F(RingBufferPadTest, given_aNextPad_when_attemptingToSetANewNextPad_then_th
 TEST_F(RingBufferPadTest, given_data_when_read_then_returnsData) {
     auto testedPad = Pad();
     auto data = DataTestUtil::createRandomSimpleMessageWithEmptyTimestamps();
+    using DataType = decltype(data);
+    auto dataCopy = DataType(data);
     testedPad.write(std::move(data));
 
     auto readData = testedPad.read();
 
-    ASSERT_EQ(readData, data);
+    ASSERT_EQ(readData, dataCopy);
 }
 
 #endif //SENSORGATEWAY_RINGBUFFERPADTEST_CPP

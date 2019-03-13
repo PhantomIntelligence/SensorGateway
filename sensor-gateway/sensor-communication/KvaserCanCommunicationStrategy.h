@@ -61,6 +61,7 @@ namespace SensorCommunication {
     private:
         void throwErrorIfNecessary(canStatus const& errorCode, std::string const& callOrigin);
 
+
         typedef struct {
             int64_t id;
             uint64_t timestamp;
@@ -68,6 +69,8 @@ namespace SensorCommunication {
             uint32_t length;
             uint8_t data[NUMBER_OF_DATA_BYTES];
         } CanMessage;
+
+        void writeMessage(CanMessage const& message);
 
         super::Message convertCanMessageToSensorMessage(CanMessage canMessage);
 
