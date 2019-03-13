@@ -43,7 +43,7 @@ namespace {
     typedef std::mutex Mutex;
     typedef std::lock_guard<Mutex> LockGuard;
 
-    typedef std::atomic_uint8_t AtomicCounter;
+    typedef std::atomic<uint8_t> AtomicCounter;
     typedef std::atomic<bool> AtomicFlag;
     typedef std::promise<bool> BooleanPromise;
 
