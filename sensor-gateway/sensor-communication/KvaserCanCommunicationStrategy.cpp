@@ -97,9 +97,9 @@ void KvaserCanCommunicationStrategy::writeMessage(CanMessage const& message) {
                                    message.id,
                                    (void*) message.data,
                                    message.length,
-                                   0, // Why? --> Need to confirm with JY
-//                                   &message.flags,
-                                   CANLIB_READ_WAIT_INFINITE_DELAY);
+                                   0,
+                                   1000);
+    throwErrorIfNecessary(returnCode, "canWriteWait");
 }
 
 void KvaserCanCommunicationStrategy::throwErrorIfNecessary(canStatus const& errorCode, std::string const& callOrigin) {
