@@ -38,12 +38,14 @@ namespace DataFlow {
         explicit SensorMessage(MessageId messageId, SensorId sensorId, Pixels pixels) :
                 messageId(std::move(messageId)), sensorId(std::move(sensorId)), pixels(std::move(pixels)) {};
 
-        SensorMessage() : SensorMessage(returnDefaultData()) {};
+        SensorMessage() noexcept;
 
-        ~SensorMessage() = default;
+        ~SensorMessage() noexcept = default;
 
-        SensorMessage(SensorMessage const& other) :
-                SensorMessage(other.messageId, other.sensorId, other.pixels) {};
+        SensorMessage(SensorMessage const& other) noexcept:
+                messageId(other.messageId),
+                sensorId(other.sensorId),
+                pixels(other.pixels) {};
 
         SensorMessage(SensorMessage&& other) noexcept;
 
@@ -118,11 +120,11 @@ namespace DataFlow {
          * If a value is modified here, be sure its homologous value in the communication protocol schema file is too.
          * @see https://github.com/PhantomIntelligence/GatewayProtocol.git
          */
-        MessageId const DEFAULT_MESSAGE_ID = 0;
-        SensorId const DEFAULT_SENSOR_ID = -1;
+        static constexpr MessageId const DEFAULT_MESSAGE_ID = 0;
+        static constexpr SensorId const DEFAULT_SENSOR_ID = std::numeric_limits<SensorId>::max();
 
         template<typename SensorMessageDefinition>
-        typename SensorMessage<SensorMessageDefinition>::Pixels const DEFAULT_PIXELS_ARRAY = typename SensorMessage<SensorMessageDefinition>::Pixels();
+        typename SensorMessage<SensorMessageDefinition>::Pixels const DEFAULT_PIXELS_ARRAY{{}};
 
         template<typename SensorMessageDefinition>
         SensorMessage<SensorMessageDefinition> const DEFAULT_SENSOR_MESSAGE = SensorMessage<SensorMessageDefinition>(
@@ -130,15 +132,20 @@ namespace DataFlow {
     }
 
     template<typename SensorMessageDefinition>
+    SensorMessage<SensorMessageDefinition>::SensorMessage() noexcept :
+            messageId(Defaults::DEFAULT_MESSAGE_ID),
+            sensorId(Defaults::DEFAULT_SENSOR_ID),
+            pixels(Defaults::DEFAULT_PIXELS_ARRAY<SensorMessageDefinition>) {};
+
+    template<typename SensorMessageDefinition>
     SensorMessage<SensorMessageDefinition>::SensorMessage(SensorMessage<SensorMessageDefinition>&& other) noexcept:
-            messageId(other.messageId),
-            sensorId(other.sensorId),
-            pixels(other.pixels) {
+            messageId(std::move(other.messageId)),
+            sensorId(std::move(other.sensorId)),
+            pixels(std::move(other.pixels)) {
         other.messageId = Defaults::DEFAULT_MESSAGE_ID;
         other.sensorId = Defaults::DEFAULT_SENSOR_ID;
         other.pixels = Defaults::DEFAULT_PIXELS_ARRAY<SensorMessageDefinition>;
     }
-
 
     template<typename SensorMessageDefinition>
     SensorMessage<SensorMessageDefinition> const& SensorMessage<SensorMessageDefinition>::returnDefaultData() noexcept {

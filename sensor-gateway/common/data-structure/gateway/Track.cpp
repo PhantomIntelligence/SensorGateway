@@ -27,21 +27,27 @@ using DataFlow::Defaults::Track::DEFAULT_TRACK;
 
 
 Track::Track(TrackId trackId, Distance distance, Intensity intensity, Speed speed, Acceleration acceleration,
-             ConfidenceLevel confidenceLevel) :
+             ConfidenceLevel confidenceLevel) noexcept :
         id(trackId),
-        confidenceLevel(confidenceLevel),
-        intensity(intensity),
-        acceleration(acceleration),
         distance(distance),
-        speed(speed) {
+        intensity(intensity),
+        speed(speed),
+        acceleration(acceleration),
+        confidenceLevel(confidenceLevel) {
 
 }
 
-Track::Track() : Track(Track::returnDefaultData()) {
+Track::Track() noexcept :
+        id(DEFAULT_ID),
+        distance(DEFAULT_DISTANCE),
+        intensity(DEFAULT_INTENSITY),
+        speed(DEFAULT_SPEED),
+        acceleration(DEFAULT_ACCELERATION),
+        confidenceLevel(DEFAULT_CONFIDENCE_LEVEL) {
 }
 
-Track::Track(Track const& other) : Track(other.id, other.distance, other.intensity, other.speed,
-                                         other.acceleration, other.confidenceLevel) {
+Track::Track(Track const& other) noexcept : Track(other.id, other.distance, other.intensity, other.speed,
+                                                  other.acceleration, other.confidenceLevel) {
 }
 
 Track::Track(Track&& other) noexcept: id(other.id),

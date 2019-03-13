@@ -33,20 +33,21 @@ namespace DataFlow {
 
     public:
 
+        using IdType = DataFlow::PixelId;
         using Track = DataFlow::Track;
         static constexpr auto const numberOfTracksPerPixel = N;
         using TracksArray = std::array<Track, N>;
 
-        explicit Pixel(PixelId const& pixelId, TracksArray tracks, int currentNumberOfTracks) :
+        explicit Pixel(IdType pixelId, TracksArray tracks, int currentNumberOfTracks) noexcept :
                 id(pixelId),
-                tracks(std::move(tracks)),
+                tracks(tracks),
                 currentNumberOfTracksInPixel(currentNumberOfTracks) {}
 
         ~Pixel() noexcept {}
 
-        Pixel() : Pixel(returnDefaultData()) {}
+        Pixel() noexcept;
 
-        Pixel(Pixel const& other) :
+        Pixel(Pixel const& other) noexcept :
                 Pixel(other.id,
                       other.tracks,
                       other.currentNumberOfTracksInPixel) {}
@@ -110,7 +111,7 @@ namespace DataFlow {
             return &tracks;
         }
 
-        PixelId id;
+        IdType id;
 
         int getCurrentNumberOfTracksInPixel() const {
             return currentNumberOfTracksInPixel;
@@ -139,7 +140,8 @@ namespace DataFlow {
 
     namespace Defaults {
 
-        using DataFlow::PixelId;
+        template<size_t N>
+        using IdType = typename Pixel<N>::IdType;
 
         template<size_t N>
         using TracksArray = typename Pixel<N>::TracksArray;
@@ -149,25 +151,35 @@ namespace DataFlow {
          * If a value is modified here, be sure its homologous value in the communication protocol schema file is too.
          * @see https://github.com/PhantomIntelligence/GatewayProtocol.git
          */
-        PixelId const UNDEFINED_ID = 65535;
-        PixelId const DEFAULT_ID = UNDEFINED_ID;
+        template<size_t N>
+        constexpr IdType<N> const UNDEFINED_ID = 65535;
 
         template<size_t N>
-        TracksArray<N> const DEFAULT_TRACKS_ARRAY = TracksArray<N>();
-
-        int const DEFAULT_CURRENT_NUMBER_OF_TRACKS = 0;
+        constexpr IdType<N> const DEFAULT_ID = UNDEFINED_ID<N>;
 
         template<size_t N>
-        Pixel<N> const DEFAULT_PIXEL = Pixel<N>(DEFAULT_ID, DEFAULT_TRACKS_ARRAY<N>, DEFAULT_CURRENT_NUMBER_OF_TRACKS);
+        TracksArray<N> const DEFAULT_TRACKS_ARRAY{{}};
+
+        constexpr int const DEFAULT_CURRENT_NUMBER_OF_TRACKS = 0;
+
+        template<size_t N>
+        static Pixel<N> const DEFAULT_PIXEL = Pixel<N>(DEFAULT_ID<N>, DEFAULT_TRACKS_ARRAY<N>,
+                                                       DEFAULT_CURRENT_NUMBER_OF_TRACKS);
     }
 
+
+    template<size_t N>
+    Pixel<N>::Pixel() noexcept :
+            id(Defaults::DEFAULT_ID<N>),
+            tracks(Defaults::DEFAULT_TRACKS_ARRAY<N>),
+            currentNumberOfTracksInPixel(Defaults::DEFAULT_CURRENT_NUMBER_OF_TRACKS) {}
 
     template<size_t N>
     Pixel<N>::Pixel(Pixel<N>&& other) noexcept :
             id(std::move(other.id)),
             tracks(std::move(other.tracks)),
             currentNumberOfTracksInPixel(std::move(other.currentNumberOfTracksInPixel)) {
-        other.id = Defaults::DEFAULT_ID;
+        other.id = Defaults::DEFAULT_ID<N>;
         other.tracks = Defaults::DEFAULT_TRACKS_ARRAY<N>;
         other.currentNumberOfTracksInPixel = Defaults::DEFAULT_CURRENT_NUMBER_OF_TRACKS;
     }

@@ -17,6 +17,7 @@
 #include "ConstantValuesDefinition.h"
 
 namespace {
+
     template<typename T>
     using Bare = typename std::remove_cv<typename std::remove_reference<T>::type>::type;
 

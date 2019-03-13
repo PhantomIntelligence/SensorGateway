@@ -1,5 +1,5 @@
 /**
-	Copyright 2014-2018 Phantom Intelligence Inc.
+	Copyright 2014-2019 Phantom Intelligence Inc.
 
 	Licensed under the Apache License, Version 2.0 (the "License");
 	you may not use this file except in compliance with the License.
@@ -76,9 +76,9 @@ protected:
     AWLMessage const SOME_END_FRAME_AWL_MESSAGE = AWLMessage(9, 2188170, 8, {61, 253, 16, 0, 0, 0, 0, 0});
 
 private:
-    GatewayMessage const addTrackToSensorMessage(GatewayMessage sensorMessage, Track track) const {
-        GatewayMessage sensorMessageCopy = GatewayMessage(std::move(sensorMessage));
-        sensorMessageCopy.addTrackToPixelWithId(SOME_PIXEL_ID, std::move(track));
+    GatewayMessage const addTrackToSensorMessage(GatewayMessage const& sensorMessage, Track&& track) const {
+        GatewayMessage sensorMessageCopy = GatewayMessage(sensorMessage);
+        sensorMessageCopy.addTrackToPixelWithId(SOME_PIXEL_ID, std::forward<Track>(track));
         return sensorMessageCopy;
     }
 };

@@ -41,7 +41,7 @@ namespace Mock {
         void consume(T&& data) override {
             ++actualNumberOfDataConsumed;
             if (hasBeenCalledLessOrEqualToTheExpectedNumberOfTimes()) {
-                consumedData.push_back(data);
+                consumedData.push_back(std::forward<T>(data));
             }
             if (hasBeenCalledExpectedNumberOfTimes()) {
                 consumptionReached.set_value(true);
@@ -84,7 +84,7 @@ namespace Mock {
         struct SameDataInstance {
             T const value;
 
-            SameDataInstance(T const& t) : value(t) {}
+            explicit SameDataInstance(T const& t) : value(t) {}
 
             bool const operator()(T const& t) const {
                 return t == value;

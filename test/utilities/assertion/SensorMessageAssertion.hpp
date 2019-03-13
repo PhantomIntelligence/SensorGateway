@@ -23,38 +23,186 @@
 
 namespace Assert {
 
+    namespace Details {
+        constexpr int const PADDING_WIDTH = 4;
+        constexpr int const NAME_WIDTH = 24;
+        constexpr int const EXPECTED_VALUE_WIDTH = 12;
+        constexpr int const ACTUAL_VALUE_WIDTH = 12;
+
+        std::string const NAME_VALUE_SPACER(NAME_WIDTH - 1, ' ');
+        std::string const EXPECTED_VALUE_SPACER(EXPECTED_VALUE_WIDTH - 1, ' ');
+        std::string const ACTUAL_VALUE_SPACER(ACTUAL_VALUE_WIDTH - 1, ' ');
+
+        constexpr int const COLUMN_SIZE = 4;
+        constexpr int const TOTAL_WIDTH = PADDING_WIDTH +
+                                          NAME_WIDTH +
+                                          EXPECTED_VALUE_WIDTH +
+                                          ACTUAL_VALUE_WIDTH +
+                                          COLUMN_SIZE;
+        using DifferentialPrinting = std::array<std::string, COLUMN_SIZE>;
+        using MessageDifferencesForPrinting = std::list<DifferentialPrinting>;
+        DifferentialPrinting const HEADER = {{NAME_VALUE_SPACER, "EXPECTED  ", " ACTUAL  "}};
+        DifferentialPrinting const SPACER = {{NAME_VALUE_SPACER, EXPECTED_VALUE_SPACER, ACTUAL_VALUE_SPACER}};
+        DifferentialPrinting const BREAK = {{std::string(NAME_WIDTH - 1, '~'),
+                                                    std::string(EXPECTED_VALUE_WIDTH - 1, '~'),
+                                                    std::string(ACTUAL_VALUE_WIDTH - 1, '~')}};
+
+        template<typename T>
+        static void
+        addDiff(MessageDifferencesForPrinting* messageDifferencesForPrinting, std::string const& differenceName,
+                T&& expected, T&& actual) {
+            DifferentialPrinting newDifference = {{(differenceName + " "),
+                                                          (std::to_string(expected) + "  "),
+                                                          (std::to_string(actual) + "  ")}};
+            messageDifferencesForPrinting->emplace_back(newDifference);
+        }
+
+        static void
+        addDiffTitle(MessageDifferencesForPrinting* messageDifferencesForPrinting, std::string const& differenceName) {
+            DifferentialPrinting newDifference = {{(differenceName + " "), EXPECTED_VALUE_SPACER, ACTUAL_VALUE_SPACER}};
+            messageDifferencesForPrinting->emplace_back(newDifference);
+        }
+
+        static void
+        addSpacer(MessageDifferencesForPrinting* messageDifferencesForPrinting) {
+            messageDifferencesForPrinting->push_back(SPACER);
+        }
+
+        static void
+        addBreak(MessageDifferencesForPrinting* messageDifferencesForPrinting) {
+            messageDifferencesForPrinting->push_back(BREAK);
+        }
+
+        static auto printLine = [](std::ostringstream* message, DifferentialPrinting const& lineContent) {
+            auto const& name = std::get<0>(lineContent);
+            auto const& expectedValue = std::get<1>(lineContent);
+            auto const& actualValue = std::get<2>(lineContent);
+
+            std::string padding(PADDING_WIDTH, ' ');
+            (*message) << padding << '|';
+
+            message->width(NAME_WIDTH);
+            (*message) << name << '|';
+
+            message->width(EXPECTED_VALUE_WIDTH);
+            (*message) << (" " + expectedValue) << '|';
+
+            message->width(ACTUAL_VALUE_WIDTH);
+            (*message) << (" " + actualValue) << '|';
+
+            (*message) << '\n';
+            return message->str();
+        };
+
+        static auto printBreak = [](std::ostringstream* message, char const& breakingChar) {
+            message->width(Details::TOTAL_WIDTH);
+            message->fill(breakingChar);
+            (*message) << breakingChar << "\n";
+            message->fill(' ');
+        };
+
+        static auto printGlobalBreak = [](std::ostringstream* message) {
+            printBreak(message, '#');
+        };
+
+        static auto printLineBreak = [](std::ostringstream* message) {
+            printBreak(message, '~');
+        };
+    }
+
+    static std::string completeMessage(std::ostringstream* message) {
+        Details::printGlobalBreak(message);
+        Details::printGlobalBreak(message);
+        return message->str();
+    }
+
+    static std::string
+    formatMessage(std::ostringstream* message, Details::MessageDifferencesForPrinting* remainingDifferences) {
+        if (remainingDifferences->empty()) {
+            return completeMessage(message);
+        }
+
+        auto const& difference = remainingDifferences->front();
+
+        Details::printLine(message, difference);
+
+        remainingDifferences->pop_front();
+        return formatMessage(message, remainingDifferences);
+    }
+
+    static ::testing::AssertionResult
+    formatFailureMessage(Details::MessageDifferencesForPrinting* messageDifferencesForPrinting) {
+
+        std::ostringstream message("\n\n", std::ios_base::ate);
+        Details::printGlobalBreak(&message);
+        Details::printGlobalBreak(&message);
+        Details::printLine(&message, Details::HEADER);
+        Details::printGlobalBreak(&message);
+
+        return ::testing::AssertionFailure()
+                << formatMessage(&message, messageDifferencesForPrinting);
+    }
+
     template<typename T>
     static ::testing::AssertionResult sensorMessageHaveSameContent(T& expected, T& actual) {
+        Details::MessageDifferencesForPrinting messageDifferencesForPrinting;
+
         auto expectedPixels = expected.getPixels();
         auto actualPixels = actual.getPixels();
 
         auto sameSize = expectedPixels->size() == actualPixels->size();
         if (!sameSize) {
-            return ::testing::AssertionFailure()
-                    << "\n SensorMessages do not have the same content... \n"
-                    << "\t | --> number of Pixel differs \n"
-                    << "\t | --> expected size : " << expectedPixels->size() << "\n"
-                    << "\t | --> actual size   : " << actualPixels->size() << "\n"
-                    << "\t | -----------------------" << std::endl;
+            Details::addDiff(&messageDifferencesForPrinting, "Number of pixels", expectedPixels->size(),
+                             actualPixels->size());
+            return formatFailureMessage(&messageDifferencesForPrinting);
         }
 
-        bool samePixelUntilNow = true;
-        for (auto pixelId = 0u; pixelId < actualPixels->size() && samePixelUntilNow; ++pixelId) {
+        bool samePixels = true;
+        using PixelType = typename std::remove_reference<decltype(std::get<0>(*expectedPixels))>::type;
+        using PixelId= typename PixelType::IdType;
+        using DifferentPixel = std::tuple<PixelId, PixelType const&, PixelType const&>;
+        using DifferentPixels = std::vector<DifferentPixel>;
+
+        DifferentPixels differentPixels;
+
+        for (auto pixelId = 0u; pixelId < actualPixels->size(); ++pixelId) {
             auto expectedPixel = expectedPixels->at(pixelId);
             auto actualPixel = actualPixels->at(pixelId);
-            samePixelUntilNow = expectedPixel == actualPixel && samePixelUntilNow;
-            if (!samePixelUntilNow) {
-                return ::testing::AssertionFailure()
-                        << "\n SensorMessages do not have the same content... \n"
-                        << "\t | --> Pixel # " << pixelId << " differs... \n"
-                        << "\t | --> expected : "
-                        << " { id     : " << expectedPixel.id << ",\n"
-                        << "   tracks : " << "info not implemented for this message yet, was not needed till now... }\n"
-                        << "\t | --> actual : "
-                        << " { id     : " << actualPixel.id << ",\n"
-                        << "   tracks : " << "info not implemented for this message yet, was not needed till now... }\n"
-                        << "\t | -----------------------" << std::endl;
+            if (expectedPixel != actualPixel) {
+                samePixels = false;
+                differentPixels.emplace_back(std::make_tuple(pixelId, expectedPixel, actualPixel));
             }
+        }
+
+
+        if (!samePixels) {
+            PixelId orderId;
+            PixelType expectedPixel;
+            PixelType actualPixel;
+            for (auto diff : differentPixels) {
+                std::tie(orderId, expectedPixel, actualPixel) = diff;
+                Details::addBreak(&messageDifferencesForPrinting);
+                Details::addDiffTitle(&messageDifferencesForPrinting, ("Pixel # " + std::to_string(orderId) + ": "));
+
+                auto expectedId = expectedPixel.id;
+                auto actualId = actualPixel.id;
+                if (expectedId != actualId) {
+                    Details::addDiff(&messageDifferencesForPrinting, " id: ", expectedId, actualId);
+                }
+
+                auto expectedTracks = expectedPixel.getTracks();
+                auto actualTracks = actualPixel.getTracks();
+                if (expectedTracks != actualTracks) {
+
+                    auto expectedNumberOfTracks = expectedPixel.getCurrentNumberOfTracksInPixel();
+                    auto actualNumberOfTracks = actualPixel.getCurrentNumberOfTracksInPixel();
+
+                    Details::addDiff(&messageDifferencesForPrinting, "Number of tracks: ", expectedNumberOfTracks,
+                                     actualNumberOfTracks);
+                }
+                Details::addBreak(&messageDifferencesForPrinting);
+            }
+            return formatFailureMessage(&messageDifferencesForPrinting);
         }
         return ::testing::AssertionSuccess();
     }

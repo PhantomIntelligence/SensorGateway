@@ -22,7 +22,7 @@
 #include <gmock/gmock.h>
 
 #include "test/utilities/mock/ArbitraryDataSinkMock.hpp"
-#include "test/utilities/mock/ArbitraryDataSinkMock.hpp"
+#include "test/utilities/assertion/SensorMessageAssertion.hpp"
 
 #include "sensor-gateway/data-translation/GuardianTranslationStrategy.h"
 #include "sensor-gateway/common/data-structure/sensor/GuardianStructures.h"
@@ -111,8 +111,8 @@ protected:
     }
 
 private:
-    GatewayMessage const addTrackToGatewayMessage(GatewayMessage sensorMessage, Track track) const {
-        GatewayMessage sensorMessageCopy = GatewayMessage(std::move(sensorMessage));
+    GatewayMessage const addTrackToGatewayMessage(GatewayMessage const& sensorMessage, Track track) const {
+        GatewayMessage sensorMessageCopy = GatewayMessage(sensorMessage);
         sensorMessageCopy.addTrackToPixelWithId(SOME_PIXEL_ID, std::move(track));
         return sensorMessageCopy;
     }
@@ -133,7 +133,7 @@ TEST_F(GuardianTranslationStrategyTest,
     scheduler.terminateAndJoin();
     sensorMessageSinkMock.waitConsumptionToBeReached();
     auto actualGatewayMessage = sensorMessageSinkMock.getConsumedData().front();
-    ASSERT_EQ(expectedGatewayMessage, actualGatewayMessage);
+    ASSERT_TRUE(Assert::sameSensorMessage(expectedGatewayMessage, actualGatewayMessage));
 }
 
 TEST_F(GuardianTranslationStrategyTest,
@@ -153,7 +153,7 @@ TEST_F(GuardianTranslationStrategyTest,
     scheduler.terminateAndJoin();
     sensorMessageSinkMock.waitConsumptionToBeReached();
     auto actualGatewayMessage = sensorMessageSinkMock.getConsumedData().front();
-    ASSERT_EQ(expectedGatewayMessage, actualGatewayMessage);
+    ASSERT_TRUE(Assert::sameSensorMessage(expectedGatewayMessage, actualGatewayMessage));
 }
 
 TEST_F(GuardianTranslationStrategyTest,
@@ -175,7 +175,7 @@ TEST_F(GuardianTranslationStrategyTest,
     scheduler.terminateAndJoin();
     sensorMessageSinkMock.waitConsumptionToBeReached();
     auto actualGatewayMessage = sensorMessageSinkMock.getConsumedData().front();
-    ASSERT_EQ(expectedGatewayMessage, actualGatewayMessage);
+    ASSERT_TRUE(Assert::sameSensorMessage(expectedGatewayMessage, actualGatewayMessage));
 }
 
 TEST_F(GuardianTranslationStrategyTest,

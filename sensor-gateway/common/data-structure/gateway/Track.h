@@ -23,13 +23,13 @@ namespace DataFlow {
     public:
 
         explicit Track(TrackId trackId, Distance distance, Intensity intensity, Speed speed, Acceleration acceleration,
-                       ConfidenceLevel confidenceLevel);
+                       ConfidenceLevel confidenceLevel) noexcept;
 
-        Track();
+        Track() noexcept;
 
         ~Track() = default;
 
-        Track(Track const& other);
+        Track(Track const& other) noexcept;
 
         Track(Track&& other) noexcept;
 
@@ -61,13 +61,13 @@ namespace DataFlow {
              * If a value is modified here, be sure its homologous value in the communication protocol schema file is too.
              * @see https://github.com/PhantomIntelligence/GatewayProtocol.git
              */
-            TrackId const UNDEFINED_ID = 0;
-            TrackId const DEFAULT_ID = UNDEFINED_ID;
-            Distance const DEFAULT_DISTANCE = 0;
-            Intensity const DEFAULT_INTENSITY = 0;
-            Speed const DEFAULT_SPEED = 0;
-            Acceleration const DEFAULT_ACCELERATION = 0;
-            ConfidenceLevel const DEFAULT_CONFIDENCE_LEVEL = 0;
+            constexpr TrackId const UNDEFINED_ID = 0;
+            constexpr TrackId const DEFAULT_ID = UNDEFINED_ID;
+            constexpr Distance const DEFAULT_DISTANCE = 0;
+            constexpr Intensity const DEFAULT_INTENSITY = 0;
+            constexpr Speed const DEFAULT_SPEED = 0;
+            constexpr Acceleration const DEFAULT_ACCELERATION = 0;
+            constexpr ConfidenceLevel const DEFAULT_CONFIDENCE_LEVEL = 0;
             typename DataFlow::Track const DEFAULT_TRACK = typename DataFlow::Track(DEFAULT_ID,
                                               DEFAULT_DISTANCE,
                                               DEFAULT_INTENSITY,
