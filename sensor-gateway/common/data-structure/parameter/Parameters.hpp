@@ -53,7 +53,7 @@ namespace Sensor {
             static uint8_t const valueOffsetInBits = PARAMETER_VALUE_OFFSET_IN_BITS;
             static uint8_t const valueLengthInBits = PARAMETER_VALUE_LENGTH_IN_BITS;
 
-            using ControlMessagePayload = std::array<Byte, SENSOR_INTERNAL_TOTAL_LENGTH_IN_BITS>;
+            using ControlMessagePayload = std::array<Byte, SENSOR_INTERNAL_TOTAL_LENGTH_IN_BITS / 8>;
         };
 
 
