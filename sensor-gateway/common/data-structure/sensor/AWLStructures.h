@@ -1,5 +1,5 @@
 /**
-	Copyright 2014-2018 Phantom Intelligence Inc.
+	Copyright 2014-2019 Phantom Intelligence Inc.
 
 	Licensed under the Apache License, Version 2.0 (the "License");
 	you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@
 namespace Sensor {
     namespace AWL {
 
+        template<typename ParameterList = Gateway::NoGatewayParameters>
         class Structures final : public Communication::DataStructures {
 
         public :
@@ -56,6 +57,7 @@ namespace Sensor {
             typedef typename DataFlow::AWLMessage<MessageDefinition> Message;
             typedef typename DataFlow::RawData<RawDataDefinition> RawData;
             typedef typename DataFlow::ControlMessage<ControlMessageDefinition> ControlMessage;
+            using Parameters = ParameterList;
 
             static constexpr size_t const MAX_NUMBER_OF_BULK_FETCHABLE_MESSAGES = 1;
             static constexpr size_t const MAX_NUMBER_OF_BULK_FETCHABLE_RAW_DATA_CYCLES = 1;
