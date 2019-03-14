@@ -22,7 +22,6 @@
 
 namespace Sensor {
     namespace Gateway {
-
         template<typename SensorMessageDefinition, typename RawDataDefinition, typename ControlMessageDefinition, typename ParametersList = NoGatewayParameters>
         class Structures final : public Communication::DataStructures {
 
@@ -67,9 +66,17 @@ namespace Sensor {
             static size_t const MAX_NUMBER_OF_BULK_FETCHABLE_RAW_DATA_CYCLES = 8;
 
             static size_t const MAX_NUMBER_OF_CONCURRENT_REQUEST_OF_ONE_KIND = 256;
-
         };
     }
+}
+namespace {
+    template<typename SensorStructures>
+    using GatewayStructuresFor = typename Sensor::Gateway::Structures<
+            typename SensorStructures::MessageDefinition,
+            typename SensorStructures::RawDataDefinition,
+            typename SensorStructures::ControlMessageDefinition,
+            typename SensorStructures::Parameters
+    >;
 }
 
 #endif //SENSORGATEWAY_GATEWAYSTRUCTURES_H

@@ -37,6 +37,8 @@ namespace DataFlow {
 
     public:
 
+        using MessageId = AWL::MessageId;
+
         explicit AWLMessage(AWL::MessageId id,
                             AWL::MessageTimestamp timestamp,
                             AWL::MessageLength length,

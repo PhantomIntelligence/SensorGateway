@@ -2,14 +2,16 @@
 #define SENSORGATEWAY_KVASERREADMESSAGETOFILETEST_CPP
 
 #include <cinttypes>
-#include "sensor-gateway/sensor-communication/KvaserCanCommunicationStrategy.h"
+#include "sensor-gateway/sensor-communication/KvaserCanCommunicationStrategy.hpp"
 
 int main() {
 
     const int NUMBER_OF_DETECTIONS = 42;
     auto file = std::fopen("AWLMessagesCustom.txt", "w+");
+    auto sensorChannelId = 0;
 
-    SensorCommunication::KvaserCanCommunicationStrategy kvaserCanProtocolStrategy;
+    using Structures = typename Sensor::AWL::Structures<>;
+    SensorCommunication::KvaserCanCommunicationStrategy<Structures> kvaserCanProtocolStrategy(sensorChannelId);
     kvaserCanProtocolStrategy.openConnection();
 
 

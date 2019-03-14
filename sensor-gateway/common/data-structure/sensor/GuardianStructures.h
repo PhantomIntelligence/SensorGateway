@@ -63,12 +63,15 @@ namespace Sensor {
             static constexpr size_t const MAX_NUMBER_OF_BULK_FETCHABLE_RAW_DATA_CYCLES = 8;
             static constexpr size_t const ASYNC_REQUEST_BUFFER_SIZE_BEFORE_TRANSMISSION_TO_SENSOR = 8;
 
-            static std::array<RawDataTypes::GUARDIAN,
-                    Guardian::NUMBER_OF_CHANNELS> constexpr CHANNEL_POSITIONS = {
+            static constexpr std::array<RawDataTypes::GUARDIAN, Guardian::NUMBER_OF_CHANNELS> const CHANNEL_POSITIONS = {
                     8, 0, 9, 1, 10, 2, 11, 3, 12, 4, 13, 5, 14, 6, 15, 7
             };
         };
     }
+}
+
+namespace {
+
 }
 
 #endif //SENSORGATEWAY_GUARDIANSTRUCTURES_H

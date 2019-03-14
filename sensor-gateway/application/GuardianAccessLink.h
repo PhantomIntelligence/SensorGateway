@@ -19,8 +19,8 @@
 
 #include "SensorAccessLink.hpp"
 
-#include "sensor-gateway/sensor-communication/GuardianUSBCommunicationStrategy.h"
-#include "sensor-gateway/data-translation/GuardianTranslationStrategy.h"
+#include "sensor-gateway/sensor-communication/GuardianUSBCommunicationStrategy.hpp"
+#include "sensor-gateway/data-translation/GuardianTranslationStrategy.hpp"
 
 namespace SensorGateway {
 

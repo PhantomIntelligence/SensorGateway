@@ -17,7 +17,7 @@
 #ifndef SENSORGATEWAY_RAWDATA_HPP
 #define SENSORGATEWAY_RAWDATA_HPP
 
-#include "parameter/Parameters.hpp"
+#include "parameter/ParameterConstants.hpp"
 
 namespace DataFlow {
 

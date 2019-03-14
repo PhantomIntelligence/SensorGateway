@@ -22,7 +22,7 @@
 #include "test/utilities/stub/AWLMessageStub.h"
 #include "test/utilities/stub/SensorMessageStub.h"
 #include "test/utilities/mock/ArbitraryDataSinkMock.hpp"
-#include "sensor-gateway/data-translation/AWLTranslationStrategy.h"
+#include "sensor-gateway/data-translation/AWLTranslationStrategy.hpp"
 
 using TestUtilities::AWLMessagesFileManager;
 using TestUtilities::SensorMessageFileManager;

@@ -18,8 +18,8 @@
 #define SENSORGATEWAY_AWL16ACCESSLINK_H
 
 #include "SensorAccessLink.hpp"
-#include "sensor-gateway/sensor-communication/KvaserCanCommunicationStrategy.h"
-#include "sensor-gateway/data-translation/AWLTranslationStrategy.h"
+#include "sensor-gateway/sensor-communication/KvaserCanCommunicationStrategy.hpp"
+#include "sensor-gateway/data-translation/AWLTranslationStrategy.hpp"
 
 namespace SensorGateway {
 

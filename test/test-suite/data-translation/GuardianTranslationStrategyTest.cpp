@@ -24,7 +24,7 @@
 #include "test/utilities/mock/ArbitraryDataSinkMock.hpp"
 #include "test/utilities/assertion/SensorMessageAssertion.hpp"
 
-#include "sensor-gateway/data-translation/GuardianTranslationStrategy.h"
+#include "sensor-gateway/data-translation/GuardianTranslationStrategy.hpp"
 #include "sensor-gateway/common/data-structure/sensor/GuardianStructures.h"
 
 using DataFlow::Defaults::Track::DEFAULT_ACCELERATION;

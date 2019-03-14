@@ -82,7 +82,8 @@ namespace SensorGateway {
                     serverCommunicatorMessageScheduler(&serverCommunicator),
                     serverCommunicatorRawDataScheduler(&serverCommunicator),
                     errorScheduler(this) // TODO : Change "this" for the SensorAccessLinkErrorHandler
-            {}
+            {
+            }
 
             ~SensorAccessLink() noexcept {
                 terminateAndJoin();
@@ -183,11 +184,7 @@ namespace SensorGateway {
     template<typename S>
     struct SensorAccessLinkFactory {
 
-        using GatewayStructures = typename Sensor::Gateway::Structures<
-                typename S::MessageDefinition,
-                typename S::RawDataDefinition,
-                typename S::ControlMessageDefinition,
-                typename S::Parameters>;
+        using GatewayStructures = GatewayStructuresFor<S>;
         using AccessLink = Details::SensorAccessLink<S, GatewayStructures>;
 
     };

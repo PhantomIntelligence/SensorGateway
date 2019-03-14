@@ -29,10 +29,10 @@ namespace DataTranslation {
     protected:
         using SensorMessage = typename SENSOR_STRUCTURES::Message;
         using SensorRawData = typename SENSOR_STRUCTURES::RawData;
+        using SensorControlMessage = typename SENSOR_STRUCTURES::ControlMessage;
 
         using ServerMessage = typename SERVER_STRUCTURES::Message;
         using ServerRawData = typename SERVER_STRUCTURES::RawData;
-        using SensorControlMessage = typename SENSOR_STRUCTURES::ControlMessage;
 
         using MessageSource = DataFlow::DataSource<ServerMessage>;
         using RawDataSource = DataFlow::DataSource<ServerRawData>;
