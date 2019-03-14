@@ -32,7 +32,17 @@ namespace SensorCommunication {
 
     protected:
 
-        unsigned long const CANLIB_READ_WAIT_INFINITE_DELAY = -1; // WARNING !!! --> NEVER change -1 with infinity because the code CRASH
+        static constexpr int32_t const CANLIB_KVASER_CAN_BIT_RATE = canBITRATE_1M;
+        static constexpr uint32_t const CANLIB_TIME_SEGMENT_1 = 0;
+        static constexpr uint32_t const CANLIB_TIME_SEGMENT_2 = 0;
+        static constexpr uint32_t const CANLIB_SYNCHRONIZATION_JUMP_WIdTH = 0;
+        static constexpr uint32_t const CANLIB_NUMBER_OF_SAMPLING_POINTS = 0;
+        static constexpr uint32_t const CANLIB_SYNCMODE = 0;
+        static constexpr int32_t const CANLIB_FLAGS_FOR_CHANNEL = canOPEN_EXCLUSIVE;
+        static constexpr uint32_t const CANLIB_CAN_DRIVER_TYPE = canDRIVER_NORMAL;
+        static constexpr uint32_t const ONE_SECOND_TIMEOUT = 1000;
+        static constexpr uint64_t const CANLIB_READ_WAIT_INFINITE_DELAY = std::numeric_limits<uint64_t>::max(); // WARNING !!! --> NEVER change to infinity because the code CRASH
+        static constexpr int32_t const DEFAULT_CHANNEL_ID = 0;
         using super = SensorCommunicationStrategy<AWLStructures>;
 
         using Message = typename super::Message;
@@ -51,7 +61,8 @@ namespace SensorCommunication {
 
     public:
 
-        explicit KvaserCanCommunicationStrategy(int32_t const& channelId) : communicationChannel() {
+        explicit KvaserCanCommunicationStrategy(int32_t channelId = DEFAULT_CHANNEL_ID)
+                : communicationChannel(), sensorChannelId(channelId) {
         }
 
         ~KvaserCanCommunicationStrategy() noexcept final {
@@ -67,17 +78,9 @@ namespace SensorCommunication {
         KvaserCanCommunicationStrategy& operator=(KvaserCanCommunicationStrategy&& other)& noexcept = delete;
 
         void openConnection() final {
-            static constexpr int32_t const CANLIB_KVASER_CAN_BIT_RATE = canBITRATE_1M;
-            static constexpr uint32_t const CANLIB_TIME_SEGMENT_1 = 0;
-            static constexpr uint32_t const CANLIB_TIME_SEGMENT_2 = 0;
-            static constexpr uint32_t const CANLIB_SYNCHRONIZATION_JUMP_WIdTH = 0;
-            static constexpr uint32_t const CANLIB_NUMBER_OF_SAMPLING_POINTS = 0;
-            static constexpr uint32_t const CANLIB_SYNCMODE = 0;
-            static constexpr int32_t const CANLIB_FLAGS_FOR_CHANNEL = canOPEN_EXCLUSIVE;
-            static constexpr uint32_t const CANLIB_CAN_DRIVER_TYPE = canDRIVER_NORMAL;
-            static constexpr int32_t const CANLIB_CHANNEL_ID = 0;
             canInitializeLibrary();
-            canHandle communicationChannel = canOpenChannel(CANLIB_CHANNEL_ID, CANLIB_FLAGS_FOR_CHANNEL);
+            listChannels();
+            canHandle communicationChannel = canOpenChannel(sensorChannelId, CANLIB_FLAGS_FOR_CHANNEL);
             auto returnCode = canSetBusParams(communicationChannel,
                                               CANLIB_KVASER_CAN_BIT_RATE,
                                               CANLIB_TIME_SEGMENT_1,
@@ -93,8 +96,8 @@ namespace SensorCommunication {
         }
 
         void closeConnection() final {
-            auto returnCode = canBusOff(communicationChannel);
-            throwErrorIfNecessary(returnCode, "canBusOff");
+            auto returnCode = canWriteSync(communicationChannel, ONE_SECOND_TIMEOUT);
+            throwErrorIfNecessary(returnCode, "canWriteSync");
             returnCode = canClose(communicationChannel);
             throwErrorIfNecessary(returnCode, "canClose");
         }
@@ -167,7 +170,64 @@ namespace SensorCommunication {
             throwErrorIfNecessary(returnCode, "canWriteWait");
         }
 
+        int32_t const sensorChannelId;
         canHandle communicationChannel;
+
+
+        static void listChannels() {
+            int chanCount = 0;
+            int beta;
+            char betaString[10];
+            char name[256];
+            char driverName[256];
+            char custChanName[40];
+            unsigned int ean[2], fw[2], serial[2];
+            unsigned int canlibVersion;
+            uint16_t fileVersion[4];
+
+            beta = canGetVersionEx(canVERSION_CANLIB32_BETA);
+            if (beta) {
+                sprintf(betaString, "BETA");
+            } else {
+                betaString[0] = '\0';
+            }
+            canlibVersion = canGetVersionEx(canVERSION_CANLIB32_PRODVER);
+            printf("CANlib version %d.%d %s\n",
+                   canlibVersion >> 8,
+                   canlibVersion & 0xff,
+                   betaString);
+
+            memset(name, 0, sizeof(name));
+            memset(custChanName, 0, sizeof(custChanName));
+            memset(ean, 0, sizeof(ean));
+            memset(fw, 0, sizeof(fw));
+            memset(serial, 0, sizeof(serial));
+
+            canGetNumberOfChannels(&chanCount);
+            printf("Found %d channel(s).\n", chanCount);
+
+            for (auto i = 0u; i < chanCount; i++) {
+
+                canGetChannelData(i, canCHANNELDATA_DRIVER_NAME, &driverName, sizeof(driverName));
+                canGetChannelData(i, canCHANNELDATA_DLL_FILE_VERSION, &fileVersion, sizeof(fileVersion));
+                canGetChannelData(i, canCHANNELDATA_DEVDESCR_ASCII, &name, sizeof(name));
+                if (strcmp(name, "Kvaser Unknown") == 0) {
+                    canGetChannelData(i, canCHANNELDATA_CHANNEL_NAME, &name, sizeof(name));
+                }
+                canGetChannelData(i, canCHANNELDATA_CARD_UPC_NO, &ean, sizeof(ean));
+                canGetChannelData(i, canCHANNELDATA_CARD_SERIAL_NO, &serial, sizeof(serial));
+                canGetChannelData(i, canCHANNELDATA_CARD_FIRMWARE_REV, &fw, sizeof(fw));
+                (void) canGetChannelData(i, canCHANNELDATA_CUST_CHANNEL_NAME, custChanName, sizeof(custChanName));
+                printf("\n\nch %2.1d: %-22s\t%x-%05x-%05x-%x, s/n %u, v%u.%u.%u %s (%s v%d.%d.%d)\n\n",
+                       i, name,
+                       (ean[1] >> 12), ((ean[1] & 0xfff) << 8) | ((ean[0] >> 24) & 0xff),
+                       (ean[0] >> 4) & 0xfffff, (ean[0] & 0x0f),
+                       serial[0],
+                       fw[1] >> 16, fw[1] & 0xffff, fw[0] & 0xffff,
+                       custChanName,
+                       driverName, fileVersion[3], fileVersion[2], fileVersion[1]);
+            }
+        }
     };
 }
 #endif //SENSORGATEWAY_KVASERCANCOMMUNICATIONSTRATEGY_HPP
