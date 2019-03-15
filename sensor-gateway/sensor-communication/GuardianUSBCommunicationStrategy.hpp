@@ -18,7 +18,7 @@
 #define SENSORGATEWAY_GUARDIANUSBCOMMUNICATIONSTRATEGY_H
 
 
-#include "sensor-gateway/common/data-structure/sensor/GuardianStructures.h"
+#include "sensor-gateway/common/data-structure/sensor/GuardianStructures.hpp"
 #include "SensorCommunicationStrategy.hpp"
 #include "LibUSBCommunicationErrorFactory.h"
 

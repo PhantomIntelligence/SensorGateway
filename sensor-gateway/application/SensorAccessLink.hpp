@@ -19,6 +19,7 @@
 
 #include "sensor-gateway/common/data-structure/gateway/GatewayStructures.h"
 #include "sensor-gateway/parameter-control/SensorParameterController.hpp"
+#include <type_traits>
 
 namespace SensorGateway {
 
@@ -26,7 +27,7 @@ namespace SensorGateway {
 
         // TODO: Using things like `enable_if<>, handle different sensors when there is or not RawData or fetching in bulk`
         // TODO: Use `declval` to create a stream line for Message and RawData, abstracting what actual type is processed (scheduler, emplacement in each of SALE.) https://en.cppreference.com/w/cpp/utility/declval
-        template<class SENSOR_STRUCTURES, class SERVER_STRUCTURES>
+        template<typename SENSOR_STRUCTURES, typename SERVER_STRUCTURES>
         class SensorAccessLink : public DataFlow::DataSink<ErrorHandling::SensorAccessLinkError> {
 
         protected:
@@ -183,11 +184,63 @@ namespace SensorGateway {
 
     template<typename S>
     struct SensorAccessLinkFactory {
-
         using GatewayStructures = GatewayStructuresFor<S>;
         using AccessLink = Details::SensorAccessLink<S, GatewayStructures>;
-
     };
+
+    // TODO: find a better way to create type descriptor, will facilitate SensorAccessLinkManager & other Gateway higher order of functionnalities to be implemented
+//    template<typename ParameterList, typename SensorConnectionParameters>
+//    struct SensorAccessLinkTraits {
+//
+//        template<typename P>
+//        struct CommunicationStructures {
+//            typedef CommunicationStructures<P> type;
+//        };
+//
+//        using SensorConnectionParametersType = SensorConnectionParameters;
+//    };
+//
+//    template<typename Traits, typename ParameterList>
+//    struct SensorAccessLinkDescriptor {
+//        using SensorStructures = typename Traits::template CommunicationStructures<ParameterList>::type;
+//        using GatewayStructures = GatewayStructuresFor<SensorStructures>;
+//        using AccessLink = Details::SensorAccessLink<SensorStructures, GatewayStructures>;
+//
+//        using SensorConnectionParameterType = typename Traits::SensorConnectionParameterType;
+//    };
+
+    template<typename SensorStructures,
+            typename DataTranslationStrategyType,
+            typename SensorCommunicationStrategyType,
+            typename SensorConnectionParameterType,
+            SensorConnectionParameterType defaultSensorConnectionValue
+    >
+    struct GenericAccessLink {
+        using CommunicationStructures = SensorStructures;
+        using Factory = SensorGateway::SensorAccessLinkFactory<CommunicationStructures>;
+        using AccessLink = typename Factory::AccessLink;
+        using GatewayStructures = typename Factory::GatewayStructures;
+
+        // TODO : Incorporate std::is_same and other compile-time type checking to be REALLY simplify usage
+        using DataTranslationStrategy = DataTranslationStrategyType;
+        using SensorCommunicationStrategy = SensorCommunicationStrategyType;
+
+        static constexpr SensorConnectionParameterType sensorConnectionParameterValue = defaultSensorConnectionValue;
+        using SensorConnectionParameter = SensorConnectionParameterType;
+
+        constexpr operator SensorConnectionParameter() const noexcept {
+            return sensorConnectionParameterValue;
+        }
+
+        using type = GenericAccessLink<
+                SensorStructures,
+                DataTranslationStrategyType,
+                SensorCommunicationStrategyType,
+                SensorConnectionParameterType,
+                defaultSensorConnectionValue
+        >;
+    };
+
 }
 
 #endif //SENSORGATEWAY_SENSORACCESSLINK_HPP

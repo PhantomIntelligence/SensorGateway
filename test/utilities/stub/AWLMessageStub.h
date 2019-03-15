@@ -19,7 +19,7 @@
 #include "sensor-gateway/common/data-structure/sensor/AWLStructures.h"
 
 namespace Stub {
-    using AWLMessage = Sensor::AWL::Structures::Message;
+    using AWLMessage = typename Sensor::AWL::Structures<>::Message;
 
     std::vector<AWLMessage> createAWLMessageStub() {
         std::vector<AWLMessage> awlMessages = {AWLMessage(10, 2188169, 8, {211, 55, 0, 11, 0, 0, 123, 0}),

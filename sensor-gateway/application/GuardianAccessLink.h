@@ -24,22 +24,17 @@
 
 namespace SensorGateway {
 
-    struct GuardianAccessLink {
+    template<typename P>
+    using GuardianStructures = typename Sensor::Guardian::Structures<P>;
 
-        using CommunicationStructures = Sensor::Guardian::Structures;
-        using Factory = SensorAccessLinkFactory<CommunicationStructures>;
-        using AccessLink = typename Factory::AccessLink;
-        using GatewayStructures = typename Factory::GatewayStructures;
-
-        using ServerCommunicationStrategy = AccessLink::ServerCommunicationStrategy;
-        using DataTranslationStrategy = DataTranslation::GuardianTranslationStrategy;
-        using SensorCommunicationStrategy = SensorCommunication::GuardianUSBCommunicationStrategy;
-
-        SensorCommunication::USBConnectionParameters sensorConnectionParameters{0x058b, 0x0050,
-                                                                                  (129),
-                                                                                  (2),
-                                                                                  3000};
-    };
+    template<typename P>
+    using GuardianAccessLink = SensorGateway::GenericAccessLink<
+            GuardianStructures<P>,
+            DataTranslation::GuardianTranslationStrategy<GuardianStructures<P>>,
+            SensorCommunication::GuardianUSBCommunicationStrategy<GuardianStructures<P>>,
+            typename SensorCommunication::USBConnectionParameters,
+            SensorCommunication::USBConnectionParameters{0x058b, 0x0050, (129), (2), 3000}
+    >;
 }
 
 #endif //SENSORGATEWAY_GUARDIANACCESSLINK_H

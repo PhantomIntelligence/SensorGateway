@@ -25,7 +25,7 @@
 #include "test/utilities/assertion/SensorMessageAssertion.hpp"
 
 #include "sensor-gateway/data-translation/GuardianTranslationStrategy.hpp"
-#include "sensor-gateway/common/data-structure/sensor/GuardianStructures.h"
+#include "sensor-gateway/common/data-structure/sensor/GuardianStructures.hpp"
 
 using DataFlow::Defaults::Track::DEFAULT_ACCELERATION;
 using DataFlow::Defaults::Track::DEFAULT_DISTANCE;
@@ -37,12 +37,10 @@ protected:
 
     using Track = DataFlow::Track;
 
-    using DataStructures = Sensor::Guardian::Structures;
-    using GatewayStructures = Sensor::Gateway::Structures<
-            DataStructures::MessageDefinition,
-            DataStructures::RawDataDefinition,
-            DataStructures::ControlMessageDefinition
-    >;
+    using DataStructures = Sensor::Guardian::Structures<>;
+    using GatewayStructures = GatewayStructuresFor<DataStructures>;
+
+    using GuardianTranslationStrategy = DataTranslation::GuardianTranslationStrategy<DataStructures>;
 
     using GuardianMessage = DataStructures::Message;
     using GuardianRawData = DataStructures::RawData;
@@ -95,12 +93,15 @@ protected:
     }
 
     auto orderRawDataAccordingToGuardianChannelPositions(GuardianRawData::Definitions::Data&& content) const {
-        auto const NUMBER_OF_SAMPLES_PER_CHANNEL = GuardianRawData::Definitions::NUMBER_OF_SAMPLES_PER_CHANNEL;
-        auto const NUMBER_OF_CHANNELS = GuardianRawData::Definitions::NUMBER_OF_CHANNELS;
+        static constexpr auto const NUMBER_OF_SAMPLES_PER_CHANNEL = GuardianRawData::Definitions::NUMBER_OF_SAMPLES_PER_CHANNEL;
+        static constexpr auto const NUMBER_OF_CHANNELS = GuardianRawData::Definitions::NUMBER_OF_CHANNELS;
+        static constexpr std::array<uint32_t, NUMBER_OF_CHANNELS> const CHANNEL_POSITIONS = {
+                {8, 0, 9, 1, 10, 2, 11, 3, 12, 4, 13, 5, 14, 6, 15, 7}
+        };
         GuardianRawData orderedRawData;
         GuardianRawData::Definitions::Data orderedContent = orderedRawData.content;
         for (auto ordinalChannelIndex = 0u; ordinalChannelIndex < NUMBER_OF_CHANNELS; ++ordinalChannelIndex) {
-            auto channelPositionIndex = DataStructures::CHANNEL_POSITIONS[ordinalChannelIndex];
+            auto channelPositionIndex = CHANNEL_POSITIONS[ordinalChannelIndex];
             auto originStartPosition = content.begin() + channelPositionIndex * NUMBER_OF_SAMPLES_PER_CHANNEL;
             auto destinationStartPosition =
                     orderedContent.begin() + ordinalChannelIndex * NUMBER_OF_SAMPLES_PER_CHANNEL;
@@ -123,15 +124,16 @@ TEST_F(GuardianTranslationStrategyTest,
 
     auto endOfGatewayMessageAWLMessage = GuardianMessage(SOME_END_FRAME_AWL_MESSAGE);
     auto expectedGatewayMessage = GatewayMessage(FRAME_AFTER_END_OF_FRAME_MESSAGE_TRANSLATION);
-    DataTranslation::GuardianTranslationStrategy translationStrategy;
+    GuardianTranslationStrategy translationStrategy;
     GatewayMessageSinkMock sensorMessageSinkMock(1);
     GatewayMessageProcessingScheduler scheduler(&sensorMessageSinkMock);
     translationStrategy.linkConsumer(&scheduler);
 
     translationStrategy.translateMessage(std::move(endOfGatewayMessageAWLMessage));
 
-    scheduler.terminateAndJoin();
     sensorMessageSinkMock.waitConsumptionToBeReached();
+    scheduler.terminateAndJoin();
+
     auto actualGatewayMessage = sensorMessageSinkMock.getConsumedData().front();
     ASSERT_TRUE(Assert::sameSensorMessage(expectedGatewayMessage, actualGatewayMessage));
 }
@@ -142,7 +144,7 @@ TEST_F(GuardianTranslationStrategyTest,
     auto detectionTrackAWLMessage = GuardianMessage(SOME_DETECTION_TRACK_AWL_MESSAGE);
     auto endOfGatewayMessageAWLMessage = GuardianMessage(SOME_END_FRAME_AWL_MESSAGE);
     auto expectedGatewayMessage = GatewayMessage(FRAME_AFTER_DETECTION_TRACK_AND_END_OF_FRAME_MESSAGES_TRANSLATION);
-    DataTranslation::GuardianTranslationStrategy translationStrategy;
+    GuardianTranslationStrategy translationStrategy;
     GatewayMessageSinkMock sensorMessageSinkMock(1);
     GatewayMessageProcessingScheduler scheduler(&sensorMessageSinkMock);
     translationStrategy.linkConsumer(&scheduler);
@@ -150,8 +152,9 @@ TEST_F(GuardianTranslationStrategyTest,
     translationStrategy.translateMessage(std::move(detectionTrackAWLMessage));
     translationStrategy.translateMessage(std::move(endOfGatewayMessageAWLMessage));
 
-    scheduler.terminateAndJoin();
     sensorMessageSinkMock.waitConsumptionToBeReached();
+    scheduler.terminateAndJoin();
+
     auto actualGatewayMessage = sensorMessageSinkMock.getConsumedData().front();
     ASSERT_TRUE(Assert::sameSensorMessage(expectedGatewayMessage, actualGatewayMessage));
 }
@@ -162,8 +165,9 @@ TEST_F(GuardianTranslationStrategyTest,
     auto detectionTrackAWLMessage = GuardianMessage(SOME_DETECTION_TRACK_AWL_MESSAGE);
     auto detectionVelocityAWLMessage = GuardianMessage(SOME_VELOCITY_TRACK_AWL_MESSAGE);
     auto endOfGatewayMessageAWLMessage = GuardianMessage(SOME_END_FRAME_AWL_MESSAGE);
-    auto expectedGatewayMessage = GatewayMessage(FRAME_AFTER_DETECTION_TRACK_AND_VELOCITY_TRACK_AND_END_OF_FRAME_MESSAGES_TRANSLATION);
-    DataTranslation::GuardianTranslationStrategy translationStrategy;
+    auto expectedGatewayMessage = GatewayMessage(
+            FRAME_AFTER_DETECTION_TRACK_AND_VELOCITY_TRACK_AND_END_OF_FRAME_MESSAGES_TRANSLATION);
+    GuardianTranslationStrategy translationStrategy;
     GatewayMessageSinkMock sensorMessageSinkMock(1);
     GatewayMessageProcessingScheduler scheduler(&sensorMessageSinkMock);
     translationStrategy.linkConsumer(&scheduler);
@@ -172,8 +176,9 @@ TEST_F(GuardianTranslationStrategyTest,
     translationStrategy.translateMessage(std::move(detectionVelocityAWLMessage));
     translationStrategy.translateMessage(std::move(endOfGatewayMessageAWLMessage));
 
-    scheduler.terminateAndJoin();
     sensorMessageSinkMock.waitConsumptionToBeReached();
+    scheduler.terminateAndJoin();
+
     auto actualGatewayMessage = sensorMessageSinkMock.getConsumedData().front();
     ASSERT_TRUE(Assert::sameSensorMessage(expectedGatewayMessage, actualGatewayMessage));
 }
@@ -182,14 +187,16 @@ TEST_F(GuardianTranslationStrategyTest,
        given_someEndOfGatewayMessageAWLMessage_when_translatingThisMessage_then_callsProduceOneTime) {
 
     auto endOfGatewayMessageAWLMessage = GuardianMessage(SOME_END_FRAME_AWL_MESSAGE);
-    DataTranslation::GuardianTranslationStrategy translationStrategy;
+    GuardianTranslationStrategy translationStrategy;
     GatewayMessageSinkMock sensorMessageSinkMock(1);
     GatewayMessageProcessingScheduler scheduler(&sensorMessageSinkMock);
     translationStrategy.linkConsumer(&scheduler);
 
     translationStrategy.translateMessage(std::move(endOfGatewayMessageAWLMessage));
+    sensorMessageSinkMock.waitConsumptionToBeReached();
 
     scheduler.terminateAndJoin();
+
     ASSERT_EQ(sensorMessageSinkMock.hasBeenCalledExpectedNumberOfTimes(), 1);
 }
 
@@ -198,7 +205,7 @@ TEST_F(GuardianTranslationStrategyTest,
     auto numberOfDataToProduce = 1u;
     auto rawData = createOrdinalGuardianRawData();
 
-    DataTranslation::GuardianTranslationStrategy translationStrategy;
+    GuardianTranslationStrategy translationStrategy;
     GatewayRawDataSinkMock gatewayRawDataSink(numberOfDataToProduce);
     GatewayRawDataProcessingScheduler scheduler(&gatewayRawDataSink);
     translationStrategy.linkConsumer(&scheduler);
@@ -218,11 +225,10 @@ TEST_F(GuardianTranslationStrategyTest,
     auto guardianRawData = createIdenticalNonNullValuedGuardianRawData();
     auto contentCopy = GuardianRawData::Definitions::Data(guardianRawData.content);
 
-    DataTranslation::GuardianTranslationStrategy translationStrategy;
+    GuardianTranslationStrategy translationStrategy;
     GatewayRawDataSinkMock gatewayRawDataSink(numberOfData);
     GatewayRawDataProcessingScheduler scheduler(&gatewayRawDataSink);
     translationStrategy.linkConsumer(&scheduler);
-
     translationStrategy.translateRawData(std::move(guardianRawData));
 
     auto reversedContent = reverseDefinitionsEndianness(std::move(contentCopy));
@@ -241,7 +247,7 @@ TEST_F(GuardianTranslationStrategyTest,
     auto ordinalRawData = createOrdinalGuardianRawData();
     auto contentCopy = GuardianRawData::Definitions::Data(ordinalRawData.content);
 
-    DataTranslation::GuardianTranslationStrategy translationStrategy;
+    GuardianTranslationStrategy translationStrategy;
     GatewayRawDataSinkMock gatewayRawDataSink(numberOfData);
     GatewayRawDataProcessingScheduler scheduler(&gatewayRawDataSink);
     translationStrategy.linkConsumer(&scheduler);
@@ -250,6 +256,7 @@ TEST_F(GuardianTranslationStrategyTest,
 
     auto reversedContent = reverseDefinitionsEndianness(std::move(contentCopy));
     auto orderedContent = orderRawDataAccordingToGuardianChannelPositions(std::move(reversedContent));
+
     auto expectedGatewayRawData = GatewayRawData(orderedContent);
 
     gatewayRawDataSink.waitConsumptionToBeReached();

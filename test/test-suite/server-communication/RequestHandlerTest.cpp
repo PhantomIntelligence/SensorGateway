@@ -34,11 +34,12 @@ class RequestHandlerTest : public ::testing::Test {
 public:
 
     using DataStructures = Sensor::Test::RealisticImplementation::Structures;
+    using GatewayStructures = GatewayStructuresFor<DataStructures>;
 
 protected:
 
     using AvailableParameters = DataStructures::Parameters;
-    using RequestHandler = SensorAccessLinkElement::RequestHandler<DataStructures, DataStructures>;
+    using RequestHandler = SensorAccessLinkElement::RequestHandler<DataStructures, GatewayStructures>;
 
     using RequestAssembler = Assemble::ServerRequestAssembler;
     using GetParameterValueRequest = ServerCommunication::RequestTypes::GetParameterValue;
@@ -54,11 +55,12 @@ private:
 namespace RequestHandlerTestMock {
 
     using DataStructures = typename RequestHandlerTest::DataStructures;
+    using GatewayStructures = typename RequestHandlerTest::GatewayStructures;
 
     class SensorParameterControllerMock final
-            : public SensorAccessLinkElement::SensorParameterController<DataStructures, DataStructures> {
+            : public SensorAccessLinkElement::SensorParameterController<DataStructures, GatewayStructures> {
 
-        using super = SensorAccessLinkElement::SensorParameterController<DataStructures, DataStructures>;
+        using super = SensorAccessLinkElement::SensorParameterController<DataStructures, GatewayStructures>;
 
         using GetParameterValueRequest = typename super::GetParameterValueRequest;
 
@@ -87,7 +89,7 @@ namespace RequestHandlerTestMock {
     };
 
     using DevNullTranslationStrategy = Mock::DevNullDataTranslationStrategyMock<DataStructures>;
-    using DataTranslator = SensorAccessLinkElement::DataTranslator<DataStructures, DataStructures>;
+    using DataTranslator = SensorAccessLinkElement::DataTranslator<DataStructures, GatewayStructures>;
 
     class CatchingDataTranslatorMock final : public DataTranslator {
 
@@ -108,8 +110,8 @@ namespace RequestHandlerTestMock {
         DevNullTranslationStrategy devNullTranslationStrategy;
     };
 
-    using ServerCommunicator = SensorAccessLinkElement::ServerCommunicator<DataStructures>;
-    using DevNullCommunicationStrategy = Mock::DevNullServerCommunicationStrategyMock<DataStructures>;
+    using ServerCommunicator = SensorAccessLinkElement::ServerCommunicator<GatewayStructures>;
+    using DevNullCommunicationStrategy = Mock::DevNullServerCommunicationStrategyMock<GatewayStructures>;
 
     class DevNullServerCommunicatorMock final : public ServerCommunicator {
 

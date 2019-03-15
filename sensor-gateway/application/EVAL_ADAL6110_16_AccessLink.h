@@ -24,22 +24,17 @@
 
 namespace SensorGateway {
 
-    struct EVAL_ADAL6110_16_AccessLink {
+    template<typename P>
+    using EVAL_ADAL6110_16_Structures = typename Sensor::Guardian::Structures<P>;
 
-        using CommunicationStructures = Sensor::Guardian::Structures;
-        using Factory = SensorAccessLinkFactory<CommunicationStructures>;
-        using AccessLink = typename Factory::AccessLink;
-        using GatewayStructures = typename Factory::GatewayStructures;
-
-        using ServerCommunicationStrategy = AccessLink::ServerCommunicationStrategy;
-        using DataTranslationStrategy = DataTranslation::GuardianTranslationStrategy;
-        using SensorCommunicationStrategy = SensorCommunication::GuardianUSBCommunicationStrategy;
-
-        SensorCommunication::USBConnectionParameters sensorConnectionParameters{0x064b, 0x7823,
-                                                                                (129),
-                                                                                (1),
-                                                                                3000};
-    };
+    template<typename P>
+    using EVAL_ADAL6110_16_AccessLink = SensorGateway::GenericAccessLink<
+            EVAL_ADAL6110_16_Structures<P>,
+            DataTranslation::GuardianTranslationStrategy<EVAL_ADAL6110_16_Structures<P>>,
+            SensorCommunication::GuardianUSBCommunicationStrategy<EVAL_ADAL6110_16_Structures<P>>,
+            typename SensorCommunication::USBConnectionParameters,
+            SensorCommunication::USBConnectionParameters{0x064b, 0x7823, (129), (1), 3000}
+    >;
 }
 
 #endif //SENSORGATEWAY_EVAL_ADAL6110_16_ACCESSLINK_H

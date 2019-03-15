@@ -19,11 +19,12 @@
 
 namespace TestUtilities {
 
-    class AWLMessagesFileManager : public FileManager<Sensor::AWL::Structures::Message> {
+    using SensorStructures = typename Sensor::AWL::Structures<>;
+    class AWLMessagesFileManager : public FileManager<typename SensorStructures::Message> {
 
     protected:
 
-        using Message = Sensor::AWL::Structures::Message;
+        using Message = typename SensorStructures::Message;
 
     public:
 

@@ -11,7 +11,7 @@ class SensorMessageTest : public ::testing::Test {
 
 protected:
 
-    using SensorMessage = typename DataFlow::SensorMessage<Sensor::AWL::Structures::MessageDefinition>;
+    using SensorMessage = typename DataFlow::SensorMessage<Sensor::AWL::Structures<>::MessageDefinition>;
     using MessageId = decltype(SensorMessage::messageId);
     using SensorId = decltype(SensorMessage::sensorId);
     using Pixel = typename SensorMessage::PixelType;

@@ -18,7 +18,7 @@
 #define SENSORGATEWAY_GUARDIANTRANSLATIONSTRATEGY_HPP
 
 #include "sensor-gateway/common/data-structure/gateway/GatewayStructures.h"
-#include "sensor-gateway/common/data-structure/sensor/GuardianStructures.h"
+#include "sensor-gateway/common/data-structure/sensor/GuardianStructures.hpp"
 #include "DataTranslationStrategy.hpp"
 #include "TranslationErrorFactory.h"
 
@@ -92,14 +92,20 @@ namespace DataTranslation {
             return sensorControlMessage;
         }
 
+        using super::MessageSource::linkConsumer;
+        using super::RawDataSource::linkConsumer;
+        using super::ResponseControlMessageSource::linkConsumer;
+
     private:
 
         using super::currentOutputMessage;
 
         void addTrackInPixel(SensorMessage&& sensorMessage, DataFlow::PixelId pixelId) {
-            DataFlow::TrackId trackId = convertTwoBytesToUnsignedBigEndian(sensorMessage.data[0], sensorMessage.data[1]);
+            DataFlow::TrackId trackId = convertTwoBytesToUnsignedBigEndian(sensorMessage.data[0],
+                                                                           sensorMessage.data[1]);
             DataFlow::ConfidenceLevel confidenceLevel = sensorMessage.data[5];
-            DataFlow::Intensity intensity = convertTwoBytesToUnsignedBigEndian(sensorMessage.data[6], sensorMessage.data[7]);
+            DataFlow::Intensity intensity = convertTwoBytesToUnsignedBigEndian(sensorMessage.data[6],
+                                                                               sensorMessage.data[7]);
             DataFlow::Track track;
             track.id = trackId;
             track.confidenceLevel = confidenceLevel;
@@ -108,8 +114,10 @@ namespace DataTranslation {
         };
 
         void translateEndOfFrameMessage(SensorMessage&& sensorMessage) {
-            DataFlow::MessageId messageId = convertTwoBytesToUnsignedBigEndian(sensorMessage.data[0], sensorMessage.data[1]);
-            DataFlow::SensorId sensorId = convertTwoBytesToUnsignedBigEndian(sensorMessage.data[2], sensorMessage.data[3]);
+            DataFlow::MessageId messageId = convertTwoBytesToUnsignedBigEndian(sensorMessage.data[0],
+                                                                               sensorMessage.data[1]);
+            DataFlow::SensorId sensorId = convertTwoBytesToUnsignedBigEndian(sensorMessage.data[2],
+                                                                             sensorMessage.data[3]);
             currentOutputMessage.sensorId = sensorId;
             currentOutputMessage.messageId = messageId;
             super::MessageSource::produce(std::move(currentOutputMessage));
@@ -117,15 +125,19 @@ namespace DataTranslation {
         }
 
         void translateDetectionTrackMessage(SensorMessage&& sensorMessage) {
-            DataFlow::PixelId pixelId = convertTwoBytesToUnsignedBigEndian(sensorMessage.data[3], sensorMessage.data[4]);
+            DataFlow::PixelId pixelId = convertTwoBytesToUnsignedBigEndian(sensorMessage.data[3],
+                                                                           sensorMessage.data[4]);
             addTrackInPixel(std::move(sensorMessage), pixelId);
         }
 
         void translateDetectionVelocityMessage(SensorMessage&& sensorMessage) {
-            DataFlow::Distance distance = convertTwoBytesToUnsignedBigEndian(sensorMessage.data[2], sensorMessage.data[3]);
+            DataFlow::Distance distance = convertTwoBytesToUnsignedBigEndian(sensorMessage.data[2],
+                                                                             sensorMessage.data[3]);
             DataFlow::Speed speed = convertTwoBytesToSignedBigEndian(sensorMessage.data[4], sensorMessage.data[5]);
-            DataFlow::Acceleration acceleration = convertTwoBytesToSignedBigEndian(sensorMessage.data[6], sensorMessage.data[7]);
-            DataFlow::TrackId trackId = convertTwoBytesToUnsignedBigEndian(sensorMessage.data[0], sensorMessage.data[1]);
+            DataFlow::Acceleration acceleration = convertTwoBytesToSignedBigEndian(sensorMessage.data[6],
+                                                                                   sensorMessage.data[7]);
+            DataFlow::TrackId trackId = convertTwoBytesToUnsignedBigEndian(sensorMessage.data[0],
+                                                                           sensorMessage.data[1]);
             auto track = fetchTrack(trackId);
             track->distance = distance;
             track->speed = speed;
@@ -133,7 +145,7 @@ namespace DataTranslation {
         }
 
         void reverseRawDataDefinitionEndianness(SensorRawData* sensorRawData) {
-            auto originalContent = ServerRawData::Content(sensorRawData->content);
+            auto originalContent = typename ServerRawData::Content(sensorRawData->content);
             auto const NUMBER_OF_DATA = SensorRawData::Definitions::SIZE;
             for (auto contentIndex = 0u; contentIndex < NUMBER_OF_DATA; ++contentIndex) {
                 sensorRawData->content[contentIndex] = reverseEndiannessOfInt16(originalContent[contentIndex]);
@@ -141,11 +153,15 @@ namespace DataTranslation {
         }
 
         void orderRawData(SensorRawData* sensorRawData) {
-            auto const NUMBER_OF_SAMPLES_PER_CHANNEL = SensorRawData::Definitions::NUMBER_OF_SAMPLES_PER_CHANNEL;
-            auto const NUMBER_OF_CHANNELS = SensorRawData::Definitions::NUMBER_OF_CHANNELS;
-            auto unorderedContent = ServerRawData::Content(sensorRawData->content);
+
+            static constexpr auto const NUMBER_OF_SAMPLES_PER_CHANNEL = SensorRawData::Definitions::NUMBER_OF_SAMPLES_PER_CHANNEL;
+            static constexpr auto const NUMBER_OF_CHANNELS = SensorRawData::Definitions::NUMBER_OF_CHANNELS;
+            static constexpr std::array<uint32_t, NUMBER_OF_CHANNELS> CHANNEL_POSITIONS = {
+                    {8, 0, 9, 1, 10, 2, 11, 3, 12, 4, 13, 5, 14, 6, 15, 7}
+            };
+            auto unorderedContent = typename ServerRawData::Content(sensorRawData->content);
             for (auto ordinalChannelIndex = 0u; ordinalChannelIndex < NUMBER_OF_CHANNELS; ++ordinalChannelIndex) {
-                auto channelPositionIndex = SensorStructures::CHANNEL_POSITIONS[ordinalChannelIndex];
+                auto channelPositionIndex = CHANNEL_POSITIONS[ordinalChannelIndex];
                 auto originStartPosition =
                         unorderedContent.begin() + channelPositionIndex * NUMBER_OF_SAMPLES_PER_CHANNEL;
                 auto destinationStartPosition =

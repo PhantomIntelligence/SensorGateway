@@ -24,11 +24,11 @@ namespace Mock {
 
     template<typename T>
     class ErrorThrowingDataTranslationStrategyMock :
-            public DataTranslation::DataTranslationStrategy<T, T> {
+            public DataTranslation::DataTranslationStrategy<T, GatewayStructuresFor<T>> {
 
     protected:
 
-        using super = DataTranslation::DataTranslationStrategy<T, T>;
+        using super = DataTranslation::DataTranslationStrategy<T, GatewayStructuresFor<T>>;
         using SensorMessage = typename super::SensorMessage;
         using SensorRawData = typename super::SensorRawData;
         using SensorControlMessage = typename super::SensorControlMessage;

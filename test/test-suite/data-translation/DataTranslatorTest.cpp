@@ -28,16 +28,17 @@ class DataTranslatorTest : public ::testing::Test {
 
 public :
 
-    using Structures = Sensor::Test::Simple::Structures;
+    using DataStructures = Sensor::Test::RealisticImplementation::Structures;
+    using GatewayStructures = GatewayStructuresFor<DataStructures>;
 
 protected:
 
     using DataTestUtil = TestFunctions::DataTestUtil;
-    using DataTranslator = SensorAccessLinkElement::DataTranslator<Structures, Structures>;
+    using DataTranslator = SensorAccessLinkElement::DataTranslator<DataStructures, GatewayStructures>;
 
     using Error = ErrorHandling::SensorAccessLinkError;
     using ErrorSinkMock = Mock::ArbitraryDataSinkMock<Error>;
-    using ThrowingDataTranslationStrategy = Mock::ErrorThrowingDataTranslationStrategyMock<Sensor::Test::Simple::Structures>;
+    using ThrowingDataTranslationStrategy = Mock::ErrorThrowingDataTranslationStrategyMock<DataStructures>;
 
     DataTranslatorTest() = default;
 
@@ -47,8 +48,9 @@ protected:
 
 namespace DataTranslatorTestMock {
 
-    using Structures = DataTranslatorTest::Structures;
-    using DataTranslationStrategy = DataTranslation::DataTranslationStrategy<Structures, Structures>;
+    using DataStructures = DataTranslatorTest::DataStructures;
+    using GatewayStructures = DataTranslatorTest::GatewayStructures;
+    using DataTranslationStrategy = DataTranslation::DataTranslationStrategy<DataStructures, GatewayStructures>;
 
     class MockDataTranslationStrategy final :
             public DataTranslationStrategy {
@@ -67,8 +69,8 @@ namespace DataTranslatorTestMock {
         MockDataTranslationStrategy() :
                 translateMessageCalled(false),
                 translateRawDataCalled(false),
-                receivedSensorMessage(Structures::Message::returnDefaultData()),
-                receivedSensorRawData(Structures::RawData::returnDefaultData()) {
+                receivedSensorMessage(DataStructures::Message::returnDefaultData()),
+                receivedSensorRawData(DataStructures::RawData::returnDefaultData()) {
         };
 
         ~MockDataTranslationStrategy() noexcept = default;
@@ -118,8 +120,8 @@ namespace DataTranslatorTestMock {
 
 TEST_F(DataTranslatorTest,
        given_aTranslationStrategy_when_consumeMessage_then_callsTranslateMessageInStrategyWithTheConsumedMessage) {
-    auto message = DataTestUtil::createRandomSimpleMessageWithEmptyTimestamps();
-    auto copy = Structures::Message(message);
+    auto message = DataTestUtil::createRandomRealisticMessageWithEmptyTimestamps();
+    auto copy = DataStructures::Message(message);
 
     DataTranslatorTestMock::MockDataTranslationStrategy mockStrategy;
     DataTranslator dataTranslator(&mockStrategy);
@@ -132,8 +134,8 @@ TEST_F(DataTranslatorTest,
 
 TEST_F(DataTranslatorTest,
        given_aTranslationStrategy_when_consumeRawData_then_callsTranslateRawDataInStrategyWithTheConsumedRawData) {
-    auto data = DataTestUtil::createRandomSimpleRawData();
-    auto copy = Structures::RawData(data);
+    auto data = DataTestUtil::createRandomRealisticRawData();
+    auto copy = DataStructures::RawData(data);
 
     DataTranslatorTestMock::MockDataTranslationStrategy mockStrategy;
     DataTranslator dataTranslator(&mockStrategy);
@@ -154,7 +156,7 @@ TEST_F(DataTranslatorTest,
     DataTranslator dataTranslator(&throwingMockStrategy);
 
     dataTranslator.linkConsumer(&scheduler);
-    auto data = DataTestUtil::createRandomSimpleMessageWithEmptyTimestamps();
+    auto data = DataTestUtil::createRandomRealisticMessageWithEmptyTimestamps();
     dataTranslator.consume(std::move(data));
     sink.waitConsumptionToBeReached();
 
@@ -191,10 +193,10 @@ TEST_F(DataTranslatorTest,
             throwingMockStrategy.ERROR_CODE,
             throwingMockStrategy.RAW_DATA_ERROR_MESSAGE);
 
-    auto data = DataTestUtil::createRandomSimpleRawData();
+    auto data = DataTestUtil::createRandomRealisticRawData();
 
     dataTranslator.linkConsumer(&scheduler);
-    data = DataTestUtil::createRandomSimpleRawData();
+    data = DataTestUtil::createRandomRealisticRawData();
     dataTranslator.consume(std::move(data));
     sink.waitConsumptionToBeReached();
 
@@ -217,8 +219,6 @@ TEST_F(DataTranslatorTest,
     auto messageCopy = decltype(availableParameters.createGetParameterValueControlMessageFor(validParameterName))(
             sensorControlMessage);
 
-    using DataStructures = Sensor::Test::RealisticImplementation::Structures;
-    using GatewayStructures = typename SensorGateway::SensorAccessLinkFactory<DataStructures>::GatewayStructures;
     using LoopBackDataTranslationStrategyMock = Mock::DataTranslationStrategyMock<DataStructures, GatewayStructures>;
     using LoopBackDataTranslator = SensorAccessLinkElement::DataTranslator<DataStructures, GatewayStructures>;
     LoopBackDataTranslationStrategyMock dataTranslationStrategyMock;
@@ -246,8 +246,6 @@ TEST_F(DataTranslatorTest,
     auto messageCopy = decltype(availableParameters.createGetParameterValueControlMessageFor(validParameterName))(
             sensorControlMessage);
 
-    using DataStructures = Sensor::Test::RealisticImplementation::Structures;
-    using GatewayStructures = typename SensorGateway::SensorAccessLinkFactory<DataStructures>::GatewayStructures;
     using LoopBackDataTranslationStrategyMock = Mock::DataTranslationStrategyMock<DataStructures, GatewayStructures>;
     using LoopBackDataTranslator = SensorAccessLinkElement::DataTranslator<DataStructures, GatewayStructures>;
     LoopBackDataTranslationStrategyMock dataTranslationStrategyMock;

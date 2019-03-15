@@ -23,16 +23,17 @@
 
 namespace SensorGateway {
 
-    struct AWL16AccessLink {
-        using CommunicationStructures = Sensor::AWL::Structures;
-        using Factory = SensorGateway::SensorAccessLinkFactory<CommunicationStructures>;
-        using AccessLink = typename Factory::AccessLink;
-        using GatewayStructures = typename Factory::GatewayStructures;
+    template<typename P>
+    using AWL16Structures = typename Sensor::AWL::Structures<P>;
 
-        using ServerCommunicationStrategy = AccessLink::ServerCommunicationStrategy;
-        using DataTranslationStrategy = DataTranslation::AWLTranslationStrategy;
-        using SensorCommunicationStrategy = SensorCommunication::KvaserCanCommunicationStrategy;
-    };
+    template<typename P>
+    using AWL16AccessLink = SensorGateway::GenericAccessLink<
+            AWL16Structures<P>,
+            DataTranslation::AWLTranslationStrategy<AWL16Structures<P>>,
+            SensorCommunication::KvaserCanCommunicationStrategy<AWL16Structures<P>>,
+            int,
+            0
+    >;
 }
 
 #endif //SENSORGATEWAY_AWL16ACCESSLINK_H

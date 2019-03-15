@@ -17,6 +17,7 @@
 #ifndef SENSORGATEWAY_DEVNULLDATATRANSLATIONSTRATEGYMOCK_HPP
 #define SENSORGATEWAY_DEVNULLDATATRANSLATIONSTRATEGYMOCK_HPP
 
+#include <sensor-gateway/common/data-structure/gateway/GatewayStructures.h>
 #include "test/utilities/data-model/DataModelFixture.h"
 #include "sensor-gateway/data-translation/DataTranslationStrategy.hpp"
 
@@ -24,11 +25,11 @@ namespace Mock {
 
     template<typename T>
     class DevNullDataTranslationStrategyMock :
-            public DataTranslation::DataTranslationStrategy<T, T> {
+            public DataTranslation::DataTranslationStrategy<T, GatewayStructuresFor<T>> {
 
     protected:
 
-        using super = DataTranslation::DataTranslationStrategy<T, T>;
+        using super = DataTranslation::DataTranslationStrategy<T, GatewayStructuresFor<T>>;
 
         using super::MessageSource;
         using super::RawDataSource;
