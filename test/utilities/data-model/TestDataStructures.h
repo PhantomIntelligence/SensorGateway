@@ -100,5 +100,4 @@ namespace Sensor {
         }
     }
 }
-
 #endif //SENSORGATEWAY_TESTDATASTRUCTURES_H

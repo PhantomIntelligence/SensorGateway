@@ -17,24 +17,10 @@
 #ifndef SENSORGATEWAY_EVAL_ADAL6110_16_ACCESSLINK_H
 #define SENSORGATEWAY_EVAL_ADAL6110_16_ACCESSLINK_H
 
-#include "SensorAccessLink.hpp"
-
-#include "sensor-gateway/sensor-communication/GuardianUSBCommunicationStrategy.hpp"
-#include "sensor-gateway/data-translation/GuardianTranslationStrategy.hpp"
+#include "SensorAccessLinkManager.hpp"
 
 namespace SensorGateway {
-
-    template<typename P>
-    using EVAL_ADAL6110_16_Structures = typename Sensor::Guardian::Structures<P>;
-
-    template<typename P>
-    using EVAL_ADAL6110_16_AccessLink = SensorGateway::GenericAccessLink<
-            EVAL_ADAL6110_16_Structures<P>,
-            DataTranslation::GuardianTranslationStrategy<EVAL_ADAL6110_16_Structures<P>>,
-            SensorCommunication::GuardianUSBCommunicationStrategy<EVAL_ADAL6110_16_Structures<P>>,
-            typename SensorCommunication::USBConnectionParameters,
-            SensorCommunication::USBConnectionParameters{0x064b, 0x7823, (129), (1), 3000}
-    >;
+    using EVAL_ADAL6110_16_AccessLink_NoParameters = EVAL_ADAL6110_16_AccessLink<Sensor::Gateway::NoGatewayParameters>;
 }
 
 #endif //SENSORGATEWAY_EVAL_ADAL6110_16_ACCESSLINK_H

@@ -17,24 +17,10 @@
 #ifndef SENSORGATEWAY_GUARDIANACCESSLINK_H
 #define SENSORGATEWAY_GUARDIANACCESSLINK_H
 
-#include "SensorAccessLink.hpp"
-
-#include "sensor-gateway/sensor-communication/GuardianUSBCommunicationStrategy.hpp"
-#include "sensor-gateway/data-translation/GuardianTranslationStrategy.hpp"
+#include "SensorAccessLinkManager.hpp"
 
 namespace SensorGateway {
-
-    template<typename P>
-    using GuardianStructures = typename Sensor::Guardian::Structures<P>;
-
-    template<typename P>
-    using GuardianAccessLink = SensorGateway::GenericAccessLink<
-            GuardianStructures<P>,
-            DataTranslation::GuardianTranslationStrategy<GuardianStructures<P>>,
-            SensorCommunication::GuardianUSBCommunicationStrategy<GuardianStructures<P>>,
-            typename SensorCommunication::USBConnectionParameters,
-            SensorCommunication::USBConnectionParameters{0x058b, 0x0050, (129), (2), 3000}
-    >;
+    using GuardianAccessLink_NoParameters = GuardianAccessLink<Sensor::Gateway::NoGatewayParameters>;
 }
 
 #endif //SENSORGATEWAY_GUARDIANACCESSLINK_H

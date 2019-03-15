@@ -2,6 +2,7 @@
 #define SENSORGATEWAY_KVASERREADMESSAGETOFILETEST_CPP
 
 #include <cinttypes>
+
 #include "sensor-gateway/sensor-communication/KvaserCanCommunicationStrategy.hpp"
 
 int main() {

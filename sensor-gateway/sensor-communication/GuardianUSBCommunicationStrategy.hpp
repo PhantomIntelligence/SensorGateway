@@ -24,13 +24,40 @@
 
 namespace SensorCommunication {
 
+    namespace USBConnectionDetails {
+        using VendorIdType= uint16_t;
+        using ProductIdType = int16_t;
+        using EndpointInType = uint8_t;
+        using EndpointOutType = uint8_t;
+        using TimeoutType = uint16_t;
+    }
+
     typedef struct {
-        uint16_t vendorId;
-        uint16_t productId;
-        uint8_t endpointIn;
-        uint8_t endpointOut;
-        uint16_t timeout;
+        USBConnectionDetails::VendorIdType vendorId;
+        USBConnectionDetails::ProductIdType productId;
+        USBConnectionDetails::EndpointInType endpointIn;
+        USBConnectionDetails::EndpointOutType endpointOut;
+        USBConnectionDetails::TimeoutType timeout;
     } USBConnectionParameters;
+
+    template<
+            USBConnectionDetails::VendorIdType vendorId,
+            USBConnectionDetails::ProductIdType productId,
+            USBConnectionDetails::EndpointInType endpointIn,
+            USBConnectionDetails::EndpointOutType endpointOut,
+            USBConnectionDetails::TimeoutType timeout>
+    struct USBConnectionParametersLiteral {
+        static constexpr USBConnectionParameters usbConnectionParameters{vendorId, productId, endpointIn, endpointOut, timeout};
+        inline static constexpr USBConnectionParameters const& getValue() noexcept {
+            return usbConnectionParameters;
+        }
+    };
+
+//    template<typename USBConnectionParameters, USBConnectionParameters C>
+//    using USBConnectionParametersConstant = std::integral_constant<USBConnectionParameters, C>;
+//
+    template<typename USBConnectionParametersLiteral>
+    using USBConnectionParametersConstant = std::integral_constant<decltype(USBConnectionParametersLiteral::getValue()), std::declval<USBConnectionParametersLiteral::getValue()>()>;
 
     using Sensor::AWL::NUMBER_OF_DATA_BYTES;
 
@@ -64,7 +91,8 @@ namespace SensorCommunication {
                 reconnectTime(SteadyClock::now()),
                 dataCanBeFetched(false),
                 numberOfMessagesToFetch(0),
-                numberOfRawDataCyclesToFetch(0) {}
+                numberOfRawDataCyclesToFetch(0) {
+        }
 
         ~GuardianUSBCommunicationStrategy() noexcept override = default;
 

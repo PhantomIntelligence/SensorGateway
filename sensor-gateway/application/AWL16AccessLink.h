@@ -17,23 +17,10 @@
 #ifndef SENSORGATEWAY_AWL16ACCESSLINK_H
 #define SENSORGATEWAY_AWL16ACCESSLINK_H
 
-#include "SensorAccessLink.hpp"
-#include "sensor-gateway/sensor-communication/KvaserCanCommunicationStrategy.hpp"
-#include "sensor-gateway/data-translation/AWLTranslationStrategy.hpp"
+#include "SensorAccessLinkManager.hpp"
 
 namespace SensorGateway {
-
-    template<typename P>
-    using AWL16Structures = typename Sensor::AWL::Structures<P>;
-
-    template<typename P>
-    using AWL16AccessLink = SensorGateway::GenericAccessLink<
-            AWL16Structures<P>,
-            DataTranslation::AWLTranslationStrategy<AWL16Structures<P>>,
-            SensorCommunication::KvaserCanCommunicationStrategy<AWL16Structures<P>>,
-            int,
-            0
-    >;
+    using AWL16AccessLink_NoParameters = AWL16AccessLink<Sensor::Gateway::NoGatewayParameters>;
 }
 
 #endif //SENSORGATEWAY_AWL16ACCESSLINK_H

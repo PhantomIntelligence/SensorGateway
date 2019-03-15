@@ -25,7 +25,7 @@
 #include "test/utilities/mock/LoopBackSensorCommunicationStrategyMock.hpp"
 
 #include "sensor-gateway/common/data-structure/gateway/GatewayStructures.h"
-#include "sensor-gateway/application/SensorAccessLink.hpp"
+#include "sensor-gateway/application/SensorAccessLinkManager.hpp"
 
 
 /**
@@ -38,17 +38,26 @@ protected:
     std::string const SERVER_ADDRESS = "Die Potato!";
 
 
+    using TestAccessLinkName = StringLiteral<decltype("TestAccessLink"_ToString)>;
     using DataStructures = Sensor::Test::RealisticImplementation::Structures;
-    using Factory = SensorGateway::SensorAccessLinkFactory<DataStructures>;
-    using GatewayStructures = typename Factory::GatewayStructures;
-    using AvailableParameters = DataStructures::Parameters;
     using FakeSensorMessage = DataStructures::Message;
+    using DefaultParameter = SensorGateway::DefaultGuardianConnectionParameter;
+    using TestAccessLink = SensorGateway::GenericAccessLink<
+            TestAccessLinkName,
+            DataStructures,
+            Mock::DataTranslationStrategyMock<DataStructures, GatewayStructuresFor<DataStructures>>,
+            Mock::LoopBackSensorCommunicationStrategyMock<DataStructures>,
+            DefaultParameter
+    >;
+
+    using GatewayStructures = TestAccessLink::GatewayStructures;
+    using AvailableParameters = DataStructures::Parameters;
 
     using ServerCommunicationStrategyMock = Mock::RequestResponseSpecializedServerCommunicationStrategyMock<GatewayStructures>;
     using DataTranslationStrategyMock = Mock::DataTranslationStrategyMock<DataStructures, GatewayStructures>;
     using SensorCommunicationStrategyMock = Mock::LoopBackSensorCommunicationStrategyMock<DataStructures>;
 
-    using TranslationStubbedAccessLink = typename Factory::AccessLink;
+    using TranslationStubbedAccessLink = TestAccessLink::AccessLink;
 
 };
 

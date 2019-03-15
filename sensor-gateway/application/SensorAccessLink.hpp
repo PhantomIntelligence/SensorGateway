@@ -19,7 +19,6 @@
 
 #include "sensor-gateway/common/data-structure/gateway/GatewayStructures.h"
 #include "sensor-gateway/parameter-control/SensorParameterController.hpp"
-#include <type_traits>
 
 namespace SensorGateway {
 
@@ -187,60 +186,6 @@ namespace SensorGateway {
         using GatewayStructures = GatewayStructuresFor<S>;
         using AccessLink = Details::SensorAccessLink<S, GatewayStructures>;
     };
-
-    // TODO: find a better way to create type descriptor, will facilitate SensorAccessLinkManager & other Gateway higher order of functionnalities to be implemented
-//    template<typename ParameterList, typename SensorConnectionParameters>
-//    struct SensorAccessLinkTraits {
-//
-//        template<typename P>
-//        struct CommunicationStructures {
-//            typedef CommunicationStructures<P> type;
-//        };
-//
-//        using SensorConnectionParametersType = SensorConnectionParameters;
-//    };
-//
-//    template<typename Traits, typename ParameterList>
-//    struct SensorAccessLinkDescriptor {
-//        using SensorStructures = typename Traits::template CommunicationStructures<ParameterList>::type;
-//        using GatewayStructures = GatewayStructuresFor<SensorStructures>;
-//        using AccessLink = Details::SensorAccessLink<SensorStructures, GatewayStructures>;
-//
-//        using SensorConnectionParameterType = typename Traits::SensorConnectionParameterType;
-//    };
-
-    template<typename SensorStructures,
-            typename DataTranslationStrategyType,
-            typename SensorCommunicationStrategyType,
-            typename SensorConnectionParameterType,
-            SensorConnectionParameterType defaultSensorConnectionValue
-    >
-    struct GenericAccessLink {
-        using CommunicationStructures = SensorStructures;
-        using Factory = SensorGateway::SensorAccessLinkFactory<CommunicationStructures>;
-        using AccessLink = typename Factory::AccessLink;
-        using GatewayStructures = typename Factory::GatewayStructures;
-
-        // TODO : Incorporate std::is_same and other compile-time type checking to be REALLY simplify usage
-        using DataTranslationStrategy = DataTranslationStrategyType;
-        using SensorCommunicationStrategy = SensorCommunicationStrategyType;
-
-        static constexpr SensorConnectionParameterType sensorConnectionParameterValue = defaultSensorConnectionValue;
-        using SensorConnectionParameter = SensorConnectionParameterType;
-
-        constexpr operator SensorConnectionParameter() const noexcept {
-            return sensorConnectionParameterValue;
-        }
-
-        using type = GenericAccessLink<
-                SensorStructures,
-                DataTranslationStrategyType,
-                SensorCommunicationStrategyType,
-                SensorConnectionParameterType,
-                defaultSensorConnectionValue
-        >;
-    };
-
 }
 
 #endif //SENSORGATEWAY_SENSORACCESSLINK_HPP
