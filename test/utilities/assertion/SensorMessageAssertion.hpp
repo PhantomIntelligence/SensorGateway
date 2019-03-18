@@ -57,6 +57,16 @@ namespace Assert {
             messageDifferencesForPrinting->emplace_back(newDifference);
         }
 
+        template<typename T>
+        static void
+        addDiffIfDifferent(MessageDifferencesForPrinting* differences, std::string const& differenceName, T& expected,
+                           T& actual) noexcept {
+            if (expected != actual) {
+                Details::addDiff(differences, differenceName, expected, actual);
+            }
+        }
+
+
         static void
         addDiffTitle(MessageDifferencesForPrinting* messageDifferencesForPrinting, std::string const& differenceName) {
             DifferentialPrinting newDifference = {{(differenceName + " "), EXPECTED_VALUE_SPACER, ACTUAL_VALUE_SPACER}};
@@ -184,21 +194,40 @@ namespace Assert {
                 Details::addBreak(&messageDifferencesForPrinting);
                 Details::addDiffTitle(&messageDifferencesForPrinting, ("Pixel # " + std::to_string(orderId) + ": "));
 
-                auto expectedId = expectedPixel.id;
-                auto actualId = actualPixel.id;
-                if (expectedId != actualId) {
-                    Details::addDiff(&messageDifferencesForPrinting, " id: ", expectedId, actualId);
-                }
+                Details::addDiffIfDifferent(&messageDifferencesForPrinting, " id: ", expectedPixel.id, actualPixel.Id);
+
+                auto expectedNumberOfTracks = expectedPixel.getCurrentNumberOfTracksInPixel();
+                auto actualNumberOfTracks = actualPixel.getCurrentNumberOfTracksInPixel();
+                Details::addDiffIfDifferent(&messageDifferencesForPrinting, "Number of tracks: ",
+                                            expectedNumberOfTracks, actualNumberOfTracks);
 
                 auto expectedTracks = expectedPixel.getTracks();
                 auto actualTracks = actualPixel.getTracks();
+
                 if (expectedTracks != actualTracks) {
+                    Details::addDiffTitle(&messageDifferencesForPrinting, "Tracks... ");
 
-                    auto expectedNumberOfTracks = expectedPixel.getCurrentNumberOfTracksInPixel();
-                    auto actualNumberOfTracks = actualPixel.getCurrentNumberOfTracksInPixel();
+                    for (auto trackIndex = 0u; trackIndex < expectedNumberOfTracks; ++trackIndex) {
+                        auto expectedTrack = expectedTracks[trackIndex];
+                        auto actualTrack = actualTracks[trackIndex];
 
-                    Details::addDiff(&messageDifferencesForPrinting, "Number of tracks: ", expectedNumberOfTracks,
-                                     actualNumberOfTracks);
+                        if (expectedTrack != actualTrack) {
+                            Details::addDiffTitle(&messageDifferencesForPrinting,
+                                                  ("Track # " + std::to_string(trackIndex) + ": "));
+                            Details::addDiffIfDifferent(&messageDifferencesForPrinting, "TrackId: ",
+                                                        expectedTrack.trackId, actualTrack.trackId);
+                            Details::addDiffIfDifferent(&messageDifferencesForPrinting, "Distance: ",
+                                                        expectedTrack.distance, actualTrack.distance);
+                            Details::addDiffIfDifferent(&messageDifferencesForPrinting, "Intensity: ",
+                                                        expectedTrack.intensity, actualTrack.intensity);
+                            Details::addDiffIfDifferent(&messageDifferencesForPrinting, "Speed: ", expectedTrack.speed,
+                                                        actualTrack.speed);
+                            Details::addDiffIfDifferent(&messageDifferencesForPrinting, "Acceleration: ",
+                                                        expectedTrack.acceleration, actualTrack.acceleration);
+                            Details::addDiffIfDifferent(&messageDifferencesForPrinting, "ConfidenceLevel: ",
+                                                        expectedTrack.confidenceLevel, actualTrack.confidenceLevel);
+                        }
+                    }
                 }
                 Details::addBreak(&messageDifferencesForPrinting);
             }
@@ -233,7 +262,7 @@ namespace Assert {
             sameMessage = false;
         }
 
-        if(!sameMessage) {
+        if (!sameMessage) {
             return formatFailureMessage(&messageDifferencesForPrinting);
         }
 
