@@ -212,7 +212,7 @@ namespace Assert {
 
                     Details::addDiffIfDifferent(&messageDifferencesForPrinting, " size: ", expectedTrackSize, actualTrackSize);
 
-                    if (expectedTrackSize == actualNumberOfTracks) {
+                    if (expectedTrackSize == actualTrackSize) {
 
                         for (auto trackIndex = 0u; trackIndex < expectedTrackSize; ++trackIndex) {
                             auto expectedTrack = expectedTracks->at(trackIndex);
