@@ -105,8 +105,6 @@ namespace TestFunctions {
             using Acceleration = decltype(std::declval<Track>().acceleration);
             using ConfidenceLevel = decltype(std::declval<Track>().confidenceLevel);
 
-            auto const numberOfTracksToCreatePerPixel = 4;
-
             std::default_random_engine randomEngine(std::random_device{}());
 
             using messageIdLimits = std::numeric_limits<MessageId>;
@@ -134,10 +132,10 @@ namespace TestFunctions {
                                                                                        1);
 
             // TODO : create template to std::initializer_list<int> digits {1, 2, 3, 4, 5}; for array
-            for (PixelId pixelId = 0; pixelId < numberOfPixels; ++pixelId) {
+            for (PixelId pixelId = 0u; pixelId < numberOfPixels; ++pixelId) {
                 Tracks tracks;
-                for (TrackId trackId = 0;
-                     trackId < numberOfTracksToCreatePerPixel; ++trackId) {
+
+                for (TrackId trackId = 0; trackId < tracks.size(); ++trackId) {
                     Track track(
                             trackId,
                             distanceDistribution(randomEngine),
@@ -150,7 +148,7 @@ namespace TestFunctions {
                 Pixel pixel(
                         pixelId,
                         tracks,
-                        numberOfTracksToCreatePerPixel
+                        tracks.size()
                 );
                 pixels[pixelId] = pixel;
             }
