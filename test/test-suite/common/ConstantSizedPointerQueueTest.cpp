@@ -128,17 +128,6 @@ TEST_F(ConstantSizedPointerQueueTest, given_twoPointerStoredInOrder_when_consume
     ASSERT_EQ(secondPointer, secondStoredPointer);
 }
 
-TEST_F(ConstantSizedPointerQueueTest, given_aPointerInTheQueue_when_consumeNext_then_returnsThePointer) {
-    Queue queue;
-    SimpleMessage data = DataTestUtil::createRandomSimpleMessageWithEmptyTimestamps();
-    auto pointer = &data;
-    queue.store(pointer);
-
-    auto storedPointer = queue.consumeNext();
-
-    ASSERT_EQ(pointer, storedPointer);
-}
-
 TEST_F(ConstantSizedPointerQueueTest, given_aNonFullQueue_when_fillingAndConsumingTheQueueTwice_then_dataRemainsCoherent) {
     Queue queue;
 
