@@ -209,6 +209,9 @@ namespace Assert {
 
                     auto expectedTrackSize = expectedTracks->size();
                     auto actualTrackSize = actualTracks->size();
+
+                    Details::addDiffIfDifferent(&messageDifferencesForPrinting, " size: ", expectedTrackSize, actualTrackSize);
+
                     if (expectedTrackSize == actualNumberOfTracks) {
 
                         for (auto trackIndex = 0u; trackIndex < expectedTrackSize; ++trackIndex) {
@@ -216,10 +219,8 @@ namespace Assert {
                             auto actualTrack = actualTracks->at(trackIndex);
 
                             if (expectedTrack != actualTrack) {
-                                Details::addDiffTitle(&messageDifferencesForPrinting,
-                                                      ("Track # " + std::to_string(trackIndex) + ": "));
-                                Details::addDiffIfDifferent(&messageDifferencesForPrinting, " id: ",
-                                                            expectedTrack.id, actualTrack.id);
+                                Details::addDiffTitle(&messageDifferencesForPrinting, ("Track # " + std::to_string(trackIndex) + ": "));
+                                Details::addDiffIfDifferent(&messageDifferencesForPrinting, " id: ", expectedTrack.id, actualTrack.id);
                                 Details::addDiffIfDifferent(&messageDifferencesForPrinting, " distance: ",
                                                             expectedTrack.distance, actualTrack.distance);
                                 Details::addDiffIfDifferent(&messageDifferencesForPrinting, " intensity: ",
