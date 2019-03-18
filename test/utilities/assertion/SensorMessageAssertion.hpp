@@ -207,25 +207,31 @@ namespace Assert {
                 if ((*expectedTracks) != (*actualTracks)) {
                     Details::addDiffTitle(&messageDifferencesForPrinting, "Tracks... ");
 
-                    for (auto trackIndex = 0u; trackIndex < expectedNumberOfTracks; ++trackIndex) {
-                        auto expectedTrack = expectedTracks->at(trackIndex);
-                        auto actualTrack = actualTracks->at(trackIndex);
+                    auto expectedTrackSize = expectedTracks->size();
+                    auto actualTrackSize = actualTracks->size();
+                    if (expectedTrackSize == actualNumberOfTracks) {
 
-                        if (expectedTrack != actualTrack) {
-                            Details::addDiffTitle(&messageDifferencesForPrinting,
-                                                  ("Track # " + std::to_string(trackIndex) + ": "));
-                            Details::addDiffIfDifferent(&messageDifferencesForPrinting, " id: ",
-                                                        expectedTrack.id, actualTrack.id);
-                            Details::addDiffIfDifferent(&messageDifferencesForPrinting, " distance: ",
-                                                        expectedTrack.distance, actualTrack.distance);
-                            Details::addDiffIfDifferent(&messageDifferencesForPrinting, " intensity: ",
-                                                        expectedTrack.intensity, actualTrack.intensity);
-                            Details::addDiffIfDifferent(&messageDifferencesForPrinting, " speed: ", expectedTrack.speed,
-                                                        actualTrack.speed);
-                            Details::addDiffIfDifferent(&messageDifferencesForPrinting, " acceleration: ",
-                                                        expectedTrack.acceleration, actualTrack.acceleration);
-                            Details::addDiffIfDifferent(&messageDifferencesForPrinting, " confidence level: ",
-                                                        expectedTrack.confidenceLevel, actualTrack.confidenceLevel);
+                        for (auto trackIndex = 0u; trackIndex < expectedTrackSize; ++trackIndex) {
+                            auto expectedTrack = expectedTracks->at(trackIndex);
+                            auto actualTrack = actualTracks->at(trackIndex);
+
+                            if (expectedTrack != actualTrack) {
+                                Details::addDiffTitle(&messageDifferencesForPrinting,
+                                                      ("Track # " + std::to_string(trackIndex) + ": "));
+                                Details::addDiffIfDifferent(&messageDifferencesForPrinting, " id: ",
+                                                            expectedTrack.id, actualTrack.id);
+                                Details::addDiffIfDifferent(&messageDifferencesForPrinting, " distance: ",
+                                                            expectedTrack.distance, actualTrack.distance);
+                                Details::addDiffIfDifferent(&messageDifferencesForPrinting, " intensity: ",
+                                                            expectedTrack.intensity, actualTrack.intensity);
+                                Details::addDiffIfDifferent(&messageDifferencesForPrinting, " speed: ",
+                                                            expectedTrack.speed,
+                                                            actualTrack.speed);
+                                Details::addDiffIfDifferent(&messageDifferencesForPrinting, " acceleration: ",
+                                                            expectedTrack.acceleration, actualTrack.acceleration);
+                                Details::addDiffIfDifferent(&messageDifferencesForPrinting, " confidence level: ",
+                                                            expectedTrack.confidenceLevel, actualTrack.confidenceLevel);
+                            }
                         }
                     }
                 }
