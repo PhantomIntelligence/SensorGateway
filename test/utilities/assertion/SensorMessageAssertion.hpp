@@ -194,7 +194,7 @@ namespace Assert {
                 Details::addBreak(&messageDifferencesForPrinting);
                 Details::addDiffTitle(&messageDifferencesForPrinting, ("Pixel # " + std::to_string(orderId) + ": "));
 
-                Details::addDiffIfDifferent(&messageDifferencesForPrinting, " id: ", expectedPixel.id, actualPixel.Id);
+                Details::addDiffIfDifferent(&messageDifferencesForPrinting, " id: ", expectedPixel.id, actualPixel.id);
 
                 auto expectedNumberOfTracks = expectedPixel.getCurrentNumberOfTracksInPixel();
                 auto actualNumberOfTracks = actualPixel.getCurrentNumberOfTracksInPixel();
@@ -204,27 +204,27 @@ namespace Assert {
                 auto expectedTracks = expectedPixel.getTracks();
                 auto actualTracks = actualPixel.getTracks();
 
-                if (expectedTracks != actualTracks) {
+                if ((*expectedTracks) != (*actualTracks)) {
                     Details::addDiffTitle(&messageDifferencesForPrinting, "Tracks... ");
 
                     for (auto trackIndex = 0u; trackIndex < expectedNumberOfTracks; ++trackIndex) {
-                        auto expectedTrack = expectedTracks[trackIndex];
-                        auto actualTrack = actualTracks[trackIndex];
+                        auto expectedTrack = expectedTracks->at(trackIndex);
+                        auto actualTrack = actualTracks->at(trackIndex);
 
                         if (expectedTrack != actualTrack) {
                             Details::addDiffTitle(&messageDifferencesForPrinting,
                                                   ("Track # " + std::to_string(trackIndex) + ": "));
-                            Details::addDiffIfDifferent(&messageDifferencesForPrinting, "TrackId: ",
-                                                        expectedTrack.trackId, actualTrack.trackId);
-                            Details::addDiffIfDifferent(&messageDifferencesForPrinting, "Distance: ",
+                            Details::addDiffIfDifferent(&messageDifferencesForPrinting, " id: ",
+                                                        expectedTrack.id, actualTrack.id);
+                            Details::addDiffIfDifferent(&messageDifferencesForPrinting, " distance: ",
                                                         expectedTrack.distance, actualTrack.distance);
-                            Details::addDiffIfDifferent(&messageDifferencesForPrinting, "Intensity: ",
+                            Details::addDiffIfDifferent(&messageDifferencesForPrinting, " intensity: ",
                                                         expectedTrack.intensity, actualTrack.intensity);
-                            Details::addDiffIfDifferent(&messageDifferencesForPrinting, "Speed: ", expectedTrack.speed,
+                            Details::addDiffIfDifferent(&messageDifferencesForPrinting, " speed: ", expectedTrack.speed,
                                                         actualTrack.speed);
-                            Details::addDiffIfDifferent(&messageDifferencesForPrinting, "Acceleration: ",
+                            Details::addDiffIfDifferent(&messageDifferencesForPrinting, " acceleration: ",
                                                         expectedTrack.acceleration, actualTrack.acceleration);
-                            Details::addDiffIfDifferent(&messageDifferencesForPrinting, "ConfidenceLevel: ",
+                            Details::addDiffIfDifferent(&messageDifferencesForPrinting, " confidence level: ",
                                                         expectedTrack.confidenceLevel, actualTrack.confidenceLevel);
                         }
                     }
