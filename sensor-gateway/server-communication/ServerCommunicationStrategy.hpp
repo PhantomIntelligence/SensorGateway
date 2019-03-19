@@ -94,6 +94,18 @@ namespace ServerCommunication {
             return valueToReturn;
         }
 
+        void receiveGetAllParameterNamesRequest() {
+            receivedGetAllParameterNamesRequest.store(true);
+        }
+
+        void receiveCalibrationRequest() {
+            receivedCalibrationRequest.store(true);
+        }
+
+        void receiveClearCalibrationRequest() {
+            receivedClearCalibrationRequest.store(true);
+        }
+
         AtomicFlag receivedGetAllParameterNamesRequest;
         AtomicFlag receivedCalibrationRequest;
         AtomicFlag receivedClearCalibrationRequest;
