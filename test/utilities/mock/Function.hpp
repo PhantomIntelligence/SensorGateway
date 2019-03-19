@@ -17,6 +17,7 @@
 #ifndef SENSORGATEWAY_MOCKFUNCTIONMOCK_HPP
 #define SENSORGATEWAY_MOCKFUNCTIONMOCK_HPP
 
+#include <cassert>
 #include <type_traits>
 #include "test/utilities/data-model/DataModelFixture.h"
 
