@@ -122,7 +122,11 @@ namespace RequestHandlerTestMock {
     public:
 
         explicit DevNullServerCommunicatorMock() :
-                ServerCommunicator(&devNullCommunicationStrategy, nullptr) {
+                ServerCommunicator(&devNullCommunicationStrategy,
+                                   nullptr,
+                                   nullptr,
+                                   nullptr,
+                                   nullptr) {
         }
 
     private:

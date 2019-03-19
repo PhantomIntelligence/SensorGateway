@@ -36,20 +36,84 @@ namespace Mock {
                 super(nullptr, nullptr),
                 expectedNumberOfGetParameterValueRequest(0),
                 actualNumberOfGetParameterValueRequest(0),
-                receivedExpectedNumberOfGetParameterValueRequest(false) {}
+                receivedExpectedNumberOfGetAllParameterNamesRequest(false),
+
+                expectedNumberOfGetAllParameterNamesRequests(0),
+                actualNumberOfGetAllParameterNamesRequests(0),
+                receivedExpectedNumberOfGetParameterValueRequest(false),
+
+                expectedNumberOfCalibrationRequests(0),
+                actualNumberOfCalibrationRequests(0),
+                receivedExpectedNumberOfCalibrationRequest(false),
+
+                expectedNumberOfClearCalibrationRequests(0),
+                actualNumberOfClearCalibrationRequests(0),
+                receivedExpectedNumberOfClearCalibrationRequest(false) {}
 
         ~CatchingRequestHandlerMock() noexcept override = default;
+
+        bool hasReceivedExpectedNumberOfGetAllParameterNamesRequest() const {
+            return receivedExpectedNumberOfGetAllParameterNamesRequest.load();
+        }
 
         bool hasReceivedExpectedNumberOfGetParameterValueRequest() const {
             return receivedExpectedNumberOfGetParameterValueRequest.load();
         }
 
+        bool hasReceivedExpectedNumberOfCalibrationRequest() const {
+            return receivedExpectedNumberOfCalibrationRequest.load();
+        }
+
+        bool hasReceivedExpectedNumberOfClearCalibrationRequest() const {
+            return receivedExpectedNumberOfClearCalibrationRequest.load();
+        }
+
+        void handleGetAllParameterNamesRequest() override {
+            ++actualNumberOfGetAllParameterNamesRequests;
+            if (actualNumberOfGetAllParameterNamesRequests.load() == expectedNumberOfGetAllParameterNamesRequests) {
+                receivedExpectedNumberOfGetAllParameterNamesRequest.store(true);
+                receivedExpectedNumberOfGetAllParameterNamesRequestPromise.set_value(true);
+            }
+            if (actualNumberOfGetAllParameterNamesRequests.load() > expectedNumberOfGetAllParameterNamesRequests) {
+                receivedExpectedNumberOfGetAllParameterNamesRequest.store(false);
+            }
+        }
+
         void handleGetParameterValueRequest(GetParameterValueRequest&& getParameterValueRequest) override {
             ++actualNumberOfGetParameterValueRequest;
-            receivedGetParameterValueRequests.emplace_back(std::forward<GetParameterValueRequest>(getParameterValueRequest));
+            receivedGetParameterValueRequests.emplace_back(
+                    std::forward<GetParameterValueRequest>(getParameterValueRequest));
             if (actualNumberOfGetParameterValueRequest.load() == expectedNumberOfGetParameterValueRequest) {
                 receivedExpectedNumberOfGetParameterValueRequest.store(true);
                 receivedExpectedNumberOfGetParameterValueRequestPromise.set_value(true);
+            }
+        }
+
+        void handleCalibrationRequest() override {
+            ++actualNumberOfCalibrationRequests;
+            if (actualNumberOfCalibrationRequests.load() == expectedNumberOfCalibrationRequests) {
+                receivedExpectedNumberOfCalibrationRequest.store(true);
+                receivedExpectedNumberOfCalibrationRequestPromise.set_value(true);
+            }
+            if (actualNumberOfCalibrationRequests.load() > expectedNumberOfCalibrationRequests) {
+                receivedExpectedNumberOfCalibrationRequest.store(false);
+            }
+        }
+
+        void handleClearCalibrationRequest() override {
+            ++actualNumberOfClearCalibrationRequests;
+            if (actualNumberOfClearCalibrationRequests.load() == expectedNumberOfClearCalibrationRequests) {
+                receivedExpectedNumberOfClearCalibrationRequest.store(true);
+                receivedExpectedNumberOfClearCalibrationRequestPromise.set_value(true);
+            }
+            if (actualNumberOfClearCalibrationRequests.load() > expectedNumberOfClearCalibrationRequests) {
+                receivedExpectedNumberOfClearCalibrationRequest.store(false);
+            }
+        }
+
+        void waitForExpectedNumberOfGetAllParameterNamesRequest() {
+            if (!hasReceivedExpectedNumberOfGetAllParameterNamesRequest()) {
+                receivedExpectedNumberOfGetAllParameterNamesRequestPromise.get_future().wait();
             }
         }
 
@@ -59,8 +123,44 @@ namespace Mock {
             }
         }
 
+        void waitForExpectedNumberOfCalibrationRequest() {
+            if (!hasReceivedExpectedNumberOfCalibrationRequest()) {
+                receivedExpectedNumberOfCalibrationRequestPromise.get_future().wait();
+            }
+        }
+
+        void waitForExpectedNumberOfClearCalibrationRequest() {
+            if (!hasReceivedExpectedNumberOfClearCalibrationRequest()) {
+                receivedExpectedNumberOfClearCalibrationRequestPromise.get_future().wait();
+            }
+        }
+
+        void setExpectedNumberOfGetAllParameterNamesRequest(uint16_t newExpectedValue) {
+            if (newExpectedValue == 0) {
+                receivedExpectedNumberOfGetAllParameterNamesRequest.store(true);
+            }
+            expectedNumberOfGetAllParameterNamesRequests = newExpectedValue;
+        }
+
         void setExpectedNumberOfGetParameterValueRequest(uint16_t newExpectedValue) {
+            if (newExpectedValue == 0) {
+                receivedExpectedNumberOfGetParameterValueRequest.store(true);
+            }
             expectedNumberOfGetParameterValueRequest = newExpectedValue;
+        }
+
+        void setExpectedNumberOfCalibrationRequest(uint16_t newExpectedValue) {
+            if (newExpectedValue == 0) {
+                receivedExpectedNumberOfCalibrationRequest.store(true);
+            }
+            expectedNumberOfCalibrationRequests = newExpectedValue;
+        }
+
+        void setExpectedNumberOfClearCalibrationRequest(uint16_t newExpectedValue) {
+            if (newExpectedValue == 0) {
+                receivedExpectedNumberOfClearCalibrationRequest.store(true);
+            }
+            expectedNumberOfClearCalibrationRequests = newExpectedValue;
         }
 
         GetParameterValueRequests const& getReceivedGetParameterValueRequests() const {
@@ -76,6 +176,20 @@ namespace Mock {
 
         GetParameterValueRequests receivedGetParameterValueRequests;
 
+        uint16_t expectedNumberOfGetAllParameterNamesRequests;
+        AtomicCounter actualNumberOfGetAllParameterNamesRequests;
+        mutable BooleanPromise receivedExpectedNumberOfGetAllParameterNamesRequestPromise;
+        AtomicFlag receivedExpectedNumberOfGetAllParameterNamesRequest;
+
+        uint16_t expectedNumberOfCalibrationRequests;
+        AtomicCounter actualNumberOfCalibrationRequests;
+        mutable BooleanPromise receivedExpectedNumberOfCalibrationRequestPromise;
+        AtomicFlag receivedExpectedNumberOfCalibrationRequest;
+
+        uint16_t expectedNumberOfClearCalibrationRequests;
+        AtomicCounter actualNumberOfClearCalibrationRequests;
+        mutable BooleanPromise receivedExpectedNumberOfClearCalibrationRequestPromise;
+        AtomicFlag receivedExpectedNumberOfClearCalibrationRequest;
     };
 }
 

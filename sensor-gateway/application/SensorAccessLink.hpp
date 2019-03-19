@@ -68,8 +68,12 @@ namespace SensorGateway {
                     dataTranslationStrategy(dataTranslationStrategy),
                     sensorCommunicationStrategy(sensorCommunicationStrategy),
                     serverCommunicator(serverCommunicationStrategy,
+                                       std::bind(&RequestHandler::handleGetAllParameterNamesRequest, &requestHandler),
                                        std::bind(&RequestHandler::handleGetParameterValueRequest, &requestHandler,
-                                                 std::placeholders::_1)),
+                                                 std::placeholders::_1),
+                                       std::bind(&RequestHandler::handleCalibrationRequest, &requestHandler),
+                                       std::bind(&RequestHandler::handleClearCalibrationRequest, &requestHandler)
+                    ),
                     requestHandler(&serverCommunicator,
                                    std::bind(&SensorParameterController::process, &sensorParameterController,
                                              std::placeholders::_1)),

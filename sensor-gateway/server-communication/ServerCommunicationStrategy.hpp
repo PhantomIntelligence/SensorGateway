@@ -33,6 +33,8 @@ namespace ServerCommunication {
         using GetParameterValueContent = std::string;
         using GetParameterValueContents = std::array<GetParameterValueContent, T::MAX_NUMBER_OF_CONCURRENT_REQUEST_OF_ONE_KIND>;
 
+        using AllParameterNamesList = std::array<std::string, T::Parameters::NUMBER_OF_AVAILABLE_PARAMETERS>;
+
         using UnsignedIntegerParameterResponse = ResponseType::UnsignedIntegerParameterResponse;
         using SignedIntegerParameterResponse = ResponseType::SignedIntegerParameterResponse;
         using RealNumberParameterResponse = ResponseType::RealNumberParameterResponse;
@@ -42,11 +44,29 @@ namespace ServerCommunication {
 
         using SetParameterValueBooleanContent = typename std::pair<GetParameterValueContent, bool>;
 
+        ServerCommunicationStrategy() noexcept :
+                receivedGetAllParameterNamesRequest(false),
+                receivedCalibrationRequest(false),
+                receivedClearCalibrationRequest(false) {
+        }
+
         virtual ~ServerCommunicationStrategy() noexcept = default;
 
         virtual void openConnection(std::string const& serverAddress) = 0;
 
+        bool hasReceivedGetAllParameterNamesRequest() noexcept {
+            return checkIfRequestHasBeenReceived(&receivedGetAllParameterNamesRequest);
+        }
+
         virtual GetParameterValueContents fetchGetParameterValueContents() = 0;
+
+        bool hasReceivedCalibrationRequest() noexcept {
+            return checkIfRequestHasBeenReceived(&receivedCalibrationRequest);
+        }
+
+        bool hasReceivedClearCalibrationRequest() noexcept {
+            return checkIfRequestHasBeenReceived(&receivedClearCalibrationRequest);
+        }
 
         virtual void sendMessage(Message&& message) = 0;
 
@@ -65,6 +85,19 @@ namespace ServerCommunication {
         virtual void sendResponse(ErrorMessageResponse&& errorMessageResponse) = 0;
 
         virtual void closeConnection() = 0;
+
+    protected:
+
+        bool checkIfRequestHasBeenReceived(AtomicFlag* requestReceivedFlag) const {
+            bool valueToReturn = requestReceivedFlag->load();
+            requestReceivedFlag->store(false);
+            return valueToReturn;
+        }
+
+        AtomicFlag receivedGetAllParameterNamesRequest;
+        AtomicFlag receivedCalibrationRequest;
+        AtomicFlag receivedClearCalibrationRequest;
+
     };
 }
 

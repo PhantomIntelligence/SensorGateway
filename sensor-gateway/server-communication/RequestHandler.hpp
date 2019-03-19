@@ -76,6 +76,10 @@ namespace SensorAccessLinkElement {
             }
         }
 
+        virtual void handleGetAllParameterNamesRequest() {
+            // TODO
+        }
+
         virtual void handleGetParameterValueRequest(GetParameterValueRequest&& getParameterValueRequest) {
             auto requestIsValid = true;
             std::string const& parameterName = getParameterValueRequest.payloadToString();
@@ -92,6 +96,15 @@ namespace SensorAccessLinkElement {
                 processGetParameterValueRequest(std::move(getParameterValueRequest));
             }
         }
+
+        virtual void handleCalibrationRequest() {
+            // TODO
+        }
+
+        virtual void handleClearCalibrationRequest() {
+            // TODO
+        }
+
 
 // TODO : Test this and complete with actual value from Sensor --> integration test
         template<typename P, typename Value, typename Request>

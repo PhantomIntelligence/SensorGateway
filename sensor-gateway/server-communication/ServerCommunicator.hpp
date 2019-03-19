@@ -45,16 +45,26 @@ namespace SensorAccessLinkElement {
         using GetParameterValueContents = typename ServerCommunicationStrategy::GetParameterValueContents;
 
         GetParameterValueRequest const DEFAULT_GET_PARAMETER_VALUE_REQUEST = ServerCommunication::RequestTypes::GetParameterValue::returnDefaultData();
+
+        using HandleGetAllParameterNamesRequest = std::function<void()>;
         using HandleGetParameterValueRequest = std::function<void(GetParameterValueRequest&&)>;
+        using HandleCalibrationRequest = std::function<void()>;
+        using HandleClearCalibrationRequest = std::function<void()>;
 
         using ErrorSource = DataFlow::DataSource<ErrorHandling::SensorAccessLinkError>;
 
     public:
 
         explicit ServerCommunicator(ServerCommunicationStrategy* serverCommunicationStrategy,
-                                    HandleGetParameterValueRequest handleGetParameterValueRequest) :
+                                    HandleGetAllParameterNamesRequest handleGetAllParameterNamesRequest,
+                                    HandleGetParameterValueRequest handleGetParameterValueRequest,
+                                    HandleCalibrationRequest handleCalibrationRequest,
+                                    HandleClearCalibrationRequest handleClearCalibrationRequest) :
                 serverCommunicationStrategy(serverCommunicationStrategy),
+                handleGetAllParameterNamesRequest(handleGetAllParameterNamesRequest),
                 handleGetParameterValueRequest(handleGetParameterValueRequest),
+                handleCalibrationRequest(handleCalibrationRequest),
+                handleClearCalibrationRequest(handleClearCalibrationRequest),
                 serverConnected(false), // TODO: add logic not to send anything until server is connected
                 terminateOrderReceived(false),
                 requestReceptionThread(JoinableThread(doNothing)) {
@@ -111,7 +121,7 @@ namespace SensorAccessLinkElement {
         // TODO : Add template specialization for non standard Response type so it always throws
         template<typename Response>
         void sendResponse(Response&& response) {
-            try{
+            try {
                 serverCommunicationStrategy->sendResponse(std::forward<Response>(response));
             } catch (ErrorHandling::SensorAccessLinkError& strategyError) {
                 addOriginAndHandleError(std::move(strategyError),
@@ -133,7 +143,10 @@ namespace SensorAccessLinkElement {
 
         void run() {
             while (!terminateOrderHasBeenReceived()) {
+                handleIncomingGetAllParameterNamesRequests();
                 handleIncomingGetParameterValueRequests();
+                handleIncomingCalibrationRequests();
+                handleIncomingClearCalibrationRequests();
                 sleepForTenthOfASecond();
                 yield();
             }
@@ -146,6 +159,13 @@ namespace SensorAccessLinkElement {
             } catch (ErrorHandling::SensorAccessLinkError& strategyError) {
                 addOriginAndHandleError(std::move(strategyError),
                                         ErrorHandling::Origin::SERVER_COMMUNICATOR_CLOSE_CONNECTION);
+            }
+        }
+
+        void handleIncomingGetAllParameterNamesRequests() {
+            auto hasToSendAllParameterNames = serverCommunicationStrategy->hasReceivedGetAllParameterNamesRequest();
+            if(hasToSendAllParameterNames) {
+                handleGetAllParameterNamesRequest();
             }
         }
 
@@ -168,7 +188,21 @@ namespace SensorAccessLinkElement {
             while (handleRequest) {
                 handleGetParameterValueRequest(std::move(request));
                 std::tie(request, handleRequest) = assembleGetParameterValueRequestFrom(contents[requestCount++]);
-            };
+            }
+        }
+
+        void handleIncomingCalibrationRequests() {
+            auto hasToSendAllParameterNames = serverCommunicationStrategy->hasReceivedCalibrationRequest();
+            if(hasToSendAllParameterNames) {
+                handleCalibrationRequest();
+            }
+        }
+
+        void handleIncomingClearCalibrationRequests() {
+            auto hasToSendAllParameterNames = serverCommunicationStrategy->hasReceivedClearCalibrationRequest();
+            if(hasToSendAllParameterNames) {
+                handleClearCalibrationRequest();
+            }
         }
 
         auto assembleGetParameterValueRequestFrom(
@@ -210,7 +244,10 @@ namespace SensorAccessLinkElement {
         AtomicFlag terminateOrderReceived;
 
         ServerCommunicationStrategy* serverCommunicationStrategy;
+        HandleGetAllParameterNamesRequest handleGetAllParameterNamesRequest;
         HandleGetParameterValueRequest handleGetParameterValueRequest;
+        HandleCalibrationRequest handleCalibrationRequest;
+        HandleClearCalibrationRequest handleClearCalibrationRequest;
 
         std::string serverAddress;
     };

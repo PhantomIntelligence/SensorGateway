@@ -154,15 +154,18 @@ namespace Mock {
         }
 
         void sendResponse(UnsignedIntegerParameterResponse&& response) override {
-            mockFunctionSendUnsignedIntegerParameterResponse.invokeVoidReturn(std::forward<UnsignedIntegerParameterResponse>(response));
+            mockFunctionSendUnsignedIntegerParameterResponse.invokeVoidReturn(
+                    std::forward<UnsignedIntegerParameterResponse>(response));
         }
 
         void sendResponse(SignedIntegerParameterResponse&& response) override {
-            mockFunctionSendSignedIntegerParameterResponse.invokeVoidReturn(std::forward<SignedIntegerParameterResponse>(response));
+            mockFunctionSendSignedIntegerParameterResponse.invokeVoidReturn(
+                    std::forward<SignedIntegerParameterResponse>(response));
         }
 
         void sendResponse(RealNumberParameterResponse&& response) override {
-            mockFunctionSendRealNumberParameterResponse.invokeVoidReturn(std::forward<RealNumberParameterResponse>(response));
+            mockFunctionSendRealNumberParameterResponse.invokeVoidReturn(
+                    std::forward<RealNumberParameterResponse>(response));
         }
 
         void sendResponse(BooleanParameterResponse&& response) override {
@@ -180,6 +183,22 @@ namespace Mock {
         void closeConnection() override {
         }
 
+        void waitUntilSendResponseUnsignedIntegerParameterValueIsCalled() {
+            mockFunctionSendUnsignedIntegerParameterResponse.waitUntilInvocation();
+        }
+
+        void waitUntilSendResponseSignedIntegerParameterValueIsCalled() {
+            mockFunctionSendSignedIntegerParameterResponse.waitUntilInvocation();
+        }
+
+        void waitUntilSendResponseRealNumberParameterValueIsCalled() {
+            mockFunctionSendRealNumberParameterResponse.waitUntilInvocation();
+        }
+
+        void waitUntilSendResponseBooleanParameterValueIsCalled() {
+            mockFunctionSendBooleanParameterResponse.waitUntilInvocation();
+        }
+
         void waitUntilSendResponseParameterErrorIsCalled() {
             if (!hasSendResponseParameterErrorBeenCalled()) {
                 sendResponseParameterErrorCalledAcknowledgement.get_future().wait();
@@ -190,6 +209,10 @@ namespace Mock {
             if (!hasSendResponseErrorMessageBeenCalled()) {
                 sendResponseErrorMessageCalledAcknowledgement.get_future().wait();
             }
+        }
+
+        void onHasReceivedGetAllParameterNamesRequestReturn(bool valueToReturn) {
+            super::receivedGetAllParameterNamesRequest.store(valueToReturn);
         }
 
         void increaseNumberOfUniqueValidGetParameterValueContentsToReturnBy(uint16_t newNumberToReturn) {
@@ -219,6 +242,30 @@ namespace Mock {
         GetParameterValueContents const& getReturnedGetParameterValueRequest() noexcept {
             LockGuard guard(getParameterValueMutex);
             return returnedGetParameterValueContents;
+        }
+
+        void onHasReceivedCalibrationRequestReturn(bool valueToReturn) {
+            super::receivedCalibrationRequest.store(valueToReturn);
+        }
+
+        void onHasReceivedClearCalibrationRequestReturn(bool valueToReturn) {
+            super::receivedClearCalibrationRequest.store(valueToReturn);
+        }
+
+        bool hasSendResponseUnsignedIntegerParameterValueBeenCalled() const {
+            return mockFunctionSendUnsignedIntegerParameterResponse.hasBeenInvoked();
+        }
+
+        bool hasSendResponseSignedIntegerParameterValueBeenCalled() const {
+            return mockFunctionSendSignedIntegerParameterResponse.hasBeenInvoked();
+        }
+
+        bool hasSendResponseRealNumberParameterValueBeenCalled() const {
+            return mockFunctionSendRealNumberParameterResponse.hasBeenInvoked();
+        }
+
+        bool hasSendResponseBooleanParameterValueBeenCalled() const {
+            return mockFunctionSendBooleanParameterResponse.hasBeenInvoked();
         }
 
         bool hasSendResponseParameterErrorBeenCalled() const {
@@ -281,9 +328,9 @@ namespace Mock {
         GetParameterValueContents returnedGetParameterValueContents;
 
         MockFunctionSendUnsignedIntegerParameterResponse mockFunctionSendUnsignedIntegerParameterResponse;
-        MockFunctionSendSignedIntegerParameterResponse  mockFunctionSendSignedIntegerParameterResponse;
-        MockFunctionSendRealNumberParameterResponse  mockFunctionSendRealNumberParameterResponse;
-        MockFunctionSendBooleanParameterResponse  mockFunctionSendBooleanParameterResponse;
+        MockFunctionSendSignedIntegerParameterResponse mockFunctionSendSignedIntegerParameterResponse;
+        MockFunctionSendRealNumberParameterResponse mockFunctionSendRealNumberParameterResponse;
+        MockFunctionSendBooleanParameterResponse mockFunctionSendBooleanParameterResponse;
     };
 }
 

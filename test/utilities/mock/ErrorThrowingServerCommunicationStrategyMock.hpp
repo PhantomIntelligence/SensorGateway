@@ -41,6 +41,10 @@ namespace Mock {
                 throwOnClose(false),
                 throwOnSendMessage(false),
                 throwOnSendRawData(false),
+                throwOnSendUnsignedIntegerParameterValueResponse(false),
+                throwOnSendSignedIntegerParameterValueResponse(false),
+                throwOnSendRealNumberParameterValueResponse(false),
+                throwOnSendBooleanParameterValueResponse(false),
                 throwOnSendParameterErrorResponse(false),
                 throwOnSendErrorMessageResponse(false),
                 openConnectionCalled(false),
@@ -99,6 +103,26 @@ namespace Mock {
             errorToThrow = expectedErrorRequiringOpenConnection();
         }
 
+        void throwOpenConnectionRequiredErrorWhenSendUnsignedIntegerParameterResponseIsCalled() noexcept {
+            throwOnSendUnsignedIntegerParameterValueResponse.store(true);
+            errorToThrow = expectedErrorRequiringOpenConnection();
+        }
+
+        void throwOpenConnectionRequiredErrorWhenSendSignedIntegerParameterValueResponseIsCalled() noexcept {
+            throwOnSendSignedIntegerParameterValueResponse.store(true);
+            errorToThrow = expectedErrorRequiringOpenConnection();
+        }
+
+        void throwOpenConnectionRequiredErrorWhenSendRealNumberParameterValueResponseIsCalled() noexcept {
+            throwOnSendRealNumberParameterValueResponse.store(true);
+            errorToThrow = expectedErrorRequiringOpenConnection();
+        }
+
+        void throwOpenConnectionRequiredErrorWhenSendBooleanParameterValueResponseIsCalled() noexcept {
+            throwOnSendBooleanParameterValueResponse.store(true);
+            errorToThrow = expectedErrorRequiringOpenConnection();
+        }
+
         void throwOpenConnectionRequiredErrorWhenSendParameterErrorResponseIsCalled() noexcept {
             throwOnSendParameterErrorResponse.store(true);
             errorToThrow = expectedErrorRequiringOpenConnection();
@@ -126,6 +150,26 @@ namespace Mock {
 
         void throwCloseConnectionRequiredErrorWhenSendRawDataIsCalled() noexcept {
             throwOnSendRawData.store(true);
+            errorToThrow = expectedErrorRequiringCloseConnection();
+        }
+
+        void throwCloseConnectionRequiredErrorWhenSendUnsignedIntegerParameterResponseIsCalled() noexcept {
+            throwOnSendUnsignedIntegerParameterValueResponse.store(true);
+            errorToThrow = expectedErrorRequiringCloseConnection();
+        }
+
+        void throwCloseConnectionRequiredErrorWhenSendSignedIntegerParameterValueResponseIsCalled() noexcept {
+            throwOnSendSignedIntegerParameterValueResponse.store(true);
+            errorToThrow = expectedErrorRequiringCloseConnection();
+        }
+
+        void throwCloseConnectionRequiredErrorWhenSendRealNumberParameterValueResponseIsCalled() noexcept {
+            throwOnSendRealNumberParameterValueResponse.store(true);
+            errorToThrow = expectedErrorRequiringCloseConnection();
+        }
+
+        void throwCloseConnectionRequiredErrorWhenSendBooleanParameterValueResponseIsCalled() noexcept {
+            throwOnSendBooleanParameterValueResponse.store(true);
             errorToThrow = expectedErrorRequiringCloseConnection();
         }
 
@@ -207,7 +251,8 @@ namespace Mock {
             errorToThrow = expectedErrorWhenSendRawDataIsCalled();
         }
 
-        ErrorHandling::SensorAccessLinkError expectedErrorWhenSendResponseIsCalled(std::string const& errorMessage) noexcept {
+        ErrorHandling::SensorAccessLinkError
+        expectedErrorWhenSendResponseIsCalled(std::string const& errorMessage) noexcept {
             return ErrorHandling::SensorAccessLinkError(ORIGIN,
                                                         ErrorHandling::Category::COMMUNICATION_ERROR,
                                                         ErrorHandling::Severity::ERROR,
@@ -268,23 +313,19 @@ namespace Mock {
         }
 
         void sendResponse(typename super::UnsignedIntegerParameterResponse&& response) override {
-            // TODO :
-            // mockFunctionSendUnsignedIntegerParameterResponse.invokeThrow(std::forward<UnsignedIntegerParameterResponse>(response));
+            handleThrowConfirmation(&throwOnSendUnsignedIntegerParameterValueResponse);
         }
 
         void sendResponse(typename super::SignedIntegerParameterResponse&& response) override {
-            // TODO :
-            // mockFunctionSendSignedIntegerParameterResponse.invokeThrow(std::forward<SignedIntegerParameterResponse>(response));
+            handleThrowConfirmation(&throwOnSendSignedIntegerParameterValueResponse);
         }
 
         void sendResponse(typename super::RealNumberParameterResponse&& response) override {
-            // TODO :
-            // mockFunctionSendRealNumberParameterResponse.invokeThrow(std::forward<RealNumberParameterResponse>(response));
+            handleThrowConfirmation(&throwOnSendRealNumberParameterValueResponse);
         }
 
         void sendResponse(typename super::BooleanParameterResponse&& response) override {
-            // TODO :
-            // mockFunctionSendBooleanParameterResponse.invokeThrow(std::forward<BooleanParameterResponse>(response));
+            handleThrowConfirmation(&throwOnSendBooleanParameterValueResponse);
         }
 
         void sendResponse(typename super::ParameterErrorResponse&& parameterErrorResponse) override {
@@ -362,6 +403,10 @@ namespace Mock {
         AtomicFlag throwOnFetchGetParameterValueContents;
         AtomicFlag throwOnSendMessage;
         AtomicFlag throwOnSendRawData;
+        AtomicFlag throwOnSendUnsignedIntegerParameterValueResponse;
+        AtomicFlag throwOnSendSignedIntegerParameterValueResponse;
+        AtomicFlag throwOnSendRealNumberParameterValueResponse;
+        AtomicFlag throwOnSendBooleanParameterValueResponse;
         AtomicFlag throwOnSendParameterErrorResponse;
         AtomicFlag throwOnSendErrorMessageResponse;
 
