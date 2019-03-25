@@ -29,7 +29,7 @@ namespace Mock {
 
         using super = ServerCommunication::ServerCommunicationStrategy<T>;
 
-        using GetParameterValueContents = typename super::GetParameterValueContents;
+        using GetParameterValueContents = typename super::GetParameterValueContentBuffer::Contents;
 
     public:
 
@@ -41,11 +41,13 @@ namespace Mock {
                 throwOnClose(false),
                 throwOnSendMessage(false),
                 throwOnSendRawData(false),
+                throwOnSendAllParameterMetadataResponse(false),
                 throwOnSendUnsignedIntegerParameterValueResponse(false),
                 throwOnSendSignedIntegerParameterValueResponse(false),
                 throwOnSendRealNumberParameterValueResponse(false),
                 throwOnSendBooleanParameterValueResponse(false),
                 throwOnSendParameterErrorResponse(false),
+                throwOnSendSuccessMessageResponse(false),
                 throwOnSendErrorMessageResponse(false),
                 openConnectionCalled(false),
                 closeConnectionCalled(false) {
@@ -103,7 +105,12 @@ namespace Mock {
             errorToThrow = expectedErrorRequiringOpenConnection();
         }
 
-        void throwOpenConnectionRequiredErrorWhenSendUnsignedIntegerParameterResponseIsCalled() noexcept {
+        void throwOpenConnectionRequiredErrorWhenSendAllParameterMetadataResponseIsCalled() noexcept {
+            throwOnSendAllParameterMetadataResponse.store(true);
+            errorToThrow = expectedErrorRequiringOpenConnection();
+        }
+
+        void throwOpenConnectionRequiredErrorWhenSendUnsignedIntegerParameterValueResponseIsCalled() noexcept {
             throwOnSendUnsignedIntegerParameterValueResponse.store(true);
             errorToThrow = expectedErrorRequiringOpenConnection();
         }
@@ -125,6 +132,11 @@ namespace Mock {
 
         void throwOpenConnectionRequiredErrorWhenSendParameterErrorResponseIsCalled() noexcept {
             throwOnSendParameterErrorResponse.store(true);
+            errorToThrow = expectedErrorRequiringOpenConnection();
+        }
+
+        void throwOpenConnectionRequiredErrorWhenSendSuccessMessageResponseIsCalled() noexcept {
+            throwOnSendSuccessMessageResponse.store(true);
             errorToThrow = expectedErrorRequiringOpenConnection();
         }
 
@@ -153,7 +165,12 @@ namespace Mock {
             errorToThrow = expectedErrorRequiringCloseConnection();
         }
 
-        void throwCloseConnectionRequiredErrorWhenSendUnsignedIntegerParameterResponseIsCalled() noexcept {
+        void throwCloseConnectionRequiredErrorWhenSendAllParameterMetadataResponseIsCalled() noexcept {
+            throwOnSendAllParameterMetadataResponse.store(true);
+            errorToThrow = expectedErrorRequiringCloseConnection();
+        }
+
+        void throwCloseConnectionRequiredErrorWhenSendUnsignedIntegerParameterValueResponseIsCalled() noexcept {
             throwOnSendUnsignedIntegerParameterValueResponse.store(true);
             errorToThrow = expectedErrorRequiringCloseConnection();
         }
@@ -175,6 +192,11 @@ namespace Mock {
 
         void throwCloseConnectionRequiredErrorWhenSendParameterErrorResponseIsCalled() noexcept {
             throwOnSendParameterErrorResponse.store(true);
+            errorToThrow = expectedErrorRequiringCloseConnection();
+        }
+
+        void throwCloseConnectionRequiredErrorWhenSendSuccessMessageResponseIsCalled() noexcept {
+            throwOnSendSuccessMessageResponse.store(true);
             errorToThrow = expectedErrorRequiringCloseConnection();
         }
 
@@ -312,6 +334,10 @@ namespace Mock {
             handleThrowConfirmation(&throwOnSendRawData);
         }
 
+        void sendResponse(typename super::AllParameterMetadataResponse&& response) override {
+            handleThrowConfirmation(&throwOnSendAllParameterMetadataResponse);
+        }
+
         void sendResponse(typename super::UnsignedIntegerParameterResponse&& response) override {
             handleThrowConfirmation(&throwOnSendUnsignedIntegerParameterValueResponse);
         }
@@ -330,6 +356,10 @@ namespace Mock {
 
         void sendResponse(typename super::ParameterErrorResponse&& parameterErrorResponse) override {
             handleThrowConfirmation(&throwOnSendParameterErrorResponse);
+        }
+
+        void sendResponse(typename super::SuccessMessageResponse&& successMessageResponse) override {
+            handleThrowConfirmation(&throwOnSendSuccessMessageResponse);
         }
 
         void sendResponse(typename super::ErrorMessageResponse&& errorMessageResponse) override {
@@ -403,11 +433,13 @@ namespace Mock {
         AtomicFlag throwOnFetchGetParameterValueContents;
         AtomicFlag throwOnSendMessage;
         AtomicFlag throwOnSendRawData;
+        AtomicFlag throwOnSendAllParameterMetadataResponse;
         AtomicFlag throwOnSendUnsignedIntegerParameterValueResponse;
         AtomicFlag throwOnSendSignedIntegerParameterValueResponse;
         AtomicFlag throwOnSendRealNumberParameterValueResponse;
         AtomicFlag throwOnSendBooleanParameterValueResponse;
         AtomicFlag throwOnSendParameterErrorResponse;
+        AtomicFlag throwOnSendSuccessMessageResponse;
         AtomicFlag throwOnSendErrorMessageResponse;
 
     };

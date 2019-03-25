@@ -4,7 +4,7 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
-#include "sensor-gateway/common/ConstantFunctionsDefinition.h"
+#include "sensor-gateway/common/custom-type-and-helper/IncludeRootForDefinitions.h"
 
 class ConstantFunctionTest : public ::testing::Test {
 

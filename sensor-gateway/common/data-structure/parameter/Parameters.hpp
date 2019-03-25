@@ -111,11 +111,12 @@ namespace Sensor {
             using Params = std::tuple<P...>;
 
             template<size_t N>
-            using getParam = typename std::tuple_element<N, Params>::type;
+            using getParam = typename std::tuple_element_t<N, Params>;
 
         public:
 
             static auto const NUMBER_OF_AVAILABLE_PARAMETERS = sizeof...(P);
+            using AllParameterMetadata = std::array<ParameterMetadata, NUMBER_OF_AVAILABLE_PARAMETERS>;
 
             explicit Parameters() : internalParameters(std::make_tuple(P()...)) {}
 
@@ -144,8 +145,16 @@ namespace Sensor {
              */
             constexpr auto getMetadataFor(std::string const& parameterName) const {
                 auto const index = getIndexFor(parameterName);
-                auto const metadata = convertTupleToArray(getMetadataTuple());
+                auto const metadata = getMetadataForAllParameters();
                 return metadata[index];
+            }
+
+            /**
+             * @warning It is assumed that parameterName correspond to an existing name of parameter in this container
+             */
+            constexpr auto getMetadataForAllParameters() const {
+                auto const metadata = convertTupleToArray(getMetadataTuple());
+                return metadata;
             }
 
             constexpr auto getNames() const noexcept {

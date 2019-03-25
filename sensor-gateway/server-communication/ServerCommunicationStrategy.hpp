@@ -22,27 +22,114 @@
 
 namespace ServerCommunication {
 
+    namespace Details {
+
+        template<typename ContentType, size_t maxNumberOfConcurrentlyHandledRequests, size_t maxBulkReceptionSize>
+        class RequestContentBuffer {
+
+        protected:
+
+        public:
+
+            using Content = ContentType;
+            static constexpr size_t const size = maxNumberOfConcurrentlyHandledRequests;
+            static constexpr size_t const bulkSize = maxBulkReceptionSize;
+            using Contents = std::array<Content, size>;
+            using BulkContents = std::array<Content, bulkSize>;
+            using ContentList = std::list<Content>;
+
+
+            explicit RequestContentBuffer() {
+            };
+
+            ~RequestContentBuffer() noexcept = default;
+
+            auto fetchReceivedContent() -> Contents {
+                LockGuard guard(contentMutex); // ensures that requests are treated at most one bulk at the time
+
+                Contents contentsToReturn;
+
+                auto contentCount = 0u;
+                while (hasReceivedNewUntransmittedContent() && contentCount < contentsToReturn.size()) {
+                    auto getParameterValueContent = untransmittedReceivedContent.front();
+                    contentsToReturn[contentCount] = getParameterValueContent;
+                    untransmittedReceivedContent.pop_front();
+                    ++contentCount;
+                }
+
+                return contentsToReturn;
+            }
+
+            void receiveNewContentInBulk(BulkContents&& newContents) {
+                LockGuard guard(contentMutex);
+
+                auto counter = 0u;
+                while (counter != newContents.max_size()) {
+                    untransmittedReceivedContent.emplace_back(std::move[newContents++]);
+                }
+            }
+
+            void receiveNewContent(Content&& newContent) {
+                LockGuard guard(contentMutex);
+                untransmittedReceivedContent.emplace_back(std::forward<Content>(newContent));
+            }
+
+        private:
+
+            bool hasReceivedNewUntransmittedContent() const noexcept {
+                return !untransmittedReceivedContent.empty();
+            }
+
+            mutable Mutex contentMutex;
+            ContentList untransmittedReceivedContent;
+        };
+
+    }
+
     template<class T>
     class ServerCommunicationStrategy {
+
+    protected:
+
+        static constexpr size_t const MAX_NUMBER_OF_CONCURRENT_REQUEST_OF_ONE_KIND = T::MAX_NUMBER_OF_CONCURRENT_REQUEST_OF_ONE_KIND;
+        static constexpr size_t const MAX_NUMBER_OF_PARAMETER_FOR_BULK_OPERATIONS = T::Parameters::NUMBER_OF_AVAILABLE_PARAMETERS;
+        template<typename Content>
+        using RequestContentBuffer =Details::RequestContentBuffer<
+                Content,
+                MAX_NUMBER_OF_CONCURRENT_REQUEST_OF_ONE_KIND,
+                MAX_NUMBER_OF_PARAMETER_FOR_BULK_OPERATIONS
+        >;
 
     public:
 
         using Message = typename T::Message;
         using RawData = typename T::RawData;
 
-        using GetParameterValueContent = std::string;
-        using GetParameterValueContents = std::array<GetParameterValueContent, T::MAX_NUMBER_OF_CONCURRENT_REQUEST_OF_ONE_KIND>;
+        using ParameterName = std::string;
 
-        using AllParameterNamesList = std::array<std::string, T::Parameters::NUMBER_OF_AVAILABLE_PARAMETERS>;
+        using AllParameterNamesList = std::array<ParameterName, MAX_NUMBER_OF_PARAMETER_FOR_BULK_OPERATIONS>;
 
+        using GetParameterValueContent = ParameterName;
+        using GetParameterValueContentBuffer = RequestContentBuffer<ParameterName>;
+
+
+        using SetUnsignedIntegerParameterValueContent = std::pair<ParameterName, UnsignedInteger>;
+        using SetSignedIntegerParameterValueContent = std::pair<ParameterName, SignedInteger>;
+        using SetRealNumberParameterValueContent = std::pair<ParameterName, RealNumber>;
+        using SetBooleanParameterValueContent = std::pair<ParameterName, bool>;
+        using SetUnsignedIntegerParameterValueContentBuffer = RequestContentBuffer<SetUnsignedIntegerParameterValueContent>;
+        using SetSignedIntegerParameterValueContentBuffer = RequestContentBuffer<SetSignedIntegerParameterValueContent>;
+        using SetRealNumberParameterValueContentBuffer = RequestContentBuffer<SetRealNumberParameterValueContent>;
+        using SetBooleanParameterValueContentBuffer = RequestContentBuffer<SetBooleanParameterValueContent>;
+
+        using AllParameterMetadataResponse = ResponseType::AllParameterMetadataResponse<T::Parameters::NUMBER_OF_AVAILABLE_PARAMETERS>;
         using UnsignedIntegerParameterResponse = ResponseType::UnsignedIntegerParameterResponse;
         using SignedIntegerParameterResponse = ResponseType::SignedIntegerParameterResponse;
         using RealNumberParameterResponse = ResponseType::RealNumberParameterResponse;
         using BooleanParameterResponse = ResponseType::BooleanParameterResponse;
         using ParameterErrorResponse = ResponseType::ParameterErrorResponse;
+        using SuccessMessageResponse = ResponseType::SuccessMessageResponse;
         using ErrorMessageResponse = ResponseType::ErrorMessageResponse;
-
-        using SetParameterValueBooleanContent = typename std::pair<GetParameterValueContent, bool>;
 
         ServerCommunicationStrategy() noexcept :
                 receivedGetAllParameterNamesRequest(false),
@@ -58,7 +145,30 @@ namespace ServerCommunication {
             return checkIfRequestHasBeenReceived(&receivedGetAllParameterNamesRequest);
         }
 
-        virtual GetParameterValueContents fetchGetParameterValueContents() = 0;
+        // TODO: test this function
+        virtual auto fetchGetParameterValueContents() -> typename GetParameterValueContentBuffer::Contents {
+            return getParameterValueContentBuffer.fetchReceivedContent();
+        }
+
+        // TODO: test this function
+        virtual auto fetchSetUnsignedIntegerParameterValueContents() -> typename SetUnsignedIntegerParameterValueContentBuffer::Contents {
+            return setUnsignedIntegerParameterValueContentBuffer.fetchReceivedContent();
+        }
+
+        // TODO: test this function
+        virtual auto fetchSetSignedIntegerParameterValueContents() -> typename SetSignedIntegerParameterValueContentBuffer::Contents {
+            return setSignedIntegerParameterValueContentBuffer.fetchReceivedContent();
+        }
+
+        // TODO: test this function
+        virtual auto fetchSetRealNumberParameterValueContents() -> typename SetRealNumberParameterValueContentBuffer::Contents {
+            return setRealNumberParameterValueContentBuffer.fetchReceivedContent();
+        }
+
+        // TODO: test this function
+        virtual auto fetchSetBooleanParameterValueContents() -> typename SetBooleanParameterValueContentBuffer::Contents {
+            return setBooleanParameterValueContentBuffer.fetchReceivedContent();
+        }
 
         bool hasReceivedCalibrationRequest() noexcept {
             return checkIfRequestHasBeenReceived(&receivedCalibrationRequest);
@@ -72,6 +182,8 @@ namespace ServerCommunication {
 
         virtual void sendRawData(RawData&& rawData) = 0;
 
+        virtual void sendResponse(AllParameterMetadataResponse&& allParameterMetadataResponse) = 0;
+
         virtual void sendResponse(UnsignedIntegerParameterResponse&& unsignedIntegerParameterResponse) = 0;
 
         virtual void sendResponse(SignedIntegerParameterResponse&& signedIntegerParameterResponse) = 0;
@@ -81,6 +193,8 @@ namespace ServerCommunication {
         virtual void sendResponse(BooleanParameterResponse&& booleanParameterResponse) = 0;
 
         virtual void sendResponse(ParameterErrorResponse&& parameterErrorResponse) = 0;
+
+        virtual void sendResponse(SuccessMessageResponse&& successMessageResponse) = 0;
 
         virtual void sendResponse(ErrorMessageResponse&& errorMessageResponse) = 0;
 
@@ -98,6 +212,35 @@ namespace ServerCommunication {
             receivedGetAllParameterNamesRequest.store(true);
         }
 
+        // TODO : Test this function
+        void receiveGetParameterValueRequest(ParameterName&& parameterName) {
+            getParameterValueContentBuffer.receiveNewContent(std::forward<ParameterName>(parameterName));
+        }
+
+        // TODO : Test this function
+        void receiveSetUnsignedIntegerParameterValueRequest(SetUnsignedIntegerParameterValueContent&& askedParameterValue) {
+            setUnsignedIntegerParameterValueContentBuffer
+                    .receiveNewContent(std::forward<SetUnsignedIntegerParameterValueContent>(askedParameterValue));
+        }
+
+        // TODO : Test this function
+        void receiveSetSignedIntegerParameterValueRequest(SetSignedIntegerParameterValueContent&& askedParameterValue) {
+            setSignedIntegerParameterValueContentBuffer
+                    .receiveNewContent(std::forward<SetSignedIntegerParameterValueContent>(askedParameterValue));
+        }
+
+        // TODO : Test this function
+        void receiveSetRealNumberParameterValueRequest(SetRealNumberParameterValueContent&& askedParameterValue) {
+            setRealNumberParameterValueContentBuffer
+                    .receiveNewContent(std::forward<SetRealNumberParameterValueContent>(askedParameterValue));
+        }
+
+        // TODO : Test this function
+        void receiveSetBooleanParameterValueRequest(SetBooleanParameterValueContent&& askedParameterValue) {
+            setBooleanParameterValueContentBuffer
+                    .receiveNewContent(std::forward<SetBooleanParameterValueContent>(askedParameterValue));
+        }
+
         void receiveCalibrationRequest() {
             receivedCalibrationRequest.store(true);
         }
@@ -106,10 +249,18 @@ namespace ServerCommunication {
             receivedClearCalibrationRequest.store(true);
         }
 
+//        bool hasReceivedGetParameterValueRequest() const noexcept {
+//        }
+
         AtomicFlag receivedGetAllParameterNamesRequest;
         AtomicFlag receivedCalibrationRequest;
         AtomicFlag receivedClearCalibrationRequest;
 
+        GetParameterValueContentBuffer getParameterValueContentBuffer;
+        SetUnsignedIntegerParameterValueContentBuffer setUnsignedIntegerParameterValueContentBuffer;
+        SetSignedIntegerParameterValueContentBuffer setSignedIntegerParameterValueContentBuffer;
+        SetRealNumberParameterValueContentBuffer setRealNumberParameterValueContentBuffer;
+        SetBooleanParameterValueContentBuffer setBooleanParameterValueContentBuffer;
     };
 }
 

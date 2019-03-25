@@ -17,8 +17,11 @@
 #ifndef SENSORGATEWAY_DATAMODELFIXTURE_H
 #define SENSORGATEWAY_DATAMODELFIXTURE_H
 
+#include <sensor-gateway/common/custom-type-and-helper/IncludeRootForDefinitions.h>
+
 #include <sensor-gateway/server-communication/ServerRequestAssembler.hpp>
 #include <sensor-gateway/server-communication/ServerResponseAssembler.hpp>
+
 #include "TestDataStructures.h"
 
 namespace TestFunctions {
@@ -267,6 +270,23 @@ namespace Given {
     static auto aValidGetParameterValueRequest() -> ServerCommunication::RequestTypes::GetParameterValue {
         auto validParameterName = aValidParameterName<ParametersToChoseFrom>();
         return RequestAssembler::getParameterValueRequest(validParameterName);
+    }
+
+    template<typename ParametersToChoseFrom>
+    static auto anAllParameterMetadataResponse() -> ServerCommunication::ResponseType::AllParameterMetadataResponse<ParametersToChoseFrom::NUMBER_OF_AVAILABLE_PARAMETERS> {
+        ParametersToChoseFrom parametersToChoseFrom;
+        auto allParameterMetadata = parametersToChoseFrom.getMetadataForAllParameters();
+        using GetAllParameterMetadataRequest = ServerCommunication::RequestTypes::GetAllParameterMetadata;
+        GetAllParameterMetadataRequest getAllParameterMetadataRequest;
+        auto response = ResponseAssembler::createAllParameterMetadataResponse<
+                decltype(allParameterMetadata),
+                GetAllParameterMetadataRequest,
+                ParametersToChoseFrom::NUMBER_OF_AVAILABLE_PARAMETERS
+        >(
+                std::move(allParameterMetadata),
+                std::move(getAllParameterMetadataRequest)
+        );
+        return response;
     }
 
     static auto aGetUnsignedIntegerParameterValueRequest()

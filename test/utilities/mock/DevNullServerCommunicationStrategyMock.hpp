@@ -18,6 +18,7 @@
 #define SENSORGATEWAY_DEVNULLSERVERCOMMUNICATIONSTRATEGYMOCK_HPP
 
 #include "test/utilities/data-model/DataModelFixture.h"
+
 #include "sensor-gateway/server-communication/ServerCommunicationStrategy.hpp"
 
 namespace Mock {
@@ -32,12 +33,14 @@ namespace Mock {
 
         using typename super::Message;
         using typename super::RawData;
-        using typename super::GetParameterValueContents;
+        using GetParameterValueContents = typename super::GetParameterValueContentBuffer::Contents;
+        using typename super::AllParameterMetadataResponse;
         using typename super::UnsignedIntegerParameterResponse;
         using typename super::SignedIntegerParameterResponse;
         using typename super::RealNumberParameterResponse;
         using typename super::BooleanParameterResponse;
         using typename super::ParameterErrorResponse;
+        using typename super::SuccessMessageResponse;
         using typename super::ErrorMessageResponse;
 
     public:
@@ -46,30 +49,46 @@ namespace Mock {
 
         ~DevNullServerCommunicationStrategyMock() noexcept = default;
 
-        void openConnection(std::string const& serverAddress) {}
+        void openConnection(std::string const& serverAddress) {
+        }
 
         GetParameterValueContents fetchGetParameterValueContents() {
             GetParameterValueContents getParameterValueContents;
             return getParameterValueContents;
         }
 
-        void sendMessage(Message&& message) {}
+        void sendMessage(Message&& message) {
+        }
 
-        void sendRawData(RawData&& rawData) {}
+        void sendRawData(RawData&& rawData) {
+        }
 
-        void sendResponse(UnsignedIntegerParameterResponse&& unsignedIntegerParameterResponse) {}
+        void sendResponse(AllParameterMetadataResponse&& allParameterMetadataResponse) {
+        }
 
-        void sendResponse(SignedIntegerParameterResponse&& signedIntegerParameterResponse) {}
+        void sendResponse(UnsignedIntegerParameterResponse&& unsignedIntegerParameterResponse) {
+        }
 
-        void sendResponse(RealNumberParameterResponse&& realNumberParameterResponse) {}
+        void sendResponse(SignedIntegerParameterResponse&& signedIntegerParameterResponse) {
+        }
 
-        void sendResponse(BooleanParameterResponse&& booleanParameterResponse) {}
+        void sendResponse(RealNumberParameterResponse&& realNumberParameterResponse) {
+        }
 
-        void sendResponse(ParameterErrorResponse&& parameterErrorResponse) {}
+        void sendResponse(BooleanParameterResponse&& booleanParameterResponse) {
+        }
 
-        void sendResponse(ErrorMessageResponse&& errorMessageResponse) {}
+        void sendResponse(ParameterErrorResponse&& parameterErrorResponse) {
+        }
 
-        void closeConnection() {}
+        void sendResponse(SuccessMessageResponse&& successMessageResponse) {
+        }
+
+        void sendResponse(ErrorMessageResponse&& errorMessageResponse) {
+        }
+
+        void closeConnection() {
+        }
     };
 }
 

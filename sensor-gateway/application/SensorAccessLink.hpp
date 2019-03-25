@@ -38,6 +38,7 @@ namespace SensorGateway {
             using ServerRawData = typename SERVER_STRUCTURES::RawData;
 
             using ServerCommunicator = SensorAccessLinkElement::ServerCommunicator<SERVER_STRUCTURES>;
+            using ServerRequestHandlingCallBacks = typename ServerCommunicator::RequestHandlingCallBacks;
             using ServerCommunicatorMessageScheduler = DataFlow::DataProcessingScheduler<ServerMessage, ServerCommunicator, ONLY_ONE_PRODUCER>;
             using ServerCommunicatorRawDataScheduler = DataFlow::DataProcessingScheduler<ServerRawData, ServerCommunicator, ONLY_ONE_PRODUCER>;
 
@@ -47,6 +48,7 @@ namespace SensorGateway {
 
             using SensorParameterController = SensorAccessLinkElement::SensorParameterController<SENSOR_STRUCTURES, SERVER_STRUCTURES>;
             using RequestHandler = SensorAccessLinkElement::RequestHandler<SENSOR_STRUCTURES, SERVER_STRUCTURES>;
+            using ParameterRequestCallBacks = typename RequestHandler::ParameterRequestCallBacks;
 
             using SensorCommunicator = SensorAccessLinkElement::SensorCommunicator<SENSOR_STRUCTURES>;
             using SensorCommunicatorRequestScheduler = typename SensorCommunicator::RequestProcessingScheduler;
@@ -64,19 +66,28 @@ namespace SensorGateway {
             explicit SensorAccessLink(ServerCommunicationStrategy* serverCommunicationStrategy,
                                       DataTranslationStrategy* dataTranslationStrategy,
                                       SensorCommunicationStrategy* sensorCommunicationStrategy) :
+                    serverRequestHandlingCallBacks(
+                            ServerCommunicator::RequestCallBackStore::createCallBacks(
+                                    std::bind(&RequestHandler::handleGetAllParameterNamesRequest, &requestHandler),
+                                    std::bind(&RequestHandler::handleGetParameterValueRequest, &requestHandler,
+                                              std::placeholders::_1),
+                                    std::bind(&RequestHandler::handleCalibrationRequest, &requestHandler),
+                                    std::bind(&RequestHandler::handleClearCalibrationRequest, &requestHandler)
+                            )
+                    ),
+                    parameterRequestCallBacks(
+                            RequestHandler::ParameterRequestCallBackStore::createCallBacks(
+                                    std::bind(&SensorParameterController::process, &sensorParameterController,
+                                              std::placeholders::_1),
+                                    std::bind(&SensorParameterController::calibrate, &sensorParameterController),
+                                    std::bind(&SensorParameterController::clearCalibration, &sensorParameterController)
+                            )
+                    ),
                     serverCommunicationStrategy(serverCommunicationStrategy),
                     dataTranslationStrategy(dataTranslationStrategy),
                     sensorCommunicationStrategy(sensorCommunicationStrategy),
-                    serverCommunicator(serverCommunicationStrategy,
-                                       std::bind(&RequestHandler::handleGetAllParameterNamesRequest, &requestHandler),
-                                       std::bind(&RequestHandler::handleGetParameterValueRequest, &requestHandler,
-                                                 std::placeholders::_1),
-                                       std::bind(&RequestHandler::handleCalibrationRequest, &requestHandler),
-                                       std::bind(&RequestHandler::handleClearCalibrationRequest, &requestHandler)
-                    ),
-                    requestHandler(&serverCommunicator,
-                                   std::bind(&SensorParameterController::process, &sensorParameterController,
-                                             std::placeholders::_1)),
+                    serverCommunicator(serverCommunicationStrategy, &serverRequestHandlingCallBacks),
+                    requestHandler(&serverCommunicator, &parameterRequestCallBacks),
                     sensorParameterController(&requestHandler, &dataTranslator),
                     dataTranslator(dataTranslationStrategy),
                     sensorCommunicator(sensorCommunicationStrategy),
@@ -165,7 +176,9 @@ namespace SensorGateway {
             }
 
             ServerCommunicationStrategy* serverCommunicationStrategy;
+
             ServerCommunicator serverCommunicator;
+            ServerRequestHandlingCallBacks serverRequestHandlingCallBacks;
             ServerCommunicatorMessageScheduler serverCommunicatorMessageScheduler;
             ServerCommunicatorRawDataScheduler serverCommunicatorRawDataScheduler;
 
@@ -175,7 +188,9 @@ namespace SensorGateway {
             TranslatorRawDataScheduler translatorRawDataScheduler;
 
             SensorParameterController sensorParameterController;
+
             RequestHandler requestHandler;
+            ParameterRequestCallBacks parameterRequestCallBacks;
 
             SensorCommunicationStrategy* sensorCommunicationStrategy;
             SensorCommunicator sensorCommunicator;

@@ -7,6 +7,7 @@ set(DOT ${CMAKE_CURRENT_SOURCE_DIR}) # To ease reading
 # Select all the source and header files
 file(GLOB APPLICATION_FILES "${DOT}/application/*")
 file(GLOB COMMON_FILES "${DOT}/common/*")
+file(GLOB CUSTOM_TYPE_AND_HELPER_FILES "${DOT}/common/custom-type-and-helper/*")
 file(GLOB ERROR_FILES "${DOT}/common/error/*")
 file(GLOB DATA_STRUCTURE_FILES "${DOT}/common/data-structure/*")
 file(GLOB TIME_TRACKING_STRUCTURE_FILES "${DOT}/common/data-structure/time-tracking/*")
@@ -21,27 +22,28 @@ file(GLOB SENSOR_COMMUNICATION_FILES "${DOT}/sensor-communication/*")
 unset(DOT)
 
 add_library(${PROJECT_NAME} SHARED
-        ${APPLICATION_FILES}
-        ${COMMON_FILES}
-        ${ERROR_FILES}
-        ${DATA_STRUCTURE_FILES}
-        ${TIME_TRACKING_STRUCTURE_FILES}
-        ${PARAMETER_STRUCTURE_FILES}
-        ${SPIRIT_STRUCTURE_FILES}
-        ${SENSOR_STRUCTURE_FILES}
-        ${PARAMETER_CONTROL_FILES}
-        ${SERVER_COMMUNICATION_FILES}
-        ${TRANSLATION_FILES}
-        ${SENSOR_COMMUNICATION_FILES}
-        config.h.in
-        )
+            ${APPLICATION_FILES}
+            ${COMMON_FILES}
+            ${CUSTOM_TYPE_AND_HELPER_FILES}
+            ${ERROR_FILES}
+            ${DATA_STRUCTURE_FILES}
+            ${TIME_TRACKING_STRUCTURE_FILES}
+            ${PARAMETER_STRUCTURE_FILES}
+            ${SPIRIT_STRUCTURE_FILES}
+            ${SENSOR_STRUCTURE_FILES}
+            ${PARAMETER_CONTROL_FILES}
+            ${SERVER_COMMUNICATION_FILES}
+            ${TRANSLATION_FILES}
+            ${SENSOR_COMMUNICATION_FILES}
+            config.h.in
+            )
 
 setup_conan_dependencies_and_link_to_target(${PROJECT_NAME})
 
 target_link_libraries(${PROJECT_NAME} canlib)
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
-        PUBLIC_HEADER "${HEADER_FILES};${CMAKE_CURRENT_BINARY_DIR}/config.h")
+                      PUBLIC_HEADER "${HEADER_FILES};${CMAKE_CURRENT_BINARY_DIR}/config.h")
 
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 14)
 

@@ -17,6 +17,8 @@
 #ifndef SENSORGATEWAY_REQUESTRESPONSESPECIALIZEDSERVERCOMMUNICATIONSTRATEGYMOCK_HPP
 #define SENSORGATEWAY_REQUESTRESPONSESPECIALIZEDSERVERCOMMUNICATIONSTRATEGYMOCK_HPP
 
+#include <sensor-gateway/common/custom-type-and-helper/IncludeRootForDefinitions.h>
+
 #include "sensor-gateway/server-communication/ServerCommunicationStrategy.hpp"
 
 #include "test/utilities/data-model/DataModelFixture.h"
@@ -38,21 +40,27 @@ namespace Mock {
 
         using super = ServerCommunication::ServerCommunicationStrategy<T>;
 
-        using GetParameterValueContent = typename super::GetParameterValueContent;
-        using GetParameterValueContents = typename super::GetParameterValueContents;
-        using GetParameterValueContentList = std::list<GetParameterValueContent>;
+        using GetParameterValueContent = typename super::GetParameterValueContentBuffer::Content;
+        using GetParameterValueContents = typename super::GetParameterValueContentBuffer::Contents;
+        using GetParameterValueContentList = typename super::GetParameterValueContentBuffer::ContentList;
 
+        using AllParameterMetadataResponse = typename super::AllParameterMetadataResponse;
         using UnsignedIntegerParameterResponse = typename super::UnsignedIntegerParameterResponse;
         using SignedIntegerParameterResponse = typename super::SignedIntegerParameterResponse;
         using RealNumberParameterResponse = typename super::RealNumberParameterResponse;
         using BooleanParameterResponse = typename super::BooleanParameterResponse;
         using ParameterErrorResponse = typename super::ParameterErrorResponse;
+        using SuccessMessageResponse = typename super::SuccessMessageResponse;
         using ErrorMessageResponse = typename super::ErrorMessageResponse;
 
+        using MockFunctionSendAllParameterMetadataResponse = Mock::Function<StringLiteral<decltype("mock->sendParameter<AllParameterMetadata>"_ToString)>, Mock::VoidType, AllParameterMetadataResponse>;
         using MockFunctionSendUnsignedIntegerParameterResponse = Mock::Function<StringLiteral<decltype("mock->sendParameter<UnsignedInteger>"_ToString)>, Mock::VoidType, UnsignedIntegerParameterResponse>;
         using MockFunctionSendSignedIntegerParameterResponse = Mock::Function<StringLiteral<decltype("mock->sendParameter<SignedInteger>"_ToString)>, Mock::VoidType, SignedIntegerParameterResponse>;
         using MockFunctionSendRealNumberParameterResponse = Mock::Function<StringLiteral<decltype("mock->sendParameter<RealNumber>"_ToString)>, Mock::VoidType, RealNumberParameterResponse>;
         using MockFunctionSendBooleanParameterResponse = Mock::Function<StringLiteral<decltype("mock->sendParameter<Boolean>"_ToString)>, Mock::VoidType, BooleanParameterResponse>;
+        using MockFunctionSendParameterErrorResponse = Mock::Function<StringLiteral<decltype("mock->sendParameter<ParameterError>"_ToString)>, Mock::VoidType, ParameterErrorResponse>;
+        using MockFunctionSendSuccessMessageResponse = Mock::Function<StringLiteral<decltype("mock->sendParameter<SuccessMessage>"_ToString)>, Mock::VoidType, SuccessMessageResponse>;
+        using MockFunctionSendErrorMessageResponse = Mock::Function<StringLiteral<decltype("mock->sendParameter<ErrorMessage>"_ToString)>, Mock::VoidType, ErrorMessageResponse>;
 
         using ParameterNames = std::list<std::string>;
 
@@ -64,11 +72,10 @@ namespace Mock {
                 numberOfUniqueValidGetParameterValueContentsToReturn(0),
                 numberOfDuplicateValidGetParameterValueContentsToReturn(0),
                 numberOfUniqueInvalidGetParameterValueContentsToReturn(0),
-                numberOfDuplicateInvalidGetParameterValueContentsToReturn(0),
+                numberOfDuplicateInvalidGetParameterValueContentsToReturn(0)
                 // SetParameterValue
-                // Response
-                sendResponseParameterErrorCalled(false),
-                sendResponseErrorMessageCalled(false) {}
+                {
+        }
 
         ~RequestResponseSpecializedServerCommunicationStrategyMock() noexcept override = default;
 
@@ -153,19 +160,24 @@ namespace Mock {
         void sendRawData(typename super::RawData&& rawData) override {
         }
 
+        void sendResponse(AllParameterMetadataResponse&& response) override {
+            mockFunctionSendAllParameterMetadataResponse
+                    .invokeVoidReturn(std::forward<AllParameterMetadataResponse>(response));
+        }
+
         void sendResponse(UnsignedIntegerParameterResponse&& response) override {
-            mockFunctionSendUnsignedIntegerParameterResponse.invokeVoidReturn(
-                    std::forward<UnsignedIntegerParameterResponse>(response));
+            mockFunctionSendUnsignedIntegerParameterResponse
+                    .invokeVoidReturn(std::forward<UnsignedIntegerParameterResponse>(response));
         }
 
         void sendResponse(SignedIntegerParameterResponse&& response) override {
-            mockFunctionSendSignedIntegerParameterResponse.invokeVoidReturn(
-                    std::forward<SignedIntegerParameterResponse>(response));
+            mockFunctionSendSignedIntegerParameterResponse
+                    .invokeVoidReturn(std::forward<SignedIntegerParameterResponse>(response));
         }
 
         void sendResponse(RealNumberParameterResponse&& response) override {
-            mockFunctionSendRealNumberParameterResponse.invokeVoidReturn(
-                    std::forward<RealNumberParameterResponse>(response));
+            mockFunctionSendRealNumberParameterResponse
+                    .invokeVoidReturn(std::forward<RealNumberParameterResponse>(response));
         }
 
         void sendResponse(BooleanParameterResponse&& response) override {
@@ -173,14 +185,22 @@ namespace Mock {
         }
 
         void sendResponse(ParameterErrorResponse&& parameterErrorResponse) override {
-            acknowledgeSendResponseParameterErrorHasBeenCalled();
+            mockFunctionSendParameterErrorResponse.invokeVoidReturn(std::forward<ParameterErrorResponse>(parameterErrorResponse));
+        }
+
+        void sendResponse(SuccessMessageResponse&& successMessageResponse) override {
+            mockFunctionSendSuccessMessageResponse.invokeVoidReturn(std::forward<SuccessMessageResponse>(successMessageResponse));
         }
 
         void sendResponse(ErrorMessageResponse&& errorMessageResponse) override {
-            acknowledgeSendResponseErrorMessageHasBeenCalled();
+            mockFunctionSendErrorMessageResponse.invokeVoidReturn(std::forward<ErrorMessageResponse>(errorMessageResponse));
         }
 
         void closeConnection() override {
+        }
+
+        void waitUntilSendResponseAllParameterMetadataIsCalled() {
+            mockFunctionSendAllParameterMetadataResponse.waitUntilInvocation();
         }
 
         void waitUntilSendResponseUnsignedIntegerParameterValueIsCalled() {
@@ -200,15 +220,19 @@ namespace Mock {
         }
 
         void waitUntilSendResponseParameterErrorIsCalled() {
-            if (!hasSendResponseParameterErrorBeenCalled()) {
-                sendResponseParameterErrorCalledAcknowledgement.get_future().wait();
-            }
+            mockFunctionSendParameterErrorResponse.waitUntilInvocation();
+        }
+
+        void waitUntilSendResponseSuccessMessageIsCalled() {
+            mockFunctionSendSuccessMessageResponse.waitUntilInvocation();
         }
 
         void waitUntilSendResponseErrorMessageIsCalled() {
-            if (!hasSendResponseErrorMessageBeenCalled()) {
-                sendResponseErrorMessageCalledAcknowledgement.get_future().wait();
-            }
+            mockFunctionSendErrorMessageResponse.waitUntilInvocation();
+        }
+
+        void askForAllParameterMetadata() {
+            onHasReceivedGetAllParameterNamesRequestReturn(true);
         }
 
         void onHasReceivedGetAllParameterNamesRequestReturn(bool valueToReturn) {
@@ -252,6 +276,10 @@ namespace Mock {
             super::receivedClearCalibrationRequest.store(valueToReturn);
         }
 
+        bool hasSendResponseAllParameterMetadataBeenCalledWith(AllParameterMetadataResponse const& response) const {
+            return mockFunctionSendAllParameterMetadataResponse.hasBeenInvokedWith(response);
+        }
+
         bool hasSendResponseUnsignedIntegerParameterValueBeenCalled() const {
             return mockFunctionSendUnsignedIntegerParameterResponse.hasBeenInvoked();
         }
@@ -269,12 +297,16 @@ namespace Mock {
         }
 
         bool hasSendResponseParameterErrorBeenCalled() const {
-            return sendResponseParameterErrorCalled.load();
-        }
+            return mockFunctionSendParameterErrorResponse.hasBeenInvoked();
+        };
+
+        bool hasSendResponseSuccessMessageBeenCalled() const {
+            return mockFunctionSendSuccessMessageResponse.hasBeenInvoked();
+        };
 
         bool hasSendResponseErrorMessageBeenCalled() const {
-            return sendResponseErrorMessageCalled.load();
-        }
+            return mockFunctionSendErrorMessageResponse.hasBeenInvoked();
+        };
 
     private:
 
@@ -293,31 +325,8 @@ namespace Mock {
             return atomicCounter->load();
         }
 
-        void acknowledgeSendResponseParameterErrorHasBeenCalled() {
-            LockGuard guard(sendResponseParameterErrorAckMutex);
-            if (!hasSendResponseErrorMessageBeenCalled()) {
-                sendResponseParameterErrorCalled.store(true);
-                sendResponseParameterErrorCalledAcknowledgement.set_value(true);
-            }
-        }
-
-        void acknowledgeSendResponseErrorMessageHasBeenCalled() {
-            LockGuard guard(sendResponseErrorMessageAckMutex);
-            if (!hasSendResponseErrorMessageBeenCalled()) {
-                sendResponseErrorMessageCalled.store(true);
-                sendResponseErrorMessageCalledAcknowledgement.set_value(true);
-            }
-        }
-
         ParameterNames validParameterNames;
         ParameterNames invalidParameterNames;
-
-        AtomicFlag sendResponseErrorMessageCalled;
-        AtomicFlag sendResponseParameterErrorCalled;
-        Mutex sendResponseParameterErrorAckMutex;
-        Mutex sendResponseErrorMessageAckMutex;
-        mutable BooleanPromise sendResponseParameterErrorCalledAcknowledgement;
-        mutable BooleanPromise sendResponseErrorMessageCalledAcknowledgement;
 
         Mutex getParameterValueMutex;
         Mutex mockSettingsMutex;
@@ -327,10 +336,14 @@ namespace Mock {
         AtomicCounter numberOfDuplicateInvalidGetParameterValueContentsToReturn;
         GetParameterValueContents returnedGetParameterValueContents;
 
+        MockFunctionSendAllParameterMetadataResponse mockFunctionSendAllParameterMetadataResponse;
         MockFunctionSendUnsignedIntegerParameterResponse mockFunctionSendUnsignedIntegerParameterResponse;
         MockFunctionSendSignedIntegerParameterResponse mockFunctionSendSignedIntegerParameterResponse;
         MockFunctionSendRealNumberParameterResponse mockFunctionSendRealNumberParameterResponse;
         MockFunctionSendBooleanParameterResponse mockFunctionSendBooleanParameterResponse;
+        MockFunctionSendParameterErrorResponse mockFunctionSendParameterErrorResponse;
+        MockFunctionSendSuccessMessageResponse mockFunctionSendSuccessMessageResponse;
+        MockFunctionSendErrorMessageResponse mockFunctionSendErrorMessageResponse;
     };
 }
 

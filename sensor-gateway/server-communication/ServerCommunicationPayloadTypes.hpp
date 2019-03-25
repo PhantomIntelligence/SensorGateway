@@ -37,18 +37,22 @@ namespace ServerCommunication {
 
         public:
 
-            explicit StringPayload(std::string const& value) noexcept : value(value) {}
+            explicit StringPayload(std::string const& value) noexcept : value(value) {
+            }
 
             explicit StringPayload() noexcept :
-                    StringPayload(StringPayload::returnDefaultData()) {}
+                    StringPayload(StringPayload::returnDefaultData()) {
+            }
 
             ~StringPayload() noexcept = default;
 
             StringPayload(StringPayload const& other) :
-                    StringPayload(other.value) {}
+                    StringPayload(other.value) {
+            }
 
             StringPayload(StringPayload&& other) noexcept :
-                    StringPayload(std::move(other.value)) {}
+                    StringPayload(std::move(other.value)) {
+            }
 
             StringPayload& operator=(StringPayload const& other)& {
                 StringPayload temporary(other);
@@ -107,18 +111,22 @@ namespace ServerCommunication {
 
                 using Type = T;
 
-                explicit SimplePayload(Type const& value) noexcept : value(value) {}
+                explicit SimplePayload(Type const& value) noexcept : value(value) {
+                }
 
                 explicit SimplePayload() noexcept :
-                        SimplePayload(SimplePayload::returnDefaultData()) {}
+                        SimplePayload(SimplePayload::returnDefaultData()) {
+                }
 
                 ~SimplePayload() noexcept = default;
 
                 SimplePayload(SimplePayload const& other) :
-                        SimplePayload(other.value) {}
+                        SimplePayload(other.value) {
+                }
 
                 SimplePayload(SimplePayload&& other) noexcept :
-                        SimplePayload(std::move(other.value)) {}
+                        SimplePayload(std::move(other.value)) {
+                }
 
                 SimplePayload& operator=(SimplePayload const& other)& {
                     SimplePayload temporary(other);
@@ -178,6 +186,11 @@ namespace ServerCommunication {
         }
 
         namespace Details {
+            using ParameterMetadataType = std::tuple<std::string, std::string>;
+
+            template<size_t numberOfParameters>
+            using AllParameterMetadataPayload = SimplePayload<std::array<ParameterMetadataType, numberOfParameters>>;
+
             template<typename T>
             using ParameterType = std::tuple<std::string, T, std::string>;
             using UnsignedIntegerParameterPayload = SimplePayload<ParameterType<uint64_t>>;
@@ -185,6 +198,7 @@ namespace ServerCommunication {
             using RealNumberParameterPayload = SimplePayload<ParameterType<double_t>>;
             using BooleanParameterPayload = SimplePayload<ParameterType<bool>>;
             using MessagePayload = StringPayload<true>;
+            using SuccessPayload = StringPayload<true>;
             using ErrorPayload = StringPayload<false>;
             using ParameterErrorPayload = SimplePayload<ParameterType<ErrorPayload>, false>;
         }
@@ -195,6 +209,7 @@ namespace ServerCommunication {
         using Details::BooleanParameterPayload;
         using Details::ParameterErrorPayload;
         using Details::MessagePayload;
+        using Details::SuccessPayload;
         using Details::ErrorPayload;
     }
 }

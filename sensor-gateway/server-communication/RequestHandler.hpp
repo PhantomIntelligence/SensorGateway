@@ -40,22 +40,51 @@ namespace SensorAccessLinkElement {
 
         using ControlMessage = typename SENSOR_STRUCTURES::ControlMessage;
         using AvailableParameters = typename SERVER_STRUCTURES::Parameters;
+        using AllParameterMetadata = typename AvailableParameters::AllParameterMetadata;
 
         using ErrorSource = DataFlow::DataSource<ErrorHandling::SensorAccessLinkError>;
 
+        using GetAllParameterMetadataRequest = ServerCommunication::RequestTypes::GetAllParameterMetadata;
+
         using GetParameterValueRequest = ServerCommunication::RequestTypes::GetParameterValue;
-        using ProcessGetParameterValueRequest = std::function<void(GetParameterValueRequest&&)>;
 
         using GetParameter = StringLiteral<decltype("get parameter"_ToString)>;
 
     public:
 
-        explicit RequestHandler(ServerCommunicator* serverCommunicator,
-                                ProcessGetParameterValueRequest processGetParameterValueRequest) :
-                serverCommunicator(serverCommunicator),
-                processGetParameterValueRequest(processGetParameterValueRequest) {}
+        using ProcessGetParameterValueRequest  = StringLiteral<decltype("ProcessGetParameterValueRequest"_ToString)>;
+        using ProcessCalibrationRequest        = StringLiteral<decltype("ProcessCalibrationRequest"_ToString)>;
+        using ProcessClearCalibrationRequest   = StringLiteral<decltype("ProcessClearCalibrationRequest"_ToString)>;
 
-        ~RequestHandler() noexcept {};
+        using ParameterRequestCallBackStore =
+        typename CallBack
+                <
+                        std::function<void(GetParameterValueRequest&&)>,
+                        std::function<void()>,
+                        std::function<void()>
+                >
+        ::UsingArgument
+                <
+                        GetParameterValueRequest&&,
+                        EmptyDescription,
+                        EmptyDescription
+                >
+        ::Named<
+                ProcessGetParameterValueRequest,
+                ProcessCalibrationRequest,
+                ProcessClearCalibrationRequest
+        >;
+
+        using ParameterRequestCallBacks = typename ParameterRequestCallBackStore::InstancesTuple;
+
+        explicit RequestHandler(ServerCommunicator* serverCommunicator,
+                                ParameterRequestCallBacks* parameterRequestCallBacks) :
+                serverCommunicator(serverCommunicator),
+                parameterRequestCallBacks(parameterRequestCallBacks) {
+        }
+
+        ~RequestHandler() noexcept {
+        };
 
         RequestHandler(RequestHandler const& other) = delete;
 
@@ -66,6 +95,23 @@ namespace SensorAccessLinkElement {
         RequestHandler& operator=(RequestHandler&& other)& noexcept = delete;
 
         // TODO : move this in SensorParameterController
+        // TODO: test this function
+        virtual void handleGetAllParameterNamesRequest() {
+            AllParameterMetadata allParameterMetadata = parameters.getMetadataForAllParameters();
+            GetAllParameterMetadataRequest getAllParameterMetadataRequest;
+            auto parameterValueResponse = ResponseAssembler::createAllParameterMetadataResponse<
+                    AllParameterMetadata,
+                    GetAllParameterMetadataRequest,
+                    AvailableParameters::NUMBER_OF_AVAILABLE_PARAMETERS
+            >(
+                    std::move(allParameterMetadata),
+                    std::move(getAllParameterMetadataRequest)
+            );
+
+            serverCommunicator->sendResponse(std::move(parameterValueResponse));
+        }
+
+        // TODO : move this in SensorParameterController
         void ensureParameterIsAvailable(std::string const& parameterName) {
             auto parameterAvailable = parameters.isAvailable(parameterName);
             if (!parameterAvailable) {
@@ -74,10 +120,6 @@ namespace SensorAccessLinkElement {
                         ErrorHandling::Origin::SERVER_REQUEST_HANDLING_PARAMETER,
                         ErrorHandling::Message::PARAMETER_NOT_AVAILABLE);
             }
-        }
-
-        virtual void handleGetAllParameterNamesRequest() {
-            // TODO
         }
 
         virtual void handleGetParameterValueRequest(GetParameterValueRequest&& getParameterValueRequest) {
@@ -93,18 +135,19 @@ namespace SensorAccessLinkElement {
             }
 
             if (requestIsValid) {
-                processGetParameterValueRequest(std::move(getParameterValueRequest));
+                getCallBack<ProcessGetParameterValueRequest>()(std::move(getParameterValueRequest));
             }
         }
 
+// TODO : Test this and complete with actual value from Sensor --> integration test
         virtual void handleCalibrationRequest() {
-            // TODO
+            getCallBack<ProcessCalibrationRequest>()();
         }
 
+// TODO : Test this and complete with actual value from Sensor --> integration test
         virtual void handleClearCalibrationRequest() {
-            // TODO
+            getCallBack<ProcessClearCalibrationRequest>()();
         }
-
 
 // TODO : Test this and complete with actual value from Sensor --> integration test
         template<typename P, typename Value, typename Request>
@@ -142,8 +185,23 @@ namespace SensorAccessLinkElement {
             serverCommunicator->sendResponse(std::move(errorMessageResponse));
         }
 
+        // TODO : test this function
+        template<typename AttemptedAction, typename Request>
+        void writeAndSendSuccessMessageResponse(Request&& request) {
+            auto successMessageResponse =
+                    ResponseAssembler::createSuccessMessageResponseFromRequest<AttemptedAction>(request);
+            serverCommunicator->sendResponse(std::move(successMessageResponse));
+        }
+
+        template<typename Name>
+        constexpr auto getCallBack() const noexcept -> decltype(ParameterRequestCallBackStore::getInstanceNamed<Name>(
+                std::declval<ParameterRequestCallBacks&>())) {
+            ParameterRequestCallBacks& referenceToCallBacks = *parameterRequestCallBacks;
+            return ParameterRequestCallBackStore::getInstanceNamed<Name>(referenceToCallBacks);
+        }
+
         ServerCommunicator* serverCommunicator;
-        ProcessGetParameterValueRequest processGetParameterValueRequest;
+        ParameterRequestCallBacks* parameterRequestCallBacks;
 
         AvailableParameters parameters;
     };

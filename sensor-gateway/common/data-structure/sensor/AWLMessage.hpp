@@ -17,7 +17,7 @@
 #ifndef SENSORGATEWAY_AWLMESSAGE_HPP
 #define SENSORGATEWAY_AWLMESSAGE_HPP
 
-#include "sensor-gateway/common/ConstantFunctionsDefinition.h"
+#include "sensor-gateway/common/custom-type-and-helper/IncludeRootForDefinitions.h"
 
 namespace AWL {
     using MessageId = int64_t;

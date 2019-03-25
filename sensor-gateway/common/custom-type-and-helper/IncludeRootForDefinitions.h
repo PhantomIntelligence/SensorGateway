@@ -14,17 +14,14 @@
 	limitations under the License.
 */
 
-#ifndef SENSORGATEWAY_TIMEPOINTLOCATIONNAMES_H
-#define SENSORGATEWAY_TIMEPOINTLOCATIONNAMES_H
+#ifndef SENSORGATEWAY_INCLUDEROOTFORDEFINITIONS_H
+#define SENSORGATEWAY_INCLUDEROOTFORDEFINITIONS_H
 
-#include <iostream>
-#include "ExceptionMessages.h"
+#include "TypeDefinition.h"
+#include "StringLiteralType.h"
+#include "ConstantValuesDefinition.h"
+#include "StaticTupleFunctions.h"
+#include "CallBackTupleType.h"
+#include "ConstantFunctionsDefinition.h"
 
-namespace Metrics {
-    namespace LocationNames {
-
-        static std::string const SERVER_COMMUNICATOR_SENDING  = "ServerCommunicator:Transmission";
-    }
-}
-
-#endif //SENSORGATEWAY_TIMEPOINTLOCATIONNAMES_H
+#endif //SENSORGATEWAY_INCLUDEROOTFORDEFINITIONS_H

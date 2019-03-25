@@ -1,5 +1,5 @@
 /**
-	Copyright 2014-2018 Phantom Intelligence Inc.
+	Copyright 2014-2019 Phantom Intelligence Inc.
 
 	Licensed under the Apache License, Version 2.0 (the "License");
 	you may not use this file except in compliance with the License.
@@ -16,8 +16,6 @@
 
 #ifndef SENSORGATEWAY_STRINGLITERALTYPE_H
 #define SENSORGATEWAY_STRINGLITERALTYPE_H
-
-#include "TypeDefinition.h"
 
 /**
  * @warning: DO NOT MODIFY

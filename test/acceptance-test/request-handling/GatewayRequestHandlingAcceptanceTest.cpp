@@ -37,7 +37,6 @@ protected:
 
     std::string const SERVER_ADDRESS = "Die Potato!";
 
-
     using TestAccessLinkName = StringLiteral<decltype("TestAccessLink"_ToString)>;
     using DataStructures = Sensor::Test::RealisticImplementation::Structures;
     using FakeSensorMessage = DataStructures::Message;
@@ -61,6 +60,26 @@ protected:
 
 };
 
+TEST_F(GatewayRequestHandlingAcceptanceTest,
+       given__when_getAllParameterMetadataRequest_then_sendResponseAllParameterMetadataToServerCommunicationStrategyWithExpectedParameterMetadata) {
+    ServerCommunicationStrategyMock serverCommunicationStrategyMock;
+    serverCommunicationStrategyMock.askForAllParameterMetadata();
+    DataTranslationStrategyMock dataTranslationStrategyMock;
+    SensorCommunicationStrategyMock sensorCommunicationStrategyMock;
+    TranslationStubbedAccessLink accessLink(&serverCommunicationStrategyMock,
+                                            &dataTranslationStrategyMock,
+                                            &sensorCommunicationStrategyMock);
+
+    accessLink.start(SERVER_ADDRESS);
+    serverCommunicationStrategyMock.waitUntilSendResponseAllParameterMetadataIsCalled();
+    accessLink.terminateAndJoin();
+
+    auto expectedResponse = Given::anAllParameterMetadataResponse<AvailableParameters>();
+
+    auto strategyCalled = serverCommunicationStrategyMock.hasSendResponseAllParameterMetadataBeenCalledWith(expectedResponse);
+
+    ASSERT_TRUE(strategyCalled);
+}
 
 TEST_F(GatewayRequestHandlingAcceptanceTest,
        given_anInvalidParameterName_when_getParameterValue_then_sendResponseErrorMessageIsCalledInServerCommunicationStrategy) {

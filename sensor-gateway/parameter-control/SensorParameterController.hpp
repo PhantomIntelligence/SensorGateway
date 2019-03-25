@@ -99,6 +99,20 @@ namespace SensorAccessLinkElement {
             dataTranslator->translateAndSendToSensor(std::move(sensorControlMessage));
         }
 
+        // TODO : test this function
+        void calibrate() noexcept {
+//            auto parameterName = getParameterValueRequest.payloadToString();
+//            auto sensorControlMessage = parameters.createGetParameterValueControlMessageFor(parameterName);
+//            dataTranslator->translateAndSendToSensor(std::move(sensorControlMessage));
+        }
+
+        // TODO : test this function
+        void clearCalibration() noexcept {
+//            auto parameterName = getParameterValueRequest.payloadToString();
+//            auto sensorControlMessage = parameters.createGetParameterValueControlMessageFor(parameterName);
+//            dataTranslator->translateAndSendToSensor(std::move(sensorControlMessage));
+        }
+
         using ErrorSource::linkConsumer;
 
 

@@ -34,8 +34,8 @@
 #include <chrono>
 #include <utility>
 
-#include "hicpp/HighIntegrityThread.h"
-#include "TimePointLocationNames.h"
+#include "HighIntegrityThread.h"
+#include "sensor-gateway/common/TimePointLocationNames.h"
 
 namespace {
     typedef unsigned char Byte;
@@ -53,6 +53,10 @@ namespace {
     typedef std::chrono::high_resolution_clock HighResolutionClock;
     typedef std::chrono::time_point<HighResolutionClock> HighResolutionTimePoint;
     typedef std::chrono::duration<double, std::nano> DurationInNanoseconds;
+
+    using UnsignedInteger = uint64_t;
+    using SignedInteger = int64_t;
+    using RealNumber = double;
 }
 
 namespace DataFlow {

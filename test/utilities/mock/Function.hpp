@@ -48,15 +48,32 @@ namespace Mock {
         using InvokeExpectation = std::tuple<ParameterType, ReturnType>;
         using InvokeExpectations = std::list<InvokeExpectation>;
 
+        static constexpr bool const FUNCTION_REQUIRES_NO_PARAMETERS = std::is_same<ParameterType, VoidType>::value;
+        static constexpr bool const FUNCTION_REQUIRES_PARAMETERS = !FUNCTION_REQUIRES_NO_PARAMETERS;
+        static constexpr bool const FUNCTION_HAS_A_VOID_RETURN_TYPE = std::is_same<ReturnType, VoidType>::value;
+        static constexpr bool const FUNCTION_HAS_A_NON_VOID_RETURN_TYPE = !FUNCTION_HAS_A_VOID_RETURN_TYPE;
+
     public:
 
         explicit Function() :
                 mapping(false),
-                functionInvoked(false) {};
+                functionInvoked(false) {
+        };
 
         ~Function() noexcept = default;
 
+        auto invoke() -> ReturnType {
+            assertFunctionRequiresNoParameters();
+            static_assert(!std::is_same<ReturnType, VoidType>::value,
+                          "MockFunction --> this function has a non void return type. `invokeVoidReturn` should be used instead.");
+            VoidType voidValue;
+            ReturnType returnValue = useMappingIfSet(voidValue, &invokeExpectations);
+            invokeWithParameters(std::move(voidValue));
+            return returnValue;
+        }
+
         auto invoke(ParameterType&& parameter) -> ReturnType {
+            assertFunctionRequiresParameters();
             static_assert(!std::is_same<ReturnType, VoidType>::value,
                           "MockFunction --> this function has a non void return type. `invokeVoidReturn` should be used instead.");
             ReturnType returnValue = useMappingIfSet(parameter, &invokeExpectations);
@@ -64,31 +81,67 @@ namespace Mock {
             return returnValue;
         }
 
+        void invokeVoidReturn() {
+            assertFunctionRequiresNoParameters();
+            static_assert(std::is_same<ReturnType, VoidType>::value,
+                          "MockFunction --> this function has a void return type. `invoke` should be used instead.");
+            VoidType voidValue;
+            invokeWithParameters(std::move(voidValue));
+        }
+
         void invokeVoidReturn(ParameterType&& parameter) {
+            assertFunctionRequiresParameters();
             static_assert(std::is_same<ReturnType, VoidType>::value,
                           "MockFunction --> this function has a void return type. `invoke` should be used instead.");
             invokeWithParameters(std::forward<ParameterType>(parameter));
         }
 
+        /**
+         * Start to create a call expectation
+         */
+        void expectCall() {
+            assertFunctionRequiresNoParameters();
+            assertFunctionHasAVoidReturnTypeForExpectation();
+            VoidType voidValue;
+            startInvocationExpectation(voidValue);
+            completeInvocationExpectation(voidValue);
+        }
+
+        /**
+         * Start to create a call expectation
+         */
+        void expectCall(ParameterType&& parameterValue) {
+            assertFunctionRequiresParameters();
+            assertFunctionHasAVoidReturnTypeForExpectation();
+            startInvocationExpectation(parameterValue);
+            VoidType voidValue;
+            completeInvocationExpectation(voidValue);
+        }
+
+        /**
+         * Start to create a call expectation, based on the fact that no parameter is received
+         */
+        void onCall() {
+            assertFunctionRequiresNoParameters();
+            assertFunctionHasANonVoidReturnTypeForExpectation();
+            VoidType voidValue;
+            startInvocationExpectation(voidValue);
+        }
+
+        /**
+         * Start to create a call expectation, based on the reception of a parameter
+         * @param parameterValue the expected parameter
+         */
         void onCall(ParameterType&& parameterValue) {
-            static_assert(!std::is_same<ReturnType, VoidType>::value,
-                          "MockFunction --> this function has a void return type. `expectCall` should be used instead.");
-            assert(!mapping.load());
-            mapping.store(true);
-            temporaryParameterValueMapping = parameterValue;
+            assertFunctionRequiresParameters();
+            assertFunctionHasANonVoidReturnTypeForExpectation();
+            startInvocationExpectation(parameterValue);
         }
 
         void returnThis(ReturnType const& returnValue) {
             static_assert(!std::is_same<ReturnType, VoidType>::value,
                           "MockFunction --> this function has a void return type. This function cannot be called.");
-            assert(mapping.load());
-            mapping.store(false);
-            invokeExpectations.remove_if(
-                    [&](InvokeExpectation expectation) {
-                        return getParameterValue(&expectation) == temporaryParameterValueMapping;
-                    }
-            );
-            invokeExpectations.emplace_back(temporaryParameterValueMapping, returnValue);
+            completeInvocationExpectation(returnValue);
         }
 
         // TODO : Add timeout and handle cases where fail to facilitate testing and avoid infinite test
@@ -112,11 +165,42 @@ namespace Mock {
 
     private:
 
+        static constexpr void assertFunctionRequiresNoParameters() noexcept {
+            static_assert(FUNCTION_REQUIRES_NO_PARAMETERS,
+                          "MockFunction --> this function expects an argument. Try to add a parameter to this call.");
+        }
+
+        static constexpr void assertFunctionRequiresParameters() noexcept {
+            static_assert(FUNCTION_REQUIRES_PARAMETERS,
+                          "MockFunction --> this function does not expect any argument. Try to remove any parameters from this call");
+        }
+
+        static constexpr void assertFunctionHasANonVoidReturnTypeForInvocation() noexcept {
+            static_assert(FUNCTION_HAS_A_NON_VOID_RETURN_TYPE,
+                          "MockFunction --> this function has a void return type. `invokeVoidReturn` should be used instead.");
+        }
+
+        static constexpr void assertFunctionHasAVoidReturnTypeForInvocation() noexcept {
+            static_assert(FUNCTION_HAS_A_VOID_RETURN_TYPE,
+                          "MockFunction --> this function has a non void return type. `invoke` should be used instead.");
+        }
+
+        static constexpr void assertFunctionHasANonVoidReturnTypeForExpectation() noexcept {
+            static_assert(FUNCTION_HAS_A_NON_VOID_RETURN_TYPE,
+                          "MockFunction --> this function has a void return type. `expectCall` should be used instead.");
+        }
+
+        static constexpr void assertFunctionHasAVoidReturnTypeForExpectation() noexcept {
+            static_assert(FUNCTION_HAS_A_VOID_RETURN_TYPE,
+                          "MockFunction --> this function has a non void return type. `onCall` should be used instead.");
+        }
+
         // Customization of mock function behavior
         struct ExpectationMapComparator {
             ParameterType const parameterValue;
 
-            explicit ExpectationMapComparator(ParameterType const& parameterValue) : parameterValue(parameterValue) {}
+            explicit ExpectationMapComparator(ParameterType const& parameterValue) : parameterValue(parameterValue) {
+            }
 
             bool const operator()(InvokeExpectation const& invokeExpectation) const {
                 return getParameterValue(&invokeExpectation) == parameterValue;
@@ -132,6 +216,24 @@ namespace Mock {
                 returnValue = getReturnValue(&expectation);
             }
             return returnValue;
+        }
+
+
+        void startInvocationExpectation(ParameterType const& parameterValue) {
+            assert(!mapping.load());
+            mapping.store(true);
+            temporaryParameterValueMapping = parameterValue;
+        }
+
+        void completeInvocationExpectation(ReturnType const& returnValue) {
+            assert(mapping.load());
+            mapping.store(false);
+            invokeExpectations.remove_if(
+                    [&](InvokeExpectation expectation) {
+                        return getParameterValue(&expectation) == temporaryParameterValueMapping;
+                    }
+            );
+            invokeExpectations.emplace_back(temporaryParameterValueMapping, returnValue);
         }
 
         AtomicFlag mapping;

@@ -15,8 +15,8 @@
 */
 
 
-#ifndef SENSORGATEWAY_RINGBUFFER_H
-#define SENSORGATEWAY_RINGBUFFER_H
+#ifndef SENSORGATEWAY_RINGBUFFER_HPP
+#define SENSORGATEWAY_RINGBUFFER_HPP
 
 #include <unordered_map>
 #include "ConsumerLink.hpp"
@@ -160,4 +160,4 @@ namespace DataFlow {
 
     };
 }
-#endif //SENSORGATEWAY_RINGBUFFER_H
+#endif //SENSORGATEWAY_RINGBUFFER_HPP

@@ -1,5 +1,5 @@
 /**
-	Copyright 2014-2018 Phantom Intelligence Inc.
+	Copyright 2014-2019 Phantom Intelligence Inc.
 
 	Licensed under the Apache License, Version 2.0 (the "License");
 	you may not use this file except in compliance with the License.
@@ -18,7 +18,8 @@
 #define SENSORGATEWAY_TIMEASSERTION_HPP
 
 #include <gtest/gtest.h>
-#include "sensor-gateway/common/ConstantFunctionsDefinition.h"
+#include <sensor-gateway/common/custom-type-and-helper/IncludeRootForDefinitions.h>
+
 #include <typeinfo>
 
 namespace {

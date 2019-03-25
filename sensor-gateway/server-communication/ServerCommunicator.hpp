@@ -41,30 +41,49 @@ namespace SensorAccessLinkElement {
         using RequestAssembler = Assemble::ServerRequestAssembler;
 
         using GetParameterValueRequest = ServerCommunication::RequestTypes::GetParameterValue;
-        using GetParameterValueContent = typename ServerCommunicationStrategy::GetParameterValueContent;
-        using GetParameterValueContents = typename ServerCommunicationStrategy::GetParameterValueContents;
+        using ParameterName = typename ServerCommunicationStrategy::ParameterName;
+        using GetParameterValueContents = typename ServerCommunicationStrategy::GetParameterValueContentBuffer::Contents;
 
         GetParameterValueRequest const DEFAULT_GET_PARAMETER_VALUE_REQUEST = ServerCommunication::RequestTypes::GetParameterValue::returnDefaultData();
-
-        using HandleGetAllParameterNamesRequest = std::function<void()>;
-        using HandleGetParameterValueRequest = std::function<void(GetParameterValueRequest&&)>;
-        using HandleCalibrationRequest = std::function<void()>;
-        using HandleClearCalibrationRequest = std::function<void()>;
 
         using ErrorSource = DataFlow::DataSource<ErrorHandling::SensorAccessLinkError>;
 
     public:
 
+        using HandleGetAllParameterNamesRequest  = StringLiteral<decltype("HandleGetAllParameterNamesRequest"_ToString)>;
+        using HandleGetParameterValueRequest     = StringLiteral<decltype("HandleGetParameterValueRequest"_ToString)>;
+        using HandleCalibrationRequest           = StringLiteral<decltype("HandleCalibrationRequest"_ToString)>;
+        using HandleClearCalibrationRequest      = StringLiteral<decltype("HandleClearCalibrationRequest"_ToString)>;
+
+        using RequestCallBackStore =
+        typename CallBack
+                <
+                        std::function<void()>,
+                        std::function<void(GetParameterValueRequest&&)>,
+                        std::function<void()>,
+                        std::function<void()>
+                >
+        ::UsingArgument
+                <
+                        EmptyDescription,
+                        GetParameterValueRequest&&,
+                        EmptyDescription,
+                        EmptyDescription
+                >
+        ::Named<
+                HandleGetAllParameterNamesRequest,
+                HandleGetParameterValueRequest,
+                HandleCalibrationRequest,
+                HandleClearCalibrationRequest
+        >;
+
+
+        using RequestHandlingCallBacks = typename RequestCallBackStore::InstancesTuple;
+
         explicit ServerCommunicator(ServerCommunicationStrategy* serverCommunicationStrategy,
-                                    HandleGetAllParameterNamesRequest handleGetAllParameterNamesRequest,
-                                    HandleGetParameterValueRequest handleGetParameterValueRequest,
-                                    HandleCalibrationRequest handleCalibrationRequest,
-                                    HandleClearCalibrationRequest handleClearCalibrationRequest) :
+                                    RequestHandlingCallBacks* requestHandlingCallBacks) :
                 serverCommunicationStrategy(serverCommunicationStrategy),
-                handleGetAllParameterNamesRequest(handleGetAllParameterNamesRequest),
-                handleGetParameterValueRequest(handleGetParameterValueRequest),
-                handleCalibrationRequest(handleCalibrationRequest),
-                handleClearCalibrationRequest(handleClearCalibrationRequest),
+                requestHandlingCallBacks(requestHandlingCallBacks),
                 serverConnected(false), // TODO: add logic not to send anything until server is connected
                 terminateOrderReceived(false),
                 requestReceptionThread(JoinableThread(doNothing)) {
@@ -164,8 +183,8 @@ namespace SensorAccessLinkElement {
 
         void handleIncomingGetAllParameterNamesRequests() {
             auto hasToSendAllParameterNames = serverCommunicationStrategy->hasReceivedGetAllParameterNamesRequest();
-            if(hasToSendAllParameterNames) {
-                handleGetAllParameterNamesRequest();
+            if (hasToSendAllParameterNames) {
+                getCallBack<HandleGetAllParameterNamesRequest>()();
             }
         }
 
@@ -186,27 +205,26 @@ namespace SensorAccessLinkElement {
 
             std::tie(request, handleRequest) = assembleGetParameterValueRequestFrom(contents[requestCount++]);
             while (handleRequest) {
-                handleGetParameterValueRequest(std::move(request));
+                getCallBack<HandleGetParameterValueRequest>()(std::move(request));
                 std::tie(request, handleRequest) = assembleGetParameterValueRequestFrom(contents[requestCount++]);
             }
         }
 
         void handleIncomingCalibrationRequests() {
             auto hasToSendAllParameterNames = serverCommunicationStrategy->hasReceivedCalibrationRequest();
-            if(hasToSendAllParameterNames) {
-                handleCalibrationRequest();
+            if (hasToSendAllParameterNames) {
+                getCallBack<HandleCalibrationRequest>()();
             }
         }
 
         void handleIncomingClearCalibrationRequests() {
             auto hasToSendAllParameterNames = serverCommunicationStrategy->hasReceivedClearCalibrationRequest();
-            if(hasToSendAllParameterNames) {
-                handleClearCalibrationRequest();
+            if (hasToSendAllParameterNames) {
+                getCallBack<HandleClearCalibrationRequest>()();
             }
         }
 
-        auto assembleGetParameterValueRequestFrom(
-                GetParameterValueContent const& content) const -> std::tuple<GetParameterValueRequest, bool> const {
+        auto assembleGetParameterValueRequestFrom(ParameterName const& content) const -> std::tuple<GetParameterValueRequest, bool> const {
             GetParameterValueRequest getParameterRequest = RequestAssembler::getParameterValueRequest(content);
             bool hasToBeHandled = getParameterRequest != DEFAULT_GET_PARAMETER_VALUE_REQUEST;
             return std::make_tuple(getParameterRequest, hasToBeHandled);
@@ -238,16 +256,20 @@ namespace SensorAccessLinkElement {
             return terminateOrderReceived.load();
         }
 
+        template<typename Name>
+        constexpr auto getCallBack() const noexcept -> decltype(RequestCallBackStore::getInstanceNamed<Name>(
+                std::declval<RequestHandlingCallBacks&>())) {
+            RequestHandlingCallBacks& constantReferenceToCallBacks = *requestHandlingCallBacks;
+            return RequestCallBackStore::getInstanceNamed<Name>(constantReferenceToCallBacks);
+        }
+
         JoinableThread requestReceptionThread;
 
         AtomicFlag serverConnected;
         AtomicFlag terminateOrderReceived;
 
         ServerCommunicationStrategy* serverCommunicationStrategy;
-        HandleGetAllParameterNamesRequest handleGetAllParameterNamesRequest;
-        HandleGetParameterValueRequest handleGetParameterValueRequest;
-        HandleCalibrationRequest handleCalibrationRequest;
-        HandleClearCalibrationRequest handleClearCalibrationRequest;
+        RequestHandlingCallBacks* requestHandlingCallBacks;
 
         std::string serverAddress;
     };

@@ -127,8 +127,16 @@ namespace ServerCommunication {
     namespace RequestTypes {
         namespace Names {
             using GetValueOfParameter = StringLiteral<decltype("get value of parameter "_ToString)>;
+            using SetValueOfParameter = StringLiteral<decltype("set value of parameter "_ToString)>;
+            using GetAllParameterMetadata = StringLiteral<decltype("get all parameters metadata "_ToString)>;
         }
         using GetParameterValue = ServerRequest<Names::GetValueOfParameter, PayloadTypes::MessagePayload>;
+        using SetUnsignedIntegerParameterValue = ServerRequest<Names::SetValueOfParameter, PayloadTypes::UnsignedIntegerParameterPayload>;
+        using SetSignedIntegerParameterValue = ServerRequest<Names::SetValueOfParameter, PayloadTypes::SignedIntegerParameterPayload>;
+        using SetRealNumberParameterValue = ServerRequest<Names::SetValueOfParameter, PayloadTypes::RealNumberParameterPayload>;
+        using SetBooleanParameterValue = ServerRequest<Names::SetValueOfParameter, PayloadTypes::BooleanParameterPayload>;
+
+        using GetAllParameterMetadata = ServerRequest<Names::GetAllParameterMetadata, PayloadTypes::MessagePayload>;
     }
 }
 

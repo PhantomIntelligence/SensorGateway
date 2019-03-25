@@ -114,18 +114,26 @@ namespace ServerCommunication {
 
             template<typename ParameterResponsePayload>
             using ParameterErrorResponse = ServerResponse<ParameterResponsePayload, PayloadTypes::ErrorPayload>;
+
+            template<size_t numberOfParameters>
+            using AllParameterMetadataPayload = ServerCommunication::PayloadTypes::Details::AllParameterMetadataPayload<numberOfParameters>;
         }
+
+        template<size_t numberOfParameters>
+        using AllParameterMetadataResponse = ServerCommunication::ServerResponse<Details::AllParameterMetadataPayload<numberOfParameters>, PayloadTypes::MessagePayload>;
 
         using UnsignedIntegerParameterResponse = Details::ParameterValueResponse<PayloadTypes::UnsignedIntegerParameterPayload>;
         using SignedIntegerParameterResponse = Details::ParameterValueResponse<PayloadTypes::SignedIntegerParameterPayload>;
         using RealNumberParameterResponse = Details::ParameterValueResponse<PayloadTypes::RealNumberParameterPayload>;
         using BooleanParameterResponse = Details::ParameterValueResponse<PayloadTypes::BooleanParameterPayload>;
         using ParameterErrorResponse = Details::ParameterErrorResponse<PayloadTypes::ParameterErrorPayload>;
+        using SuccessMessageResponse = ServerResponse<PayloadTypes::SuccessPayload, PayloadTypes::SuccessPayload>;
         using ErrorMessageResponse = ServerResponse<PayloadTypes::ErrorPayload, PayloadTypes::ErrorPayload>;
 
     }
 
     namespace ResponseMessage {
+        using RequestSuccess = StringLiteral<decltype("Success"_ToString)>;
         using BadRequest = StringLiteral<decltype("Bad request"_ToString)>;
         using ParameterError = StringLiteral<decltype("Parameter error"_ToString)>;
         using NoPayload = StringLiteral<decltype(" - "_ToString)>;

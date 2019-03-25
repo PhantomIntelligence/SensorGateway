@@ -48,6 +48,7 @@ public:
 protected:
 
     using ServerCommunicator = SensorAccessLinkElement::ServerCommunicator<DataStructures>;
+    using ServerRequestHandlingCallBacks = typename ServerCommunicator::RequestHandlingCallBacks;
     using MockRequestHandler = Mock::CatchingRequestHandlerMock<DataStructures, DataStructures>;
     using Message = Sensor::Test::Simple::Structures::Message;
     using RawData = Sensor::Test::Simple::Structures::RawData;
@@ -74,6 +75,12 @@ protected:
         return badRequestResponse;
     }
 
+    auto givenASuccessMessageResponse() const {
+        auto request = Given::aValidGetParameterValueRequest<ParameterListForThisTestCase>();
+        auto successResponse = ResponseAssembler::createSuccessMessageResponseFromRequest<NoAction>(std::move(request));
+        return successResponse;
+    }
+
     auto givenAParameterErrorResponse() const {
         auto validRequest = Given::aValidGetParameterValueRequest<ParameterListForThisTestCase>();
         validRequest.markAsErrorCause();
@@ -92,7 +99,8 @@ protected:
         mockRequestHandler->waitForExpectedNumberOfGetParameterValueRequest();
         serverCommunicator->terminateAndJoin();
 
-        auto hasReceivedExpectedNumberOfCall = mockRequestHandler->hasReceivedExpectedNumberOfGetParameterValueRequest();
+        auto hasReceivedExpectedNumberOfCall = mockRequestHandler
+                ->hasReceivedExpectedNumberOfGetParameterValueRequest();
 
         ASSERT_TRUE(hasReceivedExpectedNumberOfCall);
     }
@@ -130,29 +138,19 @@ protected:
         return bindHandlerClearCalibrationTo(&defaultRequestHandlerMock);
     }
 
-    auto recreateGetParameterValueRequestFromName(
-            std::string const& content) const -> std::tuple<GetParameterValueRequest, bool> const {
-        GetParameterValueRequest getParameterRequest = RequestAssembler::getParameterValueRequest(content);
-        ParameterListForThisTestCase parameters;
-        bool requestIsValid = parameters.isAvailable(content);
-        if (!requestIsValid) {
-            getParameterRequest.markAsBadRequest();
-        }
-        bool hasNonDefaultContent = getParameterRequest != GetParameterValueRequest::returnDefaultData();
-        return std::make_tuple(getParameterRequest, hasNonDefaultContent);
-    };
-
     template<typename Response>
     testing::AssertionResult
     closeConnectionIsCalledAfterStrategyThrowsOnSendResponse(ThrowingServerCommunicationStrategy* throwingStrategy,
                                                              Response&& response) noexcept {
 
-        ServerCommunicator serverCommunicator(throwingStrategy,
-                                              ignoreHandleGetAllParameterNames(),
-                                              ignoreHandleGetParameterValue(),
-                                              ignoreHandleCalibration(),
-                                              ignoreHandleClearCalibration()
+        ServerRequestHandlingCallBacks handlingCallBacks = ServerCommunicator::RequestCallBackStore::createCallBacks(
+                ignoreHandleGetAllParameterNames(),
+                ignoreHandleGetParameterValue(),
+                ignoreHandleCalibration(),
+                ignoreHandleClearCalibration()
+
         );
+        ServerCommunicator serverCommunicator(throwingStrategy, &handlingCallBacks);
 
         serverCommunicator.sendResponse(std::forward<Response>(response));
         throwingStrategy->waitUntilCloseConnectionCallIsMadeAfterErrorIsThrown();
@@ -173,12 +171,15 @@ protected:
     openConnectionIsCalledAfterStrategyThrowsOnSendResponse(ThrowingServerCommunicationStrategy* throwingStrategy,
                                                             Response&& response) noexcept {
 
-        ServerCommunicator serverCommunicator(throwingStrategy,
-                                              ignoreHandleGetAllParameterNames(),
-                                              ignoreHandleGetParameterValue(),
-                                              ignoreHandleCalibration(),
-                                              ignoreHandleClearCalibration()
-        );
+        ServerRequestHandlingCallBacks handlingCallBacks =
+                ServerCommunicator::RequestCallBackStore::createCallBacks(
+                        ignoreHandleGetAllParameterNames(),
+                        ignoreHandleGetParameterValue(),
+                        ignoreHandleCalibration(),
+                        ignoreHandleClearCalibration()
+
+                );
+        ServerCommunicator serverCommunicator(throwingStrategy, &handlingCallBacks);
 
         serverCommunicator.sendResponse(std::forward<Response>(response));
         throwingStrategy->waitUntilOpenConnectionCallIsMadeAfterErrorIsThrown();
@@ -197,12 +198,15 @@ protected:
 
 TEST_F(ServerCommunicatorTest, given__when_connect_then_callsOpenConnectionInStrategy) {
     MockServerCommunicatorStrategy mockStrategy;
-    ServerCommunicator serverCommunicator(&mockStrategy,
-                                          ignoreHandleGetAllParameterNames(),
-                                          ignoreHandleGetParameterValue(),
-                                          ignoreHandleCalibration(),
-                                          ignoreHandleClearCalibration()
-    );
+    ServerRequestHandlingCallBacks handlingCallBacks =
+            ServerCommunicator::RequestCallBackStore::createCallBacks(
+                    ignoreHandleGetAllParameterNames(),
+                    ignoreHandleGetParameterValue(),
+                    ignoreHandleCalibration(),
+                    ignoreHandleClearCalibration()
+
+            );
+    ServerCommunicator serverCommunicator(&mockStrategy, &handlingCallBacks);
 
     serverCommunicator.openConnection(SERVER_ADDRESS);
     auto strategyHasBeenCalled = mockStrategy.hasOpenConnectionBeenCalled();
@@ -213,12 +217,15 @@ TEST_F(ServerCommunicatorTest, given__when_connect_then_callsOpenConnectionInStr
 
 TEST_F(ServerCommunicatorTest, given_aMessageToSend_when_consume_then_callsSendMessageInStrategy) {
     MockServerCommunicatorStrategy mockStrategy;
-    ServerCommunicator serverCommunicator(&mockStrategy,
-                                          ignoreHandleGetAllParameterNames(),
-                                          ignoreHandleGetParameterValue(),
-                                          ignoreHandleCalibration(),
-                                          ignoreHandleClearCalibration()
-    );
+    ServerRequestHandlingCallBacks handlingCallBacks =
+            ServerCommunicator::RequestCallBackStore::createCallBacks(
+                    ignoreHandleGetAllParameterNames(),
+                    ignoreHandleGetParameterValue(),
+                    ignoreHandleCalibration(),
+                    ignoreHandleClearCalibration()
+
+            );
+    ServerCommunicator serverCommunicator(&mockStrategy, &handlingCallBacks);
     auto message = DataTestUtil::createRandomSimpleMessageWithEmptyTimestamps();
 
     serverCommunicator.consume(std::move(message));
@@ -229,12 +236,15 @@ TEST_F(ServerCommunicatorTest, given_aMessageToSend_when_consume_then_callsSendM
 
 TEST_F(ServerCommunicatorTest, given_aMessageToSend_when_consume_then_callsSendMessageInStrategyWithTheMessage) {
     MockServerCommunicatorStrategy mockStrategy;
-    ServerCommunicator serverCommunicator(&mockStrategy,
-                                          ignoreHandleGetAllParameterNames(),
-                                          ignoreHandleGetParameterValue(),
-                                          ignoreHandleCalibration(),
-                                          ignoreHandleClearCalibration()
-    );
+    ServerRequestHandlingCallBacks handlingCallBacks =
+            ServerCommunicator::RequestCallBackStore::createCallBacks(
+                    ignoreHandleGetAllParameterNames(),
+                    ignoreHandleGetParameterValue(),
+                    ignoreHandleCalibration(),
+                    ignoreHandleClearCalibration()
+
+            );
+    ServerCommunicator serverCommunicator(&mockStrategy, &handlingCallBacks);
     auto message = DataTestUtil::createRandomSimpleMessageWithEmptyTimestamps();
     auto copy = Message(message);
 
@@ -248,12 +258,15 @@ TEST_F(ServerCommunicatorTest, given_aMessageToSend_when_consume_then_callsSendM
  */
 TEST_F(ServerCommunicatorTest, given_aMessageToSend_when_consume_then_sendsItAfterHavingTimestampedIt) {
     MockServerCommunicatorStrategy mockStrategy;
-    ServerCommunicator serverCommunicator(&mockStrategy,
-                                          ignoreHandleGetAllParameterNames(),
-                                          ignoreHandleGetParameterValue(),
-                                          ignoreHandleCalibration(),
-                                          ignoreHandleClearCalibration()
-    );
+    ServerRequestHandlingCallBacks handlingCallBacks =
+            ServerCommunicator::RequestCallBackStore::createCallBacks(
+                    ignoreHandleGetAllParameterNames(),
+                    ignoreHandleGetParameterValue(),
+                    ignoreHandleCalibration(),
+                    ignoreHandleClearCalibration()
+
+            );
+    ServerCommunicator serverCommunicator(&mockStrategy, &handlingCallBacks);
     auto message = DataTestUtil::createRandomSimpleMessageWithEmptyTimestamps();
 
     auto now = HighResolutionClock::now();
@@ -272,12 +285,16 @@ TEST_F(ServerCommunicatorTest, given_aMessageToSend_when_consume_then_sendsItAft
 
 TEST_F(ServerCommunicatorTest, given_aRawDataCycleToSend_when_consume_then_callsSendRawDataInStrategy) {
     MockServerCommunicatorStrategy mockStrategy;
-    ServerCommunicator serverCommunicator(&mockStrategy,
-                                          ignoreHandleGetAllParameterNames(),
-                                          ignoreHandleGetParameterValue(),
-                                          ignoreHandleCalibration(),
-                                          ignoreHandleClearCalibration()
-    );
+    ServerRequestHandlingCallBacks handlingCallBacks =
+            ServerCommunicator::RequestCallBackStore::createCallBacks(
+                    ignoreHandleGetAllParameterNames(),
+                    ignoreHandleGetParameterValue(),
+                    ignoreHandleCalibration(),
+                    ignoreHandleClearCalibration()
+
+            );
+    ServerCommunicator serverCommunicator(&mockStrategy, &handlingCallBacks);
+
     auto rawData = DataTestUtil::createRandomSimpleRawData();
 
     serverCommunicator.consume(std::move(rawData));
@@ -289,12 +306,15 @@ TEST_F(ServerCommunicatorTest, given_aRawDataCycleToSend_when_consume_then_calls
 TEST_F(ServerCommunicatorTest,
        given_aRawDataCycleToSend_when_consume_then_callsSendRawDataInStrategyWithTheRawData) {
     MockServerCommunicatorStrategy mockStrategy;
-    ServerCommunicator serverCommunicator(&mockStrategy,
-                                          ignoreHandleGetAllParameterNames(),
-                                          ignoreHandleGetParameterValue(),
-                                          ignoreHandleCalibration(),
-                                          ignoreHandleClearCalibration()
-    );
+    ServerRequestHandlingCallBacks handlingCallBacks =
+            ServerCommunicator::RequestCallBackStore::createCallBacks(
+                    ignoreHandleGetAllParameterNames(),
+                    ignoreHandleGetParameterValue(),
+                    ignoreHandleCalibration(),
+                    ignoreHandleClearCalibration()
+
+            );
+    ServerCommunicator serverCommunicator(&mockStrategy, &handlingCallBacks);
     auto rawData = DataTestUtil::createRandomSimpleRawData();
     auto copy = RawData(rawData);
 
@@ -306,12 +326,15 @@ TEST_F(ServerCommunicatorTest,
 
 TEST_F(ServerCommunicatorTest, given__when_terminateAndJoin_then_callsCloseConnectionInStrategy) {
     MockServerCommunicatorStrategy mockStrategy;
-    ServerCommunicator serverCommunicator(&mockStrategy,
-                                          ignoreHandleGetAllParameterNames(),
-                                          ignoreHandleGetParameterValue(),
-                                          ignoreHandleCalibration(),
-                                          ignoreHandleClearCalibration()
-    );
+    ServerRequestHandlingCallBacks handlingCallBacks =
+            ServerCommunicator::RequestCallBackStore::createCallBacks(
+                    ignoreHandleGetAllParameterNames(),
+                    ignoreHandleGetParameterValue(),
+                    ignoreHandleCalibration(),
+                    ignoreHandleClearCalibration()
+
+            );
+    ServerCommunicator serverCommunicator(&mockStrategy, &handlingCallBacks);
 
     serverCommunicator.terminateAndJoin();
 
@@ -324,12 +347,15 @@ TEST_F(ServerCommunicatorTest,
     ThrowingServerCommunicationStrategy throwingMockStrategy;
     throwingMockStrategy.throwCloseConnectionRequiredErrorWhenOpenConnectionIsCalled();
 
-    ServerCommunicator serverCommunicator(&throwingMockStrategy,
-                                          ignoreHandleGetAllParameterNames(),
-                                          ignoreHandleGetParameterValue(),
-                                          ignoreHandleCalibration(),
-                                          ignoreHandleClearCalibration()
-    );
+    ServerRequestHandlingCallBacks handlingCallBacks =
+            ServerCommunicator::RequestCallBackStore::createCallBacks(
+                    ignoreHandleGetAllParameterNames(),
+                    ignoreHandleGetParameterValue(),
+                    ignoreHandleCalibration(),
+                    ignoreHandleClearCalibration()
+
+            );
+    ServerCommunicator serverCommunicator(&throwingMockStrategy, &handlingCallBacks);
     serverCommunicator.openConnection(SERVER_ADDRESS);
     throwingMockStrategy.waitUntilCloseConnectionCallIsMadeAfterErrorIsThrown();
 
@@ -344,12 +370,15 @@ TEST_F(ServerCommunicatorTest,
     ThrowingServerCommunicationStrategy throwingMockStrategy;
     throwingMockStrategy.throwOpenConnectionRequiredErrorWhenOpenConnectionIsCalled();
 
-    ServerCommunicator serverCommunicator(&throwingMockStrategy,
-                                          ignoreHandleGetAllParameterNames(),
-                                          ignoreHandleGetParameterValue(),
-                                          ignoreHandleCalibration(),
-                                          ignoreHandleClearCalibration()
-    );
+    ServerRequestHandlingCallBacks handlingCallBacks =
+            ServerCommunicator::RequestCallBackStore::createCallBacks(
+                    ignoreHandleGetAllParameterNames(),
+                    ignoreHandleGetParameterValue(),
+                    ignoreHandleCalibration(),
+                    ignoreHandleClearCalibration()
+
+            );
+    ServerCommunicator serverCommunicator(&throwingMockStrategy, &handlingCallBacks);
     serverCommunicator.openConnection(SERVER_ADDRESS);
     throwingMockStrategy.waitUntilOpenConnectionCallIsMadeAfterErrorIsThrown();
 
@@ -364,12 +393,15 @@ TEST_F(ServerCommunicatorTest,
     ThrowingServerCommunicationStrategy throwingMockStrategy;
     throwingMockStrategy.throwCloseConnectionRequiredErrorWhenCloseConnectionIsCalled();
 
-    ServerCommunicator serverCommunicator(&throwingMockStrategy,
-                                          ignoreHandleGetAllParameterNames(),
-                                          ignoreHandleGetParameterValue(),
-                                          ignoreHandleCalibration(),
-                                          ignoreHandleClearCalibration()
-    );
+    ServerRequestHandlingCallBacks handlingCallBacks =
+            ServerCommunicator::RequestCallBackStore::createCallBacks(
+                    ignoreHandleGetAllParameterNames(),
+                    ignoreHandleGetParameterValue(),
+                    ignoreHandleCalibration(),
+                    ignoreHandleClearCalibration()
+
+            );
+    ServerCommunicator serverCommunicator(&throwingMockStrategy, &handlingCallBacks);
     serverCommunicator.terminateAndJoin();
     throwingMockStrategy.waitUntilCloseConnectionCallIsMadeAfterErrorIsThrown();
 
@@ -383,12 +415,15 @@ TEST_F(ServerCommunicatorTest,
     ThrowingServerCommunicationStrategy throwingMockStrategy;
     throwingMockStrategy.throwOpenConnectionRequiredErrorWhenCloseConnectionIsCalled();
 
-    ServerCommunicator serverCommunicator(&throwingMockStrategy,
-                                          ignoreHandleGetAllParameterNames(),
-                                          ignoreHandleGetParameterValue(),
-                                          ignoreHandleCalibration(),
-                                          ignoreHandleClearCalibration()
-    );
+    ServerRequestHandlingCallBacks handlingCallBacks =
+            ServerCommunicator::RequestCallBackStore::createCallBacks(
+                    ignoreHandleGetAllParameterNames(),
+                    ignoreHandleGetParameterValue(),
+                    ignoreHandleCalibration(),
+                    ignoreHandleClearCalibration()
+
+            );
+    ServerCommunicator serverCommunicator(&throwingMockStrategy, &handlingCallBacks);
     serverCommunicator.terminateAndJoin();
     throwingMockStrategy.waitUntilOpenConnectionCallIsMadeAfterErrorIsThrown();
 
@@ -402,12 +437,15 @@ TEST_F(ServerCommunicatorTest,
     ThrowingServerCommunicationStrategy throwingMockStrategy;
     throwingMockStrategy.throwCloseConnectionRequiredErrorWhenSendMessageIsCalled();
 
-    ServerCommunicator serverCommunicator(&throwingMockStrategy,
-                                          ignoreHandleGetAllParameterNames(),
-                                          ignoreHandleGetParameterValue(),
-                                          ignoreHandleCalibration(),
-                                          ignoreHandleClearCalibration()
-    );
+    ServerRequestHandlingCallBacks handlingCallBacks =
+            ServerCommunicator::RequestCallBackStore::createCallBacks(
+                    ignoreHandleGetAllParameterNames(),
+                    ignoreHandleGetParameterValue(),
+                    ignoreHandleCalibration(),
+                    ignoreHandleClearCalibration()
+
+            );
+    ServerCommunicator serverCommunicator(&throwingMockStrategy, &handlingCallBacks);
     auto message = DataTestUtil::createRandomSimpleMessageWithEmptyTimestamps();
     serverCommunicator.consume(std::move(message));
     throwingMockStrategy.waitUntilCloseConnectionCallIsMadeAfterErrorIsThrown();
@@ -422,12 +460,15 @@ TEST_F(ServerCommunicatorTest,
     ThrowingServerCommunicationStrategy throwingMockStrategy;
     throwingMockStrategy.throwOpenConnectionRequiredErrorWhenSendMessageIsCalled();
 
-    ServerCommunicator serverCommunicator(&throwingMockStrategy,
-                                          ignoreHandleGetAllParameterNames(),
-                                          ignoreHandleGetParameterValue(),
-                                          ignoreHandleCalibration(),
-                                          ignoreHandleClearCalibration()
-    );
+    ServerRequestHandlingCallBacks handlingCallBacks =
+            ServerCommunicator::RequestCallBackStore::createCallBacks(
+                    ignoreHandleGetAllParameterNames(),
+                    ignoreHandleGetParameterValue(),
+                    ignoreHandleCalibration(),
+                    ignoreHandleClearCalibration()
+
+            );
+    ServerCommunicator serverCommunicator(&throwingMockStrategy, &handlingCallBacks);
     auto message = DataTestUtil::createRandomSimpleMessageWithEmptyTimestamps();
     serverCommunicator.consume(std::move(message));
     throwingMockStrategy.waitUntilOpenConnectionCallIsMadeAfterErrorIsThrown();
@@ -442,12 +483,15 @@ TEST_F(ServerCommunicatorTest,
     ThrowingServerCommunicationStrategy throwingMockStrategy;
     throwingMockStrategy.throwCloseConnectionRequiredErrorWhenSendRawDataIsCalled();
 
-    ServerCommunicator serverCommunicator(&throwingMockStrategy,
-                                          ignoreHandleGetAllParameterNames(),
-                                          ignoreHandleGetParameterValue(),
-                                          ignoreHandleCalibration(),
-                                          ignoreHandleClearCalibration()
-    );
+    ServerRequestHandlingCallBacks handlingCallBacks =
+            ServerCommunicator::RequestCallBackStore::createCallBacks(
+                    ignoreHandleGetAllParameterNames(),
+                    ignoreHandleGetParameterValue(),
+                    ignoreHandleCalibration(),
+                    ignoreHandleClearCalibration()
+
+            );
+    ServerCommunicator serverCommunicator(&throwingMockStrategy, &handlingCallBacks);
     auto rawData = DataTestUtil::createRandomSimpleRawData();
     serverCommunicator.consume(std::move(rawData));
     throwingMockStrategy.waitUntilCloseConnectionCallIsMadeAfterErrorIsThrown();
@@ -462,12 +506,15 @@ TEST_F(ServerCommunicatorTest,
     ThrowingServerCommunicationStrategy throwingMockStrategy;
     throwingMockStrategy.throwOpenConnectionRequiredErrorWhenSendRawDataIsCalled();
 
-    ServerCommunicator serverCommunicator(&throwingMockStrategy,
-                                          ignoreHandleGetAllParameterNames(),
-                                          ignoreHandleGetParameterValue(),
-                                          ignoreHandleCalibration(),
-                                          ignoreHandleClearCalibration()
-    );
+    ServerRequestHandlingCallBacks handlingCallBacks =
+            ServerCommunicator::RequestCallBackStore::createCallBacks(
+                    ignoreHandleGetAllParameterNames(),
+                    ignoreHandleGetParameterValue(),
+                    ignoreHandleCalibration(),
+                    ignoreHandleClearCalibration()
+
+            );
+    ServerCommunicator serverCommunicator(&throwingMockStrategy, &handlingCallBacks);
     auto rawData = DataTestUtil::createRandomSimpleRawData();
     serverCommunicator.consume(std::move(rawData));
     throwingMockStrategy.waitUntilOpenConnectionCallIsMadeAfterErrorIsThrown();
@@ -478,9 +525,27 @@ TEST_F(ServerCommunicatorTest,
 }
 
 TEST_F(ServerCommunicatorTest,
+       given_anErrorThatRequiresToCloseThrownOnSendAllParameterMetadataResponseCall_when_isCaught_then_callsCloseConnectionInStrategy) {
+    ThrowingServerCommunicationStrategy throwingMockStrategy;
+    throwingMockStrategy.throwCloseConnectionRequiredErrorWhenSendAllParameterMetadataResponseIsCalled();
+    auto response = Given::anAllParameterMetadataResponse<ParameterListForThisTestCase>();
+
+    ASSERT_TRUE(closeConnectionIsCalledAfterStrategyThrowsOnSendResponse(&throwingMockStrategy, std::move(response)));
+}
+
+TEST_F(ServerCommunicatorTest,
+       given_anErrorThatRequiresToOpenThrownOnSendAllParameterMetadataResponseCall_when_isCaught_then_callsOpenConnectionInStrategy) {
+    ThrowingServerCommunicationStrategy throwingMockStrategy;
+    throwingMockStrategy.throwOpenConnectionRequiredErrorWhenSendAllParameterMetadataResponseIsCalled();
+    auto response = Given::anAllParameterMetadataResponse<ParameterListForThisTestCase>();
+
+    ASSERT_TRUE(openConnectionIsCalledAfterStrategyThrowsOnSendResponse(&throwingMockStrategy, std::move(response)));
+}
+
+TEST_F(ServerCommunicatorTest,
        given_anErrorThatRequiresToCloseThrownOnSendUnsignedIntegerParameterResponseCall_when_isCaught_then_callsCloseConnectionInStrategy) {
     ThrowingServerCommunicationStrategy throwingMockStrategy;
-    throwingMockStrategy.throwCloseConnectionRequiredErrorWhenSendUnsignedIntegerParameterResponseIsCalled();
+    throwingMockStrategy.throwCloseConnectionRequiredErrorWhenSendUnsignedIntegerParameterValueResponseIsCalled();
     auto response = Given::anUnsignedIntegerParameterValueResponse(1u);
 
     ASSERT_TRUE(closeConnectionIsCalledAfterStrategyThrowsOnSendResponse(&throwingMockStrategy, std::move(response)));
@@ -489,7 +554,7 @@ TEST_F(ServerCommunicatorTest,
 TEST_F(ServerCommunicatorTest,
        given_anErrorThatRequiresToOpenThrownOnSendUnsignedIntegerParameterResponseCall_when_isCaught_then_callsOpenConnectionInStrategy) {
     ThrowingServerCommunicationStrategy throwingMockStrategy;
-    throwingMockStrategy.throwOpenConnectionRequiredErrorWhenSendUnsignedIntegerParameterResponseIsCalled();
+    throwingMockStrategy.throwOpenConnectionRequiredErrorWhenSendUnsignedIntegerParameterValueResponseIsCalled();
     auto response = Given::anUnsignedIntegerParameterValueResponse(16u);
 
     ASSERT_TRUE(openConnectionIsCalledAfterStrategyThrowsOnSendResponse(&throwingMockStrategy, std::move(response)));
@@ -568,6 +633,24 @@ TEST_F(ServerCommunicatorTest,
 }
 
 TEST_F(ServerCommunicatorTest,
+       given_anErrorThatRequiresToCloseThrownOnSendSuccessMessageResponseCall_when_isCaught_then_callsCloseConnectionInStrategy) {
+    ThrowingServerCommunicationStrategy throwingMockStrategy;
+    throwingMockStrategy.throwCloseConnectionRequiredErrorWhenSendSuccessMessageResponseIsCalled();
+    auto response = givenASuccessMessageResponse();
+
+    ASSERT_TRUE(closeConnectionIsCalledAfterStrategyThrowsOnSendResponse(&throwingMockStrategy, std::move(response)));
+}
+
+TEST_F(ServerCommunicatorTest,
+       given_anErrorThatRequiresToOpenThrownOnSendSuccessMessageResponseCall_when_isCaught_then_callsOpenConnectionInStrategy) {
+    ThrowingServerCommunicationStrategy throwingMockStrategy;
+    throwingMockStrategy.throwOpenConnectionRequiredErrorWhenSendSuccessMessageResponseIsCalled();
+    auto response = givenASuccessMessageResponse();
+
+    ASSERT_TRUE(openConnectionIsCalledAfterStrategyThrowsOnSendResponse(&throwingMockStrategy, std::move(response)));
+}
+
+TEST_F(ServerCommunicatorTest,
        given_anErrorThatRequiresToCloseThrownOnSendErrorMessageResponseCall_when_isCaught_then_callsCloseConnectionInStrategy) {
     ThrowingServerCommunicationStrategy throwingMockStrategy;
     throwingMockStrategy.throwCloseConnectionRequiredErrorWhenSendErrorMessageResponseIsCalled();
@@ -596,12 +679,15 @@ TEST_F(ServerCommunicatorTest,
     auto numberOfErrorToReceive = 1;
     ErrorSinkMock sink(numberOfErrorToReceive);
     ErrorProcessingScheduler scheduler(&sink);
-    ServerCommunicator serverCommunicator(&throwingMockStrategy,
-                                          ignoreHandleGetAllParameterNames(),
-                                          ignoreHandleGetParameterValue(),
-                                          ignoreHandleCalibration(),
-                                          ignoreHandleClearCalibration()
-    );
+    ServerRequestHandlingCallBacks handlingCallBacks =
+            ServerCommunicator::RequestCallBackStore::createCallBacks(
+                    ignoreHandleGetAllParameterNames(),
+                    ignoreHandleGetParameterValue(),
+                    ignoreHandleCalibration(),
+                    ignoreHandleClearCalibration()
+
+            );
+    ServerCommunicator serverCommunicator(&throwingMockStrategy, &handlingCallBacks);
 
     serverCommunicator.linkConsumer(&scheduler);
 
@@ -623,12 +709,15 @@ TEST_F(ServerCommunicatorTest,
     auto numberOfErrorToReceive = 1;
     ErrorSinkMock sink(numberOfErrorToReceive);
     ErrorProcessingScheduler scheduler(&sink);
-    ServerCommunicator serverCommunicator(&throwingMockStrategy,
-                                          ignoreHandleGetAllParameterNames(),
-                                          ignoreHandleGetParameterValue(),
-                                          ignoreHandleCalibration(),
-                                          ignoreHandleClearCalibration()
-    );
+    ServerRequestHandlingCallBacks handlingCallBacks =
+            ServerCommunicator::RequestCallBackStore::createCallBacks(
+                    ignoreHandleGetAllParameterNames(),
+                    ignoreHandleGetParameterValue(),
+                    ignoreHandleCalibration(),
+                    ignoreHandleClearCalibration()
+
+            );
+    ServerCommunicator serverCommunicator(&throwingMockStrategy, &handlingCallBacks);
 
     serverCommunicator.linkConsumer(&scheduler);
 
@@ -650,12 +739,15 @@ TEST_F(ServerCommunicatorTest,
     auto numberOfErrorToReceive = 1;
     ErrorSinkMock sink(numberOfErrorToReceive);
     ErrorProcessingScheduler scheduler(&sink);
-    ServerCommunicator serverCommunicator(&throwingMockStrategy,
-                                          ignoreHandleGetAllParameterNames(),
-                                          ignoreHandleGetParameterValue(),
-                                          ignoreHandleCalibration(),
-                                          ignoreHandleClearCalibration()
-    );
+    ServerRequestHandlingCallBacks handlingCallBacks =
+            ServerCommunicator::RequestCallBackStore::createCallBacks(
+                    ignoreHandleGetAllParameterNames(),
+                    ignoreHandleGetParameterValue(),
+                    ignoreHandleCalibration(),
+                    ignoreHandleClearCalibration()
+
+            );
+    ServerCommunicator serverCommunicator(&throwingMockStrategy, &handlingCallBacks );
 
     serverCommunicator.linkConsumer(&scheduler);
 
@@ -678,12 +770,15 @@ TEST_F(ServerCommunicatorTest,
     auto numberOfErrorToReceive = 1;
     ErrorSinkMock sink(numberOfErrorToReceive);
     ErrorProcessingScheduler scheduler(&sink);
-    ServerCommunicator serverCommunicator(&throwingMockStrategy,
-                                          ignoreHandleGetAllParameterNames(),
-                                          ignoreHandleGetParameterValue(),
-                                          ignoreHandleCalibration(),
-                                          ignoreHandleClearCalibration()
-    );
+    ServerRequestHandlingCallBacks handlingCallBacks =
+            ServerCommunicator::RequestCallBackStore::createCallBacks(
+                    ignoreHandleGetAllParameterNames(),
+                    ignoreHandleGetParameterValue(),
+                    ignoreHandleCalibration(),
+                    ignoreHandleClearCalibration()
+
+            );
+    ServerCommunicator serverCommunicator(&throwingMockStrategy, &handlingCallBacks );
 
     serverCommunicator.linkConsumer(&scheduler);
 
@@ -706,12 +801,15 @@ TEST_F(ServerCommunicatorTest,
     auto numberOfErrorToReceive = 1;
     ErrorSinkMock sink(numberOfErrorToReceive);
     ErrorProcessingScheduler scheduler(&sink);
-    ServerCommunicator serverCommunicator(&throwingMockStrategy,
-                                          ignoreHandleGetAllParameterNames(),
-                                          ignoreHandleGetParameterValue(),
-                                          ignoreHandleCalibration(),
-                                          ignoreHandleClearCalibration()
-    );
+    ServerRequestHandlingCallBacks handlingCallBacks =
+            ServerCommunicator::RequestCallBackStore::createCallBacks(
+                    ignoreHandleGetAllParameterNames(),
+                    ignoreHandleGetParameterValue(),
+                    ignoreHandleCalibration(),
+                    ignoreHandleClearCalibration()
+
+            );
+    ServerCommunicator serverCommunicator(&throwingMockStrategy, &handlingCallBacks );
 
     serverCommunicator.linkConsumer(&scheduler);
 
@@ -726,12 +824,15 @@ TEST_F(ServerCommunicatorTest,
 
 TEST_F(ServerCommunicatorTest, given__when_isServerConnected_then_returnFalse) {
     MockServerCommunicatorStrategy mockStrategy;
-    ServerCommunicator serverCommunicator(&mockStrategy,
-                                          ignoreHandleGetAllParameterNames(),
-                                          ignoreHandleGetParameterValue(),
-                                          ignoreHandleCalibration(),
-                                          ignoreHandleClearCalibration()
-    );
+    ServerRequestHandlingCallBacks handlingCallBacks =
+            ServerCommunicator::RequestCallBackStore::createCallBacks(
+                    ignoreHandleGetAllParameterNames(),
+                    ignoreHandleGetParameterValue(),
+                    ignoreHandleCalibration(),
+                    ignoreHandleClearCalibration()
+
+            );
+    ServerCommunicator serverCommunicator(&mockStrategy, &handlingCallBacks );
 
     auto serverConnected = serverCommunicator.isServerConnected();
 
@@ -741,19 +842,23 @@ TEST_F(ServerCommunicatorTest, given__when_isServerConnected_then_returnFalse) {
 TEST_F(ServerCommunicatorTest,
        given_aConnectedServer_when_isServerConnected_then_returnTrueAfterStrategyHasBeenCalled) {
     MockServerCommunicatorStrategy mockStrategy;
-    ServerCommunicator serverCommunicator(&mockStrategy,
-                                          ignoreHandleGetAllParameterNames(),
-                                          ignoreHandleGetParameterValue(),
-                                          ignoreHandleCalibration(),
-                                          ignoreHandleClearCalibration()
-    );
+    ServerRequestHandlingCallBacks handlingCallBacks =
+            ServerCommunicator::RequestCallBackStore::createCallBacks(
+                    ignoreHandleGetAllParameterNames(),
+                    ignoreHandleGetParameterValue(),
+                    ignoreHandleCalibration(),
+                    ignoreHandleClearCalibration()
+
+            );
+    ServerCommunicator serverCommunicator(&mockStrategy, &handlingCallBacks );
 
     serverCommunicator.openConnection(SERVER_ADDRESS);
 
     bool strategyHasBeenCalled = false;
     do {
         strategyHasBeenCalled = mockStrategy.hasOpenConnectionBeenCalled();
-    } while (!strategyHasBeenCalled);
+    }
+    while (!strategyHasBeenCalled);
 
     auto serverConnected = serverCommunicator.isServerConnected();
     serverCommunicator.terminateAndJoin();
@@ -763,12 +868,15 @@ TEST_F(ServerCommunicatorTest,
 
 TEST_F(ServerCommunicatorTest, given_anOpennedConnection_when_terminateAndJoin_then_serverIsNoLonguerConnected) {
     MockServerCommunicatorStrategy mockStrategy;
-    ServerCommunicator serverCommunicator(&mockStrategy,
-                                          ignoreHandleGetAllParameterNames(),
-                                          ignoreHandleGetParameterValue(),
-                                          ignoreHandleCalibration(),
-                                          ignoreHandleClearCalibration()
-    );
+    ServerRequestHandlingCallBacks handlingCallBacks =
+            ServerCommunicator::RequestCallBackStore::createCallBacks(
+                    ignoreHandleGetAllParameterNames(),
+                    ignoreHandleGetParameterValue(),
+                    ignoreHandleCalibration(),
+                    ignoreHandleClearCalibration()
+
+            );
+    ServerCommunicator serverCommunicator(&mockStrategy, &handlingCallBacks );
 
     serverCommunicator.openConnection(SERVER_ADDRESS);
     serverCommunicator.terminateAndJoin();
@@ -784,12 +892,15 @@ TEST_F(ServerCommunicatorTest,
     ThrowingServerCommunicationStrategy throwingMockStrategy;
     throwingMockStrategy.throwOpenConnectionRequiredErrorWhenOpenConnectionIsCalled();
 
-    ServerCommunicator serverCommunicator(&throwingMockStrategy,
-                                          ignoreHandleGetAllParameterNames(),
-                                          ignoreHandleGetParameterValue(),
-                                          ignoreHandleCalibration(),
-                                          ignoreHandleClearCalibration()
-    );
+    ServerRequestHandlingCallBacks handlingCallBacks =
+            ServerCommunicator::RequestCallBackStore::createCallBacks(
+                    ignoreHandleGetAllParameterNames(),
+                    ignoreHandleGetParameterValue(),
+                    ignoreHandleCalibration(),
+                    ignoreHandleClearCalibration()
+
+            );
+    ServerCommunicator serverCommunicator(&throwingMockStrategy, &handlingCallBacks );
     serverCommunicator.openConnection(SERVER_ADDRESS);
     throwingMockStrategy.waitUntilOpenConnectionCallIsMadeAfterErrorIsThrown();
 
@@ -807,12 +918,15 @@ TEST_F(ServerCommunicatorTest,
     mockRequestHandler.setExpectedNumberOfGetAllParameterNamesRequest(expectedNumberOfRequest);
     RequestResponseServerCommunicationStrategy requestResponseStrategy;
     requestResponseStrategy.onHasReceivedGetAllParameterNamesRequestReturn(false);
-    ServerCommunicator serverCommunicator(&requestResponseStrategy,
-                                          bindHandlerGetAllParameterNamesTo(&mockRequestHandler),
-                                          ignoreHandleGetParameterValue(),
-                                          ignoreHandleCalibration(),
-                                          ignoreHandleClearCalibration()
-    );
+    ServerRequestHandlingCallBacks handlingCallBacks =
+            ServerCommunicator::RequestCallBackStore::createCallBacks(
+                    bindHandlerGetAllParameterNamesTo(&mockRequestHandler),
+                    ignoreHandleGetParameterValue(),
+                    ignoreHandleCalibration(),
+                    ignoreHandleClearCalibration()
+
+            );
+    ServerCommunicator serverCommunicator(&requestResponseStrategy, &handlingCallBacks );
 
     serverCommunicator.openConnection(SERVER_ADDRESS);
     sleepForTenthOfASecond();
@@ -831,12 +945,15 @@ TEST_F(ServerCommunicatorTest,
     mockRequestHandler.setExpectedNumberOfGetAllParameterNamesRequest(expectedNumberOfRequest);
     RequestResponseServerCommunicationStrategy requestResponseStrategy;
     requestResponseStrategy.onHasReceivedGetAllParameterNamesRequestReturn(true);
-    ServerCommunicator serverCommunicator(&requestResponseStrategy,
-                                          bindHandlerGetAllParameterNamesTo(&mockRequestHandler),
-                                          ignoreHandleGetParameterValue(),
-                                          ignoreHandleCalibration(),
-                                          ignoreHandleClearCalibration()
-    );
+    ServerRequestHandlingCallBacks handlingCallBacks =
+            ServerCommunicator::RequestCallBackStore::createCallBacks(
+                    bindHandlerGetAllParameterNamesTo(&mockRequestHandler),
+                    ignoreHandleGetParameterValue(),
+                    ignoreHandleCalibration(),
+                    ignoreHandleClearCalibration()
+
+            );
+    ServerCommunicator serverCommunicator(&requestResponseStrategy, &handlingCallBacks );
 
     serverCommunicator.openConnection(SERVER_ADDRESS);
     mockRequestHandler.waitForExpectedNumberOfGetAllParameterNamesRequest();
@@ -850,12 +967,15 @@ TEST_F(ServerCommunicatorTest,
 TEST_F(ServerCommunicatorTest,
        given_aConnectedServer_when_openConnection_then_callsFetchGetParameterValueContentsInStrategy) {
     MockServerCommunicatorStrategy mockStrategy;
-    ServerCommunicator serverCommunicator(&mockStrategy,
-                                          ignoreHandleGetAllParameterNames(),
-                                          ignoreHandleGetParameterValue(),
-                                          ignoreHandleCalibration(),
-                                          ignoreHandleClearCalibration()
-    );
+    ServerRequestHandlingCallBacks handlingCallBacks =
+            ServerCommunicator::RequestCallBackStore::createCallBacks(
+                    ignoreHandleGetAllParameterNames(),
+                    ignoreHandleGetParameterValue(),
+                    ignoreHandleCalibration(),
+                    ignoreHandleClearCalibration()
+
+            );
+    ServerCommunicator serverCommunicator(&mockStrategy, &handlingCallBacks );
 
     serverCommunicator.openConnection(SERVER_ADDRESS);
 
@@ -877,12 +997,15 @@ TEST_F(ServerCommunicatorTest,
     auto numberOfErrorToReceive = 1;
     ErrorSinkMock sink(numberOfErrorToReceive);
     ErrorProcessingScheduler scheduler(&sink);
-    ServerCommunicator serverCommunicator(&throwingMockStrategy,
-                                          ignoreHandleGetAllParameterNames(),
-                                          ignoreHandleGetParameterValue(),
-                                          ignoreHandleCalibration(),
-                                          ignoreHandleClearCalibration()
-    );
+    ServerRequestHandlingCallBacks handlingCallBacks =
+            ServerCommunicator::RequestCallBackStore::createCallBacks(
+                    ignoreHandleGetAllParameterNames(),
+                    ignoreHandleGetParameterValue(),
+                    ignoreHandleCalibration(),
+                    ignoreHandleClearCalibration()
+
+            );
+    ServerCommunicator serverCommunicator(&throwingMockStrategy, &handlingCallBacks );
 
     serverCommunicator.linkConsumer(&scheduler);
 
@@ -903,12 +1026,15 @@ TEST_F(ServerCommunicatorTest,
     mockRequestHandler.setExpectedNumberOfGetParameterValueRequest(expectedNumberOfRequest);
     RequestResponseServerCommunicationStrategy requestResponseStrategy;
     requestResponseStrategy.increaseNumberOfUniqueValidGetParameterValueContentsToReturnBy(expectedNumberOfRequest);
-    ServerCommunicator serverCommunicator(&requestResponseStrategy,
-                                          ignoreHandleGetAllParameterNames(),
-                                          bindHandlerGetParameterValueTo(&mockRequestHandler),
-                                          ignoreHandleCalibration(),
-                                          ignoreHandleClearCalibration()
-    );
+    ServerRequestHandlingCallBacks handlingCallBacks =
+            ServerCommunicator::RequestCallBackStore::createCallBacks(
+                    ignoreHandleGetAllParameterNames(),
+                    bindHandlerGetParameterValueTo(&mockRequestHandler),
+                    ignoreHandleCalibration(),
+                    ignoreHandleClearCalibration()
+
+            );
+    ServerCommunicator serverCommunicator(&requestResponseStrategy, &handlingCallBacks );
 
     assertRequestHandlerReceivesExpectedNumberOfValidRequestsWithStrategy(&mockRequestHandler,
                                                                           &serverCommunicator);
@@ -924,12 +1050,15 @@ TEST_F(ServerCommunicatorTest,
     RequestResponseServerCommunicationStrategy requestResponseStrategy;
     requestResponseStrategy.increaseNumberOfUniqueValidGetParameterValueContentsToReturnBy(expectedNumberOfRequest);
 
-    ServerCommunicator serverCommunicator(&requestResponseStrategy,
-                                          ignoreHandleGetAllParameterNames(),
-                                          bindHandlerGetParameterValueTo(&mockRequestHandler),
-                                          ignoreHandleCalibration(),
-                                          ignoreHandleClearCalibration()
-    );
+    ServerRequestHandlingCallBacks handlingCallBacks =
+            ServerCommunicator::RequestCallBackStore::createCallBacks(
+                    ignoreHandleGetAllParameterNames(),
+                    bindHandlerGetParameterValueTo(&mockRequestHandler),
+                    ignoreHandleCalibration(),
+                    ignoreHandleClearCalibration()
+
+            );
+    ServerCommunicator serverCommunicator(&requestResponseStrategy, &handlingCallBacks );
 
     assertRequestHandlerReceivesExpectedNumberOfValidRequestsWithStrategy(&mockRequestHandler,
                                                                           &serverCommunicator);
@@ -949,12 +1078,15 @@ TEST_F(ServerCommunicatorTest,
     requestResponseStrategy.increaseNumberOfUniqueValidGetParameterValueContentsToReturnBy(numberOfUniqueRequest);
     requestResponseStrategy.increaseNumberOfDuplicateValidGetParameterValueContentsToReturnBy(numberOfDuplicateRequest);
 
-    ServerCommunicator serverCommunicator(&requestResponseStrategy,
-                                          ignoreHandleGetAllParameterNames(),
-                                          bindHandlerGetParameterValueTo(&mockRequestHandler),
-                                          ignoreHandleCalibration(),
-                                          ignoreHandleClearCalibration()
-    );
+    ServerRequestHandlingCallBacks handlingCallBacks =
+            ServerCommunicator::RequestCallBackStore::createCallBacks(
+                    ignoreHandleGetAllParameterNames(),
+                    bindHandlerGetParameterValueTo(&mockRequestHandler),
+                    ignoreHandleCalibration(),
+                    ignoreHandleClearCalibration()
+
+            );
+    ServerCommunicator serverCommunicator(&requestResponseStrategy, &handlingCallBacks );
 
     assertRequestHandlerReceivesExpectedNumberOfValidRequestsWithStrategy(&mockRequestHandler,
                                                                           &serverCommunicator);
@@ -974,14 +1106,38 @@ TEST_F(ServerCommunicatorTest,
 }
 
 TEST_F(ServerCommunicatorTest,
+       given_anAllParameterMetadataResponse_when_sendResponse_then_asksTheStrategyToSendTheUnsignedIntegerParameterResponse) {
+    MockServerCommunicatorStrategy mockStrategy;
+    ServerRequestHandlingCallBacks handlingCallBacks =
+            ServerCommunicator::RequestCallBackStore::createCallBacks(
+                    ignoreHandleGetAllParameterNames(),
+                    ignoreHandleGetParameterValue(),
+                    ignoreHandleCalibration(),
+                    ignoreHandleClearCalibration()
+
+            );
+    ServerCommunicator serverCommunicator(&mockStrategy, &handlingCallBacks );
+    auto response = Given::anAllParameterMetadataResponse<ParameterListForThisTestCase>();
+    auto responseCopy = decltype(Given::anAllParameterMetadataResponse<ParameterListForThisTestCase>())(response);
+
+    serverCommunicator.sendResponse(std::move(response));
+
+    auto strategyHasBeenCalled = mockStrategy.hasSendResponseAllParameterMetadataBeenCalledWith(responseCopy);
+    ASSERT_TRUE(strategyHasBeenCalled);
+}
+
+TEST_F(ServerCommunicatorTest,
        given_anUnsignedIntegerParameterValueResponse_when_sendResponse_then_asksTheStrategyToSendTheUnsignedIntegerParameterResponse) {
     MockServerCommunicatorStrategy mockStrategy;
-    ServerCommunicator serverCommunicator(&mockStrategy,
-                                          ignoreHandleGetAllParameterNames(),
-                                          ignoreHandleGetParameterValue(),
-                                          ignoreHandleCalibration(),
-                                          ignoreHandleClearCalibration()
-    );
+    ServerRequestHandlingCallBacks handlingCallBacks =
+            ServerCommunicator::RequestCallBackStore::createCallBacks(
+                    ignoreHandleGetAllParameterNames(),
+                    ignoreHandleGetParameterValue(),
+                    ignoreHandleCalibration(),
+                    ignoreHandleClearCalibration()
+
+            );
+    ServerCommunicator serverCommunicator(&mockStrategy, &handlingCallBacks );
     auto response = Given::anUnsignedIntegerParameterValueResponse(true);
     auto responseCopy = decltype(Given::anUnsignedIntegerParameterValueResponse(true))(response);
 
@@ -994,12 +1150,15 @@ TEST_F(ServerCommunicatorTest,
 TEST_F(ServerCommunicatorTest,
        given_aSignedIntegerParameterValueResponse_when_sendResponse_then_asksTheStrategyToSendTheSignedIntegerParameterResponse) {
     MockServerCommunicatorStrategy mockStrategy;
-    ServerCommunicator serverCommunicator(&mockStrategy,
-                                          ignoreHandleGetAllParameterNames(),
-                                          ignoreHandleGetParameterValue(),
-                                          ignoreHandleCalibration(),
-                                          ignoreHandleClearCalibration()
-    );
+    ServerRequestHandlingCallBacks handlingCallBacks =
+            ServerCommunicator::RequestCallBackStore::createCallBacks(
+                    ignoreHandleGetAllParameterNames(),
+                    ignoreHandleGetParameterValue(),
+                    ignoreHandleCalibration(),
+                    ignoreHandleClearCalibration()
+
+            );
+    ServerCommunicator serverCommunicator(&mockStrategy, &handlingCallBacks );
     auto response = Given::aSignedIntegerParameterValueResponse(true);
     auto responseCopy = decltype(Given::aSignedIntegerParameterValueResponse(true))(response);
 
@@ -1012,12 +1171,15 @@ TEST_F(ServerCommunicatorTest,
 TEST_F(ServerCommunicatorTest,
        given_aRealNumberParameterValueResponse_when_sendResponse_then_asksTheStrategyToSendTheRealNumberParameterResponse) {
     MockServerCommunicatorStrategy mockStrategy;
-    ServerCommunicator serverCommunicator(&mockStrategy,
-                                          ignoreHandleGetAllParameterNames(),
-                                          ignoreHandleGetParameterValue(),
-                                          ignoreHandleCalibration(),
-                                          ignoreHandleClearCalibration()
-    );
+    ServerRequestHandlingCallBacks handlingCallBacks =
+            ServerCommunicator::RequestCallBackStore::createCallBacks(
+                    ignoreHandleGetAllParameterNames(),
+                    ignoreHandleGetParameterValue(),
+                    ignoreHandleCalibration(),
+                    ignoreHandleClearCalibration()
+
+            );
+    ServerCommunicator serverCommunicator(&mockStrategy, &handlingCallBacks );
     auto response = Given::aRealNumberParameterValueResponse(true);
     auto responseCopy = decltype(Given::aRealNumberParameterValueResponse(true))(response);
 
@@ -1030,12 +1192,15 @@ TEST_F(ServerCommunicatorTest,
 TEST_F(ServerCommunicatorTest,
        given_aBooleanParameterValueResponse_when_sendResponse_then_asksTheStrategyToSendTheBooleanParameterResponse) {
     MockServerCommunicatorStrategy mockStrategy;
-    ServerCommunicator serverCommunicator(&mockStrategy,
-                                          ignoreHandleGetAllParameterNames(),
-                                          ignoreHandleGetParameterValue(),
-                                          ignoreHandleCalibration(),
-                                          ignoreHandleClearCalibration()
-    );
+    ServerRequestHandlingCallBacks handlingCallBacks =
+            ServerCommunicator::RequestCallBackStore::createCallBacks(
+                    ignoreHandleGetAllParameterNames(),
+                    ignoreHandleGetParameterValue(),
+                    ignoreHandleCalibration(),
+                    ignoreHandleClearCalibration()
+
+            );
+    ServerCommunicator serverCommunicator(&mockStrategy, &handlingCallBacks );
     auto response = Given::aBooleanParameterValueResponse(true);
     auto responseCopy = decltype(Given::aBooleanParameterValueResponse(true))(response);
 
@@ -1048,12 +1213,15 @@ TEST_F(ServerCommunicatorTest,
 TEST_F(ServerCommunicatorTest,
        given_aParameterErrorResponse_when_sendResponse_then_asksTheStrategyToSendTheParameterErrorResponse) {
     MockServerCommunicatorStrategy mockStrategy;
-    ServerCommunicator serverCommunicator(&mockStrategy,
-                                          ignoreHandleGetAllParameterNames(),
-                                          ignoreHandleGetParameterValue(),
-                                          ignoreHandleCalibration(),
-                                          ignoreHandleClearCalibration()
-    );
+    ServerRequestHandlingCallBacks handlingCallBacks =
+            ServerCommunicator::RequestCallBackStore::createCallBacks(
+                    ignoreHandleGetAllParameterNames(),
+                    ignoreHandleGetParameterValue(),
+                    ignoreHandleCalibration(),
+                    ignoreHandleClearCalibration()
+
+            );
+    ServerCommunicator serverCommunicator(&mockStrategy, &handlingCallBacks );
     auto response = givenAParameterErrorResponse();
     auto responseCopy = decltype(givenAParameterErrorResponse())(response);
 
@@ -1064,14 +1232,38 @@ TEST_F(ServerCommunicatorTest,
 }
 
 TEST_F(ServerCommunicatorTest,
+       given_anSuccessMessageResponse_when_sendResponse_then_asksTheStrategyToSendTheSuccessMessageResponse) {
+    MockServerCommunicatorStrategy mockStrategy;
+    ServerRequestHandlingCallBacks handlingCallBacks =
+            ServerCommunicator::RequestCallBackStore::createCallBacks(
+                    ignoreHandleGetAllParameterNames(),
+                    ignoreHandleGetParameterValue(),
+                    ignoreHandleCalibration(),
+                    ignoreHandleClearCalibration()
+
+            );
+    ServerCommunicator serverCommunicator(&mockStrategy, &handlingCallBacks );
+    auto response = givenASuccessMessageResponse();
+    auto responseCopy = decltype(givenASuccessMessageResponse())(response);
+
+    serverCommunicator.sendResponse(std::move(response));
+
+    auto strategyHasBeenCalled = mockStrategy.hasSendSuccessMessageResponseBeenCalledWith(responseCopy);
+    ASSERT_TRUE(strategyHasBeenCalled);
+}
+
+TEST_F(ServerCommunicatorTest,
        given_anErrorMessageResponse_when_sendResponse_then_asksTheStrategyToSendTheErrorMessageResponse) {
     MockServerCommunicatorStrategy mockStrategy;
-    ServerCommunicator serverCommunicator(&mockStrategy,
-                                          ignoreHandleGetAllParameterNames(),
-                                          ignoreHandleGetParameterValue(),
-                                          ignoreHandleCalibration(),
-                                          ignoreHandleClearCalibration()
-    );
+    ServerRequestHandlingCallBacks handlingCallBacks =
+            ServerCommunicator::RequestCallBackStore::createCallBacks(
+                    ignoreHandleGetAllParameterNames(),
+                    ignoreHandleGetParameterValue(),
+                    ignoreHandleCalibration(),
+                    ignoreHandleClearCalibration()
+
+            );
+    ServerCommunicator serverCommunicator(&mockStrategy, &handlingCallBacks );
     auto response = givenAnErrorMessageResponse();
     auto responseCopy = decltype(givenAnErrorMessageResponse())(response);
 
@@ -1093,12 +1285,15 @@ TEST_F(ServerCommunicatorTest,
     mockRequestHandler.setExpectedNumberOfCalibrationRequest(expectedNumberOfRequest);
     RequestResponseServerCommunicationStrategy requestResponseStrategy;
     requestResponseStrategy.onHasReceivedCalibrationRequestReturn(false);
-    ServerCommunicator serverCommunicator(&requestResponseStrategy,
-                                          ignoreHandleGetAllParameterNames(),
-                                          ignoreHandleGetParameterValue(),
-                                          bindHandlerCalibrationTo(&mockRequestHandler),
-                                          ignoreHandleClearCalibration()
-    );
+    ServerRequestHandlingCallBacks handlingCallBacks =
+            ServerCommunicator::RequestCallBackStore::createCallBacks(
+                    ignoreHandleGetAllParameterNames(),
+                    ignoreHandleGetParameterValue(),
+                    bindHandlerCalibrationTo(&mockRequestHandler),
+                    ignoreHandleClearCalibration()
+
+            );
+    ServerCommunicator serverCommunicator(&requestResponseStrategy, &handlingCallBacks );
 
     serverCommunicator.openConnection(SERVER_ADDRESS);
     sleepForTenthOfASecond();
@@ -1117,12 +1312,15 @@ TEST_F(ServerCommunicatorTest,
     mockRequestHandler.setExpectedNumberOfCalibrationRequest(expectedNumberOfRequest);
     RequestResponseServerCommunicationStrategy requestResponseStrategy;
     requestResponseStrategy.onHasReceivedCalibrationRequestReturn(true);
-    ServerCommunicator serverCommunicator(&requestResponseStrategy,
-                                          ignoreHandleGetAllParameterNames(),
-                                          ignoreHandleGetParameterValue(),
-                                          bindHandlerCalibrationTo(&mockRequestHandler),
-                                          ignoreHandleClearCalibration()
-    );
+    ServerRequestHandlingCallBacks handlingCallBacks =
+            ServerCommunicator::RequestCallBackStore::createCallBacks(
+                    ignoreHandleGetAllParameterNames(),
+                    ignoreHandleGetParameterValue(),
+                    bindHandlerCalibrationTo(&mockRequestHandler),
+                    ignoreHandleClearCalibration()
+
+            );
+    ServerCommunicator serverCommunicator(&requestResponseStrategy, &handlingCallBacks );
 
     serverCommunicator.openConnection(SERVER_ADDRESS);
     mockRequestHandler.waitForExpectedNumberOfCalibrationRequest();
@@ -1141,12 +1339,15 @@ TEST_F(ServerCommunicatorTest,
     mockRequestHandler.setExpectedNumberOfClearCalibrationRequest(expectedNumberOfRequest);
     RequestResponseServerCommunicationStrategy requestResponseStrategy;
     requestResponseStrategy.onHasReceivedClearCalibrationRequestReturn(false);
-    ServerCommunicator serverCommunicator(&requestResponseStrategy,
-                                          ignoreHandleGetAllParameterNames(),
-                                          ignoreHandleGetParameterValue(),
-                                          ignoreHandleCalibration(),
-                                          bindHandlerClearCalibrationTo(&mockRequestHandler)
-    );
+    ServerRequestHandlingCallBacks handlingCallBacks =
+            ServerCommunicator::RequestCallBackStore::createCallBacks(
+                    ignoreHandleGetAllParameterNames(),
+                    ignoreHandleGetParameterValue(),
+                    ignoreHandleCalibration(),
+                    bindHandlerClearCalibrationTo(&mockRequestHandler)
+
+            );
+    ServerCommunicator serverCommunicator(&requestResponseStrategy, &handlingCallBacks );
 
     serverCommunicator.openConnection(SERVER_ADDRESS);
     sleepForTenthOfASecond();
@@ -1165,12 +1366,15 @@ TEST_F(ServerCommunicatorTest,
     mockRequestHandler.setExpectedNumberOfClearCalibrationRequest(expectedNumberOfRequest);
     RequestResponseServerCommunicationStrategy requestResponseStrategy;
     requestResponseStrategy.onHasReceivedClearCalibrationRequestReturn(true);
-    ServerCommunicator serverCommunicator(&requestResponseStrategy,
-                                          ignoreHandleGetAllParameterNames(),
-                                          ignoreHandleGetParameterValue(),
-                                          ignoreHandleCalibration(),
-                                          bindHandlerClearCalibrationTo(&mockRequestHandler)
-    );
+    ServerRequestHandlingCallBacks handlingCallBacks =
+            ServerCommunicator::RequestCallBackStore::createCallBacks(
+                    ignoreHandleGetAllParameterNames(),
+                    ignoreHandleGetParameterValue(),
+                    ignoreHandleCalibration(),
+                    bindHandlerClearCalibrationTo(&mockRequestHandler)
+
+            );
+    ServerCommunicator serverCommunicator(&requestResponseStrategy, &handlingCallBacks );
 
     serverCommunicator.openConnection(SERVER_ADDRESS);
     mockRequestHandler.waitForExpectedNumberOfClearCalibrationRequest();

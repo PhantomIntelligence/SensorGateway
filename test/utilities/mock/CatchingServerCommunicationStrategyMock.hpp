@@ -34,22 +34,26 @@ namespace Mock {
         using RawData = typename super::RawData;
         using RawDataCycles = std::list<RawData>;
 
-        using GetParameterValueContent = typename super::GetParameterValueContent;
-        using GetParameterValueContents = typename super::GetParameterValueContents;
-        using GetParameterValueContentList = std::list<GetParameterValueContent>;
+        using GetParameterValueContent = typename super::GetParameterValueContentBuffer::Content;
+        using GetParameterValueContents = typename super::GetParameterValueContentBuffer::Contents;
+        using GetParameterValueContentList = typename super::GetParameterValueContentBuffer::ContentList;
 
+        using AllParameterMetadataResponse = typename super::AllParameterMetadataResponse;
         using UnsignedIntegerParameterResponse = typename super::UnsignedIntegerParameterResponse;
         using SignedIntegerParameterResponse = typename super::SignedIntegerParameterResponse;
         using RealNumberParameterResponse = typename super::RealNumberParameterResponse;
         using BooleanParameterResponse = typename super::BooleanParameterResponse;
         using ParameterErrorResponse = typename super::ParameterErrorResponse;
+        using SuccessMessageResponse = typename super::SuccessMessageResponse;
         using ErrorMessageResponse = typename super::ErrorMessageResponse;
 
+        using MockFunctionSendAllParameterMetadataResponse = Mock::Function<StringLiteral<decltype("mock->sendParameter<AllParameterMetadata>"_ToString)>, Mock::VoidType, AllParameterMetadataResponse>;
         using MockFunctionSendUnsignedIntegerParameterResponse = Mock::Function<StringLiteral<decltype("mock->sendParameter<UnsignedInteger>"_ToString)>, Mock::VoidType, UnsignedIntegerParameterResponse>;
         using MockFunctionSendSignedIntegerParameterResponse = Mock::Function<StringLiteral<decltype("mock->sendParameter<SignedInteger>"_ToString)>, Mock::VoidType, SignedIntegerParameterResponse>;
         using MockFunctionSendRealNumberParameterResponse = Mock::Function<StringLiteral<decltype("mock->sendParameter<RealNumber>"_ToString)>, Mock::VoidType, RealNumberParameterResponse>;
         using MockFunctionSendBooleanParameterResponse = Mock::Function<StringLiteral<decltype("mock->sendParameter<Boolean>"_ToString)>, Mock::VoidType, BooleanParameterResponse>;
         using MockFunctionSendParameterErrorResponse = Mock::Function<StringLiteral<decltype("mock->sendParameter<ParameterError>"_ToString)>, Mock::VoidType, ParameterErrorResponse>;
+        using MockFunctionSendSuccessMessageResponse = Mock::Function<StringLiteral<decltype("mock->sendParameter<SuccessMessage>"_ToString)>, Mock::VoidType, SuccessMessageResponse>;
         using MockFunctionSendErrorMessageResponse = Mock::Function<StringLiteral<decltype("mock->sendParameter<ErrorMessage>"_ToString)>, Mock::VoidType, ErrorMessageResponse>;
 
     public:
@@ -98,6 +102,10 @@ namespace Mock {
             receivedRawData.push_back(rawData);
         }
 
+        void sendResponse(AllParameterMetadataResponse&& response) override {
+            mockFunctionSendAllParameterMetadataResponse.invokeVoidReturn( std::forward<AllParameterMetadataResponse>(response));
+        }
+
         void sendResponse(UnsignedIntegerParameterResponse&& unsignedIntegerParameterResponse) override {
             mockFunctionSendUnsignedIntegerParameterResponse.invokeVoidReturn(std::forward<UnsignedIntegerParameterResponse>(unsignedIntegerParameterResponse));
         }
@@ -116,6 +124,10 @@ namespace Mock {
 
         void sendResponse(ParameterErrorResponse&& parameterErrorResponse) override {
             mockFunctionSendParameterErrorResponse.invokeVoidReturn(std::forward<ParameterErrorResponse>(parameterErrorResponse));
+        }
+
+        void sendResponse(SuccessMessageResponse&& successMessageResponse) override {
+            mockFunctionSendSuccessMessageResponse.invokeVoidReturn(std::forward<SuccessMessageResponse>(successMessageResponse));
         }
 
         void sendResponse(ErrorMessageResponse&& errorMessageResponse) override {
@@ -142,6 +154,10 @@ namespace Mock {
             return sendRawDataCalled.load();
         }
 
+        bool hasSendResponseAllParameterMetadataBeenCalledWith(AllParameterMetadataResponse const& value) const {
+            return mockFunctionSendAllParameterMetadataResponse.hasBeenInvokedWith(value);
+        }
+
         bool hasSendUnsignedParameterResponseBeenCalledWith(UnsignedIntegerParameterResponse const& value) const {
             return mockFunctionSendUnsignedIntegerParameterResponse.hasBeenInvokedWith(value);
         };
@@ -160,6 +176,10 @@ namespace Mock {
 
         bool hasSendParameterErrorResponseBeenCalledWith(ParameterErrorResponse const& parameterErrorResponse) const {
             return mockFunctionSendParameterErrorResponse.hasBeenInvokedWith(parameterErrorResponse);
+        };
+
+        bool hasSendSuccessMessageResponseBeenCalledWith(SuccessMessageResponse const& successMessageResponse) const {
+            return mockFunctionSendSuccessMessageResponse.hasBeenInvokedWith(successMessageResponse);
         };
 
         bool hasSendErrorMessageResponseBeenCalledWith(ErrorMessageResponse const& errorMessageResponse) const {
@@ -236,11 +256,13 @@ namespace Mock {
 //        bool hasToReturnSpecificSetParameterValueContents;
 //        SetParameterValueContentList setParameterValueContentsToReturn;
 
+        MockFunctionSendAllParameterMetadataResponse mockFunctionSendAllParameterMetadataResponse;
         MockFunctionSendUnsignedIntegerParameterResponse mockFunctionSendUnsignedIntegerParameterResponse;
         MockFunctionSendSignedIntegerParameterResponse  mockFunctionSendSignedIntegerParameterResponse;
         MockFunctionSendRealNumberParameterResponse  mockFunctionSendRealNumberParameterResponse;
         MockFunctionSendBooleanParameterResponse  mockFunctionSendBooleanParameterResponse;
         MockFunctionSendParameterErrorResponse mockFunctionSendParameterErrorResponse;
+        MockFunctionSendSuccessMessageResponse mockFunctionSendSuccessMessageResponse;
         MockFunctionSendErrorMessageResponse mockFunctionSendErrorMessageResponse;
     };
 }

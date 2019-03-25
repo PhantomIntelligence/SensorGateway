@@ -17,7 +17,7 @@
 #ifndef SENSORGATEWAY_ERRORCONSTANTS_H
 #define SENSORGATEWAY_ERRORCONSTANTS_H
 
-#include "sensor-gateway/common/ConstantFunctionsDefinition.h"
+#include "sensor-gateway/common/custom-type-and-helper/IncludeRootForDefinitions.h"
 
 namespace ErrorHandling {
 

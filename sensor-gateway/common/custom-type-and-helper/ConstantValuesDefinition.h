@@ -17,8 +17,6 @@
 #ifndef SENSORGATEWAY_CONSTANTVALUESDEFINITION_H
 #define SENSORGATEWAY_CONSTANTVALUESDEFINITION_H
 
-#include "StringLiteralType.h"
-
 namespace ConversionUnits {
     uint8_t const NUMBER_OF_CENTIMETERS_IN_A_METER = 100;
 }
