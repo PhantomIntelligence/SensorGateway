@@ -23,6 +23,12 @@ namespace ServerCommunication {
 
     namespace PayloadTypes {
 
+
+        using UnsignedIntegerParameterPayloadUnit = uint64_t;
+        using SignedIntegerParameterPayloadUnit = int64_t;
+        using RealNumberParameterPayloadUnit = double_t;
+        using BooleanParameterPayloadUnit = bool;
+
         namespace Details {
 
             template<typename N, typename ValueType, ValueType v>
@@ -79,6 +85,10 @@ namespace ServerCommunication {
             }
 
             static inline StringPayload const& returnDefaultData() noexcept;
+
+            std::string const& getName() const noexcept {
+                return value;
+            }
 
             std::string const& toString() const noexcept {
                 return value;
@@ -154,8 +164,17 @@ namespace ServerCommunication {
 
                 static inline SimplePayload const& returnDefaultData() noexcept;
 
-                std::string const& toString() const noexcept {
-                    return value;
+                // here we assume that value it not a fundamental type, it is necessarily a std::tuple<string, fundamental, string> (see ParameterType below)
+                std::string const& getName() const noexcept {
+                    return std::get<0>(value);
+                }
+
+                // here we assume that value it not a fundamental type, it is necessarily a std::tuple<string, fundamental, string> (see ParameterType below)
+                std::string toString() const noexcept {
+                    std::string stringedPayload(getName() + " : " +
+                                                std::to_string(std::get<1>(value)) + " " +
+                                                std::to_string(std::get<2>(value)));
+                    return stringedPayload;
                 }
 
                 Type const& getValue() const noexcept {
@@ -193,10 +212,12 @@ namespace ServerCommunication {
 
             template<typename T>
             using ParameterType = std::tuple<std::string, T, std::string>;
-            using UnsignedIntegerParameterPayload = SimplePayload<ParameterType<uint64_t>>;
-            using SignedIntegerParameterPayload = SimplePayload<ParameterType<int64_t>>;
-            using RealNumberParameterPayload = SimplePayload<ParameterType<double_t>>;
-            using BooleanParameterPayload = SimplePayload<ParameterType<bool>>;
+
+            using UnsignedIntegerParameterPayload = SimplePayload<ParameterType<UnsignedIntegerParameterPayloadUnit>>;
+            using SignedIntegerParameterPayload = SimplePayload<ParameterType<SignedIntegerParameterPayloadUnit>>;
+            using RealNumberParameterPayload = SimplePayload<ParameterType<RealNumberParameterPayloadUnit>>;
+            using BooleanParameterPayload = SimplePayload<ParameterType<BooleanParameterPayloadUnit>>;
+
             using MessagePayload = StringPayload<true>;
             using SuccessPayload = StringPayload<true>;
             using ErrorPayload = StringPayload<false>;
@@ -211,7 +232,19 @@ namespace ServerCommunication {
         using Details::MessagePayload;
         using Details::SuccessPayload;
         using Details::ErrorPayload;
+
     }
+
+    template<typename SetParameterValueRequest>
+    using ParameterPayload = typename SetParameterValueRequest::Payload;
+
+    template<typename SetParameterValueRequest>
+    using ParameterPayloadContent = typename ParameterPayload<SetParameterValueRequest>::Type;
+
+    static constexpr size_t const PARAMETER_PAYLOAD_VALUE_TYPE_POSITION = 1;
+
+    template<typename SetParameterValueRequest>
+    using SetParameterUnit = std::tuple_element_t<PARAMETER_PAYLOAD_VALUE_TYPE_POSITION, ParameterPayloadContent<SetParameterValueRequest>>;
 }
 
 

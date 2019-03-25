@@ -30,6 +30,19 @@ namespace Mock {
         using GetParameterValueRequest = typename super::GetParameterValueRequest;
         using GetParameterValueRequests = std::list<GetParameterValueRequest>;
 
+        using SetUnsignedIntegerParameterValueRequest = typename super::SetUnsignedIntegerParameterValueRequest;
+        using SetUnsignedIntegerParameterValueRequests = std::list<SetUnsignedIntegerParameterValueRequest>;
+
+        using SetSignedIntegerParameterValueRequest = typename super::SetSignedIntegerParameterValueRequest;
+        using SetSignedIntegerParameterValueRequests = std::list<SetSignedIntegerParameterValueRequest>;
+
+        using SetRealNumberParameterValueRequest = typename super::SetRealNumberParameterValueRequest;
+        using SetRealNumberParameterValueRequests = std::list<SetRealNumberParameterValueRequest>;
+
+        using SetBooleanParameterValueRequest = typename super::SetBooleanParameterValueRequest;
+        using SetBooleanParameterValueRequests = std::list<SetBooleanParameterValueRequest>;
+
+
     public:
 
         explicit CatchingRequestHandlerMock() :
@@ -41,6 +54,22 @@ namespace Mock {
                 expectedNumberOfGetAllParameterNamesRequests(0),
                 actualNumberOfGetAllParameterNamesRequests(0),
                 receivedExpectedNumberOfGetParameterValueRequest(false),
+
+                expectedNumberOfSetUnsignedIntegerParameterValueRequest(0),
+                actualNumberOfSetUnsignedIntegerParameterValueRequest(0),
+                receivedExpectedNumberOfSetUnsignedIntegerParameterValueRequest(false),
+
+                expectedNumberOfSetSignedIntegerParameterValueRequest(0),
+                actualNumberOfSetSignedIntegerParameterValueRequest(0),
+                receivedExpectedNumberOfSetSignedIntegerParameterValueRequest(false),
+
+                expectedNumberOfSetRealNumberParameterValueRequest(0),
+                actualNumberOfSetRealNumberParameterValueRequest(0),
+                receivedExpectedNumberOfSetRealNumberParameterValueRequest(false),
+
+                expectedNumberOfSetBooleanParameterValueRequest(0),
+                actualNumberOfSetBooleanParameterValueRequest(0),
+                receivedExpectedNumberOfSetBooleanParameterValueRequest(false),
 
                 expectedNumberOfCalibrationRequests(0),
                 actualNumberOfCalibrationRequests(0),
@@ -58,6 +87,22 @@ namespace Mock {
 
         bool hasReceivedExpectedNumberOfGetParameterValueRequest() const {
             return receivedExpectedNumberOfGetParameterValueRequest.load();
+        }
+
+        bool hasReceivedExpectedNumberOfSetUnsignedIntegerParameterValueRequest() const {
+            return receivedExpectedNumberOfSetUnsignedIntegerParameterValueRequest.load();
+        }
+
+        bool hasReceivedExpectedNumberOfSetSignedIntegerParameterValueRequest() const {
+            return receivedExpectedNumberOfSetSignedIntegerParameterValueRequest.load();
+        }
+
+        bool hasReceivedExpectedNumberOfSetRealNumberParameterValueRequest() const {
+            return receivedExpectedNumberOfSetRealNumberParameterValueRequest.load();
+        }
+
+        bool hasReceivedExpectedNumberOfSetBooleanParameterValueRequest() const {
+            return receivedExpectedNumberOfSetBooleanParameterValueRequest.load();
         }
 
         bool hasReceivedExpectedNumberOfCalibrationRequest() const {
@@ -86,6 +131,54 @@ namespace Mock {
             if (actualNumberOfGetParameterValueRequest.load() == expectedNumberOfGetParameterValueRequest) {
                 receivedExpectedNumberOfGetParameterValueRequest.store(true);
                 receivedExpectedNumberOfGetParameterValueRequestPromise.set_value(true);
+            }
+        }
+
+        void handleSetUnsignedIntegerParameterValueRequest(
+                SetUnsignedIntegerParameterValueRequest&& getParameterValueRequest) override {
+            ++actualNumberOfSetUnsignedIntegerParameterValueRequest;
+            receivedSetUnsignedIntegerParameterValueRequests.emplace_back(
+                    std::forward<SetUnsignedIntegerParameterValueRequest>(getParameterValueRequest));
+            if (actualNumberOfSetUnsignedIntegerParameterValueRequest.load() ==
+                expectedNumberOfSetUnsignedIntegerParameterValueRequest) {
+                receivedExpectedNumberOfSetUnsignedIntegerParameterValueRequest.store(true);
+                receivedExpectedNumberOfSetUnsignedIntegerParameterValueRequestPromise.set_value(true);
+            }
+        }
+
+        void handleSetSignedIntegerParameterValueRequest(
+                SetSignedIntegerParameterValueRequest&& setSignedIntegerParameterValueRequest) override {
+            ++actualNumberOfSetSignedIntegerParameterValueRequest;
+            receivedSetSignedIntegerParameterValueRequests.emplace_back(
+                    std::forward<SetSignedIntegerParameterValueRequest>(setSignedIntegerParameterValueRequest));
+            if (actualNumberOfSetSignedIntegerParameterValueRequest.load() ==
+                expectedNumberOfSetSignedIntegerParameterValueRequest) {
+                receivedExpectedNumberOfSetSignedIntegerParameterValueRequest.store(true);
+                receivedExpectedNumberOfSetSignedIntegerParameterValueRequestPromise.set_value(true);
+            }
+        }
+
+        void handleSetRealNumberParameterValueRequest(
+                SetRealNumberParameterValueRequest&& setRealNumberParameterValueRequest) override {
+            ++actualNumberOfSetRealNumberParameterValueRequest;
+            receivedSetRealNumberParameterValueRequests.emplace_back(
+                    std::forward<SetRealNumberParameterValueRequest>(setRealNumberParameterValueRequest));
+            if (actualNumberOfSetRealNumberParameterValueRequest.load() ==
+                expectedNumberOfSetRealNumberParameterValueRequest) {
+                receivedExpectedNumberOfSetRealNumberParameterValueRequest.store(true);
+                receivedExpectedNumberOfSetRealNumberParameterValueRequestPromise.set_value(true);
+            }
+        }
+
+        void
+        handleSetBooleanParameterValueRequest(SetBooleanParameterValueRequest&& getParameterValueRequest) override {
+            ++actualNumberOfSetBooleanParameterValueRequest;
+            receivedSetBooleanParameterValueRequests.emplace_back(
+                    std::forward<SetBooleanParameterValueRequest>(getParameterValueRequest));
+            if (actualNumberOfSetBooleanParameterValueRequest.load() ==
+                expectedNumberOfSetBooleanParameterValueRequest) {
+                receivedExpectedNumberOfSetBooleanParameterValueRequest.store(true);
+                receivedExpectedNumberOfSetBooleanParameterValueRequestPromise.set_value(true);
             }
         }
 
@@ -123,6 +216,30 @@ namespace Mock {
             }
         }
 
+        void waitForExpectedNumberOfSetUnsignedIntegerParameterValueRequest() {
+            if (!hasReceivedExpectedNumberOfSetUnsignedIntegerParameterValueRequest()) {
+                receivedExpectedNumberOfSetUnsignedIntegerParameterValueRequestPromise.get_future().wait();
+            }
+        }
+
+        void waitForExpectedNumberOfSetSignedIntegerParameterValueRequest() {
+            if (!hasReceivedExpectedNumberOfSetSignedIntegerParameterValueRequest()) {
+                receivedExpectedNumberOfSetSignedIntegerParameterValueRequestPromise.get_future().wait();
+            }
+        }
+
+        void waitForExpectedNumberOfSetRealNumberParameterValueRequest() {
+            if (!hasReceivedExpectedNumberOfSetRealNumberParameterValueRequest()) {
+                receivedExpectedNumberOfSetRealNumberParameterValueRequestPromise.get_future().wait();
+            }
+        }
+
+        void waitForExpectedNumberOfSetBooleanParameterValueRequest() {
+            if (!hasReceivedExpectedNumberOfSetBooleanParameterValueRequest()) {
+                receivedExpectedNumberOfSetBooleanParameterValueRequestPromise.get_future().wait();
+            }
+        }
+
         void waitForExpectedNumberOfCalibrationRequest() {
             if (!hasReceivedExpectedNumberOfCalibrationRequest()) {
                 receivedExpectedNumberOfCalibrationRequestPromise.get_future().wait();
@@ -149,6 +266,34 @@ namespace Mock {
             expectedNumberOfGetParameterValueRequest = newExpectedValue;
         }
 
+        void setExpectedNumberOfSetUnsignedIntegerParameterValueRequest(uint16_t newExpectedValue) {
+            if (newExpectedValue == 0) {
+                receivedExpectedNumberOfSetUnsignedIntegerParameterValueRequest.store(true);
+            }
+            expectedNumberOfSetUnsignedIntegerParameterValueRequest = newExpectedValue;
+        }
+
+        void setExpectedNumberOfSetSignedIntegerParameterValueRequest(uint16_t newExpectedValue) {
+            if (newExpectedValue == 0) {
+                receivedExpectedNumberOfSetSignedIntegerParameterValueRequest.store(true);
+            }
+            expectedNumberOfSetSignedIntegerParameterValueRequest = newExpectedValue;
+        }
+
+        void setExpectedNumberOfSetRealNumberParameterValueRequest(uint16_t newExpectedValue) {
+            if (newExpectedValue == 0) {
+                receivedExpectedNumberOfSetRealNumberParameterValueRequest.store(true);
+            }
+            expectedNumberOfSetRealNumberParameterValueRequest = newExpectedValue;
+        }
+
+        void setExpectedNumberOfSetBooleanParameterValueRequest(uint16_t newExpectedValue) {
+            if (newExpectedValue == 0) {
+                receivedExpectedNumberOfSetBooleanParameterValueRequest.store(true);
+            }
+            expectedNumberOfSetBooleanParameterValueRequest = newExpectedValue;
+        }
+
         void setExpectedNumberOfCalibrationRequest(uint16_t newExpectedValue) {
             if (newExpectedValue == 0) {
                 receivedExpectedNumberOfCalibrationRequest.store(true);
@@ -173,8 +318,31 @@ namespace Mock {
         AtomicCounter actualNumberOfGetParameterValueRequest;
         mutable BooleanPromise receivedExpectedNumberOfGetParameterValueRequestPromise;
         AtomicFlag receivedExpectedNumberOfGetParameterValueRequest;
-
         GetParameterValueRequests receivedGetParameterValueRequests;
+
+        uint16_t expectedNumberOfSetUnsignedIntegerParameterValueRequest;
+        AtomicCounter actualNumberOfSetUnsignedIntegerParameterValueRequest;
+        mutable BooleanPromise receivedExpectedNumberOfSetUnsignedIntegerParameterValueRequestPromise;
+        AtomicFlag receivedExpectedNumberOfSetUnsignedIntegerParameterValueRequest;
+        SetUnsignedIntegerParameterValueRequests receivedSetUnsignedIntegerParameterValueRequests;
+
+        uint16_t expectedNumberOfSetSignedIntegerParameterValueRequest;
+        AtomicCounter actualNumberOfSetSignedIntegerParameterValueRequest;
+        mutable BooleanPromise receivedExpectedNumberOfSetSignedIntegerParameterValueRequestPromise;
+        AtomicFlag receivedExpectedNumberOfSetSignedIntegerParameterValueRequest;
+        SetSignedIntegerParameterValueRequests receivedSetSignedIntegerParameterValueRequests;
+
+        uint16_t expectedNumberOfSetRealNumberParameterValueRequest;
+        AtomicCounter actualNumberOfSetRealNumberParameterValueRequest;
+        mutable BooleanPromise receivedExpectedNumberOfSetRealNumberParameterValueRequestPromise;
+        AtomicFlag receivedExpectedNumberOfSetRealNumberParameterValueRequest;
+        SetRealNumberParameterValueRequests receivedSetRealNumberParameterValueRequests;
+
+        uint16_t expectedNumberOfSetBooleanParameterValueRequest;
+        AtomicCounter actualNumberOfSetBooleanParameterValueRequest;
+        mutable BooleanPromise receivedExpectedNumberOfSetBooleanParameterValueRequestPromise;
+        AtomicFlag receivedExpectedNumberOfSetBooleanParameterValueRequest;
+        SetBooleanParameterValueRequests receivedSetBooleanParameterValueRequests;
 
         uint16_t expectedNumberOfGetAllParameterNamesRequests;
         AtomicCounter actualNumberOfGetAllParameterNamesRequests;

@@ -41,6 +41,10 @@ namespace SensorAccessLinkElement {
         using ErrorSource = DataFlow::DataSource<ErrorHandling::SensorAccessLinkError>;
 
         using GetParameterValueRequest = ServerCommunication::RequestTypes::GetParameterValue;
+        using SetUnsignedIntegerParameterValueRequest = ServerCommunication::RequestTypes::SetUnsignedIntegerParameterValue;
+        using SetSignedIntegerParameterValueRequest = ServerCommunication::RequestTypes::SetSignedIntegerParameterValue;
+        using SetRealNumberParameterValueRequest = ServerCommunication::RequestTypes::SetRealNumberParameterValue;
+        using SetBooleanParameterValueRequest = ServerCommunication::RequestTypes::SetBooleanParameterValue;
 
         using Parameters = typename SERVER_STRUCTURES::Parameters;
 
@@ -93,28 +97,67 @@ namespace SensorAccessLinkElement {
              */
         }
 
-        void process(GetParameterValueRequest&& getParameterValueRequest) noexcept {
-            auto parameterName = getParameterValueRequest.payloadToString();
+        void processGet(GetParameterValueRequest&& getParameterValueRequest) noexcept {
+            auto parameterName = getParameterValueRequest.getPayloadName();
             auto sensorControlMessage = parameters.createGetParameterValueControlMessageFor(parameterName);
             dataTranslator->translateAndSendToSensor(std::move(sensorControlMessage));
         }
 
+        template<typename ParameterValueRequest>
+        void processSet(ParameterValueRequest&& parameterValueRequest) noexcept {
+//            auto parameterName = getParameterValueRequest.getPayloadName();
+//            auto sensorControlMessage = parameters.createGetParameterValueControlMessageFor(parameterName);
+//            dataTranslator->translateAndSendToSensor(std::move(sensorControlMessage));
+        }
+
+        void processSetUnsignedInteger(
+                SetUnsignedIntegerParameterValueRequest&& setUnsignedIntegerParameterValueRequest) noexcept {
+            processSet(std::forward<SetUnsignedIntegerParameterValueRequest>(setUnsignedIntegerParameterValueRequest));
+        }
+
+        void processSetSignedInteger(
+                SetSignedIntegerParameterValueRequest&& setSignedIntegerParameterValueRequest) noexcept {
+            processSet(std::forward<SetSignedIntegerParameterValueRequest>(setSignedIntegerParameterValueRequest));
+        }
+
+        void processSetRealNumber(SetRealNumberParameterValueRequest&& setRealNumberParameterValueRequest) noexcept {
+            processSet(std::forward<SetRealNumberParameterValueRequest>(setRealNumberParameterValueRequest));
+        }
+
+        void processSetBoolean(SetBooleanParameterValueRequest&& setBooleanParameterValueRequest) noexcept {
+            processSet(std::forward<SetBooleanParameterValueRequest>(setBooleanParameterValueRequest));
+        }
+
+
         // TODO : test this function
         void calibrate() noexcept {
-//            auto parameterName = getParameterValueRequest.payloadToString();
+//            auto parameterName = getParameterValueRequest.getPayloadName();
 //            auto sensorControlMessage = parameters.createGetParameterValueControlMessageFor(parameterName);
 //            dataTranslator->translateAndSendToSensor(std::move(sensorControlMessage));
         }
 
         // TODO : test this function
         void clearCalibration() noexcept {
-//            auto parameterName = getParameterValueRequest.payloadToString();
+//            auto parameterName = getParameterValueRequest.getPayloadName();
 //            auto sensorControlMessage = parameters.createGetParameterValueControlMessageFor(parameterName);
 //            dataTranslator->translateAndSendToSensor(std::move(sensorControlMessage));
         }
 
         using ErrorSource::linkConsumer;
 
+        template<typename RequestHandlerCallBackStore>
+        static constexpr auto createCallBacksForRequestHandler(ThisClass* thisClass)
+        -> typename RequestHandlerCallBackStore::InstancesTuple {
+            return RequestHandlerCallBackStore::createCallBacks(
+                    std::bind(&ThisClass::processGet, thisClass, _1),
+                    std::bind(&ThisClass::processSetUnsignedInteger, thisClass, _1),
+                    std::bind(&ThisClass::processSetSignedInteger, thisClass, _1),
+                    std::bind(&ThisClass::processSetRealNumber, thisClass, _1),
+                    std::bind(&ThisClass::processSetBoolean, thisClass, _1),
+                    std::bind(&ThisClass::calibrate, thisClass),
+                    std::bind(&ThisClass::clearCalibration, thisClass)
+            );
+        }
 
     private:
 

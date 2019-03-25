@@ -68,8 +68,16 @@ namespace RequestHandlerTestMock {
         using super = SensorAccessLinkElement::SensorParameterController<DataStructures, GatewayStructures>;
 
         using GetParameterValueRequest = typename super::GetParameterValueRequest;
+        using SetUnsignedIntegerParameterValueRequest = typename super::SetUnsignedIntegerParameterValueRequest;
+        using SetSignedIntegerParameterValueRequest = typename super::SetSignedIntegerParameterValueRequest;
+        using SetRealNumberParameterValueRequest = typename super::SetRealNumberParameterValueRequest;
+        using SetBooleanParameterValueRequest = typename super::SetBooleanParameterValueRequest;
 
         using MockFunctionProcessGetParameterValueRequest = Mock::Function<StringLiteral<decltype("mock->processGetParameterValueRequest"_ToString)>, Mock::VoidType, GetParameterValueRequest>;
+        using MockFunctionProcessSetUnsignedIntegerParameterValueRequest = Mock::Function<StringLiteral<decltype("mock->processSetUnsignedIntegerParameterValueRequest"_ToString)>, Mock::VoidType, SetUnsignedIntegerParameterValueRequest>;
+        using MockFunctionProcessSetSignedIntegerParameterValueRequest = Mock::Function<StringLiteral<decltype("mock->processSetSignedIntegerParameterValueRequest"_ToString)>, Mock::VoidType, SetSignedIntegerParameterValueRequest>;
+        using MockFunctionProcessSetRealNumberParameterValueRequest = Mock::Function<StringLiteral<decltype("mock->processSetRealNumberParameterValueRequest"_ToString)>, Mock::VoidType, SetRealNumberParameterValueRequest>;
+        using MockFunctionProcessSetBooleanParameterValueRequest = Mock::Function<StringLiteral<decltype("mock->processSetBooleanParameterValueRequest"_ToString)>, Mock::VoidType, SetBooleanParameterValueRequest>;
         using MockFunctionProcessCalibrationRequest = Mock::Function<StringLiteral<decltype("mock->processCalibrationRequest"_ToString)>, Mock::VoidType, Mock::VoidType>;
         using MockFunctionProcessClearCalibrationRequest = Mock::Function<StringLiteral<decltype("mock->ProcessClearCalibrationRequest"_ToString)>, Mock::VoidType, Mock::VoidType>;
 
@@ -81,9 +89,41 @@ namespace RequestHandlerTestMock {
         ~SensorParameterControllerMock() noexcept {
         };
 
-        void process(GetParameterValueRequest&& getParameterValueRequest) noexcept {
-            mockFunctionProcessGetParameterValueRequest.invokeVoidReturn(
-                    std::forward<GetParameterValueRequest>(getParameterValueRequest));
+        void processGet(GetParameterValueRequest&& getParameterValueRequest) noexcept {
+            invokeVoidReturn(
+                    &mockFunctionProcessGetParameterValueRequest,
+                    std::forward<GetParameterValueRequest>(getParameterValueRequest)
+            );
+        }
+
+        void processSetUnsignedInteger(
+                SetUnsignedIntegerParameterValueRequest&& setUnsignedIntegerParameterValueRequest) noexcept {
+            invokeVoidReturn(
+                    &mockFunctionProcessSetUnsignedIntegerParameterValueRequest,
+                    std::forward<SetUnsignedIntegerParameterValueRequest>(setUnsignedIntegerParameterValueRequest)
+            );
+        }
+
+        void processSetSignedInteger(
+                SetSignedIntegerParameterValueRequest&& setSignedIntegerParameterValueRequest) noexcept {
+            invokeVoidReturn(
+                    &mockFunctionProcessSetSignedIntegerParameterValueRequest,
+                    std::forward<SetSignedIntegerParameterValueRequest>(setSignedIntegerParameterValueRequest)
+            );
+        }
+
+        void processSetRealNumber(SetRealNumberParameterValueRequest&& setRealNumberParameterValueRequest) noexcept {
+            invokeVoidReturn(
+                    &mockFunctionProcessSetRealNumberParameterValueRequest,
+                    std::forward<SetRealNumberParameterValueRequest>(setRealNumberParameterValueRequest)
+            );
+        }
+
+        void processSetBoolean(SetBooleanParameterValueRequest&& setBooleanParameterValueRequest) noexcept {
+            invokeVoidReturn(
+                    &mockFunctionProcessSetBooleanParameterValueRequest,
+                    std::forward<SetBooleanParameterValueRequest>(setBooleanParameterValueRequest)
+            );
         }
 
         void calibrate() noexcept {
@@ -94,9 +134,31 @@ namespace RequestHandlerTestMock {
             mockFunctionProcessClearCalibrationRequest.invokeVoidReturn();
         }
 
-        bool hasProcessGetParameterValueRequestBeenCalledWith(GetParameterValueRequest const& getParameterValueRequest) {
-            return mockFunctionProcessGetParameterValueRequest.hasBeenInvokedWith(getParameterValueRequest);
+        bool hasProcessGetParameterValueRequestBeenCalledWith(
+                GetParameterValueRequest const& getParameterValueRequest) {
+            return hasBeenCalledWith(&mockFunctionProcessGetParameterValueRequest, getParameterValueRequest);
         }
+
+        bool hasProcessSetUnsignedIntegerParameterValueRequestBeenCalledWith(
+                SetUnsignedIntegerParameterValueRequest const& value) {
+            return hasBeenCalledWith(&mockFunctionProcessSetUnsignedIntegerParameterValueRequest, value);
+        }
+
+        bool hasProcessSetSignedIntegerParameterValueRequestBeenCalledWith(
+                SetSignedIntegerParameterValueRequest const& value) {
+            return hasBeenCalledWith(&mockFunctionProcessSetSignedIntegerParameterValueRequest, value);
+        }
+
+        bool hasProcessSetRealNumberParameterValueRequestBeenCalledWith(
+                SetRealNumberParameterValueRequest const& value) {
+            return hasBeenCalledWith(&mockFunctionProcessSetRealNumberParameterValueRequest, value);
+        }
+
+        bool hasProcessSetBooleanParameterValueRequestBeenCalledWith(
+                SetBooleanParameterValueRequest const& value) {
+            return hasBeenCalledWith(&mockFunctionProcessSetBooleanParameterValueRequest, value);
+        }
+
 
         bool hasProcessCalibrationRequestBeenCalled() {
             return mockFunctionProcessCalibrationRequest.hasBeenInvoked();
@@ -105,9 +167,24 @@ namespace RequestHandlerTestMock {
         bool hasProcessClearCalibrationRequestBeenCalled() {
             return mockFunctionProcessClearCalibrationRequest.hasBeenInvoked();
         }
+
     private:
 
+        template<typename MockFunction, typename Value>
+        static void invokeVoidReturn(MockFunction* mockFunction, Value&& value) noexcept {
+            return mockFunction->invokeVoidReturn(std::forward<Value>(value));
+        }
+
+        template<typename MockFunction, typename ExpectedValue>
+        static bool hasBeenCalledWith(MockFunction* mockFunction, ExpectedValue const& expectedValue) noexcept {
+            return mockFunction->hasBeenInvokedWith(expectedValue);
+        }
+
         MockFunctionProcessGetParameterValueRequest mockFunctionProcessGetParameterValueRequest;
+        MockFunctionProcessSetUnsignedIntegerParameterValueRequest mockFunctionProcessSetUnsignedIntegerParameterValueRequest;
+        MockFunctionProcessSetSignedIntegerParameterValueRequest mockFunctionProcessSetSignedIntegerParameterValueRequest;
+        MockFunctionProcessSetRealNumberParameterValueRequest mockFunctionProcessSetRealNumberParameterValueRequest;
+        MockFunctionProcessSetBooleanParameterValueRequest mockFunctionProcessSetBooleanParameterValueRequest;
         MockFunctionProcessCalibrationRequest mockFunctionProcessCalibrationRequest;
         MockFunctionProcessClearCalibrationRequest mockFunctionProcessClearCalibrationRequest;
 
@@ -157,7 +234,18 @@ namespace RequestHandlerTestMock {
         }
 
         void getParameters(super::GetParameterValueRequest&& g) {
+        }
 
+        void setUnsignedIntegerParameters(super::SetUnsignedIntegerParameterValueRequest&& s) {
+        }
+
+        void setSignedIntegerParameters(super::SetSignedIntegerParameterValueRequest&& s) {
+        }
+
+        void setRealNumberParameters(super::SetRealNumberParameterValueRequest&& s) {
+        }
+
+        void setBooleanParameters(super::SetBooleanParameterValueRequest&& s) {
         }
 
     private:
@@ -176,20 +264,23 @@ TEST_F(RequestHandlerTest, given_anInvalidGetParameterValueRequest_when_handle_t
 
     RequestHandlerTestMock::DevNullServerCommunicatorMock* mockServerCommunicatorPointer;
     DevNullCommunicationStrategy devNullCommunicationStrategy;
+
+    using DevNull = RequestHandlerTestMock::DevNullServerCommunicatorMock;
+    DevNull* mockPointer;
     ServerCommunicatorRequestHandlingCallBacks handlingCallBacks =
             ServerCommunicator::RequestCallBackStore::createCallBacks(
-                    std::bind(&RequestHandlerTestMock::DevNullServerCommunicatorMock::voidFunction,
-                              mockServerCommunicatorPointer),
-                    std::bind(&RequestHandlerTestMock::DevNullServerCommunicatorMock::getParameters,
-                              mockServerCommunicatorPointer, std::placeholders::_1),
-                    std::bind(&RequestHandlerTestMock::DevNullServerCommunicatorMock::voidFunction,
-                              mockServerCommunicatorPointer),
-                    std::bind(&RequestHandlerTestMock::DevNullServerCommunicatorMock::voidFunction,
-                              mockServerCommunicatorPointer)
-
+                    std::bind(&DevNull::voidFunction, mockPointer),
+                    std::bind(&DevNull::getParameters, mockPointer, _1),
+                    std::bind(&DevNull::setUnsignedIntegerParameters, mockPointer, _1),
+                    std::bind(&DevNull::setSignedIntegerParameters, mockPointer, _1),
+                    std::bind(&DevNull::setRealNumberParameters, mockPointer, _1),
+                    std::bind(&DevNull::setBooleanParameters, mockPointer, _1),
+                    std::bind(&DevNull::voidFunction, mockPointer),
+                    std::bind(&DevNull::voidFunction, mockPointer)
             );
+
     RequestHandlerTestMock::DevNullServerCommunicatorMock mockServerCommunicator(&handlingCallBacks);
-    mockServerCommunicatorPointer = &mockServerCommunicator;
+    mockPointer = &mockServerCommunicator;
     ServerCommunicator serverCommunicator(&devNullCommunicationStrategy, &handlingCallBacks);
 
     RequestHandler requestHandler(&serverCommunicator, nullptr);
@@ -211,42 +302,45 @@ TEST_F(RequestHandlerTest, given_anInvalidGetParameterValueRequest_when_handle_t
 
 TEST_F(RequestHandlerTest,
        given_aValidGetParameterValueRequest_when_handle_then_forwardsTheRequestToTheSensorParameterController) {
-    RequestHandlerTestMock::DevNullServerCommunicatorMock* mockServerCommunicatorPointer;
     DevNullCommunicationStrategy devNullCommunicationStrategy;
+    using DevNull = RequestHandlerTestMock::DevNullServerCommunicatorMock;
+    DevNull* mockPointer;
     ServerCommunicatorRequestHandlingCallBacks handlingCallBacks =
             ServerCommunicator::RequestCallBackStore::createCallBacks(
-                    std::bind(&RequestHandlerTestMock::DevNullServerCommunicatorMock::voidFunction,
-                              mockServerCommunicatorPointer),
-                    std::bind(&RequestHandlerTestMock::DevNullServerCommunicatorMock::getParameters,
-                              mockServerCommunicatorPointer, std::placeholders::_1),
-                    std::bind(&RequestHandlerTestMock::DevNullServerCommunicatorMock::voidFunction,
-                              mockServerCommunicatorPointer),
-                    std::bind(&RequestHandlerTestMock::DevNullServerCommunicatorMock::voidFunction,
-                              mockServerCommunicatorPointer)
-
+                    std::bind(&DevNull::voidFunction, mockPointer),
+                    std::bind(&DevNull::getParameters, mockPointer, _1),
+                    std::bind(&DevNull::setUnsignedIntegerParameters, mockPointer, _1),
+                    std::bind(&DevNull::setSignedIntegerParameters, mockPointer, _1),
+                    std::bind(&DevNull::setRealNumberParameters, mockPointer, _1),
+                    std::bind(&DevNull::setBooleanParameters, mockPointer, _1),
+                    std::bind(&DevNull::voidFunction, mockPointer),
+                    std::bind(&DevNull::voidFunction, mockPointer)
             );
-    RequestHandlerTestMock::DevNullServerCommunicatorMock mockServerCommunicator(&handlingCallBacks);
-    mockServerCommunicatorPointer = &mockServerCommunicator;
 
-    using RequestHandlerTestMock::SensorParameterControllerMock;
-    SensorParameterControllerMock sensorParameterControllerMock;
+    DevNull mockServerCommunicator(&handlingCallBacks);
+    mockPointer = &mockServerCommunicator;
+
+    using ParamControllerMock = RequestHandlerTestMock::SensorParameterControllerMock;
+    ParamControllerMock paramControllerMock;
     RequestHandler::ParameterRequestCallBacks parameterRequestCallBacks =
             RequestHandler::ParameterRequestCallBackStore::createCallBacks(
-                    std::bind(&SensorParameterControllerMock::process, &sensorParameterControllerMock,
-                              std::placeholders::_1),
-                    std::bind(&SensorParameterControllerMock::calibrate, &sensorParameterControllerMock),
-                    std::bind(&SensorParameterControllerMock::clearCalibration, &sensorParameterControllerMock)
+                    std::bind(&ParamControllerMock::processGet, &paramControllerMock, _1),
+                    std::bind(&ParamControllerMock::processSetUnsignedInteger, &paramControllerMock, _1),
+                    std::bind(&ParamControllerMock::processSetSignedInteger, &paramControllerMock, _1),
+                    std::bind(&ParamControllerMock::processSetRealNumber, &paramControllerMock, _1),
+                    std::bind(&ParamControllerMock::processSetBoolean, &paramControllerMock, _1),
+                    std::bind(&ParamControllerMock::calibrate, &paramControllerMock),
+                    std::bind(&ParamControllerMock::clearCalibration, &paramControllerMock)
             );
 
-    RequestHandler requestHandler(mockServerCommunicatorPointer, &parameterRequestCallBacks);
+    RequestHandler requestHandler(mockPointer, &parameterRequestCallBacks);
 
     auto validRequest = Given::aValidGetParameterValueRequest<AvailableParameters>();
     auto requestCopy = ServerCommunication::RequestTypes::GetParameterValue(validRequest);
 
     requestHandler.handleGetParameterValueRequest(std::move(validRequest));
 
-    auto hasReceivedRequest = sensorParameterControllerMock
-            .hasProcessGetParameterValueRequestBeenCalledWith(requestCopy);
+    auto hasReceivedRequest = paramControllerMock.hasProcessGetParameterValueRequestBeenCalledWith(requestCopy);
 
     ASSERT_TRUE(hasReceivedRequest);
 }
@@ -254,32 +348,35 @@ TEST_F(RequestHandlerTest,
 TEST_F(RequestHandlerTest,
        given__when_calibrate_then_forwardsTheRequestToTheSensorParameterController) {
     RequestHandlerTestMock::DevNullServerCommunicatorMock* mockServerCommunicatorPointer;
-    DevNullCommunicationStrategy devNullCommunicationStrategy;
+
+    using DevNull = RequestHandlerTestMock::DevNullServerCommunicatorMock;
+    DevNull* mockPointer;
     ServerCommunicatorRequestHandlingCallBacks handlingCallBacks =
             ServerCommunicator::RequestCallBackStore::createCallBacks(
-                    std::bind(&RequestHandlerTestMock::DevNullServerCommunicatorMock::voidFunction,
-                              mockServerCommunicatorPointer),
-                    std::bind(&RequestHandlerTestMock::DevNullServerCommunicatorMock::getParameters,
-                              mockServerCommunicatorPointer, std::placeholders::_1),
-                    std::bind(&RequestHandlerTestMock::DevNullServerCommunicatorMock::voidFunction,
-                              mockServerCommunicatorPointer),
-                    std::bind(&RequestHandlerTestMock::DevNullServerCommunicatorMock::voidFunction,
-                              mockServerCommunicatorPointer)
-
+                    std::bind(&DevNull::voidFunction, mockPointer),
+                    std::bind(&DevNull::getParameters, mockPointer, _1),
+                    std::bind(&DevNull::setUnsignedIntegerParameters, mockPointer, _1),
+                    std::bind(&DevNull::setSignedIntegerParameters, mockPointer, _1),
+                    std::bind(&DevNull::setRealNumberParameters, mockPointer, _1),
+                    std::bind(&DevNull::setBooleanParameters, mockPointer, _1),
+                    std::bind(&DevNull::voidFunction, mockPointer),
+                    std::bind(&DevNull::voidFunction, mockPointer)
             );
+
     RequestHandlerTestMock::DevNullServerCommunicatorMock mockServerCommunicator(&handlingCallBacks);
     mockServerCommunicatorPointer = &mockServerCommunicator;
 
-    using RequestHandlerTestMock::SensorParameterControllerMock;
-    SensorParameterControllerMock sensorParameterControllerMock;
+    using ParamControllerMock = RequestHandlerTestMock::SensorParameterControllerMock;
+    ParamControllerMock paramControllerMock;
     RequestHandler::ParameterRequestCallBacks parameterRequestCallBacks =
             RequestHandler::ParameterRequestCallBackStore::createCallBacks(
-                    std::bind(&SensorParameterControllerMock::process, &sensorParameterControllerMock,
-                              std::placeholders::_1),
-                    std::bind(&RequestHandlerTestMock::DevNullServerCommunicatorMock::voidFunction,
-                              mockServerCommunicatorPointer),
-                    std::bind(&RequestHandlerTestMock::DevNullServerCommunicatorMock::voidFunction,
-                              mockServerCommunicatorPointer)
+                    std::bind(&ParamControllerMock::processGet, &paramControllerMock, _1),
+                    std::bind(&ParamControllerMock::processSetUnsignedInteger, &paramControllerMock, _1),
+                    std::bind(&ParamControllerMock::processSetSignedInteger, &paramControllerMock, _1),
+                    std::bind(&ParamControllerMock::processSetRealNumber, &paramControllerMock, _1),
+                    std::bind(&ParamControllerMock::processSetBoolean, &paramControllerMock, _1),
+                    std::bind(&ParamControllerMock::calibrate, &paramControllerMock),
+                    std::bind(&ParamControllerMock::clearCalibration, &paramControllerMock)
             );
 
     RequestHandler requestHandler(mockServerCommunicatorPointer, &parameterRequestCallBacks);
@@ -289,8 +386,7 @@ TEST_F(RequestHandlerTest,
 
     requestHandler.handleGetParameterValueRequest(std::move(validRequest));
 
-    auto hasReceivedRequest = sensorParameterControllerMock
-            .hasProcessGetParameterValueRequestBeenCalledWith(requestCopy);
+    auto hasReceivedRequest = paramControllerMock.hasProcessGetParameterValueRequestBeenCalledWith(requestCopy);
 
     ASSERT_TRUE(hasReceivedRequest);
 }

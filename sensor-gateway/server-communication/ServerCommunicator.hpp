@@ -41,8 +41,17 @@ namespace SensorAccessLinkElement {
         using RequestAssembler = Assemble::ServerRequestAssembler;
 
         using GetParameterValueRequest = ServerCommunication::RequestTypes::GetParameterValue;
+        using SetUnsignedIntegerParameterValueRequest = ServerCommunication::RequestTypes::SetUnsignedIntegerParameterValue;
+        using SetSignedIntegerParameterValueRequest = ServerCommunication::RequestTypes::SetSignedIntegerParameterValue;
+        using SetRealNumberParameterValueRequest = ServerCommunication::RequestTypes::SetRealNumberParameterValue;
+        using SetBooleanParameterValueRequest = ServerCommunication::RequestTypes::SetBooleanParameterValue;
+
         using ParameterName = typename ServerCommunicationStrategy::ParameterName;
         using GetParameterValueContents = typename ServerCommunicationStrategy::GetParameterValueContentBuffer::Contents;
+        using SetUnsignedIntegerParameterValueContents = typename ServerCommunicationStrategy::SetUnsignedIntegerParameterValueContentBuffer::Contents;
+        using SetSignedIntegerParameterValueContents = typename ServerCommunicationStrategy::SetSignedIntegerParameterValueContentBuffer::Contents;
+        using SetRealNumberParameterValueContents = typename ServerCommunicationStrategy::SetRealNumberParameterValueContentBuffer::Contents;
+        using SetBooleanParameterValueContents = typename ServerCommunicationStrategy::SetBooleanParameterValueContentBuffer::Contents;
 
         GetParameterValueRequest const DEFAULT_GET_PARAMETER_VALUE_REQUEST = ServerCommunication::RequestTypes::GetParameterValue::returnDefaultData();
 
@@ -50,16 +59,24 @@ namespace SensorAccessLinkElement {
 
     public:
 
-        using HandleGetAllParameterNamesRequest  = StringLiteral<decltype("HandleGetAllParameterNamesRequest"_ToString)>;
-        using HandleGetParameterValueRequest     = StringLiteral<decltype("HandleGetParameterValueRequest"_ToString)>;
-        using HandleCalibrationRequest           = StringLiteral<decltype("HandleCalibrationRequest"_ToString)>;
-        using HandleClearCalibrationRequest      = StringLiteral<decltype("HandleClearCalibrationRequest"_ToString)>;
+        using HandleGetAllParameterNamesRequest              = StringLiteral<decltype("HandleGetAllParameterNamesRequest"_ToString)>;
+        using HandleGetParameterValueRequest                 = StringLiteral<decltype("HandleGetParameterValueRequest"_ToString)>;
+        using HandleSetUnsignedIntegerParameterValueRequest  = StringLiteral<decltype("HandleSetUnsignedIntegerParameterValueRequest"_ToString)>;
+        using HandleSetSignedIntegerParameterValueRequest    = StringLiteral<decltype("HandleSetSignedIntegerParameterValueRequest"_ToString)>;
+        using HandleSetRealNumberParameterValueRequest       = StringLiteral<decltype("HandleSetRealNumberParameterValueRequest"_ToString)>;
+        using HandleSetBooleanParameterValueRequest          = StringLiteral<decltype("HandleSetBooleanParameterValueRequest"_ToString)>;
+        using HandleCalibrationRequest                       = StringLiteral<decltype("HandleCalibrationRequest"_ToString)>;
+        using HandleClearCalibrationRequest                  = StringLiteral<decltype("HandleClearCalibrationRequest"_ToString)>;
 
         using RequestCallBackStore =
         typename CallBack
                 <
                         std::function<void()>,
                         std::function<void(GetParameterValueRequest&&)>,
+                        std::function<void(SetUnsignedIntegerParameterValueRequest&&)>,
+                        std::function<void(SetSignedIntegerParameterValueRequest&&)>,
+                        std::function<void(SetRealNumberParameterValueRequest&&)>,
+                        std::function<void(SetBooleanParameterValueRequest&&)>,
                         std::function<void()>,
                         std::function<void()>
                 >
@@ -67,12 +84,20 @@ namespace SensorAccessLinkElement {
                 <
                         EmptyDescription,
                         GetParameterValueRequest&&,
+                        SetUnsignedIntegerParameterValueRequest&&,
+                        SetSignedIntegerParameterValueRequest&&,
+                        SetRealNumberParameterValueRequest&&,
+                        SetBooleanParameterValueRequest&&,
                         EmptyDescription,
                         EmptyDescription
                 >
         ::Named<
                 HandleGetAllParameterNamesRequest,
                 HandleGetParameterValueRequest,
+                HandleSetUnsignedIntegerParameterValueRequest,
+                HandleSetSignedIntegerParameterValueRequest,
+                HandleSetRealNumberParameterValueRequest,
+                HandleSetBooleanParameterValueRequest,
                 HandleCalibrationRequest,
                 HandleClearCalibrationRequest
         >;
@@ -164,6 +189,7 @@ namespace SensorAccessLinkElement {
             while (!terminateOrderHasBeenReceived()) {
                 handleIncomingGetAllParameterNamesRequests();
                 handleIncomingGetParameterValueRequests();
+                handleIncomingSetParameterValueRequests();
                 handleIncomingCalibrationRequests();
                 handleIncomingClearCalibrationRequests();
                 sleepForTenthOfASecond();
@@ -210,6 +236,28 @@ namespace SensorAccessLinkElement {
             }
         }
 
+        void handleIncomingSetParameterValueRequests() {
+//            GetParameterValueContents contents;
+//            try {
+//                contents = serverCommunicationStrategy->fetchSetParameterValueContents();
+//            } catch (ErrorHandling::SensorAccessLinkError& strategyError) {
+//                addOriginAndHandleError(std::move(strategyError),
+//                                        ErrorHandling::Origin::SERVER_COMMUNICATOR_FETCH_SET_PARAMETER_VALUE);
+//            }
+//
+//            // TODO: Add logic to handle requests in bulk instead of one by one
+//            // TODO: This will be needed to avoid multiple & useless requests for adjacent parameters
+//            auto requestCount = 0u;
+//            bool handleRequest = false;
+//            GetParameterValueRequest request;
+//
+//            std::tie(request, handleRequest) = assembleGetParameterValueRequestFrom(contents[requestCount++]);
+//            while (handleRequest) {
+//                getCallBack<HandleGetParameterValueRequest>()(std::move(request));
+//                std::tie(request, handleRequest) = assembleGetParameterValueRequestFrom(contents[requestCount++]);
+//           }
+        }
+
         void handleIncomingCalibrationRequests() {
             auto hasToSendAllParameterNames = serverCommunicationStrategy->hasReceivedCalibrationRequest();
             if (hasToSendAllParameterNames) {
@@ -224,7 +272,8 @@ namespace SensorAccessLinkElement {
             }
         }
 
-        auto assembleGetParameterValueRequestFrom(ParameterName const& content) const -> std::tuple<GetParameterValueRequest, bool> const {
+        auto assembleGetParameterValueRequestFrom(
+                ParameterName const& content) const -> std::tuple<GetParameterValueRequest, bool> const {
             GetParameterValueRequest getParameterRequest = RequestAssembler::getParameterValueRequest(content);
             bool hasToBeHandled = getParameterRequest != DEFAULT_GET_PARAMETER_VALUE_REQUEST;
             return std::make_tuple(getParameterRequest, hasToBeHandled);
@@ -272,6 +321,40 @@ namespace SensorAccessLinkElement {
         RequestHandlingCallBacks* requestHandlingCallBacks;
 
         std::string serverAddress;
+
+        // TODO : Refactor this outside and make ServerCommunicator receive only callbacks
+
+        // Fetch requests in strategy
+        using FetchGetAllParameterNamesRequest              = StringLiteral<decltype("FetchGetAllParameterNamesRequest"_ToString)>;
+        using FetchGetParameterValueRequest                 = StringLiteral<decltype("FetchGetParameterValueRequest"_ToString)>;
+        using FetchSetUnsignedIntegerParameterValueRequest  = StringLiteral<decltype("FetchSetUnsignedIntegerParameterValueRequest"_ToString)>;
+        using FetchSetSignedIntegerParameterValueRequest    = StringLiteral<decltype("FetchSetSignedIntegerParameterValueRequest"_ToString)>;
+        using FetchSetRealNumberParameterValueRequest       = StringLiteral<decltype("FetchSetRealNumberParameterValueRequest"_ToString)>;
+        using FetchSetBooleanParameterValueRequest          = StringLiteral<decltype("FetchSetBooleanParameterValueRequest"_ToString)>;
+        using FetchCalibrationRequest                       = StringLiteral<decltype("FetchCalibrationRequest"_ToString)>;
+        using FetchClearCalibrationRequest                  = StringLiteral<decltype("FetchClearCalibrationRequest"_ToString)>;
+
+        using FetchRequestCallBackStore =
+        typename CallBack
+                <
+                        std::function<void()>,
+                        std::function<void(GetParameterValueRequest&&)>,
+                        std::function<void()>,
+                        std::function<void()>
+                >
+        ::UsingArgument
+                <
+                        EmptyDescription,
+                        GetParameterValueRequest&&,
+                        EmptyDescription,
+                        EmptyDescription
+                >
+        ::Named<
+                HandleGetAllParameterNamesRequest,
+                HandleGetParameterValueRequest,
+                HandleCalibrationRequest,
+                HandleClearCalibrationRequest
+        >;
     };
 }
 

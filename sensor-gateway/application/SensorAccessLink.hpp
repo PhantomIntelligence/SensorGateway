@@ -69,19 +69,23 @@ namespace SensorGateway {
                     serverRequestHandlingCallBacks(
                             ServerCommunicator::RequestCallBackStore::createCallBacks(
                                     std::bind(&RequestHandler::handleGetAllParameterNamesRequest, &requestHandler),
-                                    std::bind(&RequestHandler::handleGetParameterValueRequest, &requestHandler,
-                                              std::placeholders::_1),
+                                    std::bind(&RequestHandler::handleGetParameterValueRequest, &requestHandler, _1),
+                                    std::bind(&RequestHandler::handleSetUnsignedIntegerParameterValueRequest,
+                                              &requestHandler, _1),
+                                    std::bind(&RequestHandler::handleSetSignedIntegerParameterValueRequest,
+                                              &requestHandler, _1),
+                                    std::bind(&RequestHandler::handleSetRealNumberParameterValueRequest,
+                                              &requestHandler, _1),
+                                    std::bind(&RequestHandler::handleSetBooleanParameterValueRequest, &requestHandler,
+                                              _1),
                                     std::bind(&RequestHandler::handleCalibrationRequest, &requestHandler),
                                     std::bind(&RequestHandler::handleClearCalibrationRequest, &requestHandler)
                             )
                     ),
                     parameterRequestCallBacks(
-                            RequestHandler::ParameterRequestCallBackStore::createCallBacks(
-                                    std::bind(&SensorParameterController::process, &sensorParameterController,
-                                              std::placeholders::_1),
-                                    std::bind(&SensorParameterController::calibrate, &sensorParameterController),
-                                    std::bind(&SensorParameterController::clearCalibration, &sensorParameterController)
-                            )
+                            SensorParameterController::template createCallBacksForRequestHandler<
+                                    typename RequestHandler::ParameterRequestCallBackStore
+                            >(&sensorParameterController)
                     ),
                     serverCommunicationStrategy(serverCommunicationStrategy),
                     dataTranslationStrategy(dataTranslationStrategy),

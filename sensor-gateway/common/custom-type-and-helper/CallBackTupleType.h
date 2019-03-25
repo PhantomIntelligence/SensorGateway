@@ -120,6 +120,7 @@ namespace {
      */
     using VoidVoidCallback = std::function<void()>;
     using NoArguments = EmptyDescription;
+    using std::placeholders::_1;
 }
 
 #endif //SENSORGATEWAY_CALLBACKTUPLETYPE_H

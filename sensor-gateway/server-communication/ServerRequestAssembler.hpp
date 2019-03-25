@@ -27,8 +27,36 @@ namespace Assemble {
      */
     class ServerRequestAssembler {
 
+    protected:
+
         using MessagePayload = ServerCommunication::PayloadTypes::MessagePayload;
         using GetParameterValueRequest = ServerCommunication::RequestTypes::GetParameterValue;
+
+        using SetUnsignedIntegerParameterValueRequest = ServerCommunication::RequestTypes::SetUnsignedIntegerParameterValue;
+        using UnsignedIntegerRequestContent = typename ServerCommunication::ParameterPayloadContent<SetUnsignedIntegerParameterValueRequest>;
+
+        using SetSignedIntegerParameterValueRequest = ServerCommunication::RequestTypes::SetSignedIntegerParameterValue;
+        using SignedIntegerRequestContent = typename ServerCommunication::ParameterPayloadContent<SetSignedIntegerParameterValueRequest>;
+
+        using SetRealNumberParameterValueRequest = ServerCommunication::RequestTypes::SetRealNumberParameterValue;
+        using RealNumberRequestContent = typename ServerCommunication::ParameterPayloadContent<SetRealNumberParameterValueRequest>;
+
+        using SetBooleanParameterValueRequest = ServerCommunication::RequestTypes::SetBooleanParameterValue;
+        using BooleanRequestContent = typename ServerCommunication::ParameterPayloadContent<SetBooleanParameterValueRequest>;
+
+        template<typename RequestedParameterContent>
+        static constexpr auto getParameterName(RequestedParameterContent requestedParameterContent) noexcept ->
+        std::tuple_element_t<0, RequestedParameterContent> {
+            return std::get<0>(requestedParameterContent);
+        }
+
+        template<typename RequestedParameterContent>
+        static constexpr auto getParameterValue(RequestedParameterContent requestedParameterContent) noexcept ->
+        std::tuple_element_t<1, RequestedParameterContent> {
+            return std::get<1>(requestedParameterContent);
+        }
+
+        using IrrelevantForRequest = StringLiteral<decltype(""_ToString)>;
 
     public:
 
@@ -41,6 +69,45 @@ namespace Assemble {
             GetParameterValueRequest request(payload);
             return request;
         }
+
+        template<typename RequestedParameterContent>
+        static auto setUnsignedIntegerParameterValueRequest(RequestedParameterContent const& requestedParameterContent)
+        -> SetUnsignedIntegerParameterValueRequest {
+            using Payload = typename ServerCommunication::ParameterPayload<SetBooleanParameterValueRequest>;
+            using PayloadContent = typename ServerCommunication::ParameterPayloadContent<SetBooleanParameterValueRequest>;
+            using PayloadContentUnitType = typename ServerCommunication::ParameterPayloadContent<SetBooleanParameterValueRequest>;
+            auto parameterName = getParameterName(requestedParameterContent);
+            auto parameterValue = static_cast<PayloadContentUnitType>(getParameterValue(requestedParameterContent));
+            PayloadContent setParameterRequestContent(parameterName,
+                                                      parameterValue,
+                                                      IrrelevantForRequest::toString()
+            );
+            Payload payload{setParameterRequestContent};
+            SetUnsignedIntegerParameterValueRequest request(payload);
+            return request;
+        }
+
+//        template<typename UnsignedIntegerContent>
+//        static auto setSignedIntegerParameterValueRequest(std::string const& parameterName,
+//                                                          UnsignedIntegerContent const& unsignedIntegerContent) -> SetSignedIntegerParameterValueRequest {
+//            MessagePayload payload{payloadContent};
+//            SetSignedIntegerParameterValueRequest request(payload);
+//            return request;
+//        }
+//
+//        static auto setRealNumberParameterValueRequest(std::string const& parameterName,
+//                                                       RealNumberUnit const& requestedValue) -> SetRealNumberParameterValueRequest {
+//            MessagePayload payload{payloadContent};
+//            SetRealNumberParameterValueRequest request(payload);
+//            return request;
+//        }
+//
+//        static auto setBooleanParameterValueRequest(std::string const& payloadContent,
+//                                                    BooleanUnit const& requestedValue) -> SetBooleanParameterValueRequest {
+//            MessagePayload payload{payloadContent};
+//            SetBooleanParameterValueRequest request(payload);
+//            return request;
+//        }
     };
 }
 

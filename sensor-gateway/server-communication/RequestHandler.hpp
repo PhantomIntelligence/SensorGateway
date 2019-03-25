@@ -47,30 +47,51 @@ namespace SensorAccessLinkElement {
         using GetAllParameterMetadataRequest = ServerCommunication::RequestTypes::GetAllParameterMetadata;
 
         using GetParameterValueRequest = ServerCommunication::RequestTypes::GetParameterValue;
+        using SetUnsignedIntegerParameterValueRequest = ServerCommunication::RequestTypes::SetUnsignedIntegerParameterValue;
+        using SetSignedIntegerParameterValueRequest = ServerCommunication::RequestTypes::SetSignedIntegerParameterValue;
+        using SetRealNumberParameterValueRequest = ServerCommunication::RequestTypes::SetRealNumberParameterValue;
+        using SetBooleanParameterValueRequest = ServerCommunication::RequestTypes::SetBooleanParameterValue;
 
         using GetParameter = StringLiteral<decltype("get parameter"_ToString)>;
 
+        using ThisClass = RequestHandler<SENSOR_STRUCTURES, SERVER_STRUCTURES>;
     public:
 
-        using ProcessGetParameterValueRequest  = StringLiteral<decltype("ProcessGetParameterValueRequest"_ToString)>;
-        using ProcessCalibrationRequest        = StringLiteral<decltype("ProcessCalibrationRequest"_ToString)>;
-        using ProcessClearCalibrationRequest   = StringLiteral<decltype("ProcessClearCalibrationRequest"_ToString)>;
+        using ProcessGetParameterValueRequest                 = StringLiteral<decltype("ProcessGetParameterValueRequest"_ToString)>;
+        using ProcessSetUnsignedIntegerParameterValueRequest  = StringLiteral<decltype("ProcessSetUnsignedIntegerParameterValueRequest"_ToString)>;
+        using ProcessSetSignedIntegerParameterValueRequest    = StringLiteral<decltype("ProcessSetSignedIntegerParameterValueRequest"_ToString)>;
+        using ProcessSetRealNumberParameterValueRequest       = StringLiteral<decltype("ProcessSetRealNumberParameterValueRequest"_ToString)>;
+        using ProcessSetBooleanParameterValueRequest          = StringLiteral<decltype("ProcessSetBooleanParameterValueRequest"_ToString)>;
+        using ProcessCalibrationRequest                       = StringLiteral<decltype("ProcessCalibrationRequest"_ToString)>;
+        using ProcessClearCalibrationRequest                  = StringLiteral<decltype("ProcessClearCalibrationRequest"_ToString)>;
 
         using ParameterRequestCallBackStore =
         typename CallBack
                 <
                         std::function<void(GetParameterValueRequest&&)>,
+                        std::function<void(SetUnsignedIntegerParameterValueRequest&&)>,
+                        std::function<void(SetSignedIntegerParameterValueRequest&&)>,
+                        std::function<void(SetRealNumberParameterValueRequest&&)>,
+                        std::function<void(SetBooleanParameterValueRequest&&)>,
                         std::function<void()>,
                         std::function<void()>
                 >
         ::UsingArgument
                 <
                         GetParameterValueRequest&&,
+                        SetUnsignedIntegerParameterValueRequest&&,
+                        SetSignedIntegerParameterValueRequest&&,
+                        SetRealNumberParameterValueRequest&&,
+                        SetBooleanParameterValueRequest&&,
                         EmptyDescription,
                         EmptyDescription
                 >
         ::Named<
                 ProcessGetParameterValueRequest,
+                ProcessSetUnsignedIntegerParameterValueRequest,
+                ProcessSetSignedIntegerParameterValueRequest,
+                ProcessSetRealNumberParameterValueRequest,
+                ProcessSetBooleanParameterValueRequest,
                 ProcessCalibrationRequest,
                 ProcessClearCalibrationRequest
         >;
@@ -124,7 +145,7 @@ namespace SensorAccessLinkElement {
 
         virtual void handleGetParameterValueRequest(GetParameterValueRequest&& getParameterValueRequest) {
             auto requestIsValid = true;
-            std::string const& parameterName = getParameterValueRequest.payloadToString();
+            std::string const& parameterName = getParameterValueRequest.getPayloadName();
             try {
                 ensureParameterIsAvailable(parameterName);
             } catch (ErrorHandling::SensorAccessLinkError& error) {
@@ -137,6 +158,29 @@ namespace SensorAccessLinkElement {
             if (requestIsValid) {
                 getCallBack<ProcessGetParameterValueRequest>()(std::move(getParameterValueRequest));
             }
+        }
+
+        template<typename ParameterRequest>
+        void handleSetParameterValueRequest(ParameterRequest&& parameterRequest) {
+        }
+
+        virtual void
+        handleSetUnsignedIntegerParameterValueRequest(SetUnsignedIntegerParameterValueRequest&& setParameterRequest) {
+            handleSetParameterValueRequest(std::forward<SetUnsignedIntegerParameterValueRequest>(setParameterRequest));
+        }
+
+        virtual void
+        handleSetSignedIntegerParameterValueRequest(SetSignedIntegerParameterValueRequest&& setParameterRequest) {
+            handleSetParameterValueRequest(std::forward<SetSignedIntegerParameterValueRequest>(setParameterRequest));
+        }
+
+        virtual void
+        handleSetRealNumberParameterValueRequest(SetRealNumberParameterValueRequest&& setParameterRequest) {
+            handleSetParameterValueRequest(std::forward<SetRealNumberParameterValueRequest>(setParameterRequest));
+        }
+
+        virtual void handleSetBooleanParameterValueRequest(SetBooleanParameterValueRequest&& setParameterRequest) {
+            handleSetParameterValueRequest(std::forward<SetBooleanParameterValueRequest>(setParameterRequest));
         }
 
 // TODO : Test this and complete with actual value from Sensor --> integration test
@@ -173,6 +217,7 @@ namespace SensorAccessLinkElement {
         }
 
         using ErrorSource::linkConsumer;
+
 
     private:
 

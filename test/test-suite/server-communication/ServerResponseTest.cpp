@@ -54,7 +54,7 @@ TEST_F(ServerResponseTest, given_aGoodRequestResponseThatCausedAnError_when_isSu
     auto validRequest = Given::aValidGetParameterValueRequest<AvailableParameters>();
     validRequest.markAsErrorCause();
     AvailableParameters availableParameters;
-    auto metadata = availableParameters.getMetadataFor((validRequest.payloadToString()));
+    auto metadata = availableParameters.getMetadataFor((validRequest.getPayloadName()));
     auto response = Assemble::ServerResponseAssembler::createParameterErrorResponse(metadata, std::move(validRequest));
 
     auto success = decltype(response)::isSuccess();

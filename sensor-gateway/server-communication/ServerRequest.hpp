@@ -26,7 +26,9 @@ namespace ServerCommunication {
 
     public:
 
-        explicit ServerRequest(PayloadType const& payload) noexcept :
+        using Payload = PayloadType;
+
+        explicit ServerRequest(Payload const& payload) noexcept :
                 ServerRequest(payload, false, false) {}
 
         explicit ServerRequest() noexcept :
@@ -93,15 +95,20 @@ namespace ServerCommunication {
             return responseMessagePayload;
         }
 
+        std::string const& getPayloadName() const noexcept {
+            return payload.getName();
+        }
+
         std::string const& payloadToString() const noexcept {
             return payload.toString();
         }
 
     private:
-        ServerRequest(PayloadType const& payload, bool const& badRequest, bool const& causedAnError) noexcept :
-                payload(payload), badRequest(badRequest), causedAnError(causedAnError) , responseMessagePayload(N::toString() + payloadToString()){}
+        ServerRequest(Payload const& payload, bool const& badRequest, bool const& causedAnError) noexcept :
+                payload(payload), badRequest(badRequest), causedAnError(causedAnError),
+                responseMessagePayload(N::toString() + getPayloadName()) {}
 
-        PayloadType payload;
+        Payload payload;
         bool badRequest;
         bool causedAnError;
         PayloadTypes::MessagePayload const responseMessagePayload;
@@ -138,6 +145,7 @@ namespace ServerCommunication {
 
         using GetAllParameterMetadata = ServerRequest<Names::GetAllParameterMetadata, PayloadTypes::MessagePayload>;
     }
+
 }
 
 
