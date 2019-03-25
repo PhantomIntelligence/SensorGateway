@@ -67,20 +67,9 @@ namespace SensorGateway {
                                       DataTranslationStrategy* dataTranslationStrategy,
                                       SensorCommunicationStrategy* sensorCommunicationStrategy) :
                     serverRequestHandlingCallBacks(
-                            ServerCommunicator::RequestCallBackStore::createCallBacks(
-                                    std::bind(&RequestHandler::handleGetAllParameterNamesRequest, &requestHandler),
-                                    std::bind(&RequestHandler::handleGetParameterValueRequest, &requestHandler, _1),
-                                    std::bind(&RequestHandler::handleSetUnsignedIntegerParameterValueRequest,
-                                              &requestHandler, _1),
-                                    std::bind(&RequestHandler::handleSetSignedIntegerParameterValueRequest,
-                                              &requestHandler, _1),
-                                    std::bind(&RequestHandler::handleSetRealNumberParameterValueRequest,
-                                              &requestHandler, _1),
-                                    std::bind(&RequestHandler::handleSetBooleanParameterValueRequest, &requestHandler,
-                                              _1),
-                                    std::bind(&RequestHandler::handleCalibrationRequest, &requestHandler),
-                                    std::bind(&RequestHandler::handleClearCalibrationRequest, &requestHandler)
-                            )
+                            RequestHandler::template createCallBacksForServerCommunicator<
+                                    typename ServerCommunicator::RequestCallBackStore
+                            >(&requestHandler)
                     ),
                     parameterRequestCallBacks(
                             SensorParameterController::template createCallBacksForRequestHandler<

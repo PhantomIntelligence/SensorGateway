@@ -65,7 +65,7 @@ namespace Assemble {
         ~ServerRequestAssembler() = delete;
 
         static auto getParameterValueRequest(std::string const& payloadContent) -> GetParameterValueRequest {
-            MessagePayload payload{payloadContent};
+            MessagePayload const payload{payloadContent};
             GetParameterValueRequest request(payload);
             return request;
         }
@@ -73,41 +73,78 @@ namespace Assemble {
         template<typename RequestedParameterContent>
         static auto setUnsignedIntegerParameterValueRequest(RequestedParameterContent const& requestedParameterContent)
         -> SetUnsignedIntegerParameterValueRequest {
-            using Payload = typename ServerCommunication::ParameterPayload<SetBooleanParameterValueRequest>;
-            using PayloadContent = typename ServerCommunication::ParameterPayloadContent<SetBooleanParameterValueRequest>;
-            using PayloadContentUnitType = typename ServerCommunication::ParameterPayloadContent<SetBooleanParameterValueRequest>;
+            using Payload = typename ServerCommunication::ParameterPayload<SetUnsignedIntegerParameterValueRequest>;
+            using PayloadContent = typename ServerCommunication::ParameterPayloadContent<SetUnsignedIntegerParameterValueRequest>;
+            using PayloadContentUnitType = typename ServerCommunication::SetParameterUnit<SetUnsignedIntegerParameterValueRequest>;
             auto parameterName = getParameterName(requestedParameterContent);
             auto parameterValue = static_cast<PayloadContentUnitType>(getParameterValue(requestedParameterContent));
-            PayloadContent setParameterRequestContent(parameterName,
-                                                      parameterValue,
-                                                      IrrelevantForRequest::toString()
+            PayloadContent setParameterRequestContent = std::make_tuple(parameterName,
+                                                                        parameterValue,
+                                                                        IrrelevantForRequest::toString()
             );
+
             Payload payload{setParameterRequestContent};
+
             SetUnsignedIntegerParameterValueRequest request(payload);
             return request;
         }
 
-//        template<typename UnsignedIntegerContent>
-//        static auto setSignedIntegerParameterValueRequest(std::string const& parameterName,
-//                                                          UnsignedIntegerContent const& unsignedIntegerContent) -> SetSignedIntegerParameterValueRequest {
-//            MessagePayload payload{payloadContent};
-//            SetSignedIntegerParameterValueRequest request(payload);
-//            return request;
-//        }
-//
-//        static auto setRealNumberParameterValueRequest(std::string const& parameterName,
-//                                                       RealNumberUnit const& requestedValue) -> SetRealNumberParameterValueRequest {
-//            MessagePayload payload{payloadContent};
-//            SetRealNumberParameterValueRequest request(payload);
-//            return request;
-//        }
-//
-//        static auto setBooleanParameterValueRequest(std::string const& payloadContent,
-//                                                    BooleanUnit const& requestedValue) -> SetBooleanParameterValueRequest {
-//            MessagePayload payload{payloadContent};
-//            SetBooleanParameterValueRequest request(payload);
-//            return request;
-//        }
+        template<typename RequestedParameterContent>
+        static auto setSignedIntegerParameterValueRequest(RequestedParameterContent const& requestedParameterContent)
+        -> SetSignedIntegerParameterValueRequest {
+            using Payload = typename ServerCommunication::ParameterPayload<SetSignedIntegerParameterValueRequest>;
+            using PayloadContent = typename ServerCommunication::ParameterPayloadContent<SetSignedIntegerParameterValueRequest>;
+            using PayloadContentUnitType = typename ServerCommunication::SetParameterUnit<SetSignedIntegerParameterValueRequest>;
+            auto parameterName = getParameterName(requestedParameterContent);
+            auto parameterValue = static_cast<PayloadContentUnitType>(getParameterValue(requestedParameterContent));
+            PayloadContent setParameterRequestContent = std::make_tuple(parameterName,
+                                                                        parameterValue,
+                                                                        IrrelevantForRequest::toString()
+            );
+
+            Payload payload{setParameterRequestContent};
+
+            SetSignedIntegerParameterValueRequest request(payload);
+            return request;
+        }
+
+        template<typename RequestedParameterContent>
+        static auto setRealNumberParameterValueRequest(RequestedParameterContent const& requestedParameterContent)
+        -> SetRealNumberParameterValueRequest {
+            using Payload = typename ServerCommunication::ParameterPayload<SetRealNumberParameterValueRequest>;
+            using PayloadContent = typename ServerCommunication::ParameterPayloadContent<SetRealNumberParameterValueRequest>;
+            using PayloadContentUnitType = typename ServerCommunication::SetParameterUnit<SetRealNumberParameterValueRequest>;
+            auto parameterName = getParameterName(requestedParameterContent);
+            auto parameterValue = static_cast<PayloadContentUnitType>(getParameterValue(requestedParameterContent));
+            PayloadContent setParameterRequestContent = std::make_tuple(parameterName,
+                                                                        parameterValue,
+                                                                        IrrelevantForRequest::toString()
+            );
+
+            Payload payload{setParameterRequestContent};
+
+            SetRealNumberParameterValueRequest request(payload);
+            return request;
+        }
+
+        template<typename RequestedParameterContent>
+        static auto setBooleanParameterValueRequest(RequestedParameterContent const& requestedParameterContent)
+        -> SetBooleanParameterValueRequest {
+            using Payload = typename ServerCommunication::ParameterPayload<SetBooleanParameterValueRequest>;
+            using PayloadContent = typename ServerCommunication::ParameterPayloadContent<SetBooleanParameterValueRequest>;
+            using PayloadContentUnitType = typename ServerCommunication::SetParameterUnit<SetBooleanParameterValueRequest>;
+            auto parameterName = getParameterName(requestedParameterContent);
+            auto parameterValue = static_cast<PayloadContentUnitType>(getParameterValue(requestedParameterContent));
+            PayloadContent setParameterRequestContent = std::make_tuple(parameterName,
+                                                                        parameterValue,
+                                                                        IrrelevantForRequest::toString()
+            );
+
+            Payload payload{setParameterRequestContent};
+
+            SetBooleanParameterValueRequest request(payload);
+            return request;
+        }
     };
 }
 

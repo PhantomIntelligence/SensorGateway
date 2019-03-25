@@ -99,7 +99,7 @@ namespace ServerCommunication {
             return payload.getName();
         }
 
-        std::string const& payloadToString() const noexcept {
+        std::string payloadToString() const noexcept {
             return payload.toString();
         }
 

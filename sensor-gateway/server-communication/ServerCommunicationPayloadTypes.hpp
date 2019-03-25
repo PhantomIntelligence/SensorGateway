@@ -171,9 +171,11 @@ namespace ServerCommunication {
 
                 // here we assume that value it not a fundamental type, it is necessarily a std::tuple<string, fundamental, string> (see ParameterType below)
                 std::string toString() const noexcept {
-                    std::string stringedPayload(getName() + " : " +
-                                                std::to_string(std::get<1>(value)) + " " +
-                                                std::to_string(std::get<2>(value)));
+                    auto stringedPayload = std::string(
+                            getName() + " : " +
+                            std::to_string(std::get<1>(value)) + " " +
+                            std::get<2>(value)
+                    );
                     return stringedPayload;
                 }
 

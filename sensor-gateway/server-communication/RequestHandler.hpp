@@ -53,6 +53,7 @@ namespace SensorAccessLinkElement {
         using SetBooleanParameterValueRequest = ServerCommunication::RequestTypes::SetBooleanParameterValue;
 
         using GetParameter = StringLiteral<decltype("get parameter"_ToString)>;
+        using SetParameter = StringLiteral<decltype("set parameter"_ToString)>;
 
         using ThisClass = RequestHandler<SENSOR_STRUCTURES, SERVER_STRUCTURES>;
     public:
@@ -160,27 +161,45 @@ namespace SensorAccessLinkElement {
             }
         }
 
-        template<typename ParameterRequest>
-        void handleSetParameterValueRequest(ParameterRequest&& parameterRequest) {
+        template<typename CallBackName, typename SetParameterValueRequest>
+        void handleSetParameterValueRequest(SetParameterValueRequest&& setParameterValueRequest) {
+            auto requestIsValid = true;
+            std::string const& parameterName = setParameterValueRequest.getPayloadName();
+            try {
+                ensureParameterIsAvailable(parameterName);
+            } catch (ErrorHandling::SensorAccessLinkError& error) {
+                requestIsValid = false;
+                ErrorSource::produce(std::move(error));
+                setParameterValueRequest.markAsBadRequest();
+                writeAndSendErrorMessageResponse<SetParameter>(std::move(setParameterValueRequest));
+            }
+
+            if (requestIsValid) {
+                getCallBack<CallBackName>()(std::move(setParameterValueRequest));
+            }
         }
 
         virtual void
         handleSetUnsignedIntegerParameterValueRequest(SetUnsignedIntegerParameterValueRequest&& setParameterRequest) {
-            handleSetParameterValueRequest(std::forward<SetUnsignedIntegerParameterValueRequest>(setParameterRequest));
+            handleSetParameterValueRequest<ProcessSetUnsignedIntegerParameterValueRequest>(
+                    std::forward<SetUnsignedIntegerParameterValueRequest>(setParameterRequest));
         }
 
         virtual void
         handleSetSignedIntegerParameterValueRequest(SetSignedIntegerParameterValueRequest&& setParameterRequest) {
-            handleSetParameterValueRequest(std::forward<SetSignedIntegerParameterValueRequest>(setParameterRequest));
+            handleSetParameterValueRequest<ProcessSetSignedIntegerParameterValueRequest>(
+                    std::forward<SetSignedIntegerParameterValueRequest>(setParameterRequest));
         }
 
         virtual void
         handleSetRealNumberParameterValueRequest(SetRealNumberParameterValueRequest&& setParameterRequest) {
-            handleSetParameterValueRequest(std::forward<SetRealNumberParameterValueRequest>(setParameterRequest));
+            handleSetParameterValueRequest<ProcessSetRealNumberParameterValueRequest>(
+                    std::forward<SetRealNumberParameterValueRequest>(setParameterRequest));
         }
 
         virtual void handleSetBooleanParameterValueRequest(SetBooleanParameterValueRequest&& setParameterRequest) {
-            handleSetParameterValueRequest(std::forward<SetBooleanParameterValueRequest>(setParameterRequest));
+            handleSetParameterValueRequest<ProcessSetBooleanParameterValueRequest>(
+                    std::forward<SetBooleanParameterValueRequest>(setParameterRequest));
         }
 
 // TODO : Test this and complete with actual value from Sensor --> integration test
@@ -218,6 +237,20 @@ namespace SensorAccessLinkElement {
 
         using ErrorSource::linkConsumer;
 
+        template<typename ServerCommunicatorCallBackStore>
+        static constexpr auto createCallBacksForServerCommunicator(ThisClass* thisClass)
+        -> typename ServerCommunicatorCallBackStore::InstancesTuple {
+            return ServerCommunicatorCallBackStore::createCallBacks(
+                    std::bind(&ThisClass::handleGetAllParameterNamesRequest, thisClass),
+                    std::bind(&ThisClass::handleGetParameterValueRequest, thisClass, _1),
+                    std::bind(&ThisClass::handleSetUnsignedIntegerParameterValueRequest, thisClass, _1),
+                    std::bind(&ThisClass::handleSetSignedIntegerParameterValueRequest, thisClass, _1),
+                    std::bind(&ThisClass::handleSetRealNumberParameterValueRequest, thisClass, _1),
+                    std::bind(&ThisClass::handleSetBooleanParameterValueRequest, thisClass, _1),
+                    std::bind(&ThisClass::handleCalibrationRequest, thisClass),
+                    std::bind(&ThisClass::handleClearCalibrationRequest, thisClass)
+            );
+        }
 
     private:
 

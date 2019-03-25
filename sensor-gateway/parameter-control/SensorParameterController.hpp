@@ -49,9 +49,6 @@ namespace SensorAccessLinkElement {
         using Parameters = typename SERVER_STRUCTURES::Parameters;
 
         static size_t const ARBITRARILY_BIG_ENOUGH_NUMBER_OF_CONCURRENT_REQUESTS = 256;
-        using SensorControlMessages = DataFlow::RingBuffer<SensorControlMessage, ARBITRARILY_BIG_ENOUGH_NUMBER_OF_CONCURRENT_REQUESTS>;
-        using SensorControlMessagePointers = Container::ConstantSizedPointerList<SensorControlMessage, ARBITRARILY_BIG_ENOUGH_NUMBER_OF_CONCURRENT_REQUESTS>;
-
 
     public:
 
@@ -166,7 +163,6 @@ namespace SensorAccessLinkElement {
 
         Parameters parameters;
 
-        SensorControlMessages sensorControlMessageRequests;
         SensorControlMessagePointers sensorControlMessageRequestPointers;
 
         ResponseControlMessageScheduler responseControlMessageScheduler;

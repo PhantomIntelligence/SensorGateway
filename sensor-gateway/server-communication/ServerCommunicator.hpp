@@ -48,12 +48,20 @@ namespace SensorAccessLinkElement {
 
         using ParameterName = typename ServerCommunicationStrategy::ParameterName;
         using GetParameterValueContents = typename ServerCommunicationStrategy::GetParameterValueContentBuffer::Contents;
+        using SetUnsignedIntegerParameterValueContent = typename ServerCommunicationStrategy::SetUnsignedIntegerParameterValueContentBuffer::Content;
         using SetUnsignedIntegerParameterValueContents = typename ServerCommunicationStrategy::SetUnsignedIntegerParameterValueContentBuffer::Contents;
+        using SetSignedIntegerParameterValueContent = typename ServerCommunicationStrategy::SetSignedIntegerParameterValueContentBuffer::Content;
         using SetSignedIntegerParameterValueContents = typename ServerCommunicationStrategy::SetSignedIntegerParameterValueContentBuffer::Contents;
+        using SetRealNumberParameterValueContent = typename ServerCommunicationStrategy::SetRealNumberParameterValueContentBuffer::Content;
         using SetRealNumberParameterValueContents = typename ServerCommunicationStrategy::SetRealNumberParameterValueContentBuffer::Contents;
+        using SetBooleanParameterValueContent = typename ServerCommunicationStrategy::SetBooleanParameterValueContentBuffer::Content;
         using SetBooleanParameterValueContents = typename ServerCommunicationStrategy::SetBooleanParameterValueContentBuffer::Contents;
 
         GetParameterValueRequest const DEFAULT_GET_PARAMETER_VALUE_REQUEST = ServerCommunication::RequestTypes::GetParameterValue::returnDefaultData();
+        SetUnsignedIntegerParameterValueRequest const DEFAULT_SET_UNSIGNED_INTEGER_PARAMETER_VALUE_REQUEST = ServerCommunication::RequestTypes::SetUnsignedIntegerParameterValue::returnDefaultData();
+        SetSignedIntegerParameterValueRequest const DEFAULT_SET_SIGNED_INTEGER_PARAMETER_VALUE_REQUEST = ServerCommunication::RequestTypes::SetSignedIntegerParameterValue::returnDefaultData();
+        SetRealNumberParameterValueRequest const DEFAULT_SET_REAL_NUMBER_PARAMETER_VALUE_REQUEST = ServerCommunication::RequestTypes::SetRealNumberParameterValue::returnDefaultData();
+        SetBooleanParameterValueRequest const DEFAULT_SET_BOOLEAN_PARAMETER_VALUE_REQUEST = ServerCommunication::RequestTypes::SetBooleanParameterValue::returnDefaultData();
 
         using ErrorSource = DataFlow::DataSource<ErrorHandling::SensorAccessLinkError>;
 
@@ -189,7 +197,10 @@ namespace SensorAccessLinkElement {
             while (!terminateOrderHasBeenReceived()) {
                 handleIncomingGetAllParameterNamesRequests();
                 handleIncomingGetParameterValueRequests();
-                handleIncomingSetParameterValueRequests();
+                handleIncomingSetUnsignedIntegerParameterValueRequests();
+                handleIncomingSetSignedIntegerParameterValueRequests();
+                handleIncomingSetRealNumberParameterValueRequests();
+                handleIncomingSetBooleanParameterValueRequests();
                 handleIncomingCalibrationRequests();
                 handleIncomingClearCalibrationRequests();
                 sleepForTenthOfASecond();
@@ -236,27 +247,94 @@ namespace SensorAccessLinkElement {
             }
         }
 
-        void handleIncomingSetParameterValueRequests() {
-//            GetParameterValueContents contents;
-//            try {
-//                contents = serverCommunicationStrategy->fetchSetParameterValueContents();
-//            } catch (ErrorHandling::SensorAccessLinkError& strategyError) {
-//                addOriginAndHandleError(std::move(strategyError),
-//                                        ErrorHandling::Origin::SERVER_COMMUNICATOR_FETCH_SET_PARAMETER_VALUE);
-//            }
-//
-//            // TODO: Add logic to handle requests in bulk instead of one by one
-//            // TODO: This will be needed to avoid multiple & useless requests for adjacent parameters
-//            auto requestCount = 0u;
-//            bool handleRequest = false;
-//            GetParameterValueRequest request;
-//
-//            std::tie(request, handleRequest) = assembleGetParameterValueRequestFrom(contents[requestCount++]);
-//            while (handleRequest) {
-//                getCallBack<HandleGetParameterValueRequest>()(std::move(request));
-//                std::tie(request, handleRequest) = assembleGetParameterValueRequestFrom(contents[requestCount++]);
-//           }
+        void handleIncomingSetUnsignedIntegerParameterValueRequests() {
+            SetUnsignedIntegerParameterValueContents contents;
+            try {
+                contents = serverCommunicationStrategy->fetchSetUnsignedIntegerParameterValueContents();
+            } catch (ErrorHandling::SensorAccessLinkError& strategyError) {
+                addOriginAndHandleError(std::move(strategyError),
+                                        ErrorHandling::Origin::SERVER_COMMUNICATOR_FETCH_SET_UNSIGNED_INTEGER_PARAMETER_VALUE);
+            }
+
+            auto requestCount = 0u;
+            bool handleRequest = false;
+            SetUnsignedIntegerParameterValueRequest request;
+
+            std::tie(request, handleRequest) = assembleSetUnsignedIntegerParameterValueRequestFrom(
+                    contents[requestCount++]);
+            while (handleRequest) {
+                getCallBack<HandleSetUnsignedIntegerParameterValueRequest>()(std::move(request));
+                std::tie(request, handleRequest) = assembleSetUnsignedIntegerParameterValueRequestFrom(
+                        contents[requestCount++]);
+            }
         }
+
+        void handleIncomingSetSignedIntegerParameterValueRequests() {
+            SetSignedIntegerParameterValueContents contents;
+            try {
+                contents = serverCommunicationStrategy->fetchSetSignedIntegerParameterValueContents();
+            } catch (ErrorHandling::SensorAccessLinkError& strategyError) {
+                addOriginAndHandleError(std::move(strategyError),
+                                        ErrorHandling::Origin::SERVER_COMMUNICATOR_FETCH_SET_SIGNED_INTEGER_PARAMETER_VALUE);
+            }
+
+            auto requestCount = 0u;
+            bool handleRequest = false;
+            SetSignedIntegerParameterValueRequest request;
+
+            std::tie(request, handleRequest) = assembleSetSignedIntegerParameterValueRequestFrom(
+                    contents[requestCount++]);
+            while (handleRequest) {
+                getCallBack<HandleSetSignedIntegerParameterValueRequest>()(std::move(request));
+                std::tie(request, handleRequest) = assembleSetSignedIntegerParameterValueRequestFrom(
+                        contents[requestCount++]);
+            }
+        }
+
+        void handleIncomingSetRealNumberParameterValueRequests() {
+            SetRealNumberParameterValueContents contents;
+            try {
+                contents = serverCommunicationStrategy->fetchSetRealNumberParameterValueContents();
+            } catch (ErrorHandling::SensorAccessLinkError& strategyError) {
+                addOriginAndHandleError(std::move(strategyError),
+                                        ErrorHandling::Origin::SERVER_COMMUNICATOR_FETCH_SET_REAL_NUMBER_PARAMETER_VALUE);
+            }
+
+            auto requestCount = 0u;
+            bool handleRequest = false;
+            SetRealNumberParameterValueRequest request;
+
+            std::tie(request, handleRequest) = assembleSetRealNumberParameterValueRequestFrom(
+                    contents[requestCount++]);
+            while (handleRequest) {
+                getCallBack<HandleSetRealNumberParameterValueRequest>()(std::move(request));
+                std::tie(request, handleRequest) = assembleSetRealNumberParameterValueRequestFrom(
+                        contents[requestCount++]);
+            }
+        }
+
+        void handleIncomingSetBooleanParameterValueRequests() {
+            SetBooleanParameterValueContents contents;
+            try {
+                contents = serverCommunicationStrategy->fetchSetBooleanParameterValueContents();
+            } catch (ErrorHandling::SensorAccessLinkError& strategyError) {
+                addOriginAndHandleError(std::move(strategyError),
+                                        ErrorHandling::Origin::SERVER_COMMUNICATOR_FETCH_SET_BOOLEAN_PARAMETER_VALUE);
+            }
+
+            auto requestCount = 0u;
+            bool handleRequest = false;
+            SetBooleanParameterValueRequest request;
+
+            std::tie(request, handleRequest) = assembleSetBooleanParameterValueRequestFrom(
+                    contents[requestCount++]);
+            while (handleRequest) {
+                getCallBack<HandleSetBooleanParameterValueRequest>()(std::move(request));
+                std::tie(request, handleRequest) = assembleSetBooleanParameterValueRequestFrom(
+                        contents[requestCount++]);
+            }
+        }
+
 
         void handleIncomingCalibrationRequests() {
             auto hasToSendAllParameterNames = serverCommunicationStrategy->hasReceivedCalibrationRequest();
@@ -272,13 +350,45 @@ namespace SensorAccessLinkElement {
             }
         }
 
-        auto assembleGetParameterValueRequestFrom(
-                ParameterName const& content) const -> std::tuple<GetParameterValueRequest, bool> const {
-            GetParameterValueRequest getParameterRequest = RequestAssembler::getParameterValueRequest(content);
+        auto assembleGetParameterValueRequestFrom(ParameterName const& content) const
+        -> std::tuple<GetParameterValueRequest, bool> const {
+            GetParameterValueRequest getParameterRequest =
+                    RequestAssembler::getParameterValueRequest(content);
             bool hasToBeHandled = getParameterRequest != DEFAULT_GET_PARAMETER_VALUE_REQUEST;
             return std::make_tuple(getParameterRequest, hasToBeHandled);
         };
 
+        auto assembleSetUnsignedIntegerParameterValueRequestFrom(SetUnsignedIntegerParameterValueContent const& content) const
+        -> std::tuple<SetUnsignedIntegerParameterValueRequest, bool> const {
+            SetUnsignedIntegerParameterValueRequest setUnsignedIntegerParameterValueRequest =
+                    RequestAssembler::setUnsignedIntegerParameterValueRequest(content);
+            bool hasToBeHandled = setUnsignedIntegerParameterValueRequest != DEFAULT_SET_UNSIGNED_INTEGER_PARAMETER_VALUE_REQUEST;
+            return std::make_tuple(setUnsignedIntegerParameterValueRequest, hasToBeHandled);
+        };
+
+        auto assembleSetSignedIntegerParameterValueRequestFrom(SetSignedIntegerParameterValueContent const& content) const
+        -> std::tuple<SetSignedIntegerParameterValueRequest, bool> const {
+            SetSignedIntegerParameterValueRequest setSignedIntegerParameterValueRequest =
+                    RequestAssembler::setSignedIntegerParameterValueRequest(content);
+            bool hasToBeHandled = setSignedIntegerParameterValueRequest != DEFAULT_SET_SIGNED_INTEGER_PARAMETER_VALUE_REQUEST;
+            return std::make_tuple(setSignedIntegerParameterValueRequest, hasToBeHandled);
+        };
+
+        auto assembleSetRealNumberParameterValueRequestFrom(SetRealNumberParameterValueContent const& content) const
+        -> std::tuple<SetRealNumberParameterValueRequest, bool> const {
+            SetRealNumberParameterValueRequest setRealNumberParameterValueRequest =
+                    RequestAssembler::setRealNumberParameterValueRequest(content);
+            bool hasToBeHandled = setRealNumberParameterValueRequest != DEFAULT_SET_REAL_NUMBER_PARAMETER_VALUE_REQUEST;
+            return std::make_tuple(setRealNumberParameterValueRequest, hasToBeHandled);
+        };
+
+        auto assembleSetBooleanParameterValueRequestFrom(SetBooleanParameterValueContent const& content) const
+        -> std::tuple<SetBooleanParameterValueRequest, bool> const {
+            SetBooleanParameterValueRequest setBooleanParameterValueRequest =
+                    RequestAssembler::setBooleanParameterValueRequest(content);
+            bool hasToBeHandled = setBooleanParameterValueRequest != DEFAULT_SET_BOOLEAN_PARAMETER_VALUE_REQUEST;
+            return std::make_tuple(setBooleanParameterValueRequest, hasToBeHandled);
+        };
 
         void addOriginAndHandleError(ErrorHandling::SensorAccessLinkError&& error, std::string const& originToAdd) {
             auto originAddedError = ErrorHandling::SensorAccessLinkError(

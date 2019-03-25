@@ -76,6 +76,16 @@ namespace {
         return index_apply_impl(f, std::make_index_sequence<N>{});
     }
 
+    template<class F, size_t... Indices>
+    constexpr void index_apply_no_return_impl(F f, std::index_sequence<Indices...>) {
+        f(std::integral_constant<size_t, Indices>{}...);
+    }
+
+    template<size_t N, class F>
+    constexpr void index_apply_no_return(F f) {
+        index_apply_no_return_impl(f, std::make_index_sequence<N>{});
+    }
+
     // Tuple and static index function
     template<class Tuple, class F>
     constexpr auto apply(Tuple t, F f) {
