@@ -29,18 +29,22 @@ namespace ServerCommunication {
         using Payload = PayloadType;
 
         explicit ServerRequest(Payload const& payload) noexcept :
-                ServerRequest(payload, false, false) {}
+                ServerRequest(payload, false, false) {
+        }
 
         explicit ServerRequest() noexcept :
-                ServerRequest(ServerRequest::returnDefaultData()) {}
+                ServerRequest(ServerRequest::returnDefaultData()) {
+        }
 
         ~ServerRequest() noexcept = default;
 
         ServerRequest(ServerRequest const& other) :
-                ServerRequest(other.payload, other.badRequest, other.causedAnError) {}
+                ServerRequest(other.payload, other.badRequest, other.causedAnError) {
+        }
 
         ServerRequest(ServerRequest&& other) noexcept :
-                ServerRequest(std::move(other.payload), std::move(other.badRequest), std::move(other.causedAnError)) {}
+                ServerRequest(std::move(other.payload), std::move(other.badRequest), std::move(other.causedAnError)) {
+        }
 
         ServerRequest& operator=(ServerRequest const& other)& {
             ServerRequest temporary(other);
@@ -99,6 +103,13 @@ namespace ServerCommunication {
             return payload.getName();
         }
 
+//        template<typename T = typename Payload::ContentType,
+//                typename std::enable_if_t<!std::is_same<typename Payload::ContentType, typename Payload::Type>::value>
+//        >
+        auto getRequestedValue() const noexcept -> typename Payload::ContentType {
+            return payload.getContentValue();
+        }
+
         std::string payloadToString() const noexcept {
             return payload.toString();
         }
@@ -106,7 +117,8 @@ namespace ServerCommunication {
     private:
         ServerRequest(Payload const& payload, bool const& badRequest, bool const& causedAnError) noexcept :
                 payload(payload), badRequest(badRequest), causedAnError(causedAnError),
-                responseMessagePayload(N::toString() + getPayloadName()) {}
+                responseMessagePayload(N::toString() + getPayloadName()) {
+        }
 
         Payload payload;
         bool badRequest;

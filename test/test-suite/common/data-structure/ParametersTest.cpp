@@ -14,13 +14,14 @@ protected:
     using WHATEVER_UNIT = Sensor::Parameter::Units::not_applicable;
     static Byte const WHATEVER_INTERNAL_COMMAND = 0x4;
     static Byte const WHATEVER_INTERNAL_ADDRESS = 0x16;
-    static uint8_t const WHATEVER_SMALL_INTEGER_VALUE = 4;
+    static uint8_t const WHATEVER_SMALL_INTEGER_VALUE = 32;
 
     template<typename N>
     struct SensorParameterWithName : public Sensor::Gateway::SensorParameterDefinition<
             Sensor::Gateway::GatewayParameterDefinition<N, WHATEVER_TYPE, WHATEVER_UNIT>,
             WHATEVER_INTERNAL_COMMAND,
             WHATEVER_INTERNAL_ADDRESS,
+            WHATEVER_SMALL_INTEGER_VALUE,
             WHATEVER_SMALL_INTEGER_VALUE,
             WHATEVER_SMALL_INTEGER_VALUE,
             WHATEVER_SMALL_INTEGER_VALUE
@@ -32,6 +33,7 @@ protected:
             Sensor::Gateway::GatewayParameterDefinition<WHATEVER_NAME, WHATEVER_TYPE, U>,
             WHATEVER_INTERNAL_COMMAND,
             WHATEVER_INTERNAL_ADDRESS,
+            WHATEVER_SMALL_INTEGER_VALUE,
             WHATEVER_SMALL_INTEGER_VALUE,
             WHATEVER_SMALL_INTEGER_VALUE,
             WHATEVER_SMALL_INTEGER_VALUE

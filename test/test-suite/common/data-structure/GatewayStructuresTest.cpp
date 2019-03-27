@@ -33,7 +33,7 @@ protected:
 
     static Byte const WHATEVER_INTERNAL_COMMAND = 0x4;
     static Byte const WHATEVER_INTERNAL_ADDRESS = 0x16;
-    static uint8_t const WHATEVER_SMALL_INTEGER_VALUE = 4;
+    static uint8_t const WHATEVER_SMALL_INTEGER_VALUE = 32;
 
     using RealisticTestStructures = Sensor::Test::RealisticImplementation::Structures;
     using PulseWidthDefinition = Sensor::Gateway::PulseWidthDefinition;
@@ -47,6 +47,7 @@ protected:
             GPD,
             WHATEVER_INTERNAL_COMMAND,
             WHATEVER_INTERNAL_ADDRESS,
+            WHATEVER_SMALL_INTEGER_VALUE,
             WHATEVER_SMALL_INTEGER_VALUE,
             WHATEVER_SMALL_INTEGER_VALUE,
             WHATEVER_SMALL_INTEGER_VALUE

@@ -124,7 +124,8 @@ namespace SensorCommunication {
         }
 
         void sendRequest(Request&& request) final {
-            CanMessage canMessage;
+            CanMessage canMessage = convertSensorMessageToCanMessage(request);
+            writeMessage(canMessage);
         }
 
     private:

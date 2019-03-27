@@ -22,6 +22,7 @@
 namespace Sensor {
     namespace FakeParameter {
 
+        static size_t const PARAMETER_CONTROL_MESSAGE_HEADER_LENGTH_IN_BITS = 32;
         static size_t const PARAMETER_CONTROL_MESSAGE_PAYLOAD_LENGTH_IN_BITS = 32;
         namespace Details {
             namespace NameLiterals {
@@ -42,7 +43,14 @@ namespace Sensor {
 
             template<typename N, typename T, typename V>
             struct MaskedParameter : public Sensor::Gateway::Parameter<Sensor::Gateway::SensorParameterDefinition<
-                   Sensor::Gateway::GatewayParameterDefinition<N, T, V>, 0x0, 0x0, PARAMETER_CONTROL_MESSAGE_PAYLOAD_LENGTH_IN_BITS, 0x0, 0x0> > {
+                    Sensor::Gateway::GatewayParameterDefinition<N, T, V>,
+                    0x0,
+                    0x0,
+                    PARAMETER_CONTROL_MESSAGE_HEADER_LENGTH_IN_BITS,
+                    PARAMETER_CONTROL_MESSAGE_PAYLOAD_LENGTH_IN_BITS,
+                    0x0,
+                    0x0
+            > > {
             };
 
             template<typename N>

@@ -51,7 +51,10 @@ namespace Sensor {
                 static size_t const NUMBER_OF_TRACKS_PER_PIXEL = 2;
                 static size_t const NUMBER_OF_CHANNELS = 2;
                 static size_t const RAW_DATA_SAMPLING_LENGTH = 16;
-                static size_t const MAX_COMMAND_PAYLOAD_SIZE = FakeParameter::PARAMETER_CONTROL_MESSAGE_PAYLOAD_LENGTH_IN_BITS / 8;
+                static size_t const MAX_COMMAND_PAYLOAD_SIZE =
+                        (FakeParameter::PARAMETER_CONTROL_MESSAGE_HEADER_LENGTH_IN_BITS +
+                         FakeParameter::PARAMETER_CONTROL_MESSAGE_PAYLOAD_LENGTH_IN_BITS) / 8;
+
 
                 typedef Byte STUB_SENSOR_DATA_TYPE;
             }

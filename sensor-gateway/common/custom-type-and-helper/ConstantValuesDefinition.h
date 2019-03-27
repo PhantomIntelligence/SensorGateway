@@ -99,6 +99,7 @@ namespace Sensor {
         static size_t const NUMBER_OF_GATEWAY_TIME_POINTS = 2;
 
         static size_t const MAX_COMMAND_PAYLOAD_SIZE = 4096; // 1024 * floats == 1024 * 4 Bytes
+        static size_t const CONTROL_MESSAGE_TOTAL_SIZE_IN_BYTES = 8;
     }
 
     namespace AWL {
@@ -123,7 +124,7 @@ namespace Sensor {
 //        static size_t const RAW_DATA_SAMPLING_LENGTH = 1024;
         static size_t const RAW_DATA_SAMPLING_LENGTH = 1;
 
-        static size_t const MAX_COMMAND_PAYLOAD_SIZE = 4; // 4 Bytes
+        static size_t const MAX_COMMAND_PAYLOAD_SIZE = 8; // 8 Bytes
 
         namespace _7 {
             SensorId const SENSOR_ID = 0x0010;

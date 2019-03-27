@@ -51,7 +51,7 @@ namespace Sensor {
             typedef typename
             Sensor::ControlMessageDefinition<
                     ControlMessagePayloadTypes::GUARDIAN,
-                    Guardian::MAX_COMMAND_PAYLOAD_SIZE
+                    Guardian::CONTROL_MESSAGE_TOTAL_SIZE_IN_BYTES
             > ControlMessageDefinition;
 
             typedef typename DataFlow::AWLMessage<MessageDefinition> Message;

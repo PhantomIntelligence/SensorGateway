@@ -44,7 +44,7 @@ namespace CustomType {
             return string;
         }
 
-        inline constexpr auto lit() -> decltype(std::string{toString_internals(), sizeof...(elements)}){
+        inline static constexpr auto lit() -> decltype(std::string{toString_internals(), sizeof...(elements)}){
             return std::basic_string<char>{toString_internals(), sizeof...(elements) + 1};
         }
 

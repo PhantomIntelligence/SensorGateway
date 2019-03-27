@@ -47,8 +47,10 @@ namespace SensorAccessLinkElement {
         using SetBooleanParameterValueRequest = ServerCommunication::RequestTypes::SetBooleanParameterValue;
 
         using Parameters = typename SERVER_STRUCTURES::Parameters;
-
-        static size_t const ARBITRARILY_BIG_ENOUGH_NUMBER_OF_CONCURRENT_REQUESTS = 256;
+        using ParameterName = typename Parameters::ParameterName;
+        using RequestedParameterGetValues = std::unordered_set<ParameterName>;
+        using RequestedValue = typename Parameters::RequestedValue;
+        using RequestedParameterSetValues = typename Parameters::RequestedParameterValues;
 
     public:
 
@@ -56,7 +58,10 @@ namespace SensorAccessLinkElement {
                                            DataTranslator* dataTranslator) :
                 requestHandler(requestHandler),
                 dataTranslator(dataTranslator),
-                responseControlMessageScheduler(this) {}
+                calibrationRequested(false),
+                clearCalibrationRequested(false),
+                responseControlMessageScheduler(this) {
+        }
 
         ~SensorParameterController() noexcept {
             terminateAndJoin();
@@ -102,6 +107,12 @@ namespace SensorAccessLinkElement {
 
         template<typename ParameterValueRequest>
         void processSet(ParameterValueRequest&& parameterValueRequest) noexcept {
+            auto parameterName = parameterValueRequest.getPayloadName();
+            auto requestedValue = parameterValueRequest.getRequestedValue();
+            addRequestedSetValue(parameterName, requestedValue);
+            auto sensorControlMessage = parameters.createGetParameterValueControlMessageFor(parameterName);
+
+            dataTranslator->translateAndSendToSensor(std::move(sensorControlMessage));
 //            auto parameterName = getParameterValueRequest.getPayloadName();
 //            auto sensorControlMessage = parameters.createGetParameterValueControlMessageFor(parameterName);
 //            dataTranslator->translateAndSendToSensor(std::move(sensorControlMessage));
@@ -128,6 +139,7 @@ namespace SensorAccessLinkElement {
 
         // TODO : test this function
         void calibrate() noexcept {
+            calibrationRequested.store(true);
 //            auto parameterName = getParameterValueRequest.getPayloadName();
 //            auto sensorControlMessage = parameters.createGetParameterValueControlMessageFor(parameterName);
 //            dataTranslator->translateAndSendToSensor(std::move(sensorControlMessage));
@@ -135,6 +147,7 @@ namespace SensorAccessLinkElement {
 
         // TODO : test this function
         void clearCalibration() noexcept {
+            clearCalibrationRequested.store(true);
 //            auto parameterName = getParameterValueRequest.getPayloadName();
 //            auto sensorControlMessage = parameters.createGetParameterValueControlMessageFor(parameterName);
 //            dataTranslator->translateAndSendToSensor(std::move(sensorControlMessage));
@@ -158,12 +171,66 @@ namespace SensorAccessLinkElement {
 
     private:
 
+        template <typename T>
+        void addRequestedGetValue(ParameterName const& parameterName) {
+            LockGuard guard(requestGetValueMutex);
+            requestedParameterGetValues.insert(parameterName);
+        }
+
+        template <typename T>
+        void addRequestedSetValue(ParameterName const& parameterName, T&& requestedValue) {
+            LockGuard guard(requestSetValueMutex);
+            requestedParameterSetValues.at[parameterName] = createRequestedValue(requestedValue);
+        }
+
+        static constexpr auto createRequestedValue(UnsignedInteger value) noexcept -> RequestedValue {
+            return std::make_tuple(
+                    true, value,
+                    false, std::ignore,
+                    false, std::ignore,
+                    false, std::ignore
+            );
+        }
+
+        static constexpr auto createRequestedValue(SignedInteger value) noexcept -> RequestedValue {
+            return std::make_tuple(
+                    false, std::ignore,
+                    true, value,
+                    false, std::ignore,
+                    false, std::ignore
+            );
+        }
+
+        static constexpr auto createRequestedValue(RealNumber value) noexcept -> RequestedValue {
+            return std::make_tuple(
+                    false, std::ignore,
+                    false, std::ignore,
+                    true, value,
+                    false, std::ignore
+            );
+        }
+
+        static constexpr auto createRequestedValue(bool value) noexcept -> RequestedValue {
+            return std::make_tuple(
+                    false, std::ignore,
+                    false, std::ignore,
+                    false, std::ignore,
+                    true, value
+            );
+        }
+
         RequestHandler* requestHandler;
         DataTranslator* dataTranslator;
 
         Parameters parameters;
 
-        SensorControlMessagePointers sensorControlMessageRequestPointers;
+        Mutex requestGetValueMutex;
+        RequestedParameterGetValues requestedParameterGetValues;
+
+        Mutex requestSetValueMutex;
+        RequestedParameterSetValues requestedParameterSetValues;
+        AtomicFlag calibrationRequested;
+        AtomicFlag clearCalibrationRequested;
 
         ResponseControlMessageScheduler responseControlMessageScheduler;
     };

@@ -19,6 +19,7 @@
 
 
 #include <atomic>
+#include <bitset>
 #include <future>
 #include <mutex>
 #include <random>
@@ -27,6 +28,7 @@
 #include <list>
 #include <array>
 #include <unordered_map>
+#include <unordered_set>
 #include <exception>
 #include <cstring>
 #include <sstream>

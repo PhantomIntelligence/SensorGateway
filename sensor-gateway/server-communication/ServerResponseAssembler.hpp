@@ -39,7 +39,7 @@ namespace Assemble {
         template<typename T>
         using ParameterType = ServerCommunication::PayloadTypes::Details::ParameterType<T>;
         template<typename T>
-        using ParameterValuePayload = ServerCommunication::PayloadTypes::Details::SimplePayload<ParameterType<T>>;
+        using ParameterValuePayload = ServerCommunication::PayloadTypes::Details::ParameterPayload<T>;
         template<typename T>
         using ParameterValueResponse = ServerCommunication::ServerResponse<ParameterValuePayload<T>, MessagePayload>;
 
