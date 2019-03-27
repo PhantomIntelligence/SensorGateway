@@ -59,6 +59,7 @@ namespace {
     using UnsignedInteger = uint64_t;
     using SignedInteger = int64_t;
     using RealNumber = double;
+    using Boolean = bool;
 }
 
 namespace DataFlow {

@@ -52,6 +52,10 @@ namespace DataFlow {
             BULK_GET_VALUE = 11,
             SET_VALUE = 20,
             BULK_SET_VALUE = 21,
+            CALIBRATE = 30,
+            CLEAR_CALIBRATION = 31,
+            RESPONSE = 50,
+            ERROR = 100,
         };
 
         using Definitions = ControlMessageDefinition;
@@ -59,19 +63,23 @@ namespace DataFlow {
 
         explicit ControlMessage(ControlMessageCode const& commandCode, Payload payload) noexcept :
                 controlMessageCode(commandCode),
-                payload(payload) {}
+                payload(payload) {
+        }
 
         explicit ControlMessage() noexcept :
-                ControlMessage(ControlMessage::returnDefaultData()) {}
+                ControlMessage(ControlMessage::returnDefaultData()) {
+        }
 
         ~ControlMessage() noexcept = default;
 
         ControlMessage(ControlMessage const& other) :
-                ControlMessage(other.controlMessageCode, other.payload) {}
+                ControlMessage(other.controlMessageCode, other.payload) {
+        }
 
         ControlMessage(ControlMessage&& other) noexcept :
                 ControlMessage(std::move(other.controlMessageCode),
-                        std::move(other.payload)) {}
+                               std::move(other.payload)) {
+        }
 
         ControlMessage& operator=(ControlMessage const& other)& {
             ControlMessage temporary(other);
@@ -104,6 +112,47 @@ namespace DataFlow {
 
         ControlMessageCode const& getControlMessageCode() const noexcept {
             return controlMessageCode;
+        }
+
+        Payload getPayloadCopy() const noexcept {
+            Payload payloadCopy(payload);
+            return payloadCopy;
+        }
+
+        Payload const& getPayload() const noexcept {
+            return payload;
+        }
+
+        void calibrate() noexcept {
+            controlMessageCode = ControlMessageCode::CALIBRATE;
+        }
+
+        void clearCalibration() noexcept {
+            controlMessageCode = ControlMessageCode::CLEAR_CALIBRATION;
+        }
+
+        bool isGet() const noexcept {
+            return controlMessageCode == ControlMessageCode::GET_VALUE;
+        }
+
+        bool isSet() const noexcept {
+            return controlMessageCode == ControlMessageCode::SET_VALUE;
+        }
+
+        bool isResponse() const noexcept {
+            return controlMessageCode == ControlMessageCode::RESPONSE;
+        }
+
+        bool isError() const noexcept {
+            return controlMessageCode == ControlMessageCode::ERROR;
+        }
+
+        bool isCalibration() const noexcept {
+            return controlMessageCode == ControlMessageCode::CALIBRATE;
+        }
+
+        bool isClearCalibration() const noexcept {
+            return controlMessageCode == ControlMessageCode::CLEAR_CALIBRATION;
         }
 
     private:

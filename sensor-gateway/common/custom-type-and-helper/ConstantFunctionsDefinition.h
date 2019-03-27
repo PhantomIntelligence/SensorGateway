@@ -18,20 +18,28 @@
 #define SENSORGATEWAY_CONSTANTFUNCTIONSDEFINITION_H
 
 namespace {
-    uint16_t convertTwoBytesToUnsignedBigEndian(uint8_t firstByte, uint8_t secondByte) noexcept {
+    uint16_t flipEndiannessAndCastAsUInt16(uint8_t firstByte, uint8_t secondByte) noexcept {
         auto shift = static_cast<uint16_t>(256U);
-        uint16_t unsignedBigEndianNumber = shift * secondByte + firstByte;
-        return unsignedBigEndianNumber;
+        uint16_t flippedEndiannessNumber = shift * secondByte + firstByte;
+        return flippedEndiannessNumber;
     }
 
-    void convertFourBytesToUnsignedBigEndian(uint8_t (& littleEndianBytes)[4], uint32_t* bigEndianResult) noexcept {
+    void flipEndiannessAndCastAsUInt32(uint8_t (& littleEndianBytes)[4], uint32_t* bigEndianResult) noexcept {
         memcpy(bigEndianResult, littleEndianBytes, sizeof *bigEndianResult);
     }
 
-    int16_t convertTwoBytesToSignedBigEndian(uint8_t firstByte, uint8_t secondByte) noexcept {
+    int16_t flipEndiannessAndCastAsInt16(uint8_t firstByte, uint8_t secondByte) noexcept {
         auto shift = static_cast<int16_t>(256);
         int16_t signedBigEndianNumber = shift * secondByte + firstByte;
         return signedBigEndianNumber;
+    }
+
+    uint32_t flipEndiannessOfUInt32(uint32_t value) {
+        uint32_t reverseValue = (static_cast<uint32_t>(value & 0xFF000000) >> 24) |
+                                (static_cast<uint32_t>(value & 0x00FF0000) >> 8) |
+                                (static_cast<uint32_t>(value & 0x0000FF00) << 8) |
+                                (static_cast<uint32_t>(value & 0x000000FF) << 24);
+        return reverseValue;
     }
 
     int16_t reverseEndiannessOfInt16(int16_t value) {
@@ -57,7 +65,8 @@ namespace {
     /**
       * @warning Allows to start the various JoinableThreads in the constructors without blocking anything
       */
-    void doNothing() {}
+    void doNothing() {
+    }
 
     // TODO : ERROR
     // TODO: uncomment this to have a warning pop everywhere a std::runtime_error is thrown and should be replaced by some other error

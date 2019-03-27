@@ -19,6 +19,7 @@
 
 #include "sensor-gateway/data-translation/DataTranslator.hpp"
 #include "sensor-gateway/server-communication/ServerCommunicator.hpp"
+#include "SensorParameterErrorFactory.h"
 
 namespace SensorAccessLinkElement {
 
@@ -48,8 +49,17 @@ namespace SensorAccessLinkElement {
 
         using Parameters = typename SERVER_STRUCTURES::Parameters;
         using ParameterName = typename Parameters::ParameterName;
-        using RequestedParameterGetValues = std::unordered_set<ParameterName>;
+        using SensorResponseStatus = typename Parameters::ParameterResponseStatus;
         using RequestedValue = typename Parameters::RequestedValue;
+
+        using SensorParameterStatuses = typename Parameters::ParameterResponseStatuses;
+        using GetParameterRequests = std::unordered_map<ParameterName, GetParameterValueRequest>;
+        using SetUnsignedIntegerParameterRequests = std::unordered_map<ParameterName, SetUnsignedIntegerParameterValueRequest>;
+        using SetSignedIntegerParameterRequests = std::unordered_map<ParameterName, SetSignedIntegerParameterValueRequest>;
+        using SetRealNumberParameterRequests = std::unordered_map<ParameterName, SetRealNumberParameterValueRequest>;
+        using SetBooleanParameterRequests = std::unordered_map<ParameterName, SetBooleanParameterValueRequest>;
+
+        using RequestedParameterGetValues = typename Parameters::RequestedParameterNames;
         using RequestedParameterSetValues = typename Parameters::RequestedParameterValues;
 
     public:
@@ -90,67 +100,160 @@ namespace SensorAccessLinkElement {
             responseControlMessageScheduler.terminateAndJoin();
         }
 
+        template<typename Metadata, typename RequestMap>
+        void sendErrorToRequestHandler(Metadata metadata, RequestMap* map) noexcept {
+            auto name = metadata.name;
+            bool requestedInThisMap = map->find(name) != map->end();
+            if (requestedInThisMap) {
+                auto originalRequest = map->at(name);
+                requestHandler->writeAndSendParameterErrorResponse(metadata, std::move(originalRequest));
+                map->erase(name);
+            }
+        }
+
+        template<typename RequestMap>
+        void sendParameterValueToRequestHandler(ParameterName name, SensorResponseStatus sensorResponseStatus, RequestMap* map) noexcept {
+            bool requestedInThisMap = map->find(name) != map->end();
+            if (requestedInThisMap) {
+                auto originalRequest = map->at(name);
+                auto metadata = sensorResponseStatus.metadata;
+                auto parameterValue = sensorResponseStatus.receivedValue;
+                if (isUnsignedInteger(parameterValue)) {
+                    auto value = getUnsignedInteger(parameterValue);
+                    requestHandler->writeAndSendParameterValueResponse(metadata, value, std::move(originalRequest));
+                } else if (isSignedInteger(parameterValue)) {
+                    auto value = getSignedInteger(parameterValue);
+                    requestHandler->writeAndSendParameterValueResponse(metadata, value, std::move(originalRequest));
+                } else if (isRealNumber(parameterValue)) {
+                    auto value = getRealNumber(parameterValue);
+                    requestHandler->writeAndSendParameterValueResponse(metadata, value, std::move(originalRequest));
+                } else if (isBoolean(parameterValue)) {
+                    auto value = getBoolean(parameterValue);
+                    requestHandler->writeAndSendParameterValueResponse(metadata, value, std::move(originalRequest));
+                } else {
+                    ErrorSource::produce(
+                            std::move(
+                                    ErrorHandling::createSensorParameterError(
+                                            ErrorHandling::INVALID_SENSOR_PARAMETER_VALUE_TYPE,
+                                            ErrorHandling::Origin::SENSOR_PARAMETER_CONTROLLER_PARSE_VALUE_BEFORE_SEND_TO_REQUEST,
+                                            ErrorHandling::Message::PARAMETER_VALUE_TYPE_NOT_RECOGNIZED)
+                            )
+                    );
+                }
+                map->erase(name);
+            }
+        }
+
         void consume(SensorControlMessage&& sensorControlMessageResponse) override {
+            LockGuard guard(requestMutex);
+            using ControlCode = typename SensorControlMessage::ControlMessageCode;
+            if (sensorControlMessageResponse.isResponse()) {
+                bool hasToSendResponseToServer = false;
+                bool hasToSendControlMessageToSensor = false;
+                SensorControlMessage setValuesSensorControlMessage;
+                std::tie(hasToSendResponseToServer, hasToSendControlMessageToSensor, setValuesSensorControlMessage)
+                        = parameters.updateStatusForResponse(
+                        sensorControlMessageResponse,
+                        &requestedParameterGetValues,
+                        &requestedParameterSetValues,
+                        &sensorParameterStatuses
+                );
+                if (hasToSendResponseToServer) {
+                    for (auto&& statusPair :sensorParameterStatuses) {
+                        auto parameterName = statusPair.first;
+                        auto status = statusPair.second;
+                        sendParameterValueToRequestHandler(parameterName, status, &getParameterRequests);
+                        sendParameterValueToRequestHandler(parameterName, status, &setUnsignedIntegerParameterRequests);
+                        sendParameterValueToRequestHandler(parameterName, status, &setSignedIntegerParameterRequests);
+                        sendParameterValueToRequestHandler(parameterName, status, &setRealNumberParameterRequests);
+                        sendParameterValueToRequestHandler(parameterName, status, &setBooleanParameterRequests);
+                    }
+                }
+                if (hasToSendControlMessageToSensor) {
+                    dataTranslator->translateAndSendToSensor(std::move(setValuesSensorControlMessage));
+                }
+            }
+
+            if (sensorControlMessageResponse.isError()) {
+                parameters.updateStatusForError(std::move(sensorControlMessageResponse), &sensorParameterStatuses);
+
+                for (auto&& statusPair :sensorParameterStatuses) {
+                    auto metadata = statusPair.second.metadata;
+                    sendErrorToRequestHandler(metadata, &getParameterRequests);
+                    sendErrorToRequestHandler(metadata, &setUnsignedIntegerParameterRequests);
+                    sendErrorToRequestHandler(metadata, &setSignedIntegerParameterRequests);
+                    sendErrorToRequestHandler(metadata, &setRealNumberParameterRequests);
+                    sendErrorToRequestHandler(metadata, &setBooleanParameterRequests);
+                }
+            }
             /**
              *  TODO:
              *  - Create schedulers and link'em in SensorAccessLink
              *  - receive and process ControlMessage // from sensor
              *  - transmit to server w/ ServerCommunicator*
              */
+//            auto parameterData = parameter->extractMetadata();
         }
 
-        void processGet(GetParameterValueRequest&& getParameterValueRequest) noexcept {
-            auto parameterName = getParameterValueRequest.getPayloadName();
-            auto sensorControlMessage = parameters.createGetParameterValueControlMessageFor(parameterName);
+        void processGet(GetParameterValueRequest&& request) noexcept {
+            LockGuard guard(requestMutex);
+            auto name = request.getPayloadName();
+            getParameterRequests[name] = request;
+            addRequestedGetValue(name);
+            auto sensorControlMessage = parameters.createGetParameterValueControlMessageFor(name);
             dataTranslator->translateAndSendToSensor(std::move(sensorControlMessage));
         }
 
         template<typename ParameterValueRequest>
         void processSet(ParameterValueRequest&& parameterValueRequest) noexcept {
+            LockGuard guard(requestMutex);
             auto parameterName = parameterValueRequest.getPayloadName();
             auto requestedValue = parameterValueRequest.getRequestedValue();
             addRequestedSetValue(parameterName, requestedValue);
             auto sensorControlMessage = parameters.createGetParameterValueControlMessageFor(parameterName);
 
             dataTranslator->translateAndSendToSensor(std::move(sensorControlMessage));
-//            auto parameterName = getParameterValueRequest.getPayloadName();
-//            auto sensorControlMessage = parameters.createGetParameterValueControlMessageFor(parameterName);
-//            dataTranslator->translateAndSendToSensor(std::move(sensorControlMessage));
         }
 
-        void processSetUnsignedInteger(
-                SetUnsignedIntegerParameterValueRequest&& setUnsignedIntegerParameterValueRequest) noexcept {
-            processSet(std::forward<SetUnsignedIntegerParameterValueRequest>(setUnsignedIntegerParameterValueRequest));
+        void processSetUnsignedInteger(SetUnsignedIntegerParameterValueRequest&& request) noexcept {
+            auto name = request.getPayloadName();
+            setUnsignedIntegerParameterRequests[name] = request;
+            processSet(std::move(request));
         }
 
-        void processSetSignedInteger(
-                SetSignedIntegerParameterValueRequest&& setSignedIntegerParameterValueRequest) noexcept {
-            processSet(std::forward<SetSignedIntegerParameterValueRequest>(setSignedIntegerParameterValueRequest));
+        void processSetSignedInteger(SetSignedIntegerParameterValueRequest&& request) noexcept {
+            auto name = request.getPayloadName();
+            setSignedIntegerParameterRequests[name] = request;
+            processSet(std::move(request));
         }
 
-        void processSetRealNumber(SetRealNumberParameterValueRequest&& setRealNumberParameterValueRequest) noexcept {
-            processSet(std::forward<SetRealNumberParameterValueRequest>(setRealNumberParameterValueRequest));
+        void processSetRealNumber(SetRealNumberParameterValueRequest&& request) noexcept {
+            auto name = request.getPayloadName();
+            setRealNumberParameterRequests[name] = request;
+            processSet(std::move(request));
         }
 
-        void processSetBoolean(SetBooleanParameterValueRequest&& setBooleanParameterValueRequest) noexcept {
-            processSet(std::forward<SetBooleanParameterValueRequest>(setBooleanParameterValueRequest));
+        void processSetBoolean(SetBooleanParameterValueRequest&& request) noexcept {
+            auto name = request.getPayloadName();
+            setBooleanParameterRequests[name] = request;
+            processSet(std::move(request));
         }
 
 
         // TODO : test this function
         void calibrate() noexcept {
             calibrationRequested.store(true);
-//            auto parameterName = getParameterValueRequest.getPayloadName();
-//            auto sensorControlMessage = parameters.createGetParameterValueControlMessageFor(parameterName);
-//            dataTranslator->translateAndSendToSensor(std::move(sensorControlMessage));
+            SensorControlMessage sensorControlMessage;
+            sensorControlMessage.calibrate();
+            dataTranslator->translateAndSendToSensor(std::move(sensorControlMessage));
         }
 
         // TODO : test this function
         void clearCalibration() noexcept {
             clearCalibrationRequested.store(true);
-//            auto parameterName = getParameterValueRequest.getPayloadName();
-//            auto sensorControlMessage = parameters.createGetParameterValueControlMessageFor(parameterName);
-//            dataTranslator->translateAndSendToSensor(std::move(sensorControlMessage));
+            SensorControlMessage sensorControlMessage;
+            sensorControlMessage.clearCalibration();
+            dataTranslator->translateAndSendToSensor(std::move(sensorControlMessage));
         }
 
         using ErrorSource::linkConsumer;
@@ -171,15 +274,12 @@ namespace SensorAccessLinkElement {
 
     private:
 
-        template <typename T>
         void addRequestedGetValue(ParameterName const& parameterName) {
-            LockGuard guard(requestGetValueMutex);
             requestedParameterGetValues.insert(parameterName);
         }
 
-        template <typename T>
+        template<typename T>
         void addRequestedSetValue(ParameterName const& parameterName, T&& requestedValue) {
-            LockGuard guard(requestSetValueMutex);
             requestedParameterSetValues.at(parameterName) = createRequestedValue(requestedValue);
         }
 
@@ -222,13 +322,20 @@ namespace SensorAccessLinkElement {
         RequestHandler* requestHandler;
         DataTranslator* dataTranslator;
 
+        Mutex requestMutex;
+
         Parameters parameters;
+        SensorParameterStatuses sensorParameterStatuses;
 
-        Mutex requestGetValueMutex;
+        GetParameterRequests getParameterRequests;
+        SetUnsignedIntegerParameterRequests setUnsignedIntegerParameterRequests;
+        SetSignedIntegerParameterRequests setSignedIntegerParameterRequests;
+        SetRealNumberParameterRequests setRealNumberParameterRequests;
+        SetBooleanParameterRequests setBooleanParameterRequests;
+
         RequestedParameterGetValues requestedParameterGetValues;
-
-        Mutex requestSetValueMutex;
         RequestedParameterSetValues requestedParameterSetValues;
+
         AtomicFlag calibrationRequested;
         AtomicFlag clearCalibrationRequested;
 

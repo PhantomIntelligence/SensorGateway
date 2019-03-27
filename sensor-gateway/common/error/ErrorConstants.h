@@ -42,6 +42,8 @@ namespace ErrorHandling {
         std::string const SERVER_COMMUNICATOR_SEND_RESPONSE = "send response";
 
         std::string const SERVER_REQUEST_HANDLING_PARAMETER = "sensor parameter value";
+
+        std::string const SENSOR_PARAMETER_CONTROLLER_PARSE_VALUE_BEFORE_SEND_TO_REQUEST = "parse value before sending to request handler";
     }
 
     namespace Message {
@@ -49,6 +51,8 @@ namespace ErrorHandling {
         std::string const EMPTY_MESSAGE = "";
 
         std::string const PARAMETER_NOT_AVAILABLE = "Parameter is not available";
+
+        std::string const PARAMETER_VALUE_TYPE_NOT_RECOGNIZED = "Parameter value type is not recognized";
     }
 
     enum Severity : int32_t {
@@ -82,6 +86,8 @@ namespace ErrorHandling {
         TRANSLATION_ERROR = 200,
 
         TIME_POINTS_ERROR = 300,
+
+        PARAMETER_ERROR = 300,
     };
 
     typedef int64_t ErrorCode;
@@ -122,6 +128,10 @@ namespace ErrorHandling {
         INVALID_PARAMETER_NAME = 20110,
 
         INVALID_PARAMETER_VALUE = 20120,
+
+        // 20200-20299 Request Handling error code
+
+        INVALID_SENSOR_PARAMETER_VALUE_TYPE = 20200,
 
     };
 };

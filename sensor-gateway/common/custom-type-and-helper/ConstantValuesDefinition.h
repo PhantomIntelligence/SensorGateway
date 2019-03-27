@@ -107,6 +107,7 @@ namespace Sensor {
         MessageId const END_OF_FRAME = 0x09;
         MessageId const DETECTION_TRACK = 0x0A;
         MessageId const DETECTION_VELOCITY = 0x0B;
+        MessageId const COMMAND_MESSAGE = 0x50;
         int const NUMBER_OF_DATA_BYTES = 8;
 
         // Internal sensor timestamps are included in untranslated structure

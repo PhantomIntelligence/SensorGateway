@@ -213,9 +213,8 @@ namespace SensorAccessLinkElement {
         }
 
 // TODO : Test this and complete with actual value from Sensor --> integration test
-        template<typename P, typename Value, typename Request>
-        void writeAndSendParameterValueResponse(P* parameter, Value value, Request&& originalRequest) const {
-            auto parameterData = parameter->extractMetadata();
+        template<typename ParameterData, typename Value, typename Request>
+        void writeAndSendParameterValueResponse(ParameterData parameterData, Value value, Request&& originalRequest) const {
             auto parameterValueResponse = ResponseAssembler::createParameterValueResponse(
                     parameterData,
                     value,
@@ -225,9 +224,8 @@ namespace SensorAccessLinkElement {
         }
 
 // TODO : Test this and complete with error value from Sensor --> integration test
-        template<typename P, typename Request>
-        void writeAndSendParameterErrorResponse(P* parameter, Request&& originalRequest) const {
-            auto parameterData = parameter->extractMetadata();
+        template<typename ParameterData, typename Request>
+        void writeAndSendParameterErrorResponse(ParameterData parameterData, Request&& originalRequest) const {
             auto parameterErrorResponse = ResponseAssembler::createParameterErrorResponse(
                     parameterData,
                     std::forward<Request>(originalRequest)

@@ -30,10 +30,10 @@ namespace Sensor {
             using TIAGain = StringLiteral<decltype("TIA Gain"_ToString)>;
         }
         namespace Types {
-            using Boolean = bool;
-            using RealNumber = double;
             using UnsignedInteger = uint64_t;
             using SignedInteger = int64_t;
+            using RealNumber = double;
+            using Boolean = bool;
             using Text = std::string;
         }
         namespace Units {

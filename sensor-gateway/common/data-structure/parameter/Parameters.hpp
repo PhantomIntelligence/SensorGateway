@@ -22,6 +22,117 @@
 namespace Sensor {
     namespace Gateway {
 
+        struct ParameterMetadata {
+            std::string name{""};
+            std::string unit{""};
+        };
+
+        struct ParameterInfoForBulkSet {
+            bool isOfInterest = false;
+            std::string const name{""};
+            std::string const unit{""};
+            size_t const valueOffsetInBits = 0;
+            size_t const valueLengthInBits = 0;
+        };
+
+    }
+}
+
+namespace {
+    using Sensor::Gateway::ParameterMetadata;
+}
+
+namespace ParameterValueStatus {
+
+    using ValueIsUnsignedInteger = bool;
+    using UnsignedIntegerValue = UnsignedInteger;
+    using ValueIsSignedInteger = bool;
+    using SignedIntegerValue = SignedInteger;
+    using ValueIsRealNumber = bool;
+    using RealNumberValue = RealNumber;
+    using ValueIsBoolean = bool;
+    using BooleanValue = bool;
+
+    using RequestedValue = std::tuple<
+            ValueIsUnsignedInteger,
+            UnsignedIntegerValue,
+            ValueIsSignedInteger,
+            SignedIntegerValue,
+            ValueIsRealNumber,
+            RealNumberValue,
+            ValueIsBoolean,
+            BooleanValue
+    >;
+
+    struct ParameterResponseStatus {
+        bool receivedError = false;
+        bool receivedResponse = false;
+        Sensor::Gateway::ParameterMetadata metadata = {.name = "", .unit=""};
+        RequestedValue receivedValue = std::make_tuple(false, 0, false, 0, false, 0.0, false, false);
+    };
+}
+
+namespace {
+    using ParameterValueStatus::RequestedValue;
+    using ParameterValueStatus::ParameterResponseStatus;
+
+    using ParameterValueStatus::UnsignedIntegerValue;
+    using ParameterValueStatus::SignedIntegerValue;
+    using ParameterValueStatus::RealNumberValue;
+    using ParameterValueStatus::BooleanValue;
+
+    static constexpr auto isUnsignedInteger(RequestedValue const& requestedValue) -> bool {
+        return std::get<0>(requestedValue);
+    }
+
+    static constexpr auto getUnsignedInteger(RequestedValue const& requestedValue) -> UnsignedIntegerValue {
+        return std::get<1>(requestedValue);
+    }
+
+    static constexpr auto isSignedInteger(RequestedValue const& requestedValue) -> bool {
+        return std::get<2>(requestedValue);
+    }
+
+    static constexpr auto getSignedInteger(RequestedValue const& requestedValue) -> SignedIntegerValue {
+        return std::get<3>(requestedValue);
+    }
+
+    static constexpr auto isRealNumber(RequestedValue const& requestedValue) -> bool {
+        return std::get<4>(requestedValue);
+    }
+
+    static constexpr auto getRealNumber(RequestedValue const& requestedValue) -> RealNumberValue {
+        return std::get<5>(requestedValue);
+    }
+
+    static constexpr auto isBoolean(RequestedValue const& requestedValue) -> bool {
+        return std::get<6>(requestedValue);
+    }
+
+    static constexpr auto getBoolean(RequestedValue const& requestedValue) -> BooleanValue {
+        return std::get<7>(requestedValue);
+    }
+
+    template<typename T>
+    static constexpr auto getValue(RequestedValue const& requestedValue) -> T {
+        if (isUnsignedInteger(requestedValue)) {
+            return getUnsignedInteger(requestedValue);
+        }
+        if (isSignedInteger(requestedValue)) {
+            return getSignedInteger(requestedValue);
+        }
+        if (isRealNumber(requestedValue)) {
+            return getRealNumber(requestedValue);
+        }
+        if (isBoolean(requestedValue)) {
+            return getBoolean(requestedValue);
+        }
+    }
+}
+
+namespace Sensor {
+    namespace Gateway {
+
         template<
                 typename N,
                 typename T,
@@ -62,26 +173,12 @@ namespace Sensor {
             using ControlMessagePayload = std::array<Byte, totalControlMessageLengthInBits / 8>;
         };
 
-
-        struct ParameterMetadata {
-            std::string const name;
-            std::string const unit;
-        };
-
-        struct ParameterInfoForBulkSet {
-            bool isOfInterest;
-            std::string const name;
-            uint8_t const valueOffsetInBits;
-            uint8_t const valueLengthInBits;
-        };
-
         template<typename SensorParameterDefinition>
         class Parameter {
 
         protected:
 
             using Definition = SensorParameterDefinition;
-            using ValueType = typename Definition::ValueType;
             using Unit = typename Definition::Unit;
             using ControlMessageHeader = typename Definition::ControlMessageHeader;
             using ControlMessageData = typename Definition::ControlMessageData;
@@ -90,6 +187,7 @@ namespace Sensor {
         public:
 
             using Name = typename Definition::Name;
+            using ValueType = typename Definition::ValueType;
 
             explicit Parameter() {
             };
@@ -104,6 +202,11 @@ namespace Sensor {
 
             static constexpr std::string const& getStringifiedUnit() noexcept {
                 return Unit::toString();
+            }
+
+            template<typename T>
+            static constexpr bool isType() noexcept {
+                return std::is_same<T, ValueType>::value;
             }
 
             auto extractMetadata() const noexcept -> ParameterMetadata {
@@ -127,8 +230,14 @@ namespace Sensor {
 
             auto fetchParameterInfoForBulkSet(ControlMessagePayload const& currentSensorValues) const noexcept
             -> ParameterInfoForBulkSet {
-                ParameterInfoForBulkSet info = createParameterInfoForBulkSet();
-                info.isOfInterest = isOfInterest(currentSensorValues);
+                bool ofInterest = isOfInterest(currentSensorValues);
+                ParameterInfoForBulkSet info{
+                        .isOfInterest = ofInterest,
+                        .name = Name::toString(),
+                        .unit = Unit::toString(),
+                        .valueOffsetInBits = Definition::valueOffsetInBits,
+                        .valueLengthInBits = Definition::valueLengthInBits
+                };
                 return info;
             };
 
@@ -155,21 +264,24 @@ namespace Sensor {
                 return controlMessageData;
             }
 
-            auto createParameterInfoForBulkSet() noexcept -> ParameterInfoForBulkSet {
-                ParameterInfoForBulkSet parameterInfoForBulkSet{
-                        false,
-                        Name::toString(),
-                        Definition::valueOffsetInBits,
-                        Definition::valueLengthInBits
-                };
-                return parameterInfoForBulkSet;
-            }
-
             auto isOfInterest(ControlMessagePayload const& currentSensorValues) const noexcept -> bool {
                 Byte type = currentSensorValues[1];
                 uint16_t address = ((uint16_t*) currentSensorValues.data())[1];
                 bool isOfInterest = type == Definition::commandType &&
                                     address == Definition::internalAddress;
+                std::cout
+                        << "\n" << std::boolalpha
+                        << "    | " << "-------------------------------" << "\n"
+                        << "    | " << "-------------------------------" << "\n"
+                        << "    | " << "#######> Parameter:   " << Name::toString() << "\n"
+                        << "    | " << "Is of interest: " << isOfInterest << "\n"
+                        << "    | " << "-------------------------------" << "\n"
+                        << "    | " << "Settings type: " << Definition::commandType << "\n"
+                        << "    | " << "Received type: " << type << "\n"
+                        << "    | " << "Settings address: " << Definition::internalAddress << "\n"
+                        << "    | " << "Settings address: " << address << "\n"
+                        << "    | " << "-------------------------------" << "\n"
+                        << std::endl;
                 return isOfInterest;
             };
         };
@@ -203,15 +315,6 @@ namespace Sensor {
             using ControlCode = typename SensorControlMessage::ControlMessageCode;
 
 
-            using ValueIsUnsignedInteger = bool;
-            using UnsignedIntegerValue = UnsignedInteger;
-            using ValueIsSignedInteger = bool;
-            using SignedIntegerValue = SignedInteger;
-            using ValueIsRealNumber = bool;
-            using RealNumberValue = RealNumber;
-            using ValueIsBoolean = bool;
-            using BooleanValue = bool;
-
             template<size_t N>
             static constexpr auto toBitSet(std::array<Byte, N> byteArray) -> std::bitset<N * 8> {
                 constexpr size_t numberOfBits = N * 8;
@@ -243,15 +346,19 @@ namespace Sensor {
                         [&](auto... Indices) {
                             return std::array<Byte, numberOfBytes>{
                                     static_cast<Byte>(
-                                            BitSetByte(bitsetValue[8 * Indices],
-                                                       bitsetValue[8 * Indices + 1],
-                                                       bitsetValue[8 * Indices + 2],
-                                                       bitsetValue[8 * Indices + 3],
-                                                       bitsetValue[8 * Indices + 4],
-                                                       bitsetValue[8 * Indices + 5],
-                                                       bitsetValue[8 * Indices + 6],
-                                                       bitsetValue[8 * Indices + 7])
-                                                    .to_ulong()
+                                            BitSetByte(
+                                                    std::string(
+                                                            std::to_string(bitsetValue[8 * Indices + 0]) +
+                                                            std::to_string(bitsetValue[8 * Indices + 1]) +
+                                                            std::to_string(bitsetValue[8 * Indices + 2]) +
+                                                            std::to_string(bitsetValue[8 * Indices + 3]) +
+                                                            std::to_string(bitsetValue[8 * Indices + 4]) +
+                                                            std::to_string(bitsetValue[8 * Indices + 5]) +
+                                                            std::to_string(bitsetValue[8 * Indices + 6]) +
+                                                            std::to_string(bitsetValue[8 * Indices + 7])
+                                                    )
+                                            )
+                                                    .to_ullong()
                                     )
                                             ...
                             };
@@ -261,54 +368,13 @@ namespace Sensor {
 
         public:
 
-            // Helpers for creating set request
             using ParameterName = std::string;
+            using RequestedValue = ::RequestedValue;
+            using ParameterResponseStatus = ::ParameterResponseStatus;
 
-            using RequestedValue = std::tuple<
-                    ValueIsUnsignedInteger,
-                    UnsignedIntegerValue,
-                    ValueIsSignedInteger,
-                    SignedIntegerValue,
-                    ValueIsRealNumber,
-                    RealNumberValue,
-                    ValueIsBoolean,
-                    BooleanValue
-            >;
-
-            static constexpr auto isUnsignedInteger(RequestedValue const& requestedValue) -> bool {
-                return std::get<0>(requestedValue);
-            }
-
-            static constexpr auto getUnsignedInteger(RequestedValue const& requestedValue) -> UnsignedIntegerValue {
-                return std::get<1>(requestedValue);
-            }
-
-            static constexpr auto isSignedInteger(RequestedValue const& requestedValue) -> bool {
-                return std::get<2>(requestedValue);
-            }
-
-            static constexpr auto getSignedInteger(RequestedValue const& requestedValue) -> SignedIntegerValue {
-                return std::get<3>(requestedValue);
-            }
-
-            static constexpr auto isRealNumber(RequestedValue const& requestedValue) -> bool {
-                return std::get<4>(requestedValue);
-            }
-
-            static constexpr auto getRealNumber(RequestedValue const& requestedValue) -> RealNumberValue {
-                return std::get<5>(requestedValue);
-            }
-
-            static constexpr auto isBoolean(RequestedValue const& requestedValue) -> bool {
-                return std::get<6>(requestedValue);
-            }
-
-            static constexpr auto getBoolean(RequestedValue const& requestedValue) -> BooleanValue {
-                return std::get<7>(requestedValue);
-            }
-
-
+            using RequestedParameterNames = std::unordered_set<ParameterName>;
             using RequestedParameterValues = std::unordered_map<ParameterName, RequestedValue>;
+            using ParameterResponseStatuses = std::unordered_map<ParameterName, ParameterResponseStatus>;
 
             static constexpr auto const NUMBER_OF_AVAILABLE_PARAMETERS = sizeof...(P);
             using AllParameterMetadata = std::array<ParameterMetadata, NUMBER_OF_AVAILABLE_PARAMETERS>;
@@ -336,15 +402,43 @@ namespace Sensor {
                 return controlMessage;
             }
 
+            void updateStatusForError(SensorControlMessage&& receivedSensorControlMessage,
+                                      ParameterResponseStatuses* parameterResponseStatuses) const {
+                ControlMessagePayload currentSensorValues = receivedSensorControlMessage.getPayloadCopy();
+                std::array<ParameterInfoForBulkSet, NUMBER_OF_AVAILABLE_PARAMETERS> allParametersInfoForBulkSet =
+                        fetchAllParameterInfoForBulkSet(currentSensorValues);
+
+                for (auto& info : allParametersInfoForBulkSet) {
+                    if (info.isOfInterest) {
+                        auto parameterName = info.name;
+                        ParameterResponseStatus errorStatus{
+                                .receivedError = true,
+                                .receivedResponse = false,
+                                .metadata = ParameterMetadata{.name = info.name, .unit = info.unit}
+                        };
+                        parameterResponseStatuses->at(parameterName) = errorStatus;
+                    }
+                }
+            }
+
             /**
              * @warning It is assumed that parameterName correspond to an existing name of parameter in this container
-             * @warning also this function might modify the RequestedParameterValues. Please apply multi-threaded protection before calling if needed
+             * @brief this function will use the receivedSensorControlMessage in the following way:
+             * @param receivedSensorControlMessage Message used to update ParameterStatuses, ASSUMED .isResponse() == true
+             * @param requestedParameterGetValues Set of parameter names to return the value of to the Server.
+             * @param requestedParameterSetValues Map of parameter names and the desired value to send to the Sensor.
+             * @param parameterResponseStatuses Map of Parameter names -> Status to send responses to the server
+             * @return A tuple<hasToSendResponseToServer, hasToSendControlMessageToSensor, SensorControlMessage (to send)>
              */
-            auto createSetParameterValueControlMessageFor(ControlMessagePayload currentSensorValues,
-                                                          RequestedParameterValues* requestedParameterValues) const
-            -> std::tuple<bool, ControlMessagePayload> {
+            auto updateStatusForResponse(SensorControlMessage const& receivedSensorControlMessage,
+                                         RequestedParameterNames* requestedParameterGetValues,
+                                         RequestedParameterValues* requestedParameterSetValues,
+                                         ParameterResponseStatuses* parameterResponseStatuses) const
+            -> std::tuple<bool, bool, SensorControlMessage> {
+                bool hasToSendResponseToServer = false;
+                bool hasToSendControlMessageToSensor = false;
+                ControlMessagePayload currentSensorValues = receivedSensorControlMessage.getPayloadCopy();
 
-                bool hasAnyParameterOfInterest = false;
                 std::array<ParameterInfoForBulkSet, NUMBER_OF_AVAILABLE_PARAMETERS> allParametersInfoForBulkSet =
                         fetchAllParameterInfoForBulkSet(currentSensorValues);
 
@@ -356,14 +450,75 @@ namespace Sensor {
                         currentSensorValues[7]
                 };
                 auto payloadInBitSet = toBitSet(valuePayload);
-                for (auto& info : allParametersInfoForBulkSet) {
-                    if (info.isOfInterest) {
-                        hasAnyParameterOfInterest = true;
-                        try {
-                            auto requestedValue = requestedParameterValues->at(info.name);
-                            requestedParameterValues->erase(info.name);
+                for (auto const& info  : allParametersInfoForBulkSet) {
 
-                            using BitSet = std::bitset<info.valueLengthInBits>;
+                    using BitSet = std::bitset<32>; // max size for AWL
+
+                    if (info.isOfInterest) {
+
+                        auto name = info.name;
+                        size_t const valueLengthInBits{info.valueLengthInBits};
+                        size_t const valueOffsetInBits{info.valueOffsetInBits};
+                        // IMPORTANT!! check that a GET value was received for this parameter BEFORE checking if a SET value was received
+                        bool hadReceiveARequestToGetValue =
+                                requestedParameterGetValues->find(name) != requestedParameterGetValues->end();
+
+                        if (hadReceiveARequestToGetValue) {
+
+                            hasToSendResponseToServer = true;
+                            requestedParameterGetValues->erase(name);
+
+                            BitSet valueContainer;
+                            for (auto i = 0u; i < valueLengthInBits; ++i) {
+                                valueContainer[i] = payloadInBitSet[valueOffsetInBits + i];
+                            }
+                            auto uncastedValue = valueContainer.to_ullong();
+
+                            bool isUnsignedInteger = isParameterType<UnsignedInteger>(name);
+                            UnsignedInteger unsignedIntegerValue = isUnsignedInteger
+                                                                   ? static_cast<UnsignedInteger>(uncastedValue)
+                                                                   : 0u;
+                            bool isSignedInteger = isParameterType<SignedInteger>(name);
+                            SignedInteger signedIntegerValue = isSignedInteger
+                                                               ? static_cast<SignedInteger>(uncastedValue)
+                                                               : 0;
+                            bool isRealNumber = isParameterType<RealNumber>(name);
+                            RealNumber realNumberValue = isRealNumber
+                                                         ? static_cast<RealNumber>(uncastedValue)
+                                                         : 0.0;
+                            bool isBoolean = isParameterType<Boolean>(name);
+                            Boolean booleanValue = isBoolean
+                                                   ? static_cast<Boolean>(uncastedValue)
+                                                   : false;
+                            RequestedValue parameterValue = std::make_tuple(
+                                    isUnsignedInteger,
+                                    unsignedIntegerValue,
+                                    isSignedInteger,
+                                    signedIntegerValue,
+                                    isRealNumber,
+                                    realNumberValue,
+                                    isBoolean,
+                                    booleanValue
+                            );
+
+
+                            parameterResponseStatuses->at(name) = ParameterResponseStatus{
+                                    .receivedError = false,
+                                    .receivedResponse = true,
+                                    .metadata = ParameterMetadata{.name = name, .unit = info.unit},
+                                    .receivedValue = parameterValue
+                            };
+                        }
+
+                        // IMPORTANT!! check that a GET value was received for this parameter BEFORE checking if a SET value was received
+                        bool hadReceiveARequestToSetValue =
+                                requestedParameterSetValues->find(name) != requestedParameterSetValues->end();
+
+                        if (hadReceiveARequestToSetValue) {
+                            hasToSendControlMessageToSensor = true;
+                            auto requestedValue = requestedParameterSetValues->at(name);
+                            requestedParameterSetValues->erase(name);
+                            requestedParameterGetValues->insert(name);
 
                             BitSet valueContainer;
                             if (isUnsignedInteger(requestedValue)) {
@@ -382,12 +537,10 @@ namespace Sensor {
                                 // todo: throw, this is error
                             }
 
-                            for (auto i = 0u; i < info.valueLengthInBits; ++i) {
-                                payloadInBitSet[info.valueOffsetInBits + i] = valueContainer[i];
+                            for (auto i = 0u; i < valueLengthInBits; ++i) {
+                                payloadInBitSet[valueOffsetInBits + i] = valueContainer[i];
                             }
 
-                        } catch (std::out_of_range& outOfRange) {
-                            // Do nothing, this happens in case the parameter was of interest but no new value was requested for it.
                         }
                     }
                 }
@@ -400,7 +553,7 @@ namespace Sensor {
                 ControlCode code = ControlCode::SET_VALUE;
 
                 SensorControlMessage controlMessage(code, currentSensorValues);
-                return std::make_tuple(hasAnyParameterOfInterest, controlMessage);
+                return std::make_tuple(hasToSendResponseToServer, hasToSendControlMessageToSensor, controlMessage);
             }
 
             /**
@@ -434,6 +587,18 @@ namespace Sensor {
             }
 
         private:
+
+            template<typename T>
+            constexpr auto isParameterType(ParameterName const& parameterName) const -> bool {
+                auto isType = index_apply<NUMBER_OF_AVAILABLE_PARAMETERS>(
+                        [&](auto... Indices) {
+                            return std::array<bool, NUMBER_OF_AVAILABLE_PARAMETERS>{
+                                    getParam<Indices>::template isType<T>()...
+                            };
+                        });
+                auto index = getIndexFor(parameterName);
+                return isType[index];
+            }
 
             constexpr auto const getIndexFor(ParameterName const& parameterName) const {
                 auto names = getNames();
