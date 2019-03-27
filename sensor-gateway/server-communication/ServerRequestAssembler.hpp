@@ -66,7 +66,7 @@ namespace Assemble {
         template<typename RequestedParameterContent>
         static auto setUnsignedIntegerParameterValueRequest(RequestedParameterContent const& requestedParameterContent)
         -> SetUnsignedIntegerParameterValueRequest {
-            using Payload = typename ServerCommunication::ParameterPayload<SetUnsignedIntegerParameterValueRequest>;
+            using Payload = typename SetUnsignedIntegerParameterValueRequest::Payload;
             using PayloadContent = typename Payload::Type;
             using PayloadUnit = typename Payload::ContentType;
             auto parameterName = getParameterName(requestedParameterContent);
@@ -85,7 +85,7 @@ namespace Assemble {
         template<typename RequestedParameterContent>
         static auto setSignedIntegerParameterValueRequest(RequestedParameterContent const& requestedParameterContent)
         -> SetSignedIntegerParameterValueRequest {
-            using Payload = typename ServerCommunication::ParameterPayload<SetSignedIntegerParameterValueRequest>;
+            using Payload = typename SetSignedIntegerParameterValueRequest::Payload;
             using PayloadContent = typename Payload::Type;
             using PayloadUnit = typename Payload::ContentType;
             auto parameterName = getParameterName(requestedParameterContent);
@@ -104,7 +104,7 @@ namespace Assemble {
         template<typename RequestedParameterContent>
         static auto setRealNumberParameterValueRequest(RequestedParameterContent const& requestedParameterContent)
         -> SetRealNumberParameterValueRequest {
-            using Payload = typename ServerCommunication::ParameterPayload<SetRealNumberParameterValueRequest>;
+            using Payload = typename SetRealNumberParameterValueRequest::Payload;
             using PayloadContent = typename Payload::Type;
             using PayloadUnit = typename Payload::ContentType;
             auto parameterName = getParameterName(requestedParameterContent);
@@ -123,7 +123,7 @@ namespace Assemble {
         template<typename RequestedParameterContent>
         static auto setBooleanParameterValueRequest(RequestedParameterContent const& requestedParameterContent)
         -> SetBooleanParameterValueRequest {
-            using Payload = typename ServerCommunication::ParameterPayload<SetBooleanParameterValueRequest>;
+            using Payload = typename SetBooleanParameterValueRequest::Payload;
             using PayloadContent = typename Payload::Type;
             using PayloadUnit = typename Payload::ContentType;
             auto parameterName = getParameterName(requestedParameterContent);

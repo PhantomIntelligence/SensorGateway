@@ -186,35 +186,35 @@ namespace SensorAccessLinkElement {
         static constexpr auto createRequestedValue(UnsignedInteger value) noexcept -> RequestedValue {
             return std::make_tuple(
                     true, value,
-                    false, std::ignore,
-                    false, std::ignore,
-                    false, std::ignore
+                    false, 0,
+                    false, 0.0,
+                    false, false
             );
         }
 
         static constexpr auto createRequestedValue(SignedInteger value) noexcept -> RequestedValue {
             return std::make_tuple(
-                    false, std::ignore,
+                    false, 0,
                     true, value,
-                    false, std::ignore,
-                    false, std::ignore
+                    false, 0.0,
+                    false, false
             );
         }
 
         static constexpr auto createRequestedValue(RealNumber value) noexcept -> RequestedValue {
             return std::make_tuple(
-                    false, std::ignore,
-                    false, std::ignore,
+                    false, 0,
+                    false, 0,
                     true, value,
-                    false, std::ignore
+                    false, false
             );
         }
 
         static constexpr auto createRequestedValue(bool value) noexcept -> RequestedValue {
             return std::make_tuple(
-                    false, std::ignore,
-                    false, std::ignore,
-                    false, std::ignore,
+                    false, 0,
+                    false, 0,
+                    false, 0.0,
                     true, value
             );
         }
