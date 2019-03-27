@@ -72,6 +72,7 @@ namespace DataTranslation {
                     translateDetectionVelocityMessage(std::move(sensorMessage));
                     break;
                 case Sensor::AWL::COMMAND_MESSAGE :
+                    // WARNING! THIS CASE IS NOT TESTED AUTOMATICALLY
                     translateResponse(std::move(sensorMessage));
                     break;
                 default:
@@ -85,6 +86,7 @@ namespace DataTranslation {
         }
 
 
+        // WARNING! THIS FUNCTION IS NOT TESTED AUTOMATICALLY
         SensorMessage translateControlMessageToSensorMessageRequest(SensorControlMessage&& sensorControlMessage) override {
             SensorMessage sensorMessage;
             sensorMessage.id = Sensor::AWL::COMMAND_MESSAGE;
@@ -98,18 +100,17 @@ namespace DataTranslation {
             static constexpr Byte const RESERVED = 0x00;
 
             if (sensorControlMessage.isCalibration()) {
-                sensorMessage.data[1] = ALL_PIXELS_MASK;
-                sensorMessage.data[2] = NUMBER_OF_FRAMES_FOR_CALIBRATION;
+                sensorMessage.data[1] = ALL_PIXELS_MASK;                   // POTENTIALLY CONFIGURABLE
+                sensorMessage.data[2] = NUMBER_OF_FRAMES_FOR_CALIBRATION;  // POTENTIALLY CONFIGURABLE
                 sensorMessage.data[3] = RESERVED;
-
-                // next 4 bytes --> float value == 0.1 (0x3DCCCCCD)
+                // next 4 bytes --> float value == 0.1 (0x3DCCCCCD)        // POTENTIALLY CONFIGURABLE
                 sensorMessage.data[4] = 0x3D;
                 sensorMessage.data[5] = 0xCC;
                 sensorMessage.data[6] = 0xCC;
                 sensorMessage.data[7] = 0xCD;
             } else if (sensorControlMessage.isClearCalibration()) {
-                sensorMessage.data[1] = ALL_PIXELS_MASK;
-                sensorMessage.data[2] = ERASE_CALIBRATION_FILE;
+                sensorMessage.data[1] = ALL_PIXELS_MASK;        // POTENTIALLY CONFIGURABLE
+                sensorMessage.data[2] = ERASE_CALIBRATION_FILE; // POTENTIALLY CONFIGURABLE
                 sensorMessage.data[3] = RESERVED;
                 sensorMessage.data[4] = RESERVED;
                 sensorMessage.data[5] = RESERVED;
@@ -132,11 +133,13 @@ namespace DataTranslation {
             return sensorMessage;
         }
 
+        // WARNING! THIS FUNCTION IS NOT TESTED AUTOMATICALLY
         void translateResponse(SensorMessage&& response) {
             auto controlMessage = translateSensorMessageToControlMessageResult(std::forward<SensorMessage>(response));
             super::ResponseControlMessageSource::produce(std::move(controlMessage));
         }
 
+        // WARNING! THIS FUNCTION IS NOT TESTED AUTOMATICALLY
         SensorControlMessage translateSensorMessageToControlMessageResult(SensorMessage&& sensorMessage) override {
 
             using Payload = typename SensorControlMessage::Payload;
@@ -185,6 +188,7 @@ namespace DataTranslation {
         static constexpr Byte const RECORD_CALIBRATION = 0xDA;
         static constexpr Byte const CLEAR_CALIBRATION = 0xDB;
 
+        // WARNING! THIS FUNCTION IS NOT TESTED AUTOMATICALLY
         Byte translateControlMessageType(SensorControlMessage* controlMessage) {
             Byte byte;
             if (controlMessage->isSet()) {
@@ -201,6 +205,7 @@ namespace DataTranslation {
             return byte;
         }
 
+        // WARNING! THIS FUNCTION IS NOT TESTED AUTOMATICALLY
         ControlCode translateByteToControlCode(Byte byte) {
             ControlCode code;
             if (byte == RESPONSE_PARAMETER) {

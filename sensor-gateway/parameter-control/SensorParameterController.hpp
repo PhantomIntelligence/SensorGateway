@@ -100,6 +100,7 @@ namespace SensorAccessLinkElement {
             responseControlMessageScheduler.terminateAndJoin();
         }
 
+        // TODO: test this code
         template<typename Metadata, typename RequestMap>
         void sendErrorToRequestHandler(Metadata metadata, RequestMap* map) noexcept {
             auto name = metadata.name;
@@ -111,6 +112,7 @@ namespace SensorAccessLinkElement {
             }
         }
 
+        // TODO: test this code
         template<typename RequestMap>
         void sendParameterValueToRequestHandler(ParameterName name, SensorResponseStatus sensorResponseStatus, RequestMap* map) noexcept {
             bool requestedInThisMap = map->find(name) != map->end();
@@ -144,6 +146,7 @@ namespace SensorAccessLinkElement {
             }
         }
 
+        // TODO: test this code
         void consume(SensorControlMessage&& sensorControlMessageResponse) override {
             LockGuard guard(requestMutex);
             using ControlCode = typename SensorControlMessage::ControlMessageCode;
@@ -186,15 +189,9 @@ namespace SensorAccessLinkElement {
                     sendErrorToRequestHandler(metadata, &setBooleanParameterRequests);
                 }
             }
-            /**
-             *  TODO:
-             *  - Create schedulers and link'em in SensorAccessLink
-             *  - receive and process ControlMessage // from sensor
-             *  - transmit to server w/ ServerCommunicator*
-             */
-//            auto parameterData = parameter->extractMetadata();
         }
 
+        // TODO: test this code
         void processGet(GetParameterValueRequest&& request) noexcept {
             LockGuard guard(requestMutex);
             auto name = request.getPayloadName();
@@ -204,6 +201,7 @@ namespace SensorAccessLinkElement {
             dataTranslator->translateAndSendToSensor(std::move(sensorControlMessage));
         }
 
+        // TODO: test this code
         template<typename ParameterValueRequest>
         void processSet(ParameterValueRequest&& parameterValueRequest) noexcept {
             LockGuard guard(requestMutex);
