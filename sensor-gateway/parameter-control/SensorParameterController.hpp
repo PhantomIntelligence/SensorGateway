@@ -180,7 +180,7 @@ namespace SensorAccessLinkElement {
         template <typename T>
         void addRequestedSetValue(ParameterName const& parameterName, T&& requestedValue) {
             LockGuard guard(requestSetValueMutex);
-            requestedParameterSetValues.at[parameterName] = createRequestedValue(requestedValue);
+            requestedParameterSetValues.at(parameterName) = createRequestedValue(requestedValue);
         }
 
         static constexpr auto createRequestedValue(UnsignedInteger value) noexcept -> RequestedValue {
