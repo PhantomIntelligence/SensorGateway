@@ -30,7 +30,7 @@ namespace ErrorHandling {
         std::string origin = SENSOR_PARAMETER_NAME + Message::SEPARATOR + callOrigin;
         Category category = PARAMETER_ERROR;
         Severity severity;
-        std::string errorMessage;
+        std::string errorMessage = message;
         if (errorCode == INVALID_SENSOR_PARAMETER_VALUE_TYPE) {
             severity = ERROR;
         } else {

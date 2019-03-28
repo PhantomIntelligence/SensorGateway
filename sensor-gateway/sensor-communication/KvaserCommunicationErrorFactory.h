@@ -69,7 +69,7 @@ namespace ErrorHandling {
         std::string origin = "Kvaser " + callOrigin;
         ErrorHandling::Category category;
         ErrorHandling::Severity severity;
-        std::string errorMessage;
+        std::string errorMessage = Message::EMPTY_MESSAGE;
         if (errorCode == canERR_PARAM) {
             category = COMMUNICATION_ERROR;
             severity = ERROR;

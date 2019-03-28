@@ -30,7 +30,7 @@ namespace ErrorHandling {
         std::string origin = REQUEST_HANDLING_NAME + Message::SEPARATOR + callOrigin;
         Category category = COMMUNICATION_ERROR;
         Severity severity;
-        std::string errorMessage;
+        std::string errorMessage = message;
         if (errorCode == BAD_REQUEST) {
             severity = ERROR;
         } else if (errorCode == REQUEST_NOT_SUPPORTED) {
