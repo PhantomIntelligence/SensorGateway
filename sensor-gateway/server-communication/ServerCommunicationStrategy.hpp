@@ -150,22 +150,26 @@ namespace ServerCommunication {
         }
 
         // TODO: test this function
-        virtual auto fetchSetUnsignedIntegerParameterValueContents() -> typename SetUnsignedIntegerParameterValueContentBuffer::Contents {
+        virtual auto
+        fetchSetUnsignedIntegerParameterValueContents() -> typename SetUnsignedIntegerParameterValueContentBuffer::Contents {
             return setUnsignedIntegerParameterValueContentBuffer.fetchReceivedContent();
         }
 
         // TODO: test this function
-        virtual auto fetchSetSignedIntegerParameterValueContents() -> typename SetSignedIntegerParameterValueContentBuffer::Contents {
+        virtual auto
+        fetchSetSignedIntegerParameterValueContents() -> typename SetSignedIntegerParameterValueContentBuffer::Contents {
             return setSignedIntegerParameterValueContentBuffer.fetchReceivedContent();
         }
 
         // TODO: test this function
-        virtual auto fetchSetRealNumberParameterValueContents() -> typename SetRealNumberParameterValueContentBuffer::Contents {
+        virtual auto
+        fetchSetRealNumberParameterValueContents() -> typename SetRealNumberParameterValueContentBuffer::Contents {
             return setRealNumberParameterValueContentBuffer.fetchReceivedContent();
         }
 
         // TODO: test this function
-        virtual auto fetchSetBooleanParameterValueContents() -> typename SetBooleanParameterValueContentBuffer::Contents {
+        virtual auto
+        fetchSetBooleanParameterValueContents() -> typename SetBooleanParameterValueContentBuffer::Contents {
             return setBooleanParameterValueContentBuffer.fetchReceivedContent();
         }
 
@@ -217,25 +221,25 @@ namespace ServerCommunication {
         }
 
         // TODO : Test this function
-        void receiveSetUnsignedIntegerParameterValueRequest(SetUnsignedIntegerParameterValueContent&& askedParameterValue) {
+        void receiveSetParameterValueRequest(SetUnsignedIntegerParameterValueContent&& askedParameterValue) {
             setUnsignedIntegerParameterValueContentBuffer
                     .receiveNewContent(std::forward<SetUnsignedIntegerParameterValueContent>(askedParameterValue));
         }
 
         // TODO : Test this function
-        void receiveSetSignedIntegerParameterValueRequest(SetSignedIntegerParameterValueContent&& askedParameterValue) {
+        void receiveSetParameterValueRequest(SetSignedIntegerParameterValueContent&& askedParameterValue) {
             setSignedIntegerParameterValueContentBuffer
                     .receiveNewContent(std::forward<SetSignedIntegerParameterValueContent>(askedParameterValue));
         }
 
         // TODO : Test this function
-        void receiveSetRealNumberParameterValueRequest(SetRealNumberParameterValueContent&& askedParameterValue) {
+        void receiveSetParameterValueRequest(SetRealNumberParameterValueContent&& askedParameterValue) {
             setRealNumberParameterValueContentBuffer
                     .receiveNewContent(std::forward<SetRealNumberParameterValueContent>(askedParameterValue));
         }
 
         // TODO : Test this function
-        void receiveSetBooleanParameterValueRequest(SetBooleanParameterValueContent&& askedParameterValue) {
+        void receiveSetParameterValueRequest(SetBooleanParameterValueContent&& askedParameterValue) {
             setBooleanParameterValueContentBuffer
                     .receiveNewContent(std::forward<SetBooleanParameterValueContent>(askedParameterValue));
         }
@@ -247,9 +251,6 @@ namespace ServerCommunication {
         void receiveClearCalibrationRequest() {
             receivedClearCalibrationRequest.store(true);
         }
-
-//        bool hasReceivedGetParameterValueRequest() const noexcept {
-//        }
 
         AtomicFlag receivedGetAllParameterNamesRequest;
         AtomicFlag receivedCalibrationRequest;
