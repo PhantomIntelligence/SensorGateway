@@ -58,7 +58,7 @@ namespace Assemble {
         ~ServerRequestAssembler() = delete;
 
         static auto getParameterValueRequest(std::string const& payloadContent) -> GetParameterValueRequest {
-            MessagePayload const payload{payloadContent};
+            MessagePayload const payload{payloadContent, true, false};
             GetParameterValueRequest request(payload);
             return request;
         }

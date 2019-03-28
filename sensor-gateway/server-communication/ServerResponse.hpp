@@ -72,6 +72,22 @@ namespace ServerCommunication {
             return !operator==(other);
         }
 
+        ResponsePayload const& getPayload() const noexcept {
+            return payload;
+        };
+
+        Request const& getOriginalRequest() const noexcept {
+            return request;
+        };
+
+        bool isResponseToGetRequest() const noexcept {
+            return request.isGetRequest();
+        };
+
+        bool isResponseToSetRequest() const noexcept {
+            return request.isSetRequest();
+        };
+
         static ServerResponse const& returnDefaultData() noexcept;
 
         static constexpr bool isSuccess() noexcept {

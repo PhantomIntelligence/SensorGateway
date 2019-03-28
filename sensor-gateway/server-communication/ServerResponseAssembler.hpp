@@ -59,9 +59,12 @@ namespace Assemble {
         static auto createErrorMessageResponseFromBadRequest(Request const& request,
                                                              std::string const& attemptedActionString) -> ErrorMessageResponse {
             using ServerCommunication::ResponseMessage::BadRequest;
-            ErrorPayload responseBadRequestPayload(BadRequest::toString());
-            ServerCommunication::PayloadTypes::ErrorPayload badRequestPayload(
-                    attemptedActionString + " : " + request.payloadToString());
+            ErrorPayload responseBadRequestPayload(BadRequest::toString(),
+                                                   request.isGetRequest(),
+                                                   request.isSetRequest());
+            ErrorPayload badRequestPayload(attemptedActionString + " : " + request.payloadToString(),
+                                           request.isGetRequest(),
+                                           request.isSetRequest());
             ErrorMessageResponse response(responseBadRequestPayload, badRequestPayload);
             return response;
         }
@@ -71,8 +74,14 @@ namespace Assemble {
         template<typename AttemptedAction, typename Request>
         static auto createSuccessMessageResponseFromRequest(Request const& request) -> SuccessMessageResponse {
             using ServerCommunication::ResponseMessage::RequestSuccess;
-            SuccessPayload responseRequestSuccessPayload(RequestSuccess::toString());
-            ServerCommunication::PayloadTypes::SuccessPayload requestSuccessPayload(AttemptedAction::toString() + " : " + request.payloadToString());
+            SuccessPayload responseRequestSuccessPayload(
+                    RequestSuccess::toString(),
+                    request.isGetRequest(),
+                    request.isSetRequest());
+            ServerCommunication::PayloadTypes::SuccessPayload requestSuccessPayload(
+                    AttemptedAction::toString() + " : " + request.payloadToString(),
+                    request.isGetRequest(),
+                    request.isSetRequest());
             SuccessMessageResponse response(responseRequestSuccessPayload, requestSuccessPayload);
             return response;
         }
@@ -90,8 +99,8 @@ namespace Assemble {
         template<typename Data, typename Request>
         static auto createParameterErrorResponse(Data const& data, Request&& request) -> ParameterErrorResponse {
             using ServerCommunication::ResponseMessage::ParameterError;
-            ParameterErrorPayload const parameterErrorPayload = createParameterErrorPayload(data);
-            ErrorPayload const errorMessage(request.payloadToString());
+            ParameterErrorPayload const parameterErrorPayload = createParameterErrorPayload(data, &request);
+            ErrorPayload const errorMessage(request.payloadToString(), request.isGetRequest(), request.isSetRequest());
             ParameterErrorResponse response(parameterErrorPayload, errorMessage);
             return response;
         }
@@ -117,10 +126,10 @@ namespace Assemble {
         }
 
     private:
-        template<typename Data>
-        static auto createParameterErrorPayload(Data const& data) -> ParameterErrorPayload {
+        template<typename Data, typename Request>
+        static auto createParameterErrorPayload(Data const& data, Request* request) -> ParameterErrorPayload {
             // TODO : change this for eventual actual parameter error message from sensor
-            ErrorPayload errorMessage("...");
+            ErrorPayload errorMessage("...", request->isGetRequest(), request->isSetRequest());
 
             ParameterErrorPayload parameterErrorPayload(
                     std::make_tuple(data.name, errorMessage, data.unit)
@@ -137,7 +146,8 @@ namespace Assemble {
 
         // TODO : test this function
         template<typename AllParameterMetadata, size_t numberOfParameters>
-        static AllParameterMetadataPayload<numberOfParameters> createAllParameterMetadataPayload(AllParameterMetadata&& allParameterMetadata) {
+        static AllParameterMetadataPayload<numberOfParameters>
+        createAllParameterMetadataPayload(AllParameterMetadata&& allParameterMetadata) {
             std::array<ParameterMetadataType, numberOfParameters> allParameterMetadataPayloadContent;
             for (auto parameterMetadataIndex = 0u;
                  parameterMetadataIndex < numberOfParameters; parameterMetadataIndex++) {

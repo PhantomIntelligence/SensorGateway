@@ -46,7 +46,10 @@ namespace ServerCommunication {
             using Type = std::string;
             using ContentType = std::string;
 
-            explicit StringPayload(std::string const& value) noexcept : value(value) {
+            explicit StringPayload(std::string const& value, bool isFromGet, bool isFromSet) noexcept :
+                    value(value),
+                    isFromGet(isFromGet),
+                    isFromSet(isFromSet) {
             }
 
             explicit StringPayload() noexcept :
@@ -56,11 +59,13 @@ namespace ServerCommunication {
             ~StringPayload() noexcept = default;
 
             StringPayload(StringPayload const& other) :
-                    StringPayload(other.value) {
+                    StringPayload(other.value, other.isFromGet, other.isFromSet) {
             }
 
             StringPayload(StringPayload&& other) noexcept :
-                    StringPayload(std::move(other.value)) {
+                    StringPayload(std::move(other.value),
+                                  std::move(other.isFromGet),
+                                  std::move(other.isFromSet)) {
             }
 
             StringPayload& operator=(StringPayload const& other)& {
@@ -76,11 +81,15 @@ namespace ServerCommunication {
 
             void swap(StringPayload& current, StringPayload& other) noexcept {
                 std::swap(current.value, other.value);
+                std::swap(current.isFromGet, other.isFromGet);
+                std::swap(current.isFromSet, other.isFromSet);
             }
 
             bool operator==(StringPayload const& other) const {
                 auto sameName = (value == other.value);
-                return sameName;
+                auto sameOrigin = isFromGet == other.isFromGet &&
+                                  isFromSet == other.isFromSet;
+                return sameName && sameOrigin;
             }
 
             bool operator!=(StringPayload const& other) const {
@@ -105,14 +114,24 @@ namespace ServerCommunication {
                 return success;
             }
 
+            bool isGetRequest() const noexcept {
+                return isFromGet;
+            }
+
+            bool isSetRequest() const noexcept {
+                return isFromSet;
+            }
+
         private:
 
             std::string value;
+            bool isFromGet;
+            bool isFromSet;
         };
 
         namespace Defaults {
             template<bool success>
-            StringPayload<success> const DEFAULT_STRING_PAYLOAD("");
+            StringPayload<success> const DEFAULT_STRING_PAYLOAD("", false, false);
         }
 
         template<bool success>
@@ -214,13 +233,18 @@ namespace ServerCommunication {
             }
 
             template<typename T, typename Content, bool success>
-            inline SimplePayload<T, Content, success> const& SimplePayload<T, Content, success>::returnDefaultData() noexcept {
+            inline SimplePayload<T, Content, success> const&
+            SimplePayload<T, Content, success>::returnDefaultData() noexcept {
                 return Defaults::DEFAULT_SIMPLE_PAYLOAD<T, Content, success>;
             }
         }
 
         namespace Details {
-            using ParameterMetadataType = std::tuple<std::string, std::string>;
+            // Todo: improve and create accessors
+            using ParameterMetadataType = std::tuple<
+                    std::string,  // Name
+                    std::string   // Unit
+            >;
 
             template<size_t numberOfParameters>
             using AllMetadata = std::array<ParameterMetadataType, numberOfParameters>;

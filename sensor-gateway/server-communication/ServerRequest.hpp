@@ -21,6 +21,14 @@
 
 namespace ServerCommunication {
 
+    namespace RequestTypes {
+        namespace Names {
+            using GetValueOfParameter = StringLiteral<decltype("get value of parameter "_ToString)>;
+            using SetValueOfParameter = StringLiteral<decltype("set value of parameter "_ToString)>;
+            using GetAllParameterMetadata = StringLiteral<decltype("get all parameters metadata "_ToString)>;
+        }
+    }
+
     template<typename N, typename PayloadType>
     class ServerRequest {
 
@@ -114,10 +122,18 @@ namespace ServerCommunication {
             return payload.toString();
         }
 
+        bool isGetRequest() const noexcept {
+            return std::is_same<N, RequestTypes::Names::GetValueOfParameter>::value;
+        };
+
+        bool isSetRequest() const noexcept {
+            return std::is_same<N, RequestTypes::Names::SetValueOfParameter>::value;
+        };
+
     private:
         ServerRequest(Payload const& payload, bool const& badRequest, bool const& causedAnError) noexcept :
                 payload(payload), badRequest(badRequest), causedAnError(causedAnError),
-                responseMessagePayload(N::toString() + getPayloadName()) {
+                responseMessagePayload(N::toString() + getPayloadName(), isGetRequest(), isSetRequest()) {
         }
 
         Payload payload;
@@ -144,11 +160,6 @@ namespace ServerCommunication {
     }
 
     namespace RequestTypes {
-        namespace Names {
-            using GetValueOfParameter = StringLiteral<decltype("get value of parameter "_ToString)>;
-            using SetValueOfParameter = StringLiteral<decltype("set value of parameter "_ToString)>;
-            using GetAllParameterMetadata = StringLiteral<decltype("get all parameters metadata "_ToString)>;
-        }
         using GetParameterValue = ServerRequest<Names::GetValueOfParameter, PayloadTypes::MessagePayload>;
         using SetUnsignedIntegerParameterValue = ServerRequest<Names::SetValueOfParameter, PayloadTypes::UnsignedIntegerParameterPayload>;
         using SetSignedIntegerParameterValue = ServerRequest<Names::SetValueOfParameter, PayloadTypes::SignedIntegerParameterPayload>;
