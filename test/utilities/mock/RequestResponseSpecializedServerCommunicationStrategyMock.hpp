@@ -82,7 +82,7 @@ namespace Mock {
         void openConnection(std::string const& serverAddress) override {
         }
 
-        GetParameterValueContents fetchGetParameterValueContents() override {
+        std::tuple<size_t,GetParameterValueContents> fetchGetParameterValueContents() override {
             LockGuard guard(getParameterValueMutex);
 
             GetParameterValueContents getParameterValueContents;
@@ -151,7 +151,7 @@ namespace Mock {
             std::copy_n(getParameterValueContents.cbegin(), totalNumberOfRequestToReturn,
                         returnedGetParameterValueContents.begin());
 
-            return getParameterValueContents;
+            return std::make_tuple(totalNumberOfRequestToReturn,getParameterValueContents);
         };
 
         void sendMessage(typename super::Message&& message) override {

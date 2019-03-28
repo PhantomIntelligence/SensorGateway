@@ -52,9 +52,9 @@ namespace Mock {
         void openConnection(std::string const& serverAddress) {
         }
 
-        GetParameterValueContents fetchGetParameterValueContents() {
+        std::tuple<size_t, GetParameterValueContents> fetchGetParameterValueContents() {
             GetParameterValueContents getParameterValueContents;
-            return getParameterValueContents;
+            return std::make_tuple(0, getParameterValueContents);
         }
 
         void sendMessage(Message&& message) {

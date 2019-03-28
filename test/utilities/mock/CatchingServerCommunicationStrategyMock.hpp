@@ -71,7 +71,7 @@ namespace Mock {
             openConnectionCalled.store(true);
         }
 
-        GetParameterValueContents fetchGetParameterValueContents() override {
+        std::tuple<size_t, GetParameterValueContents> fetchGetParameterValueContents() override {
             acknowledgeGetParameterValueContentsHasBeenCalled();
 
             if (hasToReturnSpecificGetParameterValueContents && !getParameterValueContentsToReturn.empty()) {
@@ -81,7 +81,7 @@ namespace Mock {
                     getParameterValueContents.at(i) = getParameterValueContentsToReturn.front();
                     getParameterValueContentsToReturn.pop_front();
                 }
-                return getParameterValueContents;
+                return std::make_tuple(numberOfValues, getParameterValueContents);
             }
 
             // WARNING! This mock implementation of fetchGetParameterValueContents needs to be slowed down because the way gtest works. DO NOT REMOVE.
@@ -89,7 +89,7 @@ namespace Mock {
 
             GetParameterValueContent getParameterValueContent;
             GetParameterValueContents getParameterValueContents = {getParameterValueContent};
-            return getParameterValueContents;
+            return std::make_tuple(0, getParameterValueContents);
         };
 
         void sendMessage(Message&& message) override {
@@ -103,35 +103,43 @@ namespace Mock {
         }
 
         void sendResponse(AllParameterMetadataResponse&& response) override {
-            mockFunctionSendAllParameterMetadataResponse.invokeVoidReturn( std::forward<AllParameterMetadataResponse>(response));
+            mockFunctionSendAllParameterMetadataResponse.invokeVoidReturn(
+                    std::forward<AllParameterMetadataResponse>(response));
         }
 
         void sendResponse(UnsignedIntegerParameterResponse&& unsignedIntegerParameterResponse) override {
-            mockFunctionSendUnsignedIntegerParameterResponse.invokeVoidReturn(std::forward<UnsignedIntegerParameterResponse>(unsignedIntegerParameterResponse));
+            mockFunctionSendUnsignedIntegerParameterResponse.invokeVoidReturn(
+                    std::forward<UnsignedIntegerParameterResponse>(unsignedIntegerParameterResponse));
         }
 
         void sendResponse(SignedIntegerParameterResponse&& signedIntegerParameterResponse) override {
-            mockFunctionSendSignedIntegerParameterResponse.invokeVoidReturn(std::forward<SignedIntegerParameterResponse>(signedIntegerParameterResponse));
+            mockFunctionSendSignedIntegerParameterResponse.invokeVoidReturn(
+                    std::forward<SignedIntegerParameterResponse>(signedIntegerParameterResponse));
         }
 
         void sendResponse(RealNumberParameterResponse&& realNumberParameterResponse) override {
-            mockFunctionSendRealNumberParameterResponse.invokeVoidReturn(std::forward<RealNumberParameterResponse>(realNumberParameterResponse));
+            mockFunctionSendRealNumberParameterResponse.invokeVoidReturn(
+                    std::forward<RealNumberParameterResponse>(realNumberParameterResponse));
         }
 
         void sendResponse(BooleanParameterResponse&& booleanParameterResponse) override {
-            mockFunctionSendBooleanParameterResponse.invokeVoidReturn(std::forward<BooleanParameterResponse>(booleanParameterResponse));
+            mockFunctionSendBooleanParameterResponse.invokeVoidReturn(
+                    std::forward<BooleanParameterResponse>(booleanParameterResponse));
         }
 
         void sendResponse(ParameterErrorResponse&& parameterErrorResponse) override {
-            mockFunctionSendParameterErrorResponse.invokeVoidReturn(std::forward<ParameterErrorResponse>(parameterErrorResponse));
+            mockFunctionSendParameterErrorResponse.invokeVoidReturn(
+                    std::forward<ParameterErrorResponse>(parameterErrorResponse));
         }
 
         void sendResponse(SuccessMessageResponse&& successMessageResponse) override {
-            mockFunctionSendSuccessMessageResponse.invokeVoidReturn(std::forward<SuccessMessageResponse>(successMessageResponse));
+            mockFunctionSendSuccessMessageResponse.invokeVoidReturn(
+                    std::forward<SuccessMessageResponse>(successMessageResponse));
         }
 
         void sendResponse(ErrorMessageResponse&& errorMessageResponse) override {
-            mockFunctionSendErrorMessageResponse.invokeVoidReturn(std::forward<ErrorMessageResponse>(errorMessageResponse));
+            mockFunctionSendErrorMessageResponse.invokeVoidReturn(
+                    std::forward<ErrorMessageResponse>(errorMessageResponse));
         }
 
         void closeConnection() override {
@@ -258,9 +266,9 @@ namespace Mock {
 
         MockFunctionSendAllParameterMetadataResponse mockFunctionSendAllParameterMetadataResponse;
         MockFunctionSendUnsignedIntegerParameterResponse mockFunctionSendUnsignedIntegerParameterResponse;
-        MockFunctionSendSignedIntegerParameterResponse  mockFunctionSendSignedIntegerParameterResponse;
-        MockFunctionSendRealNumberParameterResponse  mockFunctionSendRealNumberParameterResponse;
-        MockFunctionSendBooleanParameterResponse  mockFunctionSendBooleanParameterResponse;
+        MockFunctionSendSignedIntegerParameterResponse mockFunctionSendSignedIntegerParameterResponse;
+        MockFunctionSendRealNumberParameterResponse mockFunctionSendRealNumberParameterResponse;
+        MockFunctionSendBooleanParameterResponse mockFunctionSendBooleanParameterResponse;
         MockFunctionSendParameterErrorResponse mockFunctionSendParameterErrorResponse;
         MockFunctionSendSuccessMessageResponse mockFunctionSendSuccessMessageResponse;
         MockFunctionSendErrorMessageResponse mockFunctionSendErrorMessageResponse;

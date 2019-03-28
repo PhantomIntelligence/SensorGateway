@@ -23,17 +23,29 @@ namespace Sensor {
     namespace Gateway {
 
         struct ParameterMetadata {
-            std::string name{""};
-            std::string unit{""};
+            std::string name;
+            std::string unit;
         };
 
         struct ParameterInfoForBulkSet {
             bool isOfInterest = false;
-            std::string const name{""};
-            std::string const unit{""};
-            size_t const valueOffsetInBits = 0;
-            size_t const valueLengthInBits = 0;
+            std::string name;
+            std::string unit;
+            size_t valueOffsetInBits;
+            size_t valueLengthInBits;
         };
+//        struct ParameterMetadata {
+//            std::string name{""};
+//            std::string unit{""};
+//        };
+//
+//        struct ParameterInfoForBulkSet {
+//            bool isOfInterest = false;
+//            std::string const name{""};
+//            std::string const unit{""};
+//            size_t const valueOffsetInBits = 0;
+//            size_t const valueLengthInBits = 0;
+//        };
 
     }
 }

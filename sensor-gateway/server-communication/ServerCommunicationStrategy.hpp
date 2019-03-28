@@ -24,6 +24,7 @@ namespace ServerCommunication {
 
     namespace Details {
 
+
         template<typename ContentType, size_t maxNumberOfConcurrentlyHandledRequests, size_t maxBulkReceptionSize>
         class RequestContentBuffer {
 
@@ -38,18 +39,17 @@ namespace ServerCommunication {
             using BulkContents = std::array<Content, bulkSize>;
             using ContentList = std::list<Content>;
 
-
             explicit RequestContentBuffer() {
             };
 
             ~RequestContentBuffer() noexcept = default;
 
-            auto fetchReceivedContent() -> Contents {
+            auto fetchReceivedContent() -> std::tuple<size_t, Contents> {
                 LockGuard guard(contentMutex); // ensures that requests are treated at most one bulk at the time
 
                 Contents contentsToReturn;
 
-                auto contentCount = 0u;
+                size_t contentCount = 0u;
                 while (hasReceivedNewUntransmittedContent() && contentCount < contentsToReturn.size()) {
                     auto getParameterValueContent = untransmittedReceivedContent.front();
                     contentsToReturn[contentCount] = getParameterValueContent;
@@ -57,7 +57,7 @@ namespace ServerCommunication {
                     ++contentCount;
                 }
 
-                return contentsToReturn;
+                return std::make_tuple(contentCount, contentsToReturn);
             }
 
             void receiveNewContentInBulk(BulkContents&& newContents) {
@@ -83,7 +83,6 @@ namespace ServerCommunication {
             mutable Mutex contentMutex;
             ContentList untransmittedReceivedContent;
         };
-
     }
 
     template<class T>
@@ -93,6 +92,7 @@ namespace ServerCommunication {
 
         static constexpr size_t const MAX_NUMBER_OF_CONCURRENT_REQUEST_OF_ONE_KIND = T::MAX_NUMBER_OF_CONCURRENT_REQUEST_OF_ONE_KIND;
         static constexpr size_t const MAX_NUMBER_OF_PARAMETER_FOR_BULK_OPERATIONS = T::Parameters::NUMBER_OF_AVAILABLE_PARAMETERS;
+
         template<typename Content>
         using RequestContentBuffer =Details::RequestContentBuffer<
                 Content,
@@ -107,15 +107,15 @@ namespace ServerCommunication {
 
         using ParameterName = std::string;
 
-        using AllParameterNamesList = std::array<ParameterName, MAX_NUMBER_OF_PARAMETER_FOR_BULK_OPERATIONS>;
-
         using GetParameterValueContent = ParameterName;
-        using GetParameterValueContentBuffer = RequestContentBuffer<ParameterName>;
-
         using SetUnsignedIntegerParameterValueContent = std::pair<ParameterName, UnsignedInteger>;
         using SetSignedIntegerParameterValueContent = std::pair<ParameterName, SignedInteger>;
         using SetRealNumberParameterValueContent = std::pair<ParameterName, RealNumber>;
         using SetBooleanParameterValueContent = std::pair<ParameterName, bool>;
+
+        using AllParameterNamesList = std::array<ParameterName, MAX_NUMBER_OF_PARAMETER_FOR_BULK_OPERATIONS>;
+
+        using GetParameterValueContentBuffer = RequestContentBuffer<ParameterName>;
         using SetUnsignedIntegerParameterValueContentBuffer = RequestContentBuffer<SetUnsignedIntegerParameterValueContent>;
         using SetSignedIntegerParameterValueContentBuffer = RequestContentBuffer<SetSignedIntegerParameterValueContent>;
         using SetRealNumberParameterValueContentBuffer = RequestContentBuffer<SetRealNumberParameterValueContent>;
@@ -141,35 +141,37 @@ namespace ServerCommunication {
         virtual void openConnection(std::string const& serverAddress) = 0;
 
         bool hasReceivedGetAllParameterNamesRequest() noexcept {
-            return checkIfRequestHasBeenReceived(&receivedGetAllParameterNamesRequest);
+            auto receivedRequest = checkIfRequestHasBeenReceived(&receivedGetAllParameterNamesRequest);
+            return receivedRequest;
         }
 
         // TODO: test this function
-        virtual auto fetchGetParameterValueContents() -> typename GetParameterValueContentBuffer::Contents {
+        virtual auto fetchGetParameterValueContents()
+        -> decltype(std::declval<GetParameterValueContentBuffer>().fetchReceivedContent()) {
             return getParameterValueContentBuffer.fetchReceivedContent();
         }
 
         // TODO: test this function
-        virtual auto
-        fetchSetUnsignedIntegerParameterValueContents() -> typename SetUnsignedIntegerParameterValueContentBuffer::Contents {
+        virtual auto fetchSetUnsignedIntegerParameterValueContents()
+        -> decltype(std::declval<SetUnsignedIntegerParameterValueContentBuffer>().fetchReceivedContent()) {
             return setUnsignedIntegerParameterValueContentBuffer.fetchReceivedContent();
         }
 
         // TODO: test this function
-        virtual auto
-        fetchSetSignedIntegerParameterValueContents() -> typename SetSignedIntegerParameterValueContentBuffer::Contents {
+        virtual auto fetchSetSignedIntegerParameterValueContents()
+        -> decltype(std::declval<SetSignedIntegerParameterValueContentBuffer>().fetchReceivedContent()) {
             return setSignedIntegerParameterValueContentBuffer.fetchReceivedContent();
         }
 
         // TODO: test this function
-        virtual auto
-        fetchSetRealNumberParameterValueContents() -> typename SetRealNumberParameterValueContentBuffer::Contents {
+        virtual auto fetchSetRealNumberParameterValueContents()
+        -> decltype(std::declval<SetRealNumberParameterValueContentBuffer>().fetchReceivedContent()) {
             return setRealNumberParameterValueContentBuffer.fetchReceivedContent();
         }
 
         // TODO: test this function
-        virtual auto
-        fetchSetBooleanParameterValueContents() -> typename SetBooleanParameterValueContentBuffer::Contents {
+        virtual auto fetchSetBooleanParameterValueContents()
+        -> decltype(std::declval<SetBooleanParameterValueContentBuffer>().fetchReceivedContent()) {
             return setBooleanParameterValueContentBuffer.fetchReceivedContent();
         }
 
@@ -265,3 +267,4 @@ namespace ServerCommunication {
 }
 
 #endif //SENSORGATEWAY_SERVERCOMMUNICATIONPROTOCOLSTRATEGY_HPP
+

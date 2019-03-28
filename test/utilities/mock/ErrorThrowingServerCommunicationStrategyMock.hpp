@@ -296,7 +296,7 @@ namespace Mock {
             errorToThrow = expectedErrorWhenSendResponseIsCalled();
         }
 
-        GetParameterValueContents fetchGetParameterValueContents() override {
+        std::tuple<size_t, GetParameterValueContents> fetchGetParameterValueContents() override {
             if (hasCloseConnectionBeenCalled()) {
                 // WARNING! This mock implementation of readMessage needs to be slowed down because of the way gtest works. DO NOT REMOVE.
                 std::this_thread::sleep_for(std::chrono::milliseconds(5));
@@ -305,7 +305,7 @@ namespace Mock {
 
             handleThrowConfirmation(&throwOnFetchGetParameterValueContents);
             GetParameterValueContents getParameterValueContents{{" "}};
-            return getParameterValueContents;
+            return std::make_tuple(1, getParameterValueContents);
         }
 
         void openConnection(std::string const& serverAddress) override {
