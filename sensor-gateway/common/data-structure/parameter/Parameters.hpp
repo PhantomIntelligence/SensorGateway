@@ -360,6 +360,8 @@ namespace Sensor {
                 auto payloadIterator = controlMessagePayload.begin();
                 auto numberOfBytesInHeader = header.size();
                 std::copy_n(header.begin(), numberOfBytesInHeader, payloadIterator);
+
+                payloadIterator = controlMessagePayload.begin();
                 for (auto i = 0u; i < numberOfBytesInHeader; ++i) {
                     ++payloadIterator;
                 }
@@ -408,19 +410,17 @@ namespace Sensor {
                 uint16_t address = ((uint16_t*) currentSensorValues.data())[1];
                 bool isOfInterest = type == Definition::commandType &&
                                     address == Definition::internalAddress;
-//                std::cout
-//                        << std::hex
-//                        << "    | " << "-------------------------------" << "\n"
-//                        << "    | " << "#######> Parameter:   " << Name::toString() << "\n"
-//                        << "    | " << "Is of interest: " << isOfInterest << "\n"
-//                        << "    | " << "-------------------------------" << "\n"
-//                        << "    | " << "Settings type: " << static_cast<int>(Definition::commandType) << "\n"
-//                        << "    | " << "Received type: " << static_cast<int>(type) << "\n"
-//                        << "    | " << "Settings address: " << static_cast<int>(Definition::internalAddress) << "\n"
-//                        << "    | " << "Received address: " << static_cast<int>(address) << "\n"
-//                        << "    | " << "-------------------------------" << "\n"
-//                        << std::dec
-//                        << std::endl;
+                std::cout << std::boolalpha
+                        << "    | " << "-------------------------------" << "\n"
+                        << "    | " << "#######> Parameter:   " << Name::toString() << "\n"
+                        << "    | " << "Is of interest: " << isOfInterest << "\n"
+                        << "    | " << "-------------------------------" << "\n"
+                        << "    | " << "Settings type: " << static_cast<int>(Definition::commandType) << "\n"
+                        << "    | " << "Received type: " << static_cast<int>(type) << "\n"
+                        << "    | " << "Settings address: " << static_cast<int>(Definition::internalAddress) << "\n"
+                        << "    | " << "Received address: " << static_cast<int>(address) << "\n"
+                        << "    | " << "-------------------------------" << "\n"
+                        << std::endl;
                 return isOfInterest;
             };
         };
