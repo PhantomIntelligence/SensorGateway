@@ -18,17 +18,66 @@
 #define SENSORGATEWAY_CONSTANTFUNCTIONSDEFINITION_H
 
 namespace {
-    uint16_t flipEndiannessAndCastAsUInt16(uint8_t firstByte, uint8_t secondByte) noexcept {
+    uint16_t castLittleEndianBytesToUInt16InHostEndianness(uint8_t firstByte, uint8_t secondByte) noexcept {
         auto shift = static_cast<uint16_t>(256U);
         uint16_t flippedEndiannessNumber = shift * secondByte + firstByte;
         return flippedEndiannessNumber;
     }
 
-    void flipEndiannessAndCastAsUInt32(uint8_t (& littleEndianBytes)[4], uint32_t* bigEndianResult) noexcept {
+    void castLittleEndianBytesToUInt32InHostEndianness(
+            uint8_t (& littleEndianBytes)[4],
+            uint32_t* bigEndianResult
+    ) noexcept {
         memcpy(bigEndianResult, littleEndianBytes, sizeof *bigEndianResult);
     }
 
-    int16_t flipEndiannessAndCastAsInt16(uint8_t firstByte, uint8_t secondByte) noexcept {
+    inline void insertAsLittleEndian(int16_t value, Byte* output) noexcept {
+        output[0] = static_cast<Byte>(value & 0x00FF);
+        output[1] = static_cast<Byte>((value & 0xFF00) >> 8);
+    }
+
+    inline void insertAsLittleEndian(uint16_t value, Byte* output) noexcept {
+        output[0] = static_cast<Byte>(value & 0x00FF);
+        output[1] = static_cast<Byte>((value & 0xFF00) >> 8);
+    }
+
+    inline void insertAsLittleEndian(int32_t value, Byte* output) noexcept {
+        output[0] = static_cast<Byte>(value & 0x000000FF);
+        output[1] = static_cast<Byte>((value & 0x0000FF00) >> 8);
+        output[2] = static_cast<Byte>((value & 0x00FF0000) >> 16);
+        output[3] = static_cast<Byte>((value & 0xFF000000) >> 24);
+    }
+
+    inline void insertAsLittleEndian(uint32_t value, Byte* output) noexcept {
+        output[0] = static_cast<Byte>(value & 0x000000FF);
+        output[1] = static_cast<Byte>((value & 0x0000FF00) >> 8);
+        output[2] = static_cast<Byte>((value & 0x00FF0000) >> 16);
+        output[3] = static_cast<Byte>((value & 0xFF000000) >> 24);
+    }
+
+    inline void insertAsLittleEndian(int64_t value, Byte* output) noexcept {
+        output[0] = static_cast<Byte>(value & 0x00000000000000FF);
+        output[1] = static_cast<Byte>((value & 0x000000000000FF00) >> 8);
+        output[2] = static_cast<Byte>((value & 0x0000000000FF0000) >> 16);
+        output[3] = static_cast<Byte>((value & 0x00000000FF000000) >> 24);
+        output[4] = static_cast<Byte>((value & 0x000000FF00000000) >> 32);
+        output[5] = static_cast<Byte>((value & 0x0000FF0000000000) >> 40);
+        output[6] = static_cast<Byte>((value & 0x00FF000000000000) >> 48);
+        output[7] = static_cast<Byte>((value & 0xFF00000000000000) >> 56);
+    }
+
+    inline void insertAsLittleEndian(uint64_t value, Byte* output) noexcept {
+        output[0] = static_cast<Byte>(value & 0x00000000000000FF);
+        output[1] = static_cast<Byte>((value & 0x000000000000FF00) >> 8);
+        output[2] = static_cast<Byte>((value & 0x0000000000FF0000) >> 16);
+        output[3] = static_cast<Byte>((value & 0x00000000FF000000) >> 24);
+        output[4] = static_cast<Byte>((value & 0x000000FF00000000) >> 32);
+        output[5] = static_cast<Byte>((value & 0x0000FF0000000000) >> 40);
+        output[6] = static_cast<Byte>((value & 0x00FF000000000000) >> 48);
+        output[7] = static_cast<Byte>((value & 0xFF00000000000000) >> 56);
+    }
+
+    int16_t castLittleEndianBytesToInt16InHostEndianness(uint8_t firstByte, uint8_t secondByte) noexcept {
         auto shift = static_cast<int16_t>(256);
         int16_t signedBigEndianNumber = shift * secondByte + firstByte;
         return signedBigEndianNumber;

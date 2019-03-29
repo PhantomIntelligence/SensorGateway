@@ -18,7 +18,7 @@ TEST_F(ConstantFunctionTest, given_anArray_when_convertingFourBytesToUnsignedBig
     testBytes[3] = 10;
 
     uint32_t computedValue;
-    flipEndiannessAndCastAsUInt32(testBytes, &computedValue);
+    castLittleEndianBytesToUInt32InHostEndianness(testBytes, &computedValue);
 
 
     uint32_t expectedValue = 184496677;
@@ -30,7 +30,7 @@ TEST_F(ConstantFunctionTest,given_twoBytes_when_convertingTwoBytesToUnsignedBigE
     uint8_t firstTestByte = 16;
     uint8_t secondTestByte = 8;
 
-    uint16_t computedValue = flipEndiannessAndCastAsUInt16(firstTestByte, secondTestByte);
+    uint16_t computedValue = castLittleEndianBytesToUInt16InHostEndianness(firstTestByte, secondTestByte);
 
     //08 10 is 2064 in big endian
     uint16_t expectedValue = 2064;
@@ -43,7 +43,7 @@ TEST_F(ConstantFunctionTest,given_twoBytes_when_convertingTwoBytesToSignedBigEnd
     uint8_t firstTestByte = 8;
     uint8_t secondTestByte = 255;
 
-    int16_t computedValue = flipEndiannessAndCastAsInt16(firstTestByte, secondTestByte);
+    int16_t computedValue = castLittleEndianBytesToInt16InHostEndianness(firstTestByte, secondTestByte);
 
     int16_t expectedValue = -248;
 

@@ -101,11 +101,11 @@ namespace DataTranslation {
         using super::currentOutputMessage;
 
         void addTrackInPixel(SensorMessage&& sensorMessage, DataFlow::PixelId pixelId) {
-            DataFlow::TrackId trackId = flipEndiannessAndCastAsUInt16(sensorMessage.data[0],
-                                                                      sensorMessage.data[1]);
+            DataFlow::TrackId trackId = castLittleEndianBytesToUInt16InHostEndianness(sensorMessage.data[0],
+                                                                                      sensorMessage.data[1]);
             DataFlow::ConfidenceLevel confidenceLevel = sensorMessage.data[5];
-            DataFlow::Intensity intensity = flipEndiannessAndCastAsUInt16(sensorMessage.data[6],
-                                                                          sensorMessage.data[7]);
+            DataFlow::Intensity intensity = castLittleEndianBytesToUInt16InHostEndianness(sensorMessage.data[6],
+                                                                                          sensorMessage.data[7]);
             DataFlow::Track track;
             track.id = trackId;
             track.confidenceLevel = confidenceLevel;
@@ -114,10 +114,10 @@ namespace DataTranslation {
         };
 
         void translateEndOfFrameMessage(SensorMessage&& sensorMessage) {
-            DataFlow::MessageId messageId = flipEndiannessAndCastAsUInt16(sensorMessage.data[0],
-                                                                          sensorMessage.data[1]);
-            DataFlow::SensorId sensorId = flipEndiannessAndCastAsUInt16(sensorMessage.data[2],
-                                                                        sensorMessage.data[3]);
+            DataFlow::MessageId messageId = castLittleEndianBytesToUInt16InHostEndianness(sensorMessage.data[0],
+                                                                                          sensorMessage.data[1]);
+            DataFlow::SensorId sensorId = castLittleEndianBytesToUInt16InHostEndianness(sensorMessage.data[2],
+                                                                                        sensorMessage.data[3]);
             currentOutputMessage.sensorId = sensorId;
             currentOutputMessage.messageId = messageId;
             super::MessageSource::produce(std::move(currentOutputMessage));
@@ -125,19 +125,20 @@ namespace DataTranslation {
         }
 
         void translateDetectionTrackMessage(SensorMessage&& sensorMessage) {
-            DataFlow::PixelId pixelId = flipEndiannessAndCastAsUInt16(sensorMessage.data[3],
-                                                                      sensorMessage.data[4]);
+            DataFlow::PixelId pixelId = castLittleEndianBytesToUInt16InHostEndianness(sensorMessage.data[3],
+                                                                                      sensorMessage.data[4]);
             addTrackInPixel(std::move(sensorMessage), pixelId);
         }
 
         void translateDetectionVelocityMessage(SensorMessage&& sensorMessage) {
-            DataFlow::Distance distance = flipEndiannessAndCastAsUInt16(sensorMessage.data[2],
-                                                                        sensorMessage.data[3]);
-            DataFlow::Speed speed = flipEndiannessAndCastAsInt16(sensorMessage.data[4], sensorMessage.data[5]);
-            DataFlow::Acceleration acceleration = flipEndiannessAndCastAsInt16(sensorMessage.data[6],
-                                                                               sensorMessage.data[7]);
-            DataFlow::TrackId trackId = flipEndiannessAndCastAsUInt16(sensorMessage.data[0],
-                                                                      sensorMessage.data[1]);
+            DataFlow::Distance distance = castLittleEndianBytesToUInt16InHostEndianness(sensorMessage.data[2],
+                                                                                        sensorMessage.data[3]);
+            DataFlow::Speed speed = castLittleEndianBytesToInt16InHostEndianness(sensorMessage.data[4],
+                                                                                 sensorMessage.data[5]);
+            DataFlow::Acceleration acceleration = castLittleEndianBytesToInt16InHostEndianness(sensorMessage.data[6],
+                                                                                               sensorMessage.data[7]);
+            DataFlow::TrackId trackId = castLittleEndianBytesToUInt16InHostEndianness(sensorMessage.data[0],
+                                                                                      sensorMessage.data[1]);
             auto track = fetchTrack(trackId);
             track->distance = distance;
             track->speed = speed;

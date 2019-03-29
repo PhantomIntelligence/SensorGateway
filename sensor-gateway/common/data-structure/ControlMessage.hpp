@@ -46,6 +46,7 @@ namespace DataFlow {
 
     public:
 
+
         enum ControlMessageCode {
             NOOP = 0,
             GET_VALUE = 10,
@@ -60,6 +61,7 @@ namespace DataFlow {
 
         using Definitions = ControlMessageDefinition;
         using Payload = typename Definitions::Payload;
+        static constexpr size_t const PAYLOAD_SIZE = std::tuple_size<Payload>::value;
 
         explicit ControlMessage(ControlMessageCode const& commandCode, Payload payload) noexcept :
                 controlMessageCode(commandCode),

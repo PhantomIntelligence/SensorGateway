@@ -87,12 +87,12 @@ namespace DataTranslation {
 
 
         // WARNING! THIS FUNCTION IS NOT TESTED AUTOMATICALLY
-        SensorMessage translateControlMessageToSensorMessageRequest(SensorControlMessage&& sensorControlMessage) override {
+        SensorMessage
+        translateControlMessageToSensorMessageRequest(SensorControlMessage&& sensorControlMessage) override {
             SensorMessage sensorMessage;
             sensorMessage.id = Sensor::AWL::COMMAND_MESSAGE;
             Byte commandByte = translateControlMessageType(&sensorControlMessage);
             sensorMessage.data[0] = commandByte;
-            bool calibration = false;
 
             static constexpr Byte const ALL_PIXELS_MASK = 0xFF;
             static constexpr Byte const NUMBER_OF_FRAMES_FOR_CALIBRATION = 0x64;
@@ -117,17 +117,19 @@ namespace DataTranslation {
                 sensorMessage.data[6] = RESERVED;
                 sensorMessage.data[7] = RESERVED;
             } else {
-                auto payload = sensorControlMessage.getPayload();
+                // Assumed -> direct transfer of payload
+                auto payload = sensorControlMessage.getPayload().data();
+
                 // Command Type
                 sensorMessage.data[1] = payload[1];
-                // Internal address
-                sensorMessage.data[2] = payload[3];
-                sensorMessage.data[3] = payload[2];
+
+                // Address
+                uint16_t responseAddress = ((uint16_t*) payload)[1];
+                insertAsLittleEndian(responseAddress, &sensorMessage.data.data()[2]);
+
                 // Value
-                sensorMessage.data[4] = payload[7];
-                sensorMessage.data[5] = payload[6];
-                sensorMessage.data[6] = payload[5];
-                sensorMessage.data[7] = payload[4];
+                uint32_t responseValue = ((uint32_t*) payload)[1];
+                insertAsLittleEndian(responseValue, &sensorMessage.data.data()[4]);
             }
             sensorMessage.length = std::tuple_size<typename SensorControlMessage::Payload>::value;
             return sensorMessage;
@@ -141,28 +143,38 @@ namespace DataTranslation {
 
         // WARNING! THIS FUNCTION IS NOT TESTED AUTOMATICALLY
         SensorControlMessage translateSensorMessageToControlMessageResult(SensorMessage&& sensorMessage) override {
+            static constexpr Byte const IRRELEVANT = 0x00;
+            static constexpr size_t const size = SensorControlMessage::PAYLOAD_SIZE;
+
+            auto responseData = sensorMessage.data.data();
+            Byte responseControlMessageValues[size];
+
+            // Control code
+            auto code = translateByteToControlCode(responseData[0]);
+            responseControlMessageValues[0] = IRRELEVANT;
+
+            // Command Type
+            Byte responseCommandType = responseData[1];
+            responseControlMessageValues[1] = responseCommandType;
+
+            // Address
+            uint16_t responseAddress = ((uint16_t*) responseData)[1];
+            insertAsLittleEndian(responseAddress, &responseControlMessageValues[2]);
+
+            // Value
+            uint32_t responseValue = ((uint32_t*) responseData)[1];
+            insertAsLittleEndian(responseValue, &responseControlMessageValues[4]);
 
             using Payload = typename SensorControlMessage::Payload;
-
-            auto responseData = sensorMessage.data;
-
-            auto code = translateByteToControlCode(responseData[0]);
-
-            static constexpr Byte const IRRELEVANT = 0x00;
-
             Payload payload{
-                    // Has already been used for Control Code
-                    IRRELEVANT,
-                    // Command Type
-                    responseData[1],
-                    // Address
-                    responseData[3],
-                    responseData[2],
-                    // Value
-                    responseData[7],
-                    responseData[6],
-                    responseData[5],
-                    responseData[4]
+                    responseControlMessageValues[0],
+                    responseControlMessageValues[1],
+                    responseControlMessageValues[2],
+                    responseControlMessageValues[3],
+                    responseControlMessageValues[4],
+                    responseControlMessageValues[5],
+                    responseControlMessageValues[6],
+                    responseControlMessageValues[7]
             };
 
             SensorControlMessage sensorControlMessage(code, payload);
@@ -221,10 +233,10 @@ namespace DataTranslation {
         using super::currentOutputMessage;
 
         void translateEndOfFrameMessage(SensorMessage&& sensorMessage) {
-            DataFlow::MessageId messageId = flipEndiannessAndCastAsUInt16(sensorMessage.data[0],
-                                                                          sensorMessage.data[1]);
-            DataFlow::SensorId sensorId = flipEndiannessAndCastAsUInt16(sensorMessage.data[2],
-                                                                        sensorMessage.data[3]);
+            DataFlow::MessageId messageId = castLittleEndianBytesToUInt16InHostEndianness(sensorMessage.data[0],
+                                                                                          sensorMessage.data[1]);
+            DataFlow::SensorId sensorId = castLittleEndianBytesToUInt16InHostEndianness(sensorMessage.data[2],
+                                                                                        sensorMessage.data[3]);
             currentOutputMessage.messageId = messageId;
             currentOutputMessage.sensorId = sensorId;
             super::MessageSource::produce(std::move(currentOutputMessage));
@@ -232,17 +244,17 @@ namespace DataTranslation {
         }
 
         void translateDetectionTrackMessage(SensorMessage&& sensorMessage) {
-            DataFlow::PixelId pixelId = flipEndiannessAndCastAsUInt16(sensorMessage.data[3],
-                                                                      sensorMessage.data[4]);
+            DataFlow::PixelId pixelId = castLittleEndianBytesToUInt16InHostEndianness(sensorMessage.data[3],
+                                                                                      sensorMessage.data[4]);
             addTrackInPixel(std::move(sensorMessage), pixelId);
         }
 
         void addTrackInPixel(SensorMessage&& sensorMessage, DataFlow::PixelId pixelId) {
-            DataFlow::TrackId const trackId = flipEndiannessAndCastAsUInt16(sensorMessage.data[0],
-                                                                            sensorMessage.data[1]);
+            DataFlow::TrackId const trackId = castLittleEndianBytesToUInt16InHostEndianness(sensorMessage.data[0],
+                                                                                            sensorMessage.data[1]);
             DataFlow::ConfidenceLevel const confidenceLevel = sensorMessage.data[5];
-            DataFlow::Intensity const intensity = flipEndiannessAndCastAsUInt16(sensorMessage.data[6],
-                                                                                sensorMessage.data[7]);
+            DataFlow::Intensity const intensity = castLittleEndianBytesToUInt16InHostEndianness(sensorMessage.data[6],
+                                                                                                sensorMessage.data[7]);
             DataFlow::Track track;
             track.id = trackId;
             track.confidenceLevel = confidenceLevel;
@@ -251,14 +263,15 @@ namespace DataTranslation {
         };
 
         void translateDetectionVelocityMessage(SensorMessage&& sensorMessage) {
-            DataFlow::Distance const distance = flipEndiannessAndCastAsUInt16(sensorMessage.data[2],
-                                                                              sensorMessage.data[3]);
-            DataFlow::Speed const speed = flipEndiannessAndCastAsInt16(sensorMessage.data[4],
-                                                                       sensorMessage.data[5]);
-            DataFlow::Acceleration const acceleration = flipEndiannessAndCastAsInt16(sensorMessage.data[6],
-                                                                                     sensorMessage.data[7]);
-            DataFlow::TrackId const trackId = flipEndiannessAndCastAsUInt16(sensorMessage.data[0],
-                                                                            sensorMessage.data[1]);
+            DataFlow::Distance const distance = castLittleEndianBytesToUInt16InHostEndianness(sensorMessage.data[2],
+                                                                                              sensorMessage.data[3]);
+            DataFlow::Speed const speed = castLittleEndianBytesToInt16InHostEndianness(sensorMessage.data[4],
+                                                                                       sensorMessage.data[5]);
+            DataFlow::Acceleration const acceleration = castLittleEndianBytesToInt16InHostEndianness(
+                    sensorMessage.data[6],
+                    sensorMessage.data[7]);
+            DataFlow::TrackId const trackId = castLittleEndianBytesToUInt16InHostEndianness(sensorMessage.data[0],
+                                                                                            sensorMessage.data[1]);
             auto track = fetchTrack(trackId);
             track->distance = distance / ConversionUnits::NUMBER_OF_CENTIMETERS_IN_A_METER;
             track->speed = speed / ConversionUnits::NUMBER_OF_CENTIMETERS_IN_A_METER;

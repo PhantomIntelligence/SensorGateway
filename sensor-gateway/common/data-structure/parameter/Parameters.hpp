@@ -22,13 +22,90 @@
 namespace Sensor {
     namespace Gateway {
 
-        struct ParameterMetadata {
+        class ParameterMetadata {
+        public:
+            ParameterMetadata(std::string const& name, std::string const& unit) : name(name), unit(unit) {}
+
+            ~ParameterMetadata() noexcept {}
+
+            ParameterMetadata(ParameterMetadata const& other) :
+                    name(other.name),
+                    unit(other.unit) {}
+
+            ParameterMetadata(ParameterMetadata&& other) noexcept :
+                    name(std::move(other.name)),
+                    unit(std::move(other.unit)) {}
+
+            ParameterMetadata& operator=(ParameterMetadata const& other)& {
+                ParameterMetadata temporary(other);
+                swap(*this, temporary);
+                return *this;
+            }
+
+            ParameterMetadata& operator=(ParameterMetadata&& other)& noexcept {
+                swap(*this, other);
+                return *this;
+            }
+
+            static void swap(ParameterMetadata& current, ParameterMetadata& other) noexcept {
+                std::swap(current.name, other.name);
+                std::swap(current.unit, other.unit);
+            }
+
             std::string name;
             std::string unit;
         };
 
-        struct ParameterInfoForBulkSet {
-            bool isOfInterest = false;
+        class ParameterInfoForBulkSet {
+        public:
+
+            explicit ParameterInfoForBulkSet(bool const isOfInterest,
+                                             std::string const& name,
+                                             std::string const& unit,
+                                             size_t const valueOffsetInBits,
+                                             size_t const valueLengthInBits)
+                    : isOfInterest(isOfInterest),
+                      name(name),
+                      unit(unit),
+                      valueOffsetInBits(valueOffsetInBits),
+                      valueLengthInBits(valueLengthInBits) {}
+
+            ~ParameterInfoForBulkSet() noexcept {}
+
+            ParameterInfoForBulkSet(ParameterInfoForBulkSet const& other) :
+                    isOfInterest(other.isOfInterest),
+                    name(other.name),
+                    unit(other.unit),
+                    valueOffsetInBits(other.valueOffsetInBits),
+                    valueLengthInBits(other.valueLengthInBits) {}
+
+            ParameterInfoForBulkSet(ParameterInfoForBulkSet&& other) noexcept :
+                    isOfInterest(std::move(other.isOfInterest)),
+                    name(std::move(other.name)),
+                    unit(std::move(other.unit)),
+                    valueOffsetInBits(std::move(other.valueOffsetInBits)),
+                    valueLengthInBits(std::move(other.valueLengthInBits)) {}
+
+            ParameterInfoForBulkSet& operator=(ParameterInfoForBulkSet const& other)& {
+                ParameterInfoForBulkSet temporary(other);
+                swap(*this, temporary);
+                return *this;
+            }
+
+            ParameterInfoForBulkSet& operator=(ParameterInfoForBulkSet&& other)& noexcept {
+                swap(*this, other);
+                return *this;
+            }
+
+            static void swap(ParameterInfoForBulkSet& current, ParameterInfoForBulkSet& other) noexcept {
+                std::swap(current.isOfInterest, other.isOfInterest);
+                std::swap(current.name, other.name);
+                std::swap(current.unit, other.unit);
+                std::swap(current.valueOffsetInBits, other.valueOffsetInBits);
+                std::swap(current.valueLengthInBits, other.valueLengthInBits);
+            }
+
+            bool isOfInterest;
             std::string name;
             std::string unit;
             size_t valueOffsetInBits;
@@ -76,11 +153,58 @@ namespace ParameterValueStatus {
             BooleanValue
     >;
 
-    struct ParameterResponseStatus {
-        bool receivedError = false;
-        bool receivedResponse = false;
-        Sensor::Gateway::ParameterMetadata metadata = {.name = "", .unit=""};
-        RequestedValue receivedValue = std::make_tuple(false, 0, false, 0, false, 0.0, false, false);
+    class ParameterResponseStatus {
+    public:
+        explicit ParameterResponseStatus(bool const receivedError = false,
+                                         bool const receivedResponse = false,
+                                         ParameterMetadata const& metadata = ParameterMetadata("", ""),
+                                         RequestedValue const receivedValue = std::make_tuple(false, 0,
+                                                                                              false, 0,
+                                                                                              false, 0.0,
+                                                                                              false, false)
+        )
+                : receivedError(receivedError),
+                  receivedResponse(receivedResponse),
+                  metadata(metadata),
+                  receivedValue(receivedValue) {}
+
+
+        ~ParameterResponseStatus() noexcept {}
+
+        ParameterResponseStatus(ParameterResponseStatus const& other) :
+                receivedError(other.receivedError),
+                receivedResponse(other.receivedResponse),
+                metadata(other.metadata),
+                receivedValue(other.receivedValue) {}
+
+        ParameterResponseStatus(ParameterResponseStatus&& other) noexcept :
+                receivedError(std::move(other.receivedError)),
+                receivedResponse(std::move(other.receivedResponse)),
+                metadata(std::move(other.metadata)),
+                receivedValue(std::move(other.receivedValue)) {}
+
+        ParameterResponseStatus& operator=(ParameterResponseStatus const& other)& {
+            ParameterResponseStatus temporary(other);
+            swap(*this, temporary);
+            return *this;
+        }
+
+        ParameterResponseStatus& operator=(ParameterResponseStatus&& other)& noexcept {
+            swap(*this, other);
+            return *this;
+        }
+
+        static void swap(ParameterResponseStatus& current, ParameterResponseStatus& other) noexcept {
+            std::swap(current.receivedError, other.receivedError);
+            std::swap(current.receivedResponse, other.receivedResponse);
+            std::swap(current.metadata, other.metadata);
+            std::swap(current.receivedValue, other.receivedValue);
+        }
+
+        bool receivedError;
+        bool receivedResponse;
+        Sensor::Gateway::ParameterMetadata metadata;
+        RequestedValue receivedValue;
     };
 }
 
@@ -222,7 +346,10 @@ namespace Sensor {
             }
 
             auto extractMetadata() const noexcept -> ParameterMetadata {
-                return {.name = getStringifiedName(), .unit = getStringifiedUnit()};
+                return ParameterMetadata(
+                        getStringifiedName(),
+                        getStringifiedUnit()
+                );
             }
 
             auto createGetParameterValueControlMessagePayload() const noexcept -> ControlMessagePayload {
@@ -243,13 +370,13 @@ namespace Sensor {
             auto fetchParameterInfoForBulkSet(ControlMessagePayload const& currentSensorValues) const noexcept
             -> ParameterInfoForBulkSet {
                 bool ofInterest = isOfInterest(currentSensorValues);
-                ParameterInfoForBulkSet info{
-                        .isOfInterest = ofInterest,
-                        .name = Name::toString(),
-                        .unit = Unit::toString(),
-                        .valueOffsetInBits = Definition::valueOffsetInBits,
-                        .valueLengthInBits = Definition::valueLengthInBits
-                };
+                ParameterInfoForBulkSet info(
+                        ofInterest,
+                        Name::toString(),
+                        Unit::toString(),
+                        Definition::valueOffsetInBits,
+                        Definition::valueLengthInBits
+                );
                 return info;
             };
 
@@ -277,23 +404,23 @@ namespace Sensor {
             }
 
             auto isOfInterest(ControlMessagePayload const& currentSensorValues) const noexcept -> bool {
-                Byte type = currentSensorValues[1];
+                Byte type = (Byte) currentSensorValues[1];
                 uint16_t address = ((uint16_t*) currentSensorValues.data())[1];
                 bool isOfInterest = type == Definition::commandType &&
                                     address == Definition::internalAddress;
-                std::cout
-                        << "\n" << std::boolalpha
-                        << "    | " << "-------------------------------" << "\n"
-                        << "    | " << "-------------------------------" << "\n"
-                        << "    | " << "#######> Parameter:   " << Name::toString() << "\n"
-                        << "    | " << "Is of interest: " << isOfInterest << "\n"
-                        << "    | " << "-------------------------------" << "\n"
-                        << "    | " << "Settings type: " << Definition::commandType << "\n"
-                        << "    | " << "Received type: " << type << "\n"
-                        << "    | " << "Settings address: " << Definition::internalAddress << "\n"
-                        << "    | " << "Settings address: " << address << "\n"
-                        << "    | " << "-------------------------------" << "\n"
-                        << std::endl;
+//                std::cout
+//                        << std::hex
+//                        << "    | " << "-------------------------------" << "\n"
+//                        << "    | " << "#######> Parameter:   " << Name::toString() << "\n"
+//                        << "    | " << "Is of interest: " << isOfInterest << "\n"
+//                        << "    | " << "-------------------------------" << "\n"
+//                        << "    | " << "Settings type: " << static_cast<int>(Definition::commandType) << "\n"
+//                        << "    | " << "Received type: " << static_cast<int>(type) << "\n"
+//                        << "    | " << "Settings address: " << static_cast<int>(Definition::internalAddress) << "\n"
+//                        << "    | " << "Received address: " << static_cast<int>(address) << "\n"
+//                        << "    | " << "-------------------------------" << "\n"
+//                        << std::dec
+//                        << std::endl;
                 return isOfInterest;
             };
         };
@@ -360,14 +487,14 @@ namespace Sensor {
                                     static_cast<Byte>(
                                             BitSetByte(
                                                     std::string(
-                                                            std::to_string(bitsetValue[8 * Indices + 0]) +
-                                                            std::to_string(bitsetValue[8 * Indices + 1]) +
-                                                            std::to_string(bitsetValue[8 * Indices + 2]) +
-                                                            std::to_string(bitsetValue[8 * Indices + 3]) +
-                                                            std::to_string(bitsetValue[8 * Indices + 4]) +
-                                                            std::to_string(bitsetValue[8 * Indices + 5]) +
+                                                            std::to_string(bitsetValue[8 * Indices + 7]) +
                                                             std::to_string(bitsetValue[8 * Indices + 6]) +
-                                                            std::to_string(bitsetValue[8 * Indices + 7])
+                                                            std::to_string(bitsetValue[8 * Indices + 5]) +
+                                                            std::to_string(bitsetValue[8 * Indices + 4]) +
+                                                            std::to_string(bitsetValue[8 * Indices + 3]) +
+                                                            std::to_string(bitsetValue[8 * Indices + 2]) +
+                                                            std::to_string(bitsetValue[8 * Indices + 1]) +
+                                                            std::to_string(bitsetValue[8 * Indices + 0])
                                                     )
                                             )
                                                     .to_ullong()
@@ -420,15 +547,23 @@ namespace Sensor {
                 std::array<ParameterInfoForBulkSet, NUMBER_OF_AVAILABLE_PARAMETERS> allParametersInfoForBulkSet =
                         fetchAllParameterInfoForBulkSet(currentSensorValues);
 
-                for (auto& info : allParametersInfoForBulkSet) {
+                for (auto parameterInfoIterator = allParametersInfoForBulkSet.begin();
+                     parameterInfoIterator != allParametersInfoForBulkSet.end();
+                     ++parameterInfoIterator) {
+//                    for (auto const& info  : allParametersInfoForBulkSet) {
+                    auto info = *parameterInfoIterator;
                     if (info.isOfInterest) {
                         auto parameterName = info.name;
-                        ParameterResponseStatus errorStatus{
-                                .receivedError = true,
-                                .receivedResponse = false,
-                                .metadata = ParameterMetadata{.name = info.name, .unit = info.unit}
-                        };
-                        (*parameterResponseStatuses)[parameterName] = errorStatus;
+                        ParameterResponseStatus errorStatus(
+                                true,
+                                false,
+                                ParameterMetadata(info.name, info.unit),
+                                std::make_tuple(false, 0u,
+                                                false, 0,
+                                                false, 0.0,
+                                                false, false)
+                        );
+                        parameterResponseStatuses->operator[](parameterName) = errorStatus;
                     }
                 }
             }
@@ -449,7 +584,7 @@ namespace Sensor {
             -> std::tuple<bool, bool, SensorControlMessage> {
                 bool hasToSendResponseToServer = false;
                 bool hasToSendControlMessageToSensor = false;
-                ControlMessagePayload currentSensorValues = receivedSensorControlMessage.getPayloadCopy();
+                ControlMessagePayload currentSensorValues = receivedSensorControlMessage.getPayload();
 
                 std::array<ParameterInfoForBulkSet, NUMBER_OF_AVAILABLE_PARAMETERS> allParametersInfoForBulkSet =
                         fetchAllParameterInfoForBulkSet(currentSensorValues);
@@ -462,11 +597,15 @@ namespace Sensor {
                         currentSensorValues[7]
                 };
                 auto payloadInBitSet = toBitSet(valuePayload);
-                for (auto const& info  : allParametersInfoForBulkSet) {
+                for (auto parameterInfoIterator = allParametersInfoForBulkSet.begin();
+                     parameterInfoIterator != allParametersInfoForBulkSet.end();
+                     ++parameterInfoIterator) {
+//                    for (auto const& info  : allParametersInfoForBulkSet) {
+                    auto info = *parameterInfoIterator;
 
                     using BitSet = std::bitset<32>; // max size for AWL
 
-                    if (info.isOfInterest) {
+                    if (info.isOfInterest == true) {
 
                         auto name = info.name;
                         size_t const valueLengthInBits{info.valueLengthInBits};
@@ -514,12 +653,12 @@ namespace Sensor {
                             );
 
 
-                            (*parameterResponseStatuses)[name] = ParameterResponseStatus{
-                                    .receivedError = false,
-                                    .receivedResponse = true,
-                                    .metadata = ParameterMetadata{.name = name, .unit = info.unit},
-                                    .receivedValue = parameterValue
-                            };
+                            parameterResponseStatuses->operator[](name) = ParameterResponseStatus(
+                                    false,
+                                    true,
+                                    ParameterMetadata(name, info.unit),
+                                    parameterValue
+                            );
                         }
 
                         // IMPORTANT!! check that a GET value was received for this parameter BEFORE checking if a SET value was received
