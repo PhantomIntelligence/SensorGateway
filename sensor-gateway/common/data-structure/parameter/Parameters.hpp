@@ -428,7 +428,7 @@ namespace Sensor {
                                 .receivedResponse = false,
                                 .metadata = ParameterMetadata{.name = info.name, .unit = info.unit}
                         };
-                        parameterResponseStatuses->at(parameterName) = errorStatus;
+                        (*parameterResponseStatuses)[parameterName] = errorStatus;
                     }
                 }
             }
@@ -514,7 +514,7 @@ namespace Sensor {
                             );
 
 
-                            parameterResponseStatuses->at(name) = ParameterResponseStatus{
+                            (*parameterResponseStatuses)[name] = ParameterResponseStatus{
                                     .receivedError = false,
                                     .receivedResponse = true,
                                     .metadata = ParameterMetadata{.name = name, .unit = info.unit},
@@ -660,7 +660,8 @@ namespace Sensor {
                 return getParameterValueControlMessages;
             }
 
-            constexpr auto fetchAllParameterInfoForBulkSet(ControlMessagePayload const& currentSensorValues) const noexcept {
+            constexpr auto
+            fetchAllParameterInfoForBulkSet(ControlMessagePayload const& currentSensorValues) const noexcept {
                 auto allParameterInfoForBulkSet = index_apply<NUMBER_OF_AVAILABLE_PARAMETERS>(
                         [&](auto... Indices) {
                             return std::array<ParameterInfoForBulkSet, NUMBER_OF_AVAILABLE_PARAMETERS>{
@@ -678,3 +679,4 @@ namespace Sensor {
 }
 
 #endif //SENSORGATEWAY_PARAMETERS_HPP
+

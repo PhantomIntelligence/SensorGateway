@@ -278,7 +278,7 @@ namespace SensorAccessLinkElement {
 
         template<typename T>
         void addRequestedSetValue(ParameterName const& parameterName, T&& requestedValue) {
-            requestedParameterSetValues.at(parameterName) = createRequestedValue(requestedValue);
+            requestedParameterSetValues[parameterName] = createRequestedValue(requestedValue);
         }
 
         static constexpr auto createRequestedValue(UnsignedInteger value) noexcept -> RequestedValue {
